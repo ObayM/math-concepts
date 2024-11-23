@@ -1,0 +1,36 @@
+create table courses (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  created_at timestamptz default now()
+);
+
+create table lessons (
+  id uuid primary key default gen_random_uuid(),
+
+  course_id uuid references courses(id) on delete cascade,
+
+  lesson_key text unique not null
+  data jsonb not null,
+  
+  created_at timestamptz default now()
+);
+
+create table user_daily_activity (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  activity_date date not null,
+  created_at timestamp default now(),
+  unique(user_id, activity_date)
+);
+
+create table user_lesson_progress (
+  user_id uuid references auth.users(id) on delete cascade,
+  lesson_id uuid references lessons(id) on delete cascade,
+
+  completed boolean default false,
+  completed_at timestamp with time zone,
+
+  primary key (user_id, lesson_id)
+);
+
