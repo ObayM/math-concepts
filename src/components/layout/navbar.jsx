@@ -10,8 +10,8 @@ export default function Navbar() {
         <nav className="flex">
           <ul className="flex items-center space-x-8 text-sm font-semibold text-gray-600">
             <li>
-              <Link href="/lessons" className="hover:text-blue-600 transition-colors">
-                Lessons
+              <Link href="/courses" className="hover:text-blue-600 transition-colors">
+                Courses
               </Link>
             </li>
           </ul>
