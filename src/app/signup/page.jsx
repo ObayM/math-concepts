@@ -43,7 +43,7 @@ export default function SignupPage() {
 
   if (user) return redirect("/");
   return (
-    <main className="flex items-center justify-center min-h-screen px-4 ">
+    <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4 ">
       <div 
         className="w-full max-w-md p-6 space-y-6 bg-white border rounded-2xl shadow-xl border-neutral-200/70 sm:p-8"
 

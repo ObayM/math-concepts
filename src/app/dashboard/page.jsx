@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 import { 
   FiPlayCircle, 
@@ -35,7 +36,8 @@ const itemVariants = {
 
 
 const HomePage = () => {
-  const firstName = "Obay";
+  const {user, profile} = useAuth()
+
   const currentCourse = {
     title: "Math Basics",
   };
@@ -49,7 +51,7 @@ const HomePage = () => {
           initial="hidden"
           animate="visible"
         >
-          <WelcomeHeader name={firstName} />
+        <WelcomeHeader name={profile?.username} />
           <CurrentCourseCard course={currentCourse} />
         <RecommendedLessons lessons={lessonsData.slice(-3)} />
         </motion.div>
