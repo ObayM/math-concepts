@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/components/auth/AuthProvider';
-
+import Link from 'next/link';
 import { 
   FiPlayCircle, 
   FiArrowRight,
@@ -43,7 +43,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-slate-100 min-h-[calc(100vh-64px)]">
+    <div className="bg-linear-to-b from-sky-50 via-blue-100 to-amber-50 min-h-[calc(100vh-73px)]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div 
           className="space-y-12"
@@ -53,7 +53,7 @@ const HomePage = () => {
         >
         <WelcomeHeader name={profile?.username} />
           <CurrentCourseCard course={currentCourse} />
-        <RecommendedLessons lessons={lessonsData.slice(-3)} />
+        <RecommendedLessons lessons={lessonsData.slice(0,3)} />
         </motion.div>
       </div>
     </div>
@@ -66,7 +66,7 @@ const WelcomeHeader = ({ name }) => (
     <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
       Welcome back, <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-sky-600">{name}!</span>
     </h1>
-    <p className="mt-2 text-lg text-gray-500">Ready to continue your learning journey?</p>
+    <p className="mt-2 text-lg text-gray-500">Ready to continue your space adventures ?</p>
   </motion.div>
 );
 
@@ -80,11 +80,11 @@ const CurrentCourseCard = ({ course }) => (
       <h2 className="text-4xl font-bold mt-2">{course.title}</h2>
 
 
-      <button className="mt-10 flex items-center space-x-3 bg-white text-blue-700 font-bold px-8 py-3 rounded-xl shadow-lg
+      <Link href={'/courses/algebra'} className="mt-10 max-w-62 flex items-center space-x-3 bg-white text-blue-700 font-bold px-8 py-3 rounded-xl shadow-lg
        hover:bg-slate-100 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
         <FiPlayCircle size={22} />
         <span>Continue Learning</span>
-      </button>
+      </Link>
     </div>
     
 
@@ -111,13 +111,13 @@ const LessonItemCard = ({ lesson }) => (
   >
     <div className="flex items-start justify-between">
         
-        <p className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">{lesson.category}</p>
+        <p className="text-xs text-neutral-800 bg-green-100 px-2 py-1 rounded-full">{lesson.category}</p>
     </div>
     <h4 className="text-lg font-bold text-gray-800 mt-4">{lesson.title}</h4>
-    <div className="mt-6 flex items-center justify-between text-blue-600 font-semibold">
+    <Link href={`/courses/algebra/${lesson.id}`} className="mt-6 flex items-center justify-between text-blue-600 font-semibold">
       <span>Start Lesson</span>
       <FiArrowRight className="opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
-    </div>
+    </Link>
   </motion.div>
 );
 

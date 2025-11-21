@@ -3,64 +3,79 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateFunctionData, ProgressBar, Navigation, LessonStep } from '../shared';
 
-
 export const lessonSteps = [
     { 
-        title: "Welcome to Functions!", 
-        content: "Ever wonder how your GPS finds the fastest route or how a video game knows how a character should jump? It's all powered by **functions**. Think of a function as a simple machine: you put a number in, and it spits a new number out. Our mission is to figure out the two big 'rules' for any function: its **Domain** (what can go in) and its **Range** (what can come out)." 
+        title: "Welcome to Galactic Functions!", 
+        content: "Strap in, boy! Ever wonder how a spacecraft computes its landing path or how a rover knows exactly where to drive on Mars? It's all powered by **functions**. Think of a function as a control panel on your ship: you input one number, and it outputs another. Our mission today is to master the two big rules every function-computer follows: its **Domain** (what values are allowed to go in) and its **Range** (what values can come out)." 
     },
     { 
-        title: "The 'Plus 2' Machine", 
-        content: "Let's meet our first function machine: `f(x) = x + 2`. Its rule is super simple: whatever number you put in for `x`, it just adds 2. Pop a 5 in, get a 7 out. Easy, right? Give it a try.",
+        title: "The 'Plus 2' Thruster", 
+        content: "Meet your first system: `f(x) = x + 2`. This thruster module simply takes your input fuel value and boosts it by 2 units. Input a power level of 5, and your thruster outputs 7. Smooth flight! Give it a test run.",
         interactive: { type: 'machine', func: x => x + 2 } 
     },
     { 
-        title: "Seeing the Machine at Work", 
-        content: "Okay, but what does a function *look* like? We can plot it on a graph. The X-axis (the flat one) is for our inputs, and the Y-axis (the tall one) is for the outputs. Let's graph our `f(x) = x + 2` machine. Drag the slider to see how the output `y` changes for every input `x`.", 
+        title: "Plotting the Flight Path", 
+        content: "But what does this thruster's behavior **look** like in space? We can chart its trajectory. The X-axis is your input (fuel level), and the Y-axis is your output (thrust). Let’s graph `f(x) = x + 2`. Slide through values and watch how your output changes across the flight path.", 
         interactive: { type: 'graph', func: x => x + 2, domain: [-10, 10], initialX: 3 } 
     },
     { 
-        title: "The Domain: Allowed Inputs", 
-        content: "So, what numbers are we *allowed* to put into our `f(x) = x + 2` machine? Turns out, you can plug in any number you can think of—positive, negative, zero, anything! This complete list of allowed inputs is called the **Domain**. For this function, the domain is 'all real numbers', which is just a fancy way of writing `(-∞, ∞)`.", 
+        title: "The Domain: Safe Input Zones", 
+        content: "When entering values into your thruster, what numbers are actually **allowed**? For `f(x) = x + 2`, any real number works—positive, negative, zero, cosmic dust, anything! This complete set of allowable inputs is the **Domain**. In this case, it's all real numbers, which astronomers write as `(-∞, ∞)`.", 
         interactive: { type: 'graph', func: x => x + 2, domain: [-10, 10], initialX: 0, highlight: 'domain' } 
     },
     { 
-        title: "The Range: Possible Outputs", 
-        content: "If the Domain is what can go *in*, then the **Range** is everything that can possibly come *out*. Since our `f(x) = x + 2` machine can take any input, it can also spit out any output. See how the point can go up and down forever? Its Range is also 'all real numbers', or `(-∞, ∞)`.", 
+        title: "The Range: Possible Output Levels", 
+        content: "If the Domain is what can enter the thruster, the **Range** is all the thrust levels that can come out. Since the input can be anything, the output can be anything too—your ship can accelerate to any height in the graph. The Range is also `(-∞, ∞)`.", 
         interactive: { type: 'graph', func: x => x + 2, domain: [-10, 10], initialX: 0, highlight: 'range' } 
     },
     { 
-        title: "Rule #1: Don't Divide by Zero", 
-        content: "Now for a function with a big, important rule. What's the one thing you can absolutely never do in math? **You can't divide by zero!** It breaks everything. Let's look at `f(x) = 1/x`. See what happens when you try to make the input `x` equal to 0.", 
+        title: "Rule #1: The Black Hole of Division by Zero", 
+        content: "Time to examine a more dangerous system. In the galaxy of mathematics, there's one thing you absolutely never want your ship's computer to do: **divide by zero**. It’s like flying straight into a black hole—everything breaks! Take a look at `f(x) = 1/x`. Watch what happens as your input approaches 0.", 
         interactive: { type: 'graph', func: x => 1 / x, domain: [-5, 5], initialX: 2, asymptote: 0 } 
     },
     { 
-        title: "Handling a Restriction", 
-        content: "Our `f(x) = 1/x` machine will break if we feed it a zero. So, its Domain is every single number *except* 0. Notice how the graph gets super close to that vertical line at `x=0` but never actually touches it? That 'electric fence' line is called an **asymptote**. We write this domain as `(-∞, 0) U (0, ∞)`.", 
+        title: "Avoiding the Zero Singularity", 
+        content: "The function `f(x) = 1/x` crashes if your input hits zero. That means its Domain is every number *except* 0. Notice how the graph approaches that vertical danger line at `x = 0` but never touches it? That's an **asymptote**, like a gravitational barrier your ship can’t cross. The domain is `(-∞, 0) U (0, ∞)`.", 
     },
     { 
-        title: "Your Turn! Find the Broken Spot", 
-        content: "You've got this. Look at the function `f(x) = 5 / (x - 3)`. What one value for `x` would make you divide by zero?", 
-        interactive: { type: 'quiz', question: 'What is the domain of f(x) = 5 / (x - 3)?',
-        options: ['All real numbers', 'All real numbers except x = 3', 'All real numbers except x = 5', 'x > 3'], correctAnswer: 'All real numbers except x = 3', hint: 'The bottom part is (x - 3). What would x have to be to make that equal 0?' } 
+        title: "Your Turn, Pilot! Identify the Danger Zone", 
+        content: "You’ve got the controls now. For the function `f(x) = 5 / (x - 3)`, which input would pull you into the zero singularity? (Hint: what makes the denominator zero?)", 
+        interactive: { 
+            type: 'quiz', 
+            question: 'What is the domain of f(x) = 5 / (x - 3)?',
+            options: [
+                'All real numbers', 
+                'All real numbers except x = 3', 
+                'All real numbers except x = 5', 
+                'x > 3'
+            ], 
+            correctAnswer: 'All real numbers except x = 3', 
+            hint: 'The bottom part is (x - 3). What would x have to be to make that equal 0?' 
+        } 
     },
     { 
-        title: "Rule #2: No Negative Square Roots", 
-        content: "Alright, division by zero is one math-breaker. Here's the other big one: **you can't take the square root of a negative number** (not with real numbers, anyway!). Let's check out `f(x) = √x`. Drag the slider into the negative zone and see what happens to the graph.", 
+        title: "Rule #2: No Imaginary Fuel (Negative Square Roots)", 
+        content: "Here’s another key system limitation: your ship's real-number computer **cannot process the square root of a negative number**. That’s imaginary-fuel territory—only complex-number ships can handle that! Try `f(x) = √x` and slide into the negative zone. See how the graph disappears?", 
         interactive: { type: 'graph', func: x => Math.sqrt(x), domain: [-5, 10], initialX: 4 } 
     },
     { 
-        title: "Domain of a Square Root", 
-        content: "As you can see, the graph just... stops. It doesn't exist for negative x-values. For `f(x) = √x`, the input must be zero or positive. So, its **Domain** is `[0, ∞)`. The square bracket `[` means that 0 is included! Since the inputs are never negative, the outputs won't be either. The **Range** is also `[0, ∞)`.", 
+        title: "Domain of the Square-Root Scanner", 
+        content: "Since the square-root scanner can only process values that are zero or greater, the Domain of `f(x) = √x` is `[0, ∞)`. And because outputs can’t go negative either, the Range is also `[0, ∞)`.", 
     },
     { 
-        title: "Putting It All Together", 
-        content: "Ready for a challenge? For the function `f(x) = √(x - 2)`, what's the smallest number `x` can be? Remember, the stuff inside the square root can't be negative.", 
-        interactive: { type: 'quiz', question: 'What is the domain of f(x) = √(x - 2)?', options: ['(-∞, 2)', '(-∞, 2]', '(2, ∞)', '[2, ∞)'], correctAnswer: '[2, ∞)', hint: 'We need to make sure that (x - 2) is 0 or bigger. So, we need to solve x - 2 ≥ 0.' } 
+        title: "Mission Challenge: Check the Scanner Limits", 
+        content: "Final mission! For the function `f(x) = √(x - 2)`, what is the smallest value `x` can be? Remember, the inside of the square root must stay non-negative to avoid system failure.", 
+        interactive: { 
+            type: 'quiz', 
+            question: 'What is the domain of f(x) = √(x - 2)?', 
+            options: ['(-∞, 2)', '(-∞, 2]', '(2, ∞)', '[2, ∞)'], 
+            correctAnswer: '[2, ∞)', 
+            hint: 'We need (x - 2) to be 0 or greater. Solve x - 2 ≥ 0.' 
+        } 
     },
     { 
-        title: "You Did It!", 
-        content: "And that's a wrap! Great job. You now know the two biggest 'look-out' rules for functions: no dividing by zero and no negative square roots. That's a massive skill to have as you tackle more math. Keep it up!" 
+        title: "Mission Complete!", 
+        content: "Cool work, explorer! You’ve mastered the two important laws of galactic functions: never divide by zero, and never take the square root of a negative number (unless you’re flying an imaginary-number cruiser). Your ship’s computer is now certified for deep-space calculations. Onward to the next mission!" 
     }
 ];
 

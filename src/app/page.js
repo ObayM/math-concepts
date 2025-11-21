@@ -1,8 +1,14 @@
+'use client';
+
+import { useAuth } from "@/components/auth/AuthProvider";
 import Link from "next/link";
 
 export default function Home() {
+
+   const {user} = useAuth()
+
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-linear-to-b from-cyan-50 to-amber-50 text-neutral-800">
+    <div className="min-h-[calc(100vh-73px)] bg-linear-to-b from-cyan-50 to-amber-50 text-neutral-800">
       <main className="container mx-auto px-6">
         <section className="flex flex-col items-center justify-center text-center py-32 md:py-40">
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
@@ -11,12 +17,23 @@ export default function Home() {
               <p className="text-lg text-gray-600 mb-10 max-w-2xl">
                 Explore interactive lessons that make math cool and fun and see the concepts come to life!
               </p>
+              {user? (
               <Link
-                href="/lessons"
+                href="/dashboard"
+                className="bg-blue-700 text-white px-8 py-3 rounded-sm text-lg hover:scale-105 transition-all duration-300 ease-in-out"
+              >
+                Continue Learning
+              </Link>
+              ):(
+
+                <Link
+                href="/signup"
                 className="bg-blue-700 text-white px-8 py-3 rounded-sm text-lg hover:scale-105 transition-all duration-300 ease-in-out"
               >
                 Start Learning
               </Link>
+              )}
+             
             </section>
       </main>
     </div>

@@ -4,7 +4,7 @@ import { BookOpen } from 'lucide-react';
 
 export default function CoursesPage() {
   return (
-    <div className="flex flex-col min-h-[calc(100vh-65px)] bg-slate-100 font-sans text-gray-800">
+    <div className="flex flex-col min-h-[calc(100vh-73px)] bg-sky-50 text-gray-800">
       
       <main className="grow container mx-auto px-6 py-16">
 

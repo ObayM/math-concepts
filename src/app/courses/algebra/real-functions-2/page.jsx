@@ -3,53 +3,54 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, easeInOut } from 'framer-motion';
 import { generateFunctionData, ProgressBar, Navigation, LessonStep } from '../shared';
 
-const lessonSteps = [
+export const lessonSteps = [
     { 
-        title: "Going Uphill or Downhill?", 
-        content: "Imagine walking along the path of a function's graph from **left to right**. Are you going uphill, downhill, or is the path flat? This simple idea is the key to understanding **monotonicity**! It's the term we use to describe where a function is increasing, decreasing, or constant." 
+        title: "Navigating Cosmic Paths", 
+        content: "Imagine piloting your spacecraft along the trajectory of a function's graph from **left to right** across the galaxy. Are you climbing to orbit, descending into a planet’s gravity well, or cruising along flat space? This idea is key to understanding **monotonicity**—it tells us where a function (your flight path) is increasing, decreasing, or constant." 
     },
     { 
-        title: "Strictly Increasing Functions", 
-        content: "An **increasing** function is one where you're always going uphill as you move from left to right. In math terms, as the `x`-value gets bigger, the `y`-value *also* gets bigger. Look at the function `f(x) = 2x + 1`. No matter where you are on the graph, you're always moving up!",
+        title: "Ascending Functions: Climbing to Orbit", 
+        content: "An **increasing** function is like a spacecraft always climbing higher as it travels forward. In math terms, as the `x`-value increases, the `y`-value also rises. Check out `f(x) = 2x + 1`. No matter where you are on the graph, your ship is always ascending!", 
         interactive: { type: 'graph', func: x => 2 * x + 1, domain: [-5, 5], initialX: -2 } 
     },
     { 
-        title: "Strictly Decreasing Functions", 
-        content: "A **decreasing** function is the opposite: you're always going downhill. As the `x`-value gets bigger, the `y`-value gets *smaller*. The function `f(x) = -x + 3` is a perfect example. It's a constant downhill journey.",
+        title: "Descending Functions: Gravity Wells", 
+        content: "A **decreasing** function is the opposite: your spacecraft is descending as you move forward. As `x` increases, `y` decreases. The function `f(x) = -x + 3` represents a smooth descent into a gravity well. Steady downhill flight!", 
         interactive: { type: 'graph', func: x => -x + 3, domain: [-5, 5], initialX: -3 } 
     },
     { 
-        title: "Doing Both: Non-Monotonic Functions", 
-        content: "What about a function like a parabola, `f(x) = x²`? It goes downhill for a while, then turns around and goes uphill! A function that isn't *always* increasing or *always* decreasing is called **non-monotonic**. However, we can describe its behavior on specific sections, or **intervals**.",
+        title: "Twists in the Trajectory: Non-Monotonic Functions", 
+        content: "Some flight paths twist through space. For example, `f(x) = x²` descends at first, then loops around and climbs! A function that isn’t always ascending or always descending is **non-monotonic**. We can describe its behavior in sections, or **intervals** of space.", 
         interactive: { type: 'graph', func: x => x * x, domain: [-5, 5], initialX: 3, turningPoint: { x: 0, label: 'Turning Point' } } 
     },
     { 
-        title: "Finding the Intervals", 
-        content: "Let's analyze `f(x) = x²`. By looking at the graph, we can see it changes direction at its lowest point, `x = 0`. So, we say the function is **decreasing** on the interval `(-∞, 0)` and **increasing** on the interval `(0, ∞)`. The turning point is the key!",
+        title: "Charting the Intervals", 
+        content: "Analyzing `f(x) = x²`, the spacecraft changes direction at its lowest point, `x = 0`. So we say the path is **descending** on `(-∞, 0)` and **ascending** on `(0, ∞)`. That turning point is your key navigational landmark!", 
         interactive: { type: 'graph', func: x => x * x, domain: [-5, 5], initialX: -4, turningPoint: { x: 0, label: 'x = 0' } } 
     },
     { 
-        title: "Quiz: Analyze the Function", 
-        content: "Time to test your skills! Look at the graph of the function `f(x) = -(x - 2)² + 1`. On what interval is this function **increasing**? Find the turning point first!",
+        title: "Quiz: Pilot the Function", 
+        content: "Time to test your navigation skills! Examine the graph of `f(x) = -(x - 2)² + 1`. On which interval is the spacecraft **ascending**? Find the peak first!", 
         interactive: { 
             type: 'quiz', 
             question: 'On what interval is f(x) = -(x - 2)² + 1 increasing?', 
             options: ['(-∞, 2)', '(2, ∞)', '(-∞, 1)', '(1, ∞)'], 
             correctAnswer: '(-∞, 2)', 
-            hint: 'The turning point (the peak of the hill) is at x = 2. The function goes uphill *before* it reaches the peak.',
-            graph: { func: x => -((x - 2) ** 2) + 1, domain: [-2, 6] }
+            hint: 'The turning point (the peak of the orbit) is at x = 2. The ship climbs before reaching the peak.', 
+            graph: { func: x => -((x - 2) ** 2) + 1, domain: [-2, 6] } 
         } 
     },
     { 
-        title: "The Special Case: Constant Functions", 
-        content: "What if the path is completely flat? This is a **constant** function. As the `x`-value changes, the `y`-value stays exactly the same. For `f(x) = 4`, the output is always 4, no matter the input.",
+        title: "Flat Flight: Constant Functions", 
+        content: "What if your ship cruises along a perfectly flat path? That’s a **constant** function. As `x` changes, `y` stays the same. For `f(x) = 4`, your ship maintains a steady altitude of 4 units across all x-values.", 
         interactive: { type: 'graph', func: x => 4, domain: [-5, 5], initialX: -3 } 
     },
     { 
-        title: "Lesson Complete!", 
-        content: "Fantastic job! You now know how to analyze a function's monotonicity. You can identify if it's **increasing** (uphill), **decreasing** (downhill), or **constant** (flat), and you can pinpoint the **intervals** where each behavior occurs. This is a fundamental skill for understanding functions!" 
+        title: "Mission Complete!", 
+        content: "Congratulations, pilot! You can now read a spacecraft’s trajectory: **ascending** (uphill), **descending** (downhill), or **flat** (constant). You can also pinpoint **intervals** of each behavior. Your cosmic navigation skills are ready for interstellar missions!" 
     }
 ];
+
 
 
 const MonotonicityLesson = () => {

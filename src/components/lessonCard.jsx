@@ -1,35 +1,56 @@
+import Link from 'next/link';
 
-const difficultyColors = {
-  Beginner: 'bg-green-100 text-green-800',
-  Intermediate: 'bg-yellow-100 text-yellow-800',
-  Advanced: 'bg-red-100 text-red-800',
+const statusStyles = {
+  locked: {
+    ring: 'ring-gray-300',
+    background: 'bg-gray-200',
+    icon: 'text-gray-400',
+    cursor: 'cursor-not-allowed',
+    href: '#',
+  },
+  unlocked: {
+    ring: 'ring-blue-500',
+    background: 'bg-blue-500 hover:bg-blue-600',
+    icon: 'text-white',
+    cursor: 'cursor-pointer',
+    pulse: 'animate-pulse',
+  },
+  completed: {
+    ring: 'ring-green-500',
+    background: 'bg-green-500 hover:bg-green-600',
+    icon: 'text-white',
+    cursor: 'cursor-pointer',
+  },
 };
 
 export default function LessonCard({ lesson }) {
-  const { id, title, description, category, difficulty } = lesson;
+  const { id, title, description, category, status, icon: Icon } = lesson;
+  const config = statusStyles[status] || statusStyles.locked;
+  const isLocked = status === 'locked';
+
+  const NodeContent = (
+    <div className={`relative flex items-center justify-center group ${config.cursor}`}>
+      <div className="absolute bottom-full mb-4 w-64 p-3 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+        <h3 className="font-bold text-base mb-1">{title}</h3>
+        <p className="leading-tight">{description}</p>
+
+        <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-8 border-x-transparent border-t-8
+         border-t-gray-800"></div>
+      </div>
+
+      <div className={`relative w-28 h-28 rounded-full flex items-center justify-center ring-8 ${config.ring} ${config.background} transition-all duration-300 ${config.pulse || ''}`}>
+        <Icon className={`${config.icon}`} size={48} />
+      </div>
+    </div>
+  );
+
+  if (isLocked) {
+    return <div aria-disabled="true">{NodeContent}</div>;
+  }
 
   return (
-    <a href={`/lessons/${id}`} className="block group">
-      <div className="bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col p-6 border border-gray-200/80">
-        
-        <div className="flex justify-between items-center mb-4">
-          <p className="text-sm  text-blue-700">{category}</p>
-          <span className={`px-2 py-1 text-xs font-bold rounded-full ${difficultyColors[difficulty] || 'bg-gray-100 text-gray-800'}`}>
-            {difficulty}
-          </span>
-        </div>
-
-        <div className="grow">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-          <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
-        </div>
-        
-        <div className="mt-6">
-           <span className=" text-blue-600 group-hover:text-blue-800 transition-colors">
-            Start
-           </span>
-        </div>
-      </div>
-    </a>
+    <Link href={`/courses/${category.toLowerCase()}/${id}`}>
+      {NodeContent}
+    </Link>
   );
 }
