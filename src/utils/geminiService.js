@@ -1,7 +1,7 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyC4o9pZ_thbrcLwpR9P7Sbx44MmaGiHyVo" });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const askTutor = async (context, question) => {
   try {
@@ -25,7 +25,6 @@ export const generatePersonalizedSlide = async (
 ) => {
   try {
     const prompt = `
-      The user is learning about Function Properties (Even, Odd, One-to-One).
       User History: ${JSON.stringify(history)}
       
       Generate a JSON object for a new LessonSlide.
