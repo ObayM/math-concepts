@@ -1,0 +1,443 @@
+
+'use client';
+import React, { useState, useEffect } from 'react';
+
+import Button from '@/components/slides/Button';
+import { FunctionVisualizer } from '@/components/visualizations';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, XCircle, Sparkles, HelpCircle, Play, Activity, BrainCircuit, RotateCcw } from 'lucide-react';
+import { askTutor, generatePersonalizedSlide } from '@/utils/geminiService';
+
+const LoadingState = Object.freeze({
+  IDLE: 'IDLE',
+  LOADING: 'LOADING',
+  SUCCESS: 'SUCCESS',
+  ERROR: 'ERROR'
+});
+
+
+const INITIAL_LESSON_DATA = [
+  {
+    id: 'intro',
+    title: 'Welcome to Functions',
+    content: "Functions are the machines of mathematics. They take an input (x) and produce exactly one output (y). Let's master their secret properties.",
+    interactiveType: 'intro'
+  },
+  {
+    id: 'vlt',
+    title: 'The Vertical Line Test',
+    content: "A relation is a function only if no vertical line intersects the graph at more than one point. Use the scanner to test this sideways parabola.",
+    interactiveType: 'graph',
+    category: 'Fundamentals',
+    visualization: {
+      xDomain: [-2, 6],
+      yDomain: [-4, 4],
+      paramRange: [-2, 6],
+      paramLabel: "Scanner x",
+      elements: [
+
+        { id: 'top', type: 'function', expression: 'sqrt(x)', color: '#94a3b8', strokeWidth: 3 },
+        { id: 'bot', type: 'function', expression: '-sqrt(x)', color: '#94a3b8', strokeWidth: 3 },
+
+        { id: 'scan', type: 'v-line', x: 't', color: '#ef4444', style: 'solid', label: 'Scanner', strokeWidth: 3 },
+
+        { id: 'int1', type: 'point', x: 't', y: 'sqrt(t)', color: '#ef4444', r: 5 },
+        { id: 'int2', type: 'point', x: 't', y: '-sqrt(t)', color: '#ef4444', r: 5 },
+      ]
+    }
+  },
+  {
+    id: 'even',
+    title: 'Even Functions',
+    content: "Symmetry is beauty. An Even function is symmetric about the y-axis. f(x) = f(-x). Drag to see the mirror image.",
+    interactiveType: 'graph',
+    category: 'Symmetry',
+    visualization: {
+      xDomain: [-5, 5],
+      yDomain: [-2, 12],
+      paramRange: [-5, 5],
+      paramLabel: "Input x",
+      elements: [
+        { id: 'f', type: 'function', expression: '0.5 * x^2', color: '#3b82f6' },
+        { id: 'p_main', type: 'point', x: 't', y: '0.5 * t^2', color: '#3b82f6', label: '(x,y)' },
+        { id: 'p_ref', type: 'point', x: '-t', y: '0.5 * t^2', color: '#10b981', label: '(-x,y)' },
+        { id: 'conn', type: 'line', x1: 't', y1: '0.5 * t^2', x2: '-t', y2: '0.5 * t^2', color: '#10b981', style: 'dashed' }
+      ]
+    }
+  },
+  {
+    id: 'odd',
+    title: 'Odd Functions',
+    content: "Odd functions have rotational symmetry. f(-x) = -f(x). If you rotate 180° around the origin, it matches.",
+    interactiveType: 'graph',
+    category: 'Symmetry',
+    visualization: {
+      xDomain: [-5, 5],
+      yDomain: [-10, 10],
+      paramRange: [-5, 5],
+      paramLabel: "Input x",
+      elements: [
+        { id: 'f', type: 'function', expression: '(x^3)/5 - x', color: '#8b5cf6' },
+        { id: 'p_main', type: 'point', x: 't', y: '(t^3)/5 - t', color: '#8b5cf6', label: '(x,y)' },
+        { id: 'p_ref', type: 'point', x: '-t', y: '-((t^3)/5 - t)', color: '#f59e0b', label: '(-x,-y)' },
+        { id: 'line_origin', type: 'line', x1: 't', y1: '(t^3)/5 - t', x2: '-t', y2: '-((t^3)/5 - t)', color: '#f59e0b', style: 'dotted' }
+      ]
+    }
+  },
+  {
+    id: 'one-to-one',
+    title: 'One-to-One Functions',
+    content: "Every y-value is unique. Use the Horizontal Line Test to verify.",
+    interactiveType: 'graph',
+    category: 'Mapping',
+    visualization: {
+      xDomain: [-5, 5],
+      yDomain: [-5, 5],
+      paramRange: [-4, 4],
+      paramLabel: "Test y",
+      elements: [
+        { id: 'f', type: 'function', expression: '(x^3)/10 + x', color: '#ec4899' },
+        { id: 'scan', type: 'h-line', y: 't', color: '#f59e0b', label: 'HLT', strokeWidth: 3 },
+        
+      ]
+    }
+  },
+  {
+    id: 'quiz-1',
+    title: 'Quick Check',
+    content: "If a graph is symmetric about the Y-axis, which type of function is it?",
+    interactiveType: 'quiz',
+    quizOptions: ['Odd', 'One-to-One', 'Even', 'Neither'],
+    correctOption: 2,
+    category: 'Assessment'
+  }
+];
+
+export default function App() {
+  const [slides, setSlides] = useState(INITIAL_LESSON_DATA);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [interactiveValue, setInteractiveValue] = useState(50);
+  const [selectedQuizOption, setSelectedQuizOption] = useState(null);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizHistory, setQuizHistory] = useState([]);
+  
+
+  const [isGeneratingNext, setIsGeneratingNext] = useState(false);
+
+
+  const [tutorOpen, setTutorOpen] = useState(false);
+  const [tutorQuery, setTutorQuery] = useState('');
+  const [tutorResponse, setTutorResponse] = useState('');
+  const [tutorLoading, setTutorLoading] = useState(LoadingState.IDLE);
+
+  const currentSlide = slides[currentSlideIndex];
+  const isLastSlide = currentSlideIndex === slides.length - 1;
+
+
+  useEffect(() => {
+    setInteractiveValue(50); 
+    setSelectedQuizOption(null);
+    setQuizSubmitted(false);
+    setTutorOpen(false);
+    setTutorResponse('');
+  }, [currentSlideIndex]);
+
+  const handleQuizSubmit = () => {
+    setQuizSubmitted(true);
+    
+
+    const isCorrect = selectedQuizOption === currentSlide.correctOption;
+    const record = `Slide: ${currentSlide.title}, Question: ${currentSlide.content}, Result: ${isCorrect ? 'Correct' : 'Incorrect'}`;
+    setQuizHistory(prev => [...prev, record]);
+  };
+
+  const handleNext = async () => {
+    if (isLastSlide) {
+
+      if (!currentSlide.isAiGenerated) {
+          setIsGeneratingNext(true);
+          const newSlide = await generatePersonalizedSlide(quizHistory);
+          setIsGeneratingNext(false);
+          
+          if (newSlide) {
+             setSlides(prev => [...prev, newSlide]);
+             setCurrentSlideIndex(prev => prev + 1);
+          } else {
+             alert("Great job! That's all for now.");
+          }
+      }
+    } else {
+      setCurrentSlideIndex(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentSlideIndex > 0) {
+      setCurrentSlideIndex(prev => prev - 1);
+    }
+  };
+
+  const handleTutorAsk = async () => {
+    if (!tutorQuery.trim()) return;
+    setTutorLoading(LoadingState.LOADING);
+    const answer = await askTutor(currentSlide.content, tutorQuery);
+    setTutorResponse(answer);
+    setTutorLoading(LoadingState.SUCCESS);
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7]
+     text-slate-900  p-4 md:p-6 flex items-center justify-center
+      selection:bg-blue-100 selection:text-blue-900 relative overflow-hidden">
+      
+
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-4xl bg-white/80 rounded-md overflow-hidden flex flex-col  relative"
+      >
+        
+
+        <div className="pt-8 px-10 pb-2 flex items-center justify-between">
+
+            <div className="flex-1 mx-8 flex space-x-1 h-2">
+                {slides.map((_, idx) => (
+                    <div 
+                        key={idx} 
+                        className={`flex-1 rounded-full transition-all duration-500 ${
+                            idx <= currentSlideIndex ? 'bg-[#58CC02]' : 'bg-slate-200'
+                        }`} 
+                    />
+                ))}
+
+                {!slides.find(s => s.isAiGenerated) && (
+                     <div className="flex-1 rounded-full bg-slate-100 border border-dashed border-slate-300 opacity-50" />
+                )}
+            </div>
+            
+        </div>
+
+
+        <div className="flex-1 px-10 py-6 overflow-hidden scrollbar-hide relative">
+            <AnimatePresence mode="wait">
+                {isGeneratingNext ? (
+                    <motion.div 
+                        key="loading"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="h-full flex flex-col items-center justify-center text-center space-y-6"
+                    >
+                        <div className="relative">
+                            <div className="w-24 h-24 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin" />
+                            <BrainCircuit className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500 w-10 h-10" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-800">Analyzing your skills...</h2>
+                            <p className="text-slate-500 mt-2">Designing a personalized challenge for you.</p>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key={currentSlide.id}
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="h-full flex flex-col"
+                    >
+
+                        <div className="mb-6">
+                            <div className="flex items-center space-x-2 mb-2">
+                                {currentSlide.isAiGenerated && (
+                                    <span className="bg-purple-100 text-purple-600 text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wide flex items-center gap-1">
+                                        <Sparkles className="w-3 h-3" /> AI Generated
+                                    </span>
+                                )}
+                                <span className="text-slate-400 font-bold text-sm tracking-wider uppercase">{currentSlide.category || "Concept"}</span>
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">{currentSlide.title}</h1>
+                        </div>
+
+                        <p className="text-xl text-slate-600 leading-relaxed mb-8 font-medium">
+                            {currentSlide.content}
+                        </p>
+
+                        
+                        <div className="flex-1 w-full">
+                            
+                            {currentSlide.interactiveType === 'intro' && (
+                               <></>
+                            )}
+
+                            {currentSlide.interactiveType === 'graph' && currentSlide.visualization && (
+                                <div className="flex flex-col space-y-6">
+                                    <FunctionVisualizer config={currentSlide.visualization} interactiveValue={interactiveValue} />
+                                    
+                                    <div className="bg-slate-100 rounded-3xl p-6">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Interact</span>
+                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                {currentSlide.visualization.paramLabel || 'Value'}
+                                            </span>
+                                        </div>
+                                        <input 
+                                            type="range" 
+                                            min="0" 
+                                            max="100" 
+                                            value={interactiveValue} 
+                                            onChange={(e) => setInteractiveValue(Number(e.target.value))}
+                                            className="w-full h-12 opacity-0 absolute z-20 cursor-pointer"
+                                        />
+                                        <div className="relative w-full h-4 bg-slate-200 rounded-full overflow-hidden">
+                                            <div 
+                                                className="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-75 ease-out"
+                                                style={{ width: `${interactiveValue}%` }}
+                                            />
+                                        </div>
+                                        <div className="flex justify-between mt-2">
+                                            {[...Array(5)].map((_, i) => (
+                                                <div key={i} className="w-1 h-3 bg-slate-300 rounded-full" />
+                                            ))}
+                                        </div>
+                                        <p className="text-center text-slate-500 text-sm font-medium mt-3">
+                                            Drag to explore
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            
+
+                            {currentSlide.interactiveType === 'quiz' && currentSlide.quizOptions && (
+                                <div className="grid gap-3">
+                                    {currentSlide.quizOptions.map((option, idx) => {
+                                        const isSelected = selectedQuizOption === idx;
+                                        const isCorrect = idx === currentSlide.correctOption;
+                                        
+                                        let containerClass = "border-2 border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50";
+                                        if (isSelected) containerClass = "border-blue-500 bg-blue-50 shadow-[0_0_0_2px_rgba(59,130,246,0.2)]";
+                                        
+                                        if (quizSubmitted) {
+                                            if (isCorrect) containerClass = "border-[#58CC02] bg-green-50";
+                                            else if (isSelected) containerClass = "border-red-500 bg-red-50";
+                                            else containerClass = "border-slate-100 bg-slate-50 opacity-50";
+                                        }
+
+                                        return (
+                                            <motion.button 
+                                                key={idx}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => !quizSubmitted && setSelectedQuizOption(idx)}
+                                                className={`p-5 rounded-2xl text-left text-lg font-bold transition-all flex items-center justify-between ${containerClass}`}
+                                            >
+                                                <span className={quizSubmitted && isCorrect ? "text-green-700" : (quizSubmitted && isSelected ? "text-red-700" : "text-slate-700")}>
+                                                    {option}
+                                                </span>
+                                                {quizSubmitted && isCorrect && <CheckCircle2 className="text-[#58CC02] w-6 h-6" />}
+                                                {quizSubmitted && isSelected && !isCorrect && <XCircle className="text-red-500 w-6 h-6" />}
+                                            </motion.button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+
+        <div className={`border-t border-slate-100 bg-slate-50/50 backdrop-blur transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}>
+             <div className="p-6">
+                <div className="flex items-start gap-4">
+                    <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-200">
+                        <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-xs font-bold text-indigo-500 uppercase mb-2">AI Math Tutor</p>
+                        
+                        {tutorResponse ? (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm text-slate-700 text-sm leading-relaxed"
+                            >
+                                {tutorResponse}
+                                <div className="mt-3 pt-3 border-t border-slate-100 flex justify-end">
+                                    <button onClick={() => setTutorResponse('')} className="text-xs font-bold text-indigo-600 flex items-center hover:underline">
+                                        <RotateCcw className="w-3 h-3 mr-1" /> Ask new question
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <div className="flex gap-2">
+                                <input 
+                                    value={tutorQuery}
+                                    onChange={(e) => setTutorQuery(e.target.value)}
+                                    placeholder="Eg. Why is symmetry important?"
+                                    className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2
+                                     focus:ring-indigo-500 outline-none shadow-sm"
+                                    onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
+                                />
+                                <Button 
+                                    onClick={handleTutorAsk} 
+                                    isLoading={tutorLoading === LoadingState.LOADING}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl! px-6!"
+                                >
+                                    Ask
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <div className="p-6 md:px-10 md:py-8 bg-white border-t border-slate-100 flex items-center justify-between gap-4">
+            
+            <button 
+                onClick={() => setTutorOpen(!tutorOpen)}
+                className={`p-4 rounded-2xl transition-all duration-200 ${tutorOpen ? 'bg-indigo-100 text-indigo-600' : 
+                  'bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500'}`}
+            >
+                <HelpCircle className="w-6 h-6" />
+            </button>
+
+            <div className="flex items-center gap-3 w-full md:w-auto">
+                {currentSlideIndex > 0 && (
+                    <Button variant="secondary" onClick={handleBack} className="hidden md:flex">
+                        Back
+                    </Button>
+                )}
+                
+                {currentSlide.interactiveType === 'quiz' && !quizSubmitted ? (
+                     <Button 
+                        variant="primary" 
+                        onClick={handleQuizSubmit}
+                        disabled={selectedQuizOption === null}
+                        className="w-full md:w-auto bg-[#58CC02] hover:bg-[#46a302] shadow-[0_4px_0_0_#46a302] active:shadow-none active:translate-y-1
+                         text-white font-extrabold tracking-wide uppercase"
+                     >
+                        Check
+                     </Button>
+                ) : (
+                    <Button 
+                        onClick={handleNext}
+                        className={`w-full md:w-auto font-extrabold tracking-wide uppercase ${
+                            isLastSlide && !currentSlide.isAiGenerated && !isGeneratingNext
+                            ? 'bg-purple-600 hover:bg-purple-700 shadow-[0_4px_0_0_#7e22ce]' 
+                            : 'bg-[#58CC02] hover:bg-[#46a302] shadow-[0_4px_0_0_#46a302]'
+                        } text-white active:shadow-none active:translate-y-1`}
+                    >
+                       {isLastSlide && !currentSlide.isAiGenerated ? (
+                           <span className="flex items-center">Generative Challenge <Sparkles className="ml-2 w-4 h-4"/></span>
+                       ) : 'Continue'}
+                    </Button>
+                )}
+            </div>
+        </div>
+
+      </motion.div>
+    </div>
+  );
+}
