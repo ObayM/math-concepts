@@ -4,6 +4,7 @@ import {
   Sigma,
   LineChart,
   Move,
+  Undo2
 } from 'lucide-react';
 
 export const lessonsData = [
@@ -67,4 +68,15 @@ export const lessonsData = [
     status: 'locked',
     icon: (props) => <Move {...props} />,
   },
+  {
+  id: 'real-functions-7',
+  title: 'Inverse Functions',
+  description:
+    'Learn how to determine whether a function is invertible, find the inverse algebraically, and interpret inverse functions graphically.',
+  category: 'Algebra',
+  difficulty: 'Intermediate',
+  status: 'locked',
+  icon: (props) => <Undo2 {...props} />,
+  },
+
 ];
