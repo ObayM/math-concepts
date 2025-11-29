@@ -42,11 +42,20 @@ Open [http://localhost:3000](http://localhost:3000) during development.
 * `/onboarding` : to create a username  
 
 * `/courses` : to see all the courses
-* `/dashboard` : a simple dashobard (i'll add streaks/xp, etc.. in coming weeks)
+* `/dashboard` : a simple dashobard and see your activity (gh style) and your streak
 
 * `/algebra` : to see the full lessons of algebra course
 * `/algebra/lesson-name` : Yea, an interactive lesson will wait you there
 
----
+* `/geometry` : to see the full lessons of the gemoetry course
+* `/geometry/lesson-name` : a cool lesson with AI features
 
-If you are a stoneman from siege, this week theme is "space" and the text of the lessons is space themed, why not the css because math + space won't fit in the same css theme :(
+## APIs
+* `/api/courses/`: to fetch all courses
+* `/api/courses/[id]`: to fetch by the course id and return the lessons
+* `/api/lesson/[id]`: to return the lesson data
+* `/api/activity/`: to get the activity of a user (to create a gh style activity)
+* `/api/update-activity/`: to update activity 
+* `/api/streak/`: to fetch & calculate streak 
+
+---

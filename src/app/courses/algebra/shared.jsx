@@ -6,15 +6,15 @@ import { FaArrowRight, FaArrowLeft, FaCheckCircle, FaTimesCircle, FaLightbulb } 
 import clsx from 'clsx';
 
 export const StyledContent = ({ text }) => {
-    return text.split('**').map((part, index) => 
-        index % 2 === 1 
-            ? <strong key={index} className="font-semibold text-slate-900">{part}</strong> 
-            : part.split('`').map((subPart, subIndex) => 
-                subIndex % 2 === 1 
-                    ? <code key={`${index}-${subIndex}`} className="bg-blue-100 text-blue-800 font-mono text-sm py-0.5 px-1.5 rounded-md">{subPart}</code> 
-                    : subPart
-            )
-    );
+  return text.split('**').map((part, index) =>
+    index % 2 === 1
+      ? <strong key={index} className="font-semibold text-slate-900">{part}</strong>
+      : part.split('`').map((subPart, subIndex) =>
+        subIndex % 2 === 1
+          ? <code key={`${index}-${subIndex}`} className="bg-blue-100 text-blue-800 font-mono text-sm py-0.5 px-1.5 rounded-md">{subPart}</code>
+          : subPart
+      )
+  );
 };
 
 export const generateFunctionData = (func, domain = [-10, 10], step = 0.1) => {
@@ -28,7 +28,7 @@ export const generateFunctionData = (func, domain = [-10, 10], step = 0.1) => {
   return data;
 };
 
-export const  ProgressBar = ({ currentStep, totalSteps }) => {
+export const ProgressBar = ({ currentStep, totalSteps }) => {
   const progress = ((currentStep + 1) / totalSteps) * 100;
   return (
     <div className="mb-4">
@@ -80,13 +80,13 @@ const InteractiveGraph = ({ config, chartData, sliderValue, onSliderChange }) =>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
           <XAxis dataKey="x" type="number" domain={domain} stroke="#9ca3af" label={{ value: 'Input (x)', position: 'insideBottom', offset: -10, fill: '#6b7280' }} />
 
-          <YAxis type="number" domain={['auto', 'auto']} stroke="#9ca3af" label={{ value: 'Output (y)', angle: -90, position: 'insideLeft', offset: 10, fill: '#6b7280' }}/>
+          <YAxis type="number" domain={['auto', 'auto']} stroke="#9ca3af" label={{ value: 'Output (y)', angle: -90, position: 'insideLeft', offset: 10, fill: '#6b7280' }} />
           <Tooltip contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(5px)', border: '1px solid #ddd', borderRadius: '0.5rem' }} />
 
           <Line type="monotone" dataKey="y" stroke="#3b82f6" strokeWidth={3} dot={false} />
           {isFinite(yValue) && <ReferenceDot x={sliderValue} y={yValue} r={8} fill="#ef4444" stroke="white" strokeWidth={2} isFront={true} />}
 
-          {config.turningPoint && <ReferenceDot x={config.turningPoint.x} y={config.func(config.turningPoint.x)} r={8} fill="#10b981" stroke="white" strokeWidth={2} isFront={true} label={config.turningPoint.label}/>}
+          {config.turningPoint && <ReferenceDot x={config.turningPoint.x} y={config.func(config.turningPoint.x)} r={8} fill="#10b981" stroke="white" strokeWidth={2} isFront={true} label={config.turningPoint.label} />}
         </LineChart>
       </ResponsiveContainer>
 
@@ -115,7 +115,7 @@ const InteractiveQuiz = ({ config, chartData, selectedAnswer, onSelect, isCorrec
             <YAxis type="number" domain={['auto', 'auto']} />
             <Tooltip />
             <Line type="monotone" dataKey="y" stroke="#3b82f6" strokeWidth={3} dot={false} />
-            <ReferenceDot x={2} y={config.graph.func(2)} r={8} fill="#10b981" stroke="white" strokeWidth={2} isFront={true} label="Turning Point"/>
+            <ReferenceDot x={2} y={config.graph.func(2)} r={8} fill="#10b981" stroke="white" strokeWidth={2} isFront={true} label="Turning Point" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -139,11 +139,11 @@ const InteractiveQuiz = ({ config, chartData, selectedAnswer, onSelect, isCorrec
     </div>
 
     {selectedAnswer && (
-      <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className={clsx('mt-4 p-4 rounded-lg flex items-center gap-3 font-medium', {
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={clsx('mt-4 p-4 rounded-lg flex items-center gap-3 font-medium', {
         'bg-green-100 text-green-700': isCorrect,
         'bg-red-100 text-red-700': !isCorrect,
       })}>
-        {isCorrect ? <FaCheckCircle/> : <FaTimesCircle/>}
+        {isCorrect ? <FaCheckCircle /> : <FaTimesCircle />}
         {isCorrect ? "Exactly! You found the interval before the peak." : "Not quite. Remember to read the graph from left to right."}
       </motion.div>
     )}
@@ -155,7 +155,7 @@ const InteractiveQuiz = ({ config, chartData, selectedAnswer, onSelect, isCorrec
         </button>
         <AnimatePresence>
           {showHint && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -174,43 +174,68 @@ const InteractiveQuiz = ({ config, chartData, selectedAnswer, onSelect, isCorrec
 
 
 const InteractiveElement = (props) => {
-    const { interactiveData } = props;
-    if (!interactiveData) return null;
-  
-    switch (interactiveData.type) {
-      case 'graph':
-        return <InteractiveGraph config={interactiveData} {...props} />;
-      case 'quiz':
-        return <InteractiveQuiz config={interactiveData} {...props} />;
-      default:
-        return null;
-    }
+  const { interactiveData } = props;
+  if (!interactiveData) return null;
+
+  switch (interactiveData.type) {
+    case 'graph':
+      return <InteractiveGraph config={interactiveData} {...props} />;
+    case 'quiz':
+      return <InteractiveQuiz config={interactiveData} {...props} />;
+    default:
+      return null;
+  }
 };
 
 
 const LessonStep = ({ stepData, ...interactiveProps }) => {
-    const animationVariants = {
-        initial: { opacity: 0, y: 20 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -20 },
-    };
-    
-    return (
-        <motion.div
-            variants={animationVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-        >
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">{stepData.title}</h1>
-            <div className="text-lg text-slate-600 leading-relaxed space-y-4">
-                <StyledContent text={stepData.content} />
-            </div>
-            <InteractiveElement interactiveData={stepData.interactive} {...interactiveProps} />
-        </motion.div>
-    );
+  const animationVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+  };
+
+  return (
+    <motion.div
+      variants={animationVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+    >
+      <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">{stepData.title}</h1>
+      <div className="text-lg text-slate-600 leading-relaxed space-y-4">
+        <StyledContent text={stepData.content} />
+      </div>
+      <InteractiveElement interactiveData={stepData.interactive} {...interactiveProps} />
+    </motion.div>
+  );
 };
 
-export {LessonStep, InteractiveQuiz, InteractiveElement, InteractiveGraph, Navigation};
+export { LessonStep, InteractiveQuiz, InteractiveElement, InteractiveGraph, Navigation };
+
+export const funcMap = {
+  'add2': x => x + 2,
+  'inverse': x => 1 / x,
+  'sqrt': x => Math.sqrt(x),
+  'quiz1': x => 5 / (x - 3),
+  'quiz2': x => Math.sqrt(x - 2),
+
+
+  'linear_inc': x => 2 * x + 1,
+  'linear_dec': x => -x + 3,
+  'square': x => x * x,
+  'square_shifted': x => -((x - 2) ** 2) + 1,
+  'constant': x => 4,
+
+
+  'add_ops': x => (x + 2) + (3 * x),
+  'sub_ops': x => (2 * x + 1) - x,
+  'mul_ops': x => x * (x + 1),
+  'div_ops': x => x ** 2 / x,
+  'comp_ops': x => (3 * x) + 2,
+  'comp_ops_rev': x => 3 * (x + 2),
+};
+
+
 
