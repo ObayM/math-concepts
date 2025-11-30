@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/navbar";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { getUserInfo } from "@/components/auth/getUserInfo";
 
+import Snow from "@/components/layout/snow";
 
 const aldrich = Aldrich({
   variable: "--font-aldrich",
@@ -27,6 +28,7 @@ export default async function RootLayout({ children }) {
       >
         <AuthProvider initialUser={user}>
           <Navbar/>
+          <Snow/>
           {children}
         </AuthProvider>
 
