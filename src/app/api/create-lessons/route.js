@@ -488,6 +488,261 @@ const lesson7Data = [
     }
 ];
 
+
+
+const lesson8Data = [
+    {
+        id: 'intro-vectors',
+        title: 'Introduction to Vectors',
+        content: "A vector has both magnitude (length) and direction. It's like an arrow pointing from one place to another. Drag the tip to change the vector.",
+        interactiveType: 'graph',
+        category: "Vectors",
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 5],
+            paramRange: [-4, 4],
+            paramLabel: "Tip X",
+            elements: [
+                { id: 'vec', type: 'vector', x1: '0', y1: '0', x2: 't', y2: '3', color: '#3b82f6', strokeWidth: 4 },
+                { id: 'label', type: 'text', x: 't/2', y: '1.5', content: 'v', color: '#3b82f6', fontSize: 16 }
+            ]
+        }
+    },
+    {
+        id: 'vector-components',
+        title: 'Vector Components',
+        content: "Every vector can be broken down into horizontal (x) and vertical (y) components. These are like instructions: 'Go right 3, then go up 4'.",
+        interactiveType: 'graph',
+        category: 'Vectors',
+        visualization: {
+            xDomain: [-2, 6],
+            yDomain: [-2, 6],
+            paramRange: [1, 5],
+            paramLabel: "X Component",
+            elements: [
+                { id: 'vec', type: 'vector', x1: '0', y1: '0', x2: 't', y2: '4', 
+                    color: '#8b5cf6', strokeWidth: 4 },
+                { id: 'compX', type: 'line', x1: '0', y1: '0', x2: 't', y2: '0', 
+                    color: '#ef4444', style: 'dashed', label: 'Vx' },
+                { id: 'compY', type: 'line', x1: 't', y1: '0', x2: 't', y2: '4', 
+                    color: '#10b981', style: 'dashed', label: 'Vy' },
+                { id: 'pt', type: 'point', x: 't', y: '4', color: '#8b5cf6', r: 4 }
+            ]
+        }
+    },
+    {
+        id: 'vector-addition',
+        title: 'Vector Addition',
+        content: "To add vectors, we place them head-to-tail. The result (red) goes from the start of the first to the end of the last.",
+        interactiveType: 'graph',
+        category: 'Vectors',
+        visualization: {
+            xDomain: [-2, 8],
+            yDomain: [-2, 8],
+            paramRange: [1, 5],
+            paramLabel: "Vector B X",
+            elements: [
+                { id: 'v1', type: 'vector', x1: '0', y1: '0', x2: '2', y2: '3', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'v2', type: 'vector', x1: '2', y1: '3', x2: '2+t', y2: '3+1', color: '#10b981', strokeWidth: 3 },
+                { id: 'vSum', type: 'vector', x1: '0', y1: '0', x2: '2+t', y2: '4', color: '#ef4444', strokeWidth: 4 },
+                { id: 'lbl1', type: 'text', x: '1', y: '1.5', content: 'A', color: '#3b82f6' },
+                { id: 'lbl2', type: 'text', x: '2+t/2', y: '3.5', content: 'B', color: '#10b981' },
+                { id: 'lblSum', type: 'text', x: '(2+t)/2', y: '2', content: 'A+B', color: '#ef4444' }
+            ]
+        }
+    },
+    {
+        id: 'vector-scaling',
+        title: 'Scalar Multiplication',
+        content: "Multiplying a vector by a number (scalar) stretches or shrinks it. If the scalar is negative, it flips direction.",
+        interactiveType: 'graph',
+        category: 'Vectors',
+        visualization: {
+            xDomain: [-6, 6],
+            yDomain: [-6, 6],
+            paramRange: [-2, 2],
+            paramLabel: "Scalar k",
+            elements: [
+                { id: 'orig', type: 'vector', x1: '0', y1: '0', x2: '2', y2: '1', 
+                    color: '#cbd5e1', strokeWidth: 2 },
+                { id: 'scaled', type: 'vector', x1: '0', y1: '0', x2: '2*t', y2: '1*t', color: '#ec4899', strokeWidth: 4 },
+                { id: 'lbl', type: 'text', x: '2*t', y: '1*t + 0.5', content: 'kv', color: '#ec4899' }
+            ]
+        }
+    },
+    {
+        id: 'parametric-intro',
+        title: 'Parametric Equations',
+        content: "Instead of y = f(x), we can define x and y separately as functions of time 't'. x(t) = t, y(t) = t². This traces a parabola.",
+        interactiveType: 'graph',
+        category: 'Parametric',
+        visualization: {
+            xDomain: [-3, 3],
+            yDomain: [-1, 5],
+            paramRange: [-2, 2],
+            paramLabel: "Time t",
+            elements: [
+                { id: 'curve', type: 'parametric', xExpression: 't', yExpression: 't^2', tRange: [-3, 3], 
+                    color: '#3b82f6', strokeWidth: 3 },
+                { id: 'particle', type: 'point', x: 't', y: 't^2', color: '#ef4444', r: 6, label: 't' }
+            ]
+        }
+    },
+    {
+        id: 'unit-circle',
+        title: 'The Unit Circle',
+        content: "The most famous parametric curve! x(t) = cos(t), y(t) = sin(t). As t goes from 0 to 2π, we trace a circle.",
+        interactiveType: 'graph',
+        category: 'Parametric',
+        visualization: {
+            xDomain: [-2, 2],
+            yDomain: [-2, 2],
+            paramRange: [0, 6.28],
+            paramLabel: "Angle t",
+            elements: [
+                { id: 'circle', type: 'parametric', xExpression: 'cos(t)', yExpression: 'sin(t)', tRange: [0, 6.28], color: '#cbd5e1', strokeWidth: 2 },
+                { id: 'radius', type: 'vector', x1: '0', y1: '0', x2: 'cos(t)', y2: 'sin(t)', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'pt', type: 'point', x: 'cos(t)', y: 'sin(t)', color: '#ef4444', r: 5 }
+            ]
+        }
+    },
+    {
+        id: 'ellipse',
+        title: 'Parametric Ellipse',
+        content: "If we scale x and y differently, we get an ellipse. x(t) = a*cos(t), y(t) = b*sin(t). Change 'a' to stretch it horizontally.",
+        interactiveType: 'graph',
+        category: 'Parametric',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-3, 3],
+            paramRange: [1, 4],
+            paramLabel: "Width a",
+            elements: [
+                { id: 'ellipse', type: 'parametric', xExpression: 't * cos(p)', yExpression: '2 * sin(p)', tRange: [0, 6.28], color: '#8b5cf6', strokeWidth: 3, steps: 100 },
+            ]
+        }
+    },
+    {
+        id: 'lissajous',
+        title: 'Lissajous Figures',
+        content: "When the frequencies of x and y oscillation differ, we get beautiful knots. x = sin(3t), y = sin(kt).",
+        interactiveType: 'graph',
+        category: 'Parametric',
+        visualization: {
+            xDomain: [-2, 2],
+            yDomain: [-2, 2],
+            paramRange: [1, 5],
+            paramLabel: "Freq k",
+            elements: [
+                { id: 'liss', type: 'parametric', xExpression: 'sin(3*t)', yExpression: 'sin(T*t)', tRange: [0, 6.28], color: '#ec4899', strokeWidth: 2, steps: 200 }
+            ]
+        }
+    },
+    {
+        id: 'spiral',
+        title: 'Parametric Spiral',
+        content: "If the radius grows with time, we get a spiral. x = t*cos(t), y = t*sin(t).",
+        interactiveType: 'graph',
+        category: 'Parametric',
+        visualization: {
+            xDomain: [-10, 10],
+            yDomain: [-10, 10],
+            paramRange: [0, 10],
+            paramLabel: "Growth",
+            elements: [
+                { id: 'spiral', type: 'parametric', xExpression: '(t/2)*cos(t)', yExpression: '(t/2)*sin(t)', tRange: [0, 20], color: '#f59e0b', strokeWidth: 2, steps: 300 },
+                { id: 'pt', type: 'point', x: '(T/2)*cos(T)', y: '(T/2)*sin(T)', color: '#ef4444', r: 6 }
+            ]
+        }
+    },
+    {
+        id: 'inequalities',
+        title: 'Visualizing Inequalities',
+        content: "We can shade regions where a condition is true. Here, we shade y < x².",
+        interactiveType: 'graph',
+        category: 'Areas',
+        visualization: {
+            xDomain: [-3, 3],
+            yDomain: [-1, 5],
+            paramRange: [-2, 2],
+            paramLabel: "Check x",
+            elements: [
+                { id: 'para', type: 'function', expression: 'x^2', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'shade', type: 'area', y1: '-1', y2: 'x^2', color: '#3b82f6', opacity: 0.2 },
+                { id: 'pt', type: 'point', x: 't', y: 't^2', color: '#3b82f6', r: 5 }
+            ]
+        }
+    },
+    {
+        id: 'area-between',
+        title: 'Area Between Curves',
+        content: "Calculus often asks for the area between two functions. Here, between y = x and y = x².",
+        interactiveType: 'graph',
+        category: 'Areas',
+        visualization: {
+            xDomain: [-0.5, 1.5],
+            yDomain: [-0.5, 1.5],
+            paramRange: [0, 1],
+            paramLabel: "Sweep",
+            elements: [
+                { id: 'f1', type: 'function', expression: 'x', color: '#10b981', strokeWidth: 3 },
+                { id: 'f2', type: 'function', expression: 'x^2', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'area', type: 'area', y1: 'x^2', y2: 'x', color: '#f59e0b', opacity: 0.3 }
+            ]
+        }
+    },
+    {
+        id: 'calculus-preview',
+        title: 'Area Under Curve',
+        content: "The area under a velocity graph represents distance traveled. This is the core of integration.",
+        interactiveType: 'graph',
+        category: 'Calculus',
+        visualization: {
+            xDomain: [0, 5],
+            yDomain: [0, 5],
+            paramRange: [0, 5],
+            paramLabel: "Limit b",
+            elements: [
+                { id: 'f', type: 'function', expression: '0.5*x + 1', color: '#8b5cf6', strokeWidth: 3 },
+                { id: 'area', type: 'area', y1: '0', y2: '(x < T) ? 0.5*x + 1 : 0', color: '#8b5cf6', opacity: 0.3 },
+                { id: 'limit', type: 'v-line', x: 'T', color: '#ef4444', style: 'dashed' }
+            ]
+        }
+    },
+    {
+        id: 'dynamic-labels',
+        title: 'Dynamic Labeling',
+        content: "Labels can move and update with the visualization, making it easier to track points of interest.",
+        interactiveType: 'graph',
+        category: 'Features',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 5],
+            paramRange: [-4, 4],
+            paramLabel: "Move Point",
+            elements: [
+                { id: 'path', type: 'function', expression: 'sin(x)*3', color: '#cbd5e1' },
+                { id: 'pt', type: 'point', x: 't', y: 'sin(t)*3', color: '#ef4444', r: 6 },
+                { id: 'lbl', type: 'text', x: 't', y: 'sin(t)*3 + 1', content: 'Moving!', color: '#ef4444' }
+            ]
+        }
+    },
+    {
+        id: 'final-quiz',
+        title: 'Mastery Check',
+        content: "Which parametric equation represents a circle with radius 3?",
+        interactiveType: 'quiz',
+        quizOptions: [
+            'x = 3cos(t), y = 3sin(t)',
+            'x = cos(3t), y = sin(3t)',
+            'x = 3t, y = 3t',
+            'x = cos(t)+3, y = sin(t)+3'
+        ],
+        correctOption: 0,
+        category: 'Assessment'
+    }
+];
+
 const geometry1Data = [
     {
         id: 'intro-geo',
@@ -740,6 +995,7 @@ export async function GET() {
         { key: 'real-functions-5', course_id: algebra.id, data: lesson5Data },
         { key: 'real-functions-6', course_id: algebra.id, data: lesson6Data },
         { key: 'real-functions-7', course_id: algebra.id, data: lesson7Data },
+        { key: 'real-functions-8', course_id: algebra.id, data: lesson8Data },
 
         { key: 'geometry-basic-1', course_id: geometry.id, data: geometry1Data },
         { key: 'geometry-basic-2', course_id: geometry.id, data: geometry2Data },
