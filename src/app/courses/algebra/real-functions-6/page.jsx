@@ -26,5 +26,6 @@ export default async function Page() {
     )
   }
 
-  return <LessonTemplateNew initialSlides={lesson.data} />
+  return <LessonTemplateNew initialSlides={lesson.data} lessonId="real-functions-6" />
+
 }

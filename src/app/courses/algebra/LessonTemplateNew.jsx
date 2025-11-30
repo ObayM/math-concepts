@@ -6,6 +6,9 @@ import { FunctionVisualizer } from '@/components/visualizations';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, Sparkles, HelpCircle, BrainCircuit, RotateCcw } from 'lucide-react';
 import { askTutor, generatePersonalizedSlide } from '@/utils/geminiService';
+import LessonCompletion from '@/components/slides/LessonCompletion';
+import { lessonsData, geometryLessonsData } from '@/components/lib/data';
+import { useRouter } from 'next/navigation';
 
 const LoadingState = Object.freeze({
     IDLE: 'IDLE',
@@ -14,7 +17,9 @@ const LoadingState = Object.freeze({
     ERROR: 'ERROR'
 });
 
-export default function LessonTemplateNew({ initialSlides }) {
+export default function AdvancedLessonView({ initialSlides, lessonId }) {
+    const router = useRouter();
+    
     const [slides, setSlides] = useState(initialSlides);
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [interactiveValue, setInteractiveValue] = useState(50);
@@ -23,6 +28,9 @@ export default function LessonTemplateNew({ initialSlides }) {
     const [quizHistory, setQuizHistory] = useState([]);
 
     const [isGeneratingNext, setIsGeneratingNext] = useState(false);
+
+    const [isLessonComplete, setIsLessonComplete] = useState(false);
+
 
     const [tutorOpen, setTutorOpen] = useState(false);
     const [tutorQuery, setTutorQuery] = useState('');
@@ -80,26 +88,19 @@ export default function LessonTemplateNew({ initialSlides }) {
     };
 
     const handleNext = async () => {
+
         if (isLastSlide) {
-            if (currentSlide.isAiGenerated) {
+            if (!currentSlide.isAiGenerated) {
 
                 handleCompletion();
-
-                setIsGeneratingNext(true);
-                const newSlide = await generatePersonalizedSlide(quizHistory);
-                setIsGeneratingNext(false);
-
-                if (newSlide) {
-                    setSlides(prev => [...prev, newSlide]);
-                    setCurrentSlideIndex(prev => prev + 1);
-                } else {
-                    alert("Great job! That's all for now.");
-                }
+                setIsLessonComplete(true);
+                return;
             }
         } else {
             setCurrentSlideIndex(prev => prev + 1);
         }
     };
+
 
     const handleBack = () => {
         if (currentSlideIndex > 0) {
@@ -114,6 +115,53 @@ export default function LessonTemplateNew({ initialSlides }) {
         setTutorResponse(answer);
         setTutorLoading(LoadingState.SUCCESS);
     };
+
+
+
+    const handleContinue = () => {
+
+        const allLessons = [...lessonsData, ...geometryLessonsData];
+
+        const currentLessonIndex = allLessons.findIndex(l => l.id === lessonId);
+        
+        const nextLesson = allLessons[currentLessonIndex + 1];
+
+        if (nextLesson) {
+            const coursePath = nextLesson.category.toLowerCase();
+            router.push(`/courses/${coursePath}/${nextLesson.id}`);
+        } else {
+            router.push('/courses/algebra');
+        }
+    };
+
+    const handleBackToCourse = () => {
+        router.push('/courses/algebra');
+    };
+
+    if (isLessonComplete) {
+
+        const allLessons = [...lessonsData, ...geometryLessonsData];
+        const currentLessonIndex = allLessons.findIndex(l => l.id === lessonId);
+        const nextLesson = allLessons[currentLessonIndex + 1];
+
+        return (
+            <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7] flex items-center justify-center">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="w-full max-w-4xl bg-white/80 rounded-3xl overflow-hidden shadow-xl min-h-[500px] flex items-center justify-center"
+                >
+
+                    <LessonCompletion
+                        onContinue={handleContinue}
+                        onBack={handleBackToCourse}
+                        nextLessonId={nextLesson ? nextLesson.id : null}
+                        streak={streak}
+                    />
+                </motion.div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7]
