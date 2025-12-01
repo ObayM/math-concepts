@@ -34,3 +34,22 @@ create table user_lesson_progress (
   primary key (user_id, lesson_id)
 );
 
+create table if not exists user_lesson_progress (
+  user_id uuid references auth.users(id) on delete cascade,
+  lesson_id uuid references lessons(id) on delete cascade,
+  completed boolean default false,
+  completed_at timestamp with time zone,
+  primary key (user_id, lesson_id)
+);
+
+alter table user_lesson_progress 
+  add column if not exists current_step integer default 0,
+  add column if not exists last_played_at timestamp with time zone default now();
+
+alter table lessons 
+  add column if not exists title text,
+  add column if not exists description text,
+  add column if not exists category text,
+  add column if not exists difficulty text,
+  add column if not exists icon_name text,
+  add column if not exists sort_order integer default 0;

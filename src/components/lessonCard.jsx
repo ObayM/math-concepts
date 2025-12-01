@@ -1,6 +1,8 @@
+'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Check, Lock, Play, ChevronRight } from 'lucide-react';
+import { iconMap } from './lib/IconMap';
 
 const statusConfig = {
   locked: {
@@ -30,7 +32,9 @@ const statusConfig = {
 };
 
 export default function LessonCard({ lesson, index }) {
-  const { id, title, description, category, status, icon: Icon } = lesson;
+  const { id, title, description, category, status, icon_name } = lesson;
+  const Icon = iconMap[icon_name] || iconMap['FunctionSquare'];
+
   const config = statusConfig[status] || statusConfig.locked;
   const isLocked = status === 'locked';
   const isEven = index % 2 === 0;

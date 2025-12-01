@@ -30,8 +30,8 @@ export default function AdvancedLessonView({ initialSlides, lessonId }) {
     const [isGeneratingNext, setIsGeneratingNext] = useState(false);
 
     const [isLessonComplete, setIsLessonComplete] = useState(false);
-
-
+    const [progressLoaded, setProgressLoaded] = useState(false);
+    
     const [tutorOpen, setTutorOpen] = useState(false);
     const [tutorQuery, setTutorQuery] = useState('');
     const [tutorResponse, setTutorResponse] = useState('');
@@ -41,6 +41,49 @@ export default function AdvancedLessonView({ initialSlides, lessonId }) {
     const currentSlide = slides[currentSlideIndex];
     const isLastSlide = currentSlideIndex === slides.length - 1;
 
+    useEffect(() => {
+        if (!lessonId){
+            return;
+        }
+        
+        fetch(`/api/progress?lessonKey=${lessonId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.currentStep > 0 && data.currentStep < slides.length){
+                    setCurrentSlideIndex(data.currentStep)
+                }
+                if (data.completed) {
+                    setIsLessonComplete(true)
+                }
+                setProgressLoaded(true)
+
+            })
+            .catch(err =>{
+                console.error("failed to fetch progress :(", err)
+            })
+    },[lessonId, slides.length])
+
+    useEffect(() => {
+        if (!progressLoaded || !lessonId) return;
+
+
+        const saveProgress = async () => {
+            try {
+                await fetch('/api/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        lessonKey: lessonId,
+                        currentStep: currentSlideIndex,
+                        isCompleted: false
+                    })
+                });
+            } catch (err) {
+                console.error('Failed to save progress:', err);
+            }
+        };
+        saveProgress();
+    }, [currentSlideIndex, lessonId, progressLoaded]);
 
     useEffect(() => {
         fetch('/api/streak')
@@ -57,7 +100,9 @@ export default function AdvancedLessonView({ initialSlides, lessonId }) {
         }
     }, [isLastSlide, currentSlide, isGeneratingNext]);
 
+    
     const handleCompletion = () => {
+
         fetch('/api/update-activity', { method: 'POST' })
             .then(res => res.json())
             .then(() => {
@@ -67,7 +112,18 @@ export default function AdvancedLessonView({ initialSlides, lessonId }) {
                         if (data.streak !== undefined) setStreak(data.streak);
                     });
             })
-            .catch(err => console.error('Failed to update activity -->', err));
+            .catch(err => console.error('Failed to update activity:', err));
+
+
+            fetch('/api/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lessonKey: lessonId,
+                currentStep: currentSlideIndex,
+                isCompleted: true
+            })
+        }).catch(err => console.error('Failed to mark completion:', err));
     }
 
 
@@ -123,7 +179,7 @@ export default function AdvancedLessonView({ initialSlides, lessonId }) {
         const allLessons = [...lessonsData, ...geometryLessonsData];
 
         const currentLessonIndex = allLessons.findIndex(l => l.id === lessonId);
-        
+
         const nextLesson = allLessons[currentLessonIndex + 1];
 
         if (nextLesson) {

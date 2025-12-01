@@ -1,21 +1,73 @@
-'use client';
+import { createClient } from '@/utils/supabase/server';
 import LessonCard from '@/components/lessonCard';
-import { geometryLessonsData } from '@/components/lib/data';
 
-export default function LessonsPage() {
+export default async function GeometryCourse() {
+    const supabase = await createClient();
+
+
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let progressMap = new Map();
+
+    if (user) {
+        const { data: progressData } = await supabase
+            .from('user_lesson_progress')
+            .select('lesson_id, completed, current_step, lessons(lesson_key)')
+            .eq('user_id', user.id);
+
+        if (progressData) {
+            progressData.forEach(p => {
+                if (p.lessons) {
+                    progressMap.set(p.lessons.lesson_key, {
+                        is_completed: p.completed,
+                        current_step: p.current_step
+                    });
+                }
+            });
+        }
+    }
+
+
+    const { data: lessons } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('category', 'Geometry')
+        .order('sort_order', { ascending: true });
+
+    const lessonsWithProgress = (lessons || []).map((lesson, index) => {
+        const progress = progressMap.get(lesson.lesson_key);
+        let status = 'locked';
+
+        const isCompleted = progress?.is_completed;
+        const isStarted = progress?.current_step > 0;
+
+        if (isCompleted) {
+            status = 'completed';
+        } else if (index === 0) {
+            status = 'unlocked';
+        } else {
+
+            const prevLessonKey = (lessons || [])[index - 1].lesson_key;
+            const prevProgress = progressMap.get(prevLessonKey);
+            if (prevProgress?.is_completed) {
+                status = 'unlocked';
+            }
+        }
+
+
+        if (status === 'locked' && isStarted) {
+            status = 'unlocked';
+        }
+
+        return {
+            ...lesson,
+            id: lesson.lesson_key,
+            status
+        };
+    });
+
     return (
         <div className="min-h-screen bg-slate-50 relative overflow-hidden">
-
-            <div className="absolute inset-0 z-0 opacity-40">
-                <div className="absolute top-0 -left-4 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-                <div className="absolute top-0 -right-4 w-72 h-72 bg-teal-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-                <div className="absolute -bottom-8 left-20 w-72 h-72 bg-lime-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-            </div>
-
-
-            <div className="absolute inset-0 z-0 opacity-[0.03]"
-                style={{ backgroundImage: 'radial-gradient(#444 1px, transparent 1px)', backgroundSize: '24px 24px' }}
-            ></div>
 
             <main className="relative z-10 container mx-auto px-4 py-16 md:py-24">
 
@@ -24,7 +76,7 @@ export default function LessonsPage() {
                         Geometry Course
                     </span>
                     <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
-                        Explore the <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Shape of Space</span>
+                        Explore the <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-teal-600">Shape of Space</span>
                     </h1>
                     <p className="text-xl text-slate-600 leading-relaxed">
                         Dive into the world of points, lines, and shapes. Master the coordinate plane and visualize geometric concepts like never before.
@@ -40,25 +92,20 @@ export default function LessonsPage() {
                     ></div>
 
                     <div className="space-y-24 py-12">
-                        {geometryLessonsData.map((lesson, index) => (
-                            <LessonCard
-                                key={lesson.id}
-                                lesson={lesson}
-                                index={index}
-                            />
-                        ))}
+                    {lessonsWithProgress.map((lesson) => (
+                        <LessonCard key={lesson.id} lesson={lesson} />
+                    ))}
                     </div>
 
+                </div>
 
-                    <div className="relative z-10 flex justify-center mt-12">
+                 <div className="relative z-10 flex justify-center mt-12">
                         <div className="px-6 py-3 bg-white rounded-full shadow-md border border-slate-200 text-slate-500 text-sm font-medium">
                             More lessons coming soon...
                         </div>
-                    </div>
                 </div>
+
             </main>
-
-
         </div>
     );
 }

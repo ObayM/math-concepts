@@ -1,10 +1,74 @@
-'use client';
+import { createClient } from '@/utils/supabase/server';
 import LessonCard from '@/components/lessonCard';
-import { lessonsData } from '@/components/lib/data';
 
-export default function LessonsPage() {
-  return (
-    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+export default async function AlgebraCourse() {
+  const supabase = await createClient();
+
+
+  const { data: { user } } = await supabase.auth.getUser();
+  let progressMap = new Map();
+
+  
+  if (user) {
+    const { data: progressData } = await supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, completed, current_step, lessons(lesson_key)')
+      .eq('user_id', user.id);
+
+    if (progressData) {
+      progressData.forEach(p => {
+        if (p.lessons) {
+          progressMap.set(p.lessons.lesson_key, {
+            is_completed: p.completed,
+            current_step: p.current_step
+          });
+        }
+      });
+    }
+  }
+
+
+  const { data: lessons } = await supabase
+    .from('lessons')
+    .select('*')
+    .eq('category', 'Algebra')
+    .order('sort_order', { ascending: true });
+
+  const lessonsWithProgress = (lessons || []).map((lesson, index) => {
+
+    const progress = progressMap.get(lesson.lesson_key);
+    let status = 'locked';
+
+    const isCompleted = progress?.is_completed;
+    const isStarted = progress?.current_step > 0;
+
+    if (isCompleted) {
+      status = 'completed';
+    } else if (index === 0) {
+      status = 'unlocked'; 
+    } else {
+
+      const prevLessonKey = (lessons || [])[index - 1].lesson_key;
+      const prevProgress = progressMap.get(prevLessonKey);
+      if (prevProgress?.is_completed) {
+        status = 'unlocked';
+      }
+    }
+
+
+    if (status === 'locked' && isStarted) {
+      status = 'unlocked';
+    }
+
+    return {
+      ...lesson,
+      id: lesson.lesson_key,
+      status
+    };
+  });
+
+  return ( 
+  <div className="min-h-screen bg-slate-50 relative overflow-hidden">
 
       <main className="relative z-10 container mx-auto px-4 py-16 md:py-24">
 
@@ -29,13 +93,9 @@ export default function LessonsPage() {
           ></div>
 
           <div className="space-y-24 py-12">
-            {lessonsData.map((lesson, index) => (
-              <LessonCard
-                key={lesson.id}
-                lesson={lesson}
-                index={index}
-              />
-            ))}
+             {lessonsWithProgress.map((lesson) => (
+                                    <LessonCard key={lesson.id} lesson={lesson} />
+                                ))}
           </div>
 
 
