@@ -1,13 +1,14 @@
 import { createClient } from '@/utils/supabase/server'
-import LessonTemplateNew from '../LessonTemplateNew'
+import LessonTemplateNew from '../../algebra/LessonTemplateNew'
 
 export default async function Page() {
-  const supabase = await createClient()
-  const { data: lesson, error } = await supabase
-    .from('lessons')
-    .select('data')
-    .eq('lesson_key', 'real-functions-4')
-    .single()
+    const supabase = await createClient()
+    const { data: lesson, error } = await supabase
+        .from('lessons')
+        .select('data')
+        .eq('lesson_key', 'geometry-basic-5')
+        .single()
+
 
   if (error || !lesson) {
     return (
@@ -25,6 +26,5 @@ export default async function Page() {
       </div>
     )
   }
-
-  return <LessonTemplateNew initialSlides={lesson.data} lessonId={'real-functions-4'}/>
+    return <LessonTemplateNew initialSlides={lesson.data} lessonId={'geometry-basic-5'}/>
 }

@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import LessonTemplate from '../LessonTemplate'
+import LessonTemplateNew from '../LessonTemplateNew'
 
 export default async function Page() {
   const supabase = await createClient()
@@ -26,5 +26,5 @@ export default async function Page() {
     )
   }
 
-  return <LessonTemplate lessonData={lesson.data} />
+  return <LessonTemplateNew lessonData={lesson.data} lessonId={'real-functions-3'} />
 }

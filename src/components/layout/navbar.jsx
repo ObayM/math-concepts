@@ -37,6 +37,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Courses', href: '/courses' },
+    { name: 'Sandbox', href: '/sandbox'}
   ];
 
   return (

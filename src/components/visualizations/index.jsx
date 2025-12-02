@@ -54,7 +54,7 @@ const evaluateMath = (expr, context) => {
   }
 };
 
-export const FunctionVisualizer = ({ config, interactiveValue }) => {
+export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
   const [chartData, setChartData] = useState([]);
   const [parametricData, setParametricData] = useState({});
 
@@ -242,8 +242,8 @@ export const FunctionVisualizer = ({ config, interactiveValue }) => {
   };
 
   return (
-    <div className="h-80 w-full bg-white rounded-3xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] 
-    p-2 border border-slate-100 relative overflow-hidden group">
+    <div className={`${className || "h-80"} w-full bg-white rounded-3xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] 
+    p-2 border border-slate-100 relative overflow-hidden group `}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />

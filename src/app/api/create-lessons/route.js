@@ -1,182 +1,335 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
+
 const lesson1Steps = [
     {
+        id: 'l1-intro',
         title: "Welcome to Functions!",
-        content: "Functions are the fundamental building blocks of mathematics. Think of a function as a machine: you input one number, and it outputs exactly one corresponding number. Our goal is to understand the two main rules: **Domain** (valid inputs) and **Range** (possible outputs)."
+        content: "Functions are the fundamental building blocks of mathematics. Think of a function as a machine: you input one number, and it outputs exactly one corresponding number. Our goal is to understand the two main rules: **Domain** (valid inputs) and **Range** (possible outputs).",
+        interactiveType: 'intro',
+        category: 'Basics'
     },
     {
+        id: 'l1-machine',
         title: "The 'Plus 2' Machine",
-        content: "Consider the function `f(x) = x + 2`. This machine takes any input and adds 2 to it. If you input 5, the output is 7. Simple, right?",
-        interactive: { type: 'machine', funcId: 'add2' }
+        content: "Consider the function f(x) = x + 2. This machine takes any input and adds 2 to it. If you input 5, the output is 7. Simple, right?",
+        interactiveType: 'graph',
+        category: 'Basics',
+        visualization: {
+            xDomain: [-5, 10],
+            yDomain: [-5, 15],
+            paramRange: [-2, 8],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'x + 2', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'p', type: 'point', x: 't', y: 't + 2', color: '#ef4444', r: 6, label: 'f(x)' },
+                { id: 'line', type: 'line', x1: 't', y1: '0', x2: 't', y2: 't+2', color: '#cbd5e1', style: 'dashed' },
+                { id: 'line2', type: 'line', x1: '0', y1: 't+2', x2: 't', y2: 't+2', color: '#cbd5e1', style: 'dashed' }
+            ]
+        }
     },
     {
-        title: "Visualizing the Function",
-        content: "We can visualize this behavior on a graph. The X-axis represents inputs, and the Y-axis represents outputs. For `f(x) = x + 2`, the graph is a straight line rising to the right.",
-        interactive: { type: 'graph', funcId: 'add2', domain: [-10, 10], initialX: 3 }
-    },
-    {
+        id: 'l1-domain',
         title: "The Domain: Valid Inputs",
-        content: "What numbers can we put into `f(x) = x + 2`? Any real number! There are no restrictions. The **Domain** is all real numbers, written as `(-∞, ∞)`.",
-        interactive: { type: 'graph', funcId: 'add2', domain: [-10, 10], initialX: 0, highlight: 'domain' }
+        content: "What numbers can we put into f(x) = x + 2? Any real number! There are no restrictions. The **Domain** is all real numbers, written as (-∞, ∞).",
+        interactiveType: 'graph',
+        category: 'Domain',
+        visualization: {
+            xDomain: [-10, 10],
+            yDomain: [-10, 10],
+            paramRange: [-8, 8],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'x + 2', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'domain', type: 'line', x1: '-10', y1: '0', x2: '10', y2: '0',
+                     color: '#10b981', strokeWidth: 4, label: 'Domain' },
+                { id: 'p', type: 'point', x: 't', y: 't + 2', color: '#ef4444', r: 6 }
+            ]
+        }
     },
     {
+        id: 'l1-range',
         title: "The Range: Possible Outputs",
-        content: "Since we can input any number, we can also get any number out. The **Range** is also all real numbers, `(-∞, ∞)`.",
-        interactive: { type: 'graph', funcId: 'add2', domain: [-10, 10], initialX: 0, highlight: 'range' }
+        content: "Since we can input any number, we can also get any number out. The **Range** is also all real numbers, (-∞, ∞).",
+        interactiveType: 'graph',
+        category: 'Range',
+        visualization: {
+            xDomain: [-10, 10],
+            yDomain: [-10, 10],
+            paramRange: [-8, 8],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'x + 2', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'range', type: 'line', x1: '0', y1: '-10', x2: '0', y2: '10', color: '#8b5cf6', strokeWidth: 4, label: 'Range' },
+                { id: 'p', type: 'point', x: 't', y: 't + 2', color: '#ef4444', r: 6 }
+            ]
+        }
     },
     {
+        id: 'l1-div-zero',
         title: "Rule #1: Division by Zero",
-        content: "Some functions have restrictions. You cannot divide by zero. Consider `f(x) = 1/x`. As x gets closer to 0, the value explodes. At x=0, it's undefined.",
-        interactive: { type: 'graph', funcId: 'inverse', domain: [-5, 5], initialX: 2, asymptote: 0 }
+        content: "Some functions have restrictions. You cannot divide by zero. Consider f(x) = 1/x. As x gets closer to 0, the value explodes. At x=0, it's undefined.",
+        interactiveType: 'graph',
+        category: 'Restrictions',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-10, 10],
+            paramRange: [-4, 4],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: '1/x', color: '#ef4444', strokeWidth: 3 },
+                { id: 'asymp', type: 'v-line', x: '0', color: '#94a3b8', style: 'dashed', label: 'x≠0' },
+                { id: 'p', type: 'point', x: 't', y: '1/t', color: '#3b82f6', r: 6 }
+            ]
+        }
     },
     {
-        title: "The Vertical Asymptote",
-        content: "For `f(x) = 1/x`, the graph never touches the line x=0. This is a vertical asymptote. The domain is every number except 0: `(-∞, 0) U (0, ∞)`.",
-    },
-    {
+        id: 'l1-quiz-1',
         title: "Quiz: Identify the Restriction",
-        content: "For the function `f(x) = 5 / (x - 3)`, which input value is not allowed?",
-        interactive: {
-            type: 'quiz',
-            question: 'What is the domain of f(x) = 5 / (x - 3)?',
-            options: [
-                'All real numbers',
-                'All real numbers except x = 3',
-                'All real numbers except x = 5',
-                'x > 3'
-            ],
-            correctAnswer: 'All real numbers except x = 3',
-            hint: 'The denominator (x - 3) cannot be zero.',
-            graph: { funcId: 'quiz1', domain: [-5, 10] }
-        }
+        content: "For the function f(x) = 5 / (x - 3), which input value is not allowed?",
+        interactiveType: 'quiz',
+        quizOptions: [
+            'All real numbers',
+            'All real numbers except x = 3',
+            'All real numbers except x = 5',
+            'x > 3'
+        ],
+        correctOption: 1,
+        category: 'Assessment'
     },
     {
+        id: 'l1-sqrt',
         title: "Rule #2: Negative Square Roots",
-        content: "In the real number system, you cannot take the square root of a negative number. Try `f(x) = √x`. The graph only exists for x ≥ 0.",
-        interactive: { type: 'graph', funcId: 'sqrt', domain: [-5, 10], initialX: 4 }
-    },
-    {
-        title: "Domain of Square Root",
-        content: "For `f(x) = √x`, the domain is `[0, ∞)`. The range is also `[0, ∞)`.",
-    },
-    {
-        title: "Challenge: Find the Domain",
-        content: "For `f(x) = √(x - 2)`, what is the smallest valid x?",
-        interactive: {
-            type: 'quiz',
-            question: 'What is the domain of f(x) = √(x - 2)?',
-            options: ['(-∞, 2)', '(-∞, 2]', '(2, ∞)', '[2, ∞)'],
-            correctAnswer: '[2, ∞)',
-            hint: 'Solve x - 2 ≥ 0.'
+        content: "In the real number system, you cannot take the square root of a negative number. Try f(x) = √x. The graph only exists for x ≥ 0.",
+        interactiveType: 'graph',
+        category: 'Restrictions',
+
+        visualization: {
+            xDomain: [-2, 10],
+            yDomain: [-2, 5],
+            paramRange: [0, 9],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'sqrt(x)', color: '#10b981', strokeWidth: 3 },
+                { id: 'p', type: 'point', x: 't', y: 'sqrt(t)', color: '#ef4444', r: 6 },
+                { id: 'invalid', type: 'text', x: '-1', y: '1', content: 'No Graph Here', color: '#94a3b8' }
+            ]
         }
     },
     {
-        title: "Lesson Complete!",
-        content: "You've mastered the basics of Domain and Range! Remember: avoid division by zero and negative square roots."
+        id: 'l1-quiz-2',
+        title: "Challenge: Find the Domain",
+        content: "For f(x) = √(x - 2), what is the smallest valid x ?",
+        interactiveType: 'quiz',
+        quizOptions: ['(-∞, 2)', '(-∞, 2]', '(2, ∞)', '[2, ∞)'],
+        correctOption: 3,
+        category: 'Assessment'
     }
 ];
 
 const lesson2Steps = [
     {
+        id: 'l2-intro',
         title: "Understanding Monotonicity",
-        content: "Monotonicity describes whether a function is increasing or decreasing. Imagine walking along the graph from left to right. Are you going uphill, downhill, or staying flat?"
+        content: "Monotonicity describes whether a function is increasing or decreasing. Imagine walking along the graph from left to right. Are you going uphill, downhill, or staying flat?",
+        interactiveType: 'intro',
+        category: 'Basics'
     },
     {
+        id: 'l2-inc',
         title: "Increasing Functions",
-        content: "A function is **increasing** if the y-value goes up as x increases. Look at `f(x) = 2x + 1`. It's always going uphill.",
-        interactive: { type: 'graph', funcId: 'linear_inc', domain: [-5, 5], initialX: -2 }
-    },
-    {
-        title: "Decreasing Functions",
-        content: "A function is **decreasing** if the y-value goes down as x increases. `f(x) = -x + 3` is always going downhill.",
-        interactive: { type: 'graph', funcId: 'linear_dec', domain: [-5, 5], initialX: -3 }
-    },
-    {
-        title: "Mixed Behavior",
-        content: "Many functions change direction. `f(x) = x²` decreases until x=0, then increases. We describe this using **intervals**.",
-        interactive: { type: 'graph', funcId: 'square', domain: [-5, 5], initialX: 3, turningPoint: { x: 0, label: 'Turning Point' } }
-    },
-    {
-        title: "Intervals of Monotonicity",
-        content: "For `f(x) = x²`, the function is decreasing on `(-∞, 0)` and increasing on `(0, ∞)`. The point where it changes is the turning point.",
-        interactive: { type: 'graph', funcId: 'square', domain: [-5, 5], initialX: -4, turningPoint: { x: 0, label: 'x = 0' } }
-    },
-    {
-        title: "Quiz: Analyze the Graph",
-        content: "Look at `f(x) = -(x - 2)² + 1`. Where is it increasing?",
-        interactive: {
-            type: 'quiz',
-            question: 'On what interval is f(x) = -(x - 2)² + 1 increasing?',
-            options: ['(-∞, 2)', '(2, ∞)', '(-∞, 1)', '(1, ∞)'],
-            correctAnswer: '(-∞, 2)',
-            hint: 'Find the peak of the parabola. It increases before the peak.',
-            graph: { funcId: 'square_shifted', domain: [-2, 6] }
+        content: "A function is **increasing** if the y-value goes up as x increases. Look at f(x) = 2x + 1. It's always going uphill.",
+        interactiveType: 'graph',
+        category: 'Increasing',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 10],
+            paramRange: [-4, 4],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: '2*x + 1', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'p', type: 'point', x: 't', y: '2*t + 1', color: '#ef4444', r: 6 },
+                { id: 'arrow', type: 'vector', x1: '0', y1: '1', x2: '1', y2: '3', color: '#10b981', strokeWidth: 2 }
+            ]
         }
     },
     {
-        title: "Constant Functions",
-        content: "A function can also be **constant**, meaning it never changes height. `f(x) = 4` is a flat horizontal line.",
-        interactive: { type: 'graph', funcId: 'constant', domain: [-5, 5], initialX: -3 }
+        id: 'l2-dec',
+        title: "Decreasing Functions",
+        content: "A function is **decreasing** if the y-value goes down as x increases. f(x) = -x + 3 is always going downhill.",
+        interactiveType: 'graph',
+        category: 'Decreasing',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 10],
+            paramRange: [-4, 4],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: '-x + 3', color: '#ef4444', strokeWidth: 3 },
+                { id: 'p', type: 'point', x: 't', y: '-t + 3', color: '#3b82f6', r: 6 }
+            ]
+        }
     },
     {
-        title: "Lesson Complete!",
-        content: "You can now identify where functions are increasing, decreasing, or constant. This is crucial for analyzing function behavior."
+        id: 'l2-mixed',
+        title: "Mixed Behavior",
+        content: "Many functions change direction. f(x) = x² decreases until x=0, then increases. We describe this using **intervals**.",
+        interactiveType: 'graph',
+        category: 'Mixed',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-2, 10],
+            paramRange: [-3, 3],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'x^2', color: '#8b5cf6', strokeWidth: 3 },
+                { id: 'p', type: 'point', x: 't', y: 't^2', color: '#ef4444', r: 6 },
+                { id: 'turn', type: 'point', x: '0', y: '0', color: '#94a3b8', r: 4, label: 'Turning Point' }
+            ]
+        }
+    },
+    {
+        id: 'l2-quiz',
+        title: "Quiz: Analyze the Graph",
+        content: "Look at f(x) = -(x - 2)² + 1. Where is it increasing?",
+        interactiveType: 'quiz',
+        quizOptions: ['(-∞, 2)', '(2, ∞)', '(-∞, 1)', '(1, ∞)'],
+        correctOption: 0,
+        category: 'Assessment'
+    },
+    {
+        id: 'l2-const',
+        title: "Constant Functions",
+        content: "A function can also be **constant**, meaning it never changes height. f(x) = 4 is a flat horizontal line.",
+        interactiveType: 'graph',
+        category: 'Constant',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [0, 8],
+            paramRange: [-4, 4],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: '4', color: '#10b981', strokeWidth: 3 },
+                { id: 'p', type: 'point', x: 't', y: '4', color: '#ef4444', r: 6 }
+            ]
+        }
     }
 ];
 
 const lesson3Steps = [
     {
+        id: 'l3-intro',
         title: "Operations on Functions",
-        content: "Just like numbers, we can add, subtract, multiply, and divide functions. We can also compose them!"
+        content: "Just like numbers, we can add, subtract, multiply, and divide functions. We can also compose them!",
+        interactiveType: 'intro',
+        category: 'Basics'
     },
     {
+        id: 'l3-add',
         title: "Adding Functions",
-        content: "If `f(x) = x + 2` and `g(x) = 3x`, then `(f + g)(x) = (x + 2) + 3x = 4x + 2`. We simply add their outputs.",
-        interactive: { type: 'graph', funcId: 'add_ops', domain: [-5, 5], initialX: 1 }
-    },
-    {
-        title: "Subtracting Functions",
-        content: "`f(x) = 2x + 1` and `g(x) = x`. `(f - g)(x) = (2x + 1) - x = x + 1`.",
-        interactive: { type: 'graph', funcId: 'sub_ops', domain: [-5, 5], initialX: 0 }
-    },
-    {
-        title: "Multiplying Functions",
-        content: "`f(x) = x` and `g(x) = x + 1`. `(f * g)(x) = x(x + 1) = x² + x`. Multiplication can change the type of function (linear to quadratic).",
-        interactive: { type: 'graph', funcId: 'mul_ops', domain: [-5, 5], initialX: -2 }
-    },
-    {
-        title: "Dividing Functions",
-        content: "Be careful with division! `(f / g)(x) = f(x) / g(x)`. The domain excludes values where g(x) = 0.",
-        interactive: { type: 'graph', funcId: 'div_ops', domain: [-5, 5], initialX: 1, asymptote: 0 }
-    },
-    {
-        title: "Quiz: Division Domain",
-        content: "For `(f / g)(x) = (x² - 1) / (x - 1)`, what value is excluded from the domain?",
-        interactive: {
-            type: 'quiz',
-            question: 'Identify the input that is not allowed.',
-            options: ['x = 0', 'x = 1', 'x = -1', 'x = 2'],
-            correctAnswer: 'x = 1',
-            hint: 'When is the denominator zero?'
+        content: "If f(x) = x + 2 and g(x) = 3x, then (f + g)(x) = (x + 2) + 3x = 4x + 2. We simply add their outputs.",
+        interactiveType: 'graph',
+
+        category: 'Addition',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-10, 20],
+            paramRange: [-3, 3],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'x + 2', color: '#94a3b8', strokeWidth: 2, style: 'dashed' },
+                { id: 'g', type: 'function', expression: '3*x', color: '#94a3b8', strokeWidth: 2, style: 'dashed' },
+                { id: 'sum', type: 'function', expression: '4*x + 2', color: '#3b82f6', strokeWidth: 4 },
+                { id: 'p', type: 'point', x: 't', y: '4*t + 2', color: '#ef4444', r: 6, label: 'f+g' }
+            ]
         }
     },
     {
+        id: 'l3-sub',
+        title: "Subtracting Functions",
+        content: "f(x) = 2x + 1 and g(x) = x. (f - g)(x) = (2x + 1) - x = x + 1.",
+        interactiveType: 'graph',
+        category: 'Substraction',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 10],
+            paramRange: [-3, 3],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: '2*x + 1', color: '#94a3b8', strokeWidth: 2, style: 'dashed' },
+                { id: 'g', type: 'function', expression: 'x', color: '#94a3b8', strokeWidth: 2, style: 'dashed' },
+                { id: 'diff', type: 'function', expression: 'x + 1', color: '#ef4444', strokeWidth: 4 },
+                { id: 'p', type: 'point', x: 't', y: 't + 1', color: '#3b82f6', r: 6, label: 'f-g' }
+            ]
+        }
+    },
+    {
+        id: 'l3-mul',
+        title: "Multiplying Functions",
+        content: "f(x) = x and g(x) = x + 1. (f * g)(x) = x(x + 1) = x² + x. Multiplication can change the type of function (linear to quadratic).",
+        interactiveType: 'graph',
+        category: 'Multiplication',
+
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 20],
+            paramRange: [-3, 3],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'f', type: 'function', expression: 'x', color: '#94a3b8', strokeWidth: 2, style: 'dashed' },
+                { id: 'g', type: 'function', expression: 'x + 1', color: '#94a3b8', strokeWidth: 2, style: 'dashed' },
+                { id: 'prod', type: 'function', expression: 'x^2 + x', color: '#8b5cf6', strokeWidth: 4 },
+                { id: 'p', type: 'point', x: 't', y: 't^2 + t', color: '#ef4444', r: 6, label: 'f*g' }
+            ]
+        }
+    },
+    {
+        id: 'l3-div',
+        title: "Dividing Functions",
+        content: "Be careful with division! (f / g)(x) = f(x) / g(x). The domain excludes values where g(x) = 0.",
+        interactiveType: 'graph',
+        category: 'Division',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 10],
+            paramRange: [-3, 3],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'quot', type: 'function', expression: '(x==1) ? NaN : x+1', color: '#10b981', strokeWidth: 4 },
+                { id: 'hole', type: 'point', x: '1', y: '2', color: '#fff', r: 5, stroke: '#10b981', strokeWidth: 2 },
+                { id: 'p', type: 'point', x: 't', y: 't+1', color: '#ef4444', r: 6 }
+            ]
+        }
+    },
+    {
+        id: 'l3-quiz',
+        title: "Quiz: Division Domain",
+        content: "For (f / g)(x) = (x² - 1) / (x - 1), what value is excluded from the domain?",
+        interactiveType: 'quiz',
+        quizOptions: ['x = 0', 'x = 1', 'x = -1', 'x = 2'],
+        correctOption: 1,
+        category: 'Assessment'
+    },
+    {
+        id: 'l3-comp',
         title: "Composition of Functions",
-        content: "Composition `(f ∘ g)(x)` means applying g first, then f. `f(g(x))`. If `f(x) = x + 2` and `g(x) = 3x`, then `f(g(x)) = 3x + 2`.",
-        interactive: { type: 'graph', funcId: 'comp_ops', domain: [-5, 5], initialX: -1 }
-    },
-    {
-        title: "Order Matters",
-        content: "Composition is usually not commutative. `g(f(x)) = 3(x + 2) = 3x + 6`. Different result!",
-        interactive: { type: 'graph', funcId: 'comp_ops_rev', domain: [-5, 5], initialX: 0 }
-    },
-    {
-        title: "Lesson Complete!",
-        content: "You've learned how to combine functions using arithmetic operations and composition."
+        content: "Composition (f ∘ g)(x) means applying g first, then f. f(g(x)). If f(x) = x + 2 and g(x) = 3x, then f(g(x)) = 3x + 2.",
+        interactiveType: 'graph',
+        category: 'Composition',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-10, 20],
+            paramRange: [-3, 3],
+            paramLabel: "Input x",
+            elements: [
+                { id: 'comp', type: 'function', expression: '3*x + 2', color: '#f97316', strokeWidth: 4 },
+                { id: 'p', type: 'point', x: 't', y: '3*t + 2', color: '#3b82f6', r: 6, label: 'f(g(x))' }
+            ]
+        }
     }
 ];
+
 
 const lesson5Data = [
     {
@@ -971,6 +1124,126 @@ const geometry4Data = [
         category: 'Assessment'
     }
 ];
+
+
+const geometry5Data = [
+    {
+        id: 'intro-parabola',
+        title: 'The Parabola',
+        content: "You know the parabola as the graph of a quadratic function. But geometrically, it's the set of all points equidistant from a single point (the Focus) and a line (the Directrix).",
+        interactiveType: 'intro',
+        category: 'Conics'
+    },
+    {
+        id: 'focus-directrix',
+        title: 'Focus and Directrix',
+        content: "Drag the point P along the curve. Notice that the distance to the Focus (F) is always equal to the distance to the Directrix line.",
+        interactiveType: 'graph',
+
+        
+        category: 'Definition',
+        visualization: {
+            xDomain: [-6, 6],
+            yDomain: [-2, 10],
+            paramRange: [-4, 4],
+            paramLabel: "Point P x",
+            elements: [
+                { id: 'curve', type: 'function', expression: '0.25*x^2', color: '#3b82f6', strokeWidth: 3 },
+                { id: 'focus', type: 'point', x: '0', y: '1', color: '#ef4444', r: 5, label: 'F' },
+                { id: 'directrix', type: 'h-line', y: '-1', color: '#ef4444', style: 'dashed', label: 'Directrix' },
+                { id: 'p', type: 'point', x: 't', y: '0.25*t^2', color: '#3b82f6', r: 6, label: 'P' },
+                { id: 'd1', type: 'line', x1: '0', y1: '1', x2: 't', y2: '0.25*t^2', color: '#10b981', style: 'dotted' },
+                { id: 'd2', type: 'line', x1: 't', y1: '-1', x2: 't', y2: '0.25*t^2', color: '#10b981', style: 'dotted' }
+            ]
+        }
+    },
+    {
+        id: 'satellite-dish',
+        title: 'The Satellite Dish',
+        content: "Why are satellite dishes parabolic? Because all incoming parallel signals reflect off the surface and converge at a single point: the Focus. Move the signal beam.",
+        interactiveType: 'graph',
+        category: 'Application',
+        visualization: {
+            xDomain: [-6, 6],
+            yDomain: [-2, 10],
+            paramRange: [-4, 4],
+            paramLabel: "Signal x",
+            elements: [
+                { id: 'dish', type: 'function', expression: '0.25*x^2', color: '#94a3b8', strokeWidth: 4 },
+                { id: 'focus', type: 'point', x: '0', y: '1', color: '#ef4444', r: 6, label: 'Receiver' },
+                { id: 'incoming', type: 'line', x1: 't', y1: '10', x2: 't', y2: '0.25*t^2', color: '#f59e0b', strokeWidth: 2, style: 'dashed' },
+                { id: 'reflected', type: 'line', x1: 't', y1: '0.25*t^2', x2: '0', y2: '1', color: '#f59e0b', strokeWidth: 2, label: 'Signal' },
+                { id: 'hit', type: 'point', x: 't', y: '0.25*t^2', color: '#f59e0b', r: 4 }
+            ]
+        }
+    },
+    {
+        id: 'projectile-motion',
+        title: 'Projectile Motion',
+        content: "Gravity pulls objects down, creating a parabolic path. Adjust the launch velocity. The water fountain follows the curve y = -x².",
+        interactiveType: 'graph',
+        category: 'Physics',
+
+        visualization: {
+            xDomain: [-1, 10],
+            yDomain: [0, 10],
+            paramRange: [1, 5],
+            paramLabel: "Velocity v",
+            elements: [
+                { id: 'ground', type: 'h-line', y: '0', color: '#10b981', strokeWidth: 2 },
+                { id: 'path', type: 'function', expression: '-(x - t)^2 + t^2', color: '#3b82f6', strokeWidth: 3, style: 'dashed' },
+                { id: 'water', type: 'point', x: '2*t', y: '0', color: '#3b82f6', r: 5, label: 'Splash' },
+                { id: 'peak', type: 'point', x: 't', y: 't^2', color: '#3b82f6', r: 4, label: 'Peak' }
+            ]
+        }
+    },
+    {
+        id: 'vertex-form',
+        title: 'Vertex Form',
+        content: "The equation y = a(x-h)² + k tells us the shape and position. (h,k) is the vertex. 'a' controls the width and direction.",
+        interactiveType: 'graph',
+        category: 'Equation',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-5, 5],
+            paramRange: [-3, 3],
+            paramLabel: "Vertex h",
+            elements: [
+                { id: 'para', type: 'function', expression: '0.5*(x-t)^2', color: '#8b5cf6', strokeWidth: 4 },
+                { id: 'vertex', type: 'point', x: 't', y: '0', color: '#8b5cf6', r: 6, label: 'V(h,k)' }
+            ]
+        }
+    },
+    {
+        id: 'target-practice',
+        title: 'Target Practice',
+        content: "Adjust the width 'a' to make the parabola hit the target point (3, 4). The vertex is at (0,0). Equation: y = ax².",
+        interactiveType: 'graph',
+        category: 'Game',
+        visualization: {
+            xDomain: [-5, 5],
+            yDomain: [-2, 8],
+            paramRange: [0.1, 1],
+            paramLabel: "Width a",
+            elements: [
+                { id: 'para', type: 'function', expression: 't*x^2', color: '#ec4899', strokeWidth: 4 },
+                { id: 'target', type: 'point', x: '3', y: '4', color: '#ef4444', r: 8, label: 'TARGET' },
+                { id: 'hit_check', type: 'point', x: '3', y: 't*9', color: '#ec4899', r: 4 }
+            ]
+        }
+    },
+    {
+        id: 'quiz-parabola',
+        title: 'Parabola Check',
+        content: "If the vertex is at (2, 3), which equation could it be?",
+        interactiveType: 'quiz',
+        quizOptions: ['y = (x+2)² + 3', 'y = (x-2)² + 3', 'y = (x-2)² - 3', 'y = 2(x+3)²'],
+        correctOption: 1,
+        category: 'Assessment'
+    }
+];
+
+
 export async function GET() {
     const supabase = await createClient()
 
@@ -1112,6 +1385,17 @@ export async function GET() {
             difficulty: 'Intermediate',
             icon_name: 'Circle',
             sort_order: 4
+        },
+        {
+            course_id: geometryCourse.id,
+            lesson_key: 'geometry-basic-5',
+            data: geometry5Data,
+            title: 'The Parabola',
+            description: 'Explore the geometric definition of a parabola using focus and directrix, and its vertex form equation.',
+            category: 'Geometry',
+            difficulty: 'Intermediate',
+            icon_name: 'Activity',
+            sort_order: 5
         }
     ]
 

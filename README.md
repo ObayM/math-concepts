@@ -3,7 +3,7 @@
 
 > Learn math in an interactive way
 
-Checkout: will deploy later
+Checkout: https://math-concepts.vercel.app/
 
 ---
 
@@ -57,5 +57,7 @@ Open [http://localhost:3000](http://localhost:3000) during development.
 * `/api/activity/`: to get the activity of a user (to create a gh style activity)
 * `/api/update-activity/`: to update activity 
 * `/api/streak/`: to fetch & calculate streak 
+* `api/progress/`: this updates your progress and saves your current step in a lesson and completed lessons, etc.. 
+* 
 
 ---
