@@ -21,7 +21,7 @@ export async function login(prevState, formData) {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/projects');
+  redirect('/dashboard');
 }
 
 export async function signup(prevState, formData) {

@@ -45,7 +45,7 @@ export async function updateSession(request) {
     !request.nextUrl.pathname.startsWith('/signup') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/error') &&
-    !request.nextUrl.pathname.startsWith('/') &&
+    pathname !== '/' && 
     !request.nextUrl.pathname.startsWith('/email-confirm')
 
   ) {
