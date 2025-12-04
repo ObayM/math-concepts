@@ -10,20 +10,20 @@ const defaultElements = [
     {
         id: 'func-1',
         type: 'function',
-        experession: 'sin(x) * cos(t)',
+        expression: 'sin(x) * cos(t)',
         color: '#3b82f6',
         strokeWidth: 3
     },
     {
         id: 'func-2',
         type: 'function',
-        experession: 'x^2 / 10',
+        expression: 'x^2 / 10',
         color: '#ef4444',
         strokeWidth: 3,
         style: 'dashed'
     }
 
-]
+];
 
 
 export default function Sandbox() {
@@ -36,7 +36,7 @@ export default function Sandbox() {
         yDomain: [-10, 10],
         paramRange: [0, 10],
         paramLabel: 'Time t'
-    })
+    });
 
     useEffect(() => {
         let interval;
@@ -49,7 +49,7 @@ export default function Sandbox() {
         }
 
         return () => clearInterval(interval);
-    }, [isPlaying])
+    }, [isPlaying]);
 
    
     const addElement = () => {
@@ -99,31 +99,31 @@ export default function Sandbox() {
                     </button>
                 </div>
 
-            </div>    
-             <div className="mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <div className="flex items-center justify-between mb-4">
-                <label className="text-sm font-bold text-slate-700">Parameter (t)</label>
-                <button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className={`p-2 rounded-lg transition-all ${isPlaying ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}
-                >
-                    {isPlaying ? <FiPause /> : <FiPlay />}
-                </button>
-            </div>
-                <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={interactiveValue}
-                    onChange={(e) => setInteractiveValue(Number(e.target.value))}
-                    className="w-full accent-blue-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-xs text-slate-400 mt-2 font-mono">
-                    <span>0</span>
-                    <span>{interactiveValue}</span>
-                    <span>100</span>
-                </div>
 
+                <div className="mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <label className="text-sm font-bold text-slate-700">Parameter (t)</label>
+                        <button
+                            onClick={() => setIsPlaying(!isPlaying)}
+                            className={`p-2 rounded-lg transition-all ${isPlaying ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}
+                        >
+                            {isPlaying ? <FiPause /> : <FiPlay />}
+                        </button>
+                    </div>
+                    <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={interactiveValue}
+                        onChange={(e) => setInteractiveValue(Number(e.target.value))}
+                        className="w-full accent-blue-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-slate-400 mt-2 font-mono">
+                        <span>0</span>
+                        <span>{interactiveValue}</span>
+                        <span>100</span>
+                    </div>
+                </div>
 
 
                 <div className="space-y-4 grow">
@@ -221,5 +221,3 @@ export default function Sandbox() {
         </div>
     );
 }
-
-
