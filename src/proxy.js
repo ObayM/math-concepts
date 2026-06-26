@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 const PUBLIC_PATHS = [
-  "/",
   "/login",
   "/signup",
   "/auth",
@@ -10,7 +9,7 @@ const PUBLIC_PATHS = [
   "/error",
 ];
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
 
   const isPublic =
