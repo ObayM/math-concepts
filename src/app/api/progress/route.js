@@ -1,107 +1,77 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextResponse } from 'next/server'
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 export async function POST(request) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { lessonKey, currentStep, isCompleted } = await request.json();
+  if (!lessonKey) {
+    return NextResponse.json({ error: "lessonKey is required" }, { status: 400 });
+  }
 
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const lesson = await prisma.lesson.findUnique({
+    where: { lessonKey },
+    select: { id: true },
+  });
+  if (!lesson) {
+    return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+  }
 
-    try {
-        const { lessonKey, currentStep, isCompleted } = await request.json()
+  const now = new Date();
+  await prisma.userLessonProgress.upsert({
+    where: {
+      userId_lessonId: { userId: session.user.id, lessonId: lesson.id },
+    },
+    update: {
+      currentStep,
+      lastPlayedAt: now,
+      ...(isCompleted && { completed: true, completedAt: now }),
+    },
+    create: {
+      userId: session.user.id,
+      lessonId: lesson.id,
+      currentStep,
+      lastPlayedAt: now,
+      ...(isCompleted && { completed: true, completedAt: now }),
+    },
+  });
 
-        if (!lessonKey) {
-            return NextResponse.json({ error: 'Lesson Key is required :(' }, { status: 400 })
-        }
-
-
-        const { data: lesson, error: lessonError } = await supabase
-            .from('lessons')
-            .select('id')
-            .eq('lesson_key', lessonKey)
-            .single()
-
-        if (lessonError || !lesson) {
-            return NextResponse.json({ error: 'Lesson not found :(' }, { status: 404 })
-        }
-
-
-        const updateData = {
-            user_id: user.id,
-            lesson_id: lesson.id,
-            current_step: currentStep,
-            last_played_at: new Date().toISOString(),
-        }
-
-        if (isCompleted) {
-            updateData.completed = true
-            updateData.completed_at = new Date().toISOString()
-        }
-
-        const { error: progressError } = await supabase
-            .from('user_lesson_progress')
-            .upsert(updateData, { onConflict: 'user_id, lesson_id' })
-
-        if (progressError) {
-            throw progressError
-        }
-
-        return NextResponse.json({ success: true })
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+  return NextResponse.json({ success: true });
 }
 
 export async function GET(request) {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const lessonKey = request.nextUrl.searchParams.get("lessonKey");
+  if (!lessonKey) {
+    return NextResponse.json({ error: "lessonKey is required" }, { status: 400 });
+  }
 
-    const { searchParams } = new URL(request.url)
-    const lessonKey = searchParams.get('lessonKey')
+  const lesson = await prisma.lesson.findUnique({
+    where: { lessonKey },
+    select: { id: true },
+  });
+  if (!lesson) {
+    return NextResponse.json({ currentStep: 0, completed: false });
+  }
 
-    if (!lessonKey) {
-        return NextResponse.json({ error: 'Lesson Key is required :(' }, { status: 400 })
-    }
+  const progress = await prisma.userLessonProgress.findUnique({
+    where: {
+      userId_lessonId: { userId: session.user.id, lessonId: lesson.id },
+    },
+    select: { currentStep: true, completed: true },
+  });
 
-    try {
-
-        const { data: lesson, error: lessonError } = await supabase
-            .from('lessons')
-            .select('id')
-            .eq('lesson_key', lessonKey)
-            .single()
-
-        if (lessonError || !lesson) {
-
-            return NextResponse.json({ currentStep: 0, completed: false })
-        }
-
-
-        const { data: progress, error: progressError } = await supabase
-            .from('user_lesson_progress')
-            .select('current_step, completed')
-            .eq('user_id', user.id)
-            .eq('lesson_id', lesson.id)
-            .single()
-
-        if (progressError && progressError.code !== 'PGRST116') { 
-            // fyi PGRST116 = "no rows returned"
-            throw progressError
-        }
-
-        return NextResponse.json({
-            currentStep: progress?.current_step || 0,
-            completed: progress?.completed || false
-        })
-
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+  return NextResponse.json({
+    currentStep: progress?.currentStep ?? 0,
+    completed: progress?.completed ?? false,
+  });
 }

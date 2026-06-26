@@ -1,23 +1,12 @@
-import { createClient } from '@/utils/supabase/server';
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function getUserInfo() {
-  const supabase = await createClient();
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return null;
 
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData?.user) return null;
-
-  const user = authData.user;
-
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError) {
-    console.error('Profile not found:', profileError);
-    return { user, profile: null };
-  }
+  const user = session.user;
+  const profile = user.username ? { username: user.username, id: user.id } : null;
 
   return { user, profile };
 }

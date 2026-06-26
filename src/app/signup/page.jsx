@@ -1,64 +1,62 @@
 "use client";
 
-import { useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
-import { signup } from '@/components/auth/actions';
-import Link from 'next/link';
-import { useAuth } from '@/components/auth/AuthProvider';
-import { Mail, KeyRound, Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
-import { redirect } from 'next/navigation';
-
-function SubmitButton() {
-  const { pending } = useFormStatus(); 
-
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="flex items-center justify-center w-full px-4 py-3 text-sm font-semibold text-white
-       transition-all duration-300 ease-in-out bg-blue-600 rounded-lg shadow-md
-        hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 
-        focus:ring-offset-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
-    >
-      {pending ? (
-        <>
-          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-          <span>Signing Up...</span>
-        </>
-      ) : (
-        <>
-          <LogIn className="w-5 h-5 mr-2" />
-          <span>Create Account</span>
-        </>
-      )}
-    </button>
-  );
-}
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Mail, KeyRound, Eye, EyeOff, Loader2, LogIn } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 
 export default function SignupPage() {
   const { user } = useAuth();
-  const initialState = { message: '' };
-  const [state, dispatch] = useFormState(signup, initialState);
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  if (user) return redirect("/");
+  if (user) return redirect("/dashboard");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+
+    const { error: authError } = await authClient.signUp.email({
+      email,
+      password,
+      name: email,
+      callbackURL: "/onboarding",
+    });
+
+    if (authError) {
+      setError(authError.message ?? "Something went wrong. Please try again.");
+      setLoading(false);
+    } else {
+      router.push(`/auth/email-confirm?email=${encodeURIComponent(email)}`);
+    }
+  }
+
   return (
-    <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4 ">
-      <div 
-        className="w-full max-w-md p-6 space-y-6 bg-white border rounded-2xl shadow-xl border-neutral-200/70 sm:p-8"
-
-      >
+    <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4">
+      <div className="w-full max-w-md p-6 space-y-6 bg-white border rounded-2xl shadow-xl border-neutral-200/70 sm:p-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Create an Account
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Join us and start your journey!
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Join us and start your journey!</p>
         </div>
 
-        <form action={dispatch} className="space-y-6">
-
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
             <Mail className="absolute w-5 h-5 text-gray-400 top-3.5 left-3" />
             <input
@@ -68,9 +66,9 @@ export default function SignupPage() {
               autoComplete="email"
               required
               placeholder="Email address"
-              className="block w-full py-3 pl-10 pr-3 text-gray-900 bg-gray-50 border
-               border-gray-300 rounded-lg shadow-sm appearance-none placeholder:text-gray-400
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="block w-full py-3 pl-10 pr-3 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
 
@@ -83,9 +81,9 @@ export default function SignupPage() {
               autoComplete="new-password"
               required
               placeholder="Password"
-              className="block w-full py-3 pl-10 pr-10 text-gray-900 bg-gray-50 border
-               border-gray-300 rounded-lg shadow-sm appearance-none placeholder:text-gray-400 
-               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="block w-full py-3 pl-10 pr-10 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
             <button
               type="button"
@@ -96,28 +94,37 @@ export default function SignupPage() {
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
-          
-          {state?.message && (
-             <p 
-              className="text-sm font-medium text-center text-red-600"
-            >
-              {state.message}
-            </p>
+
+          {error && (
+            <p className="text-sm font-medium text-center text-red-600">{error}</p>
           )}
 
-          <div>
-            <SubmitButton />
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-300 bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Signing Up...
+              </>
+            ) : (
+              <>
+                <LogIn className="w-5 h-5 mr-2" />
+                Create Account
+              </>
+            )}
+          </button>
         </form>
 
         <p className="mt-8 text-sm text-center text-gray-600">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
             Sign In
           </Link>
         </p>
       </div>
     </main>
-  )
+  );
 }
-

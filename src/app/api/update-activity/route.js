@@ -1,26 +1,30 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextResponse } from 'next/server'
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 export async function POST() {
-    const supabase = await createClient()
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-    const today = new Date().toISOString().split('T')[0]
+  await prisma.userDailyActivity.upsert({
+    where: {
+      userId_activityDate: {
+        userId: session.user.id,
+        activityDate: today,
+      },
+    },
+    update: {},
+    create: {
+      userId: session.user.id,
+      activityDate: today,
+    },
+  });
 
-    const { error } = await supabase
-        .from('user_daily_activity')
-        .upsert(
-            { user_id: user.id, activity_date: today },
-            { onConflict: 'user_id, activity_date' }
-        )
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true });
 }

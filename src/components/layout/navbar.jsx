@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { logOut } from '@/components/auth/actions';
+import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 import { Menu, X, User } from 'lucide-react';
 
 
@@ -28,6 +29,13 @@ const useOutsideClick = (ref, callback) => {
 export default function Navbar() {
   const { user } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await authClient.signOut({
+      fetchOptions: { onSuccess: () => { router.push('/'); router.refresh(); } },
+    });
+  }
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -106,14 +114,12 @@ export default function Navbar() {
                       >
                         My Profile
                       </Link>
-                      <form action={logOut} className="w-full">
-                        <button
-                          type="submit"
-                          className="text-red-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-100"
-                        >
-                          Log Out
-                        </button>
-                      </form>
+                      <button
+                        onClick={handleLogout}
+                        className="text-red-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-100"
+                      >
+                        Log Out
+                      </button>
                     </div>
                   </div>
                 )}
@@ -183,11 +189,9 @@ export default function Navbar() {
                       >
                         <User className="w-5 h-5" /> My Profile
                       </Link>
-                      <form action={logOut} className="w-full">
-                        <button type="submit" className="w-full rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500">
-                          Log Out
-                        </button>
-                      </form>
+                      <button onClick={handleLogout} className="w-full rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500">
+                        Log Out
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-4">

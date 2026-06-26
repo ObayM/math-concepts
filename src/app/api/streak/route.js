@@ -1,57 +1,49 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextResponse } from 'next/server'
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 export async function GET() {
-    const supabase = await createClient()
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const activities = await prisma.userDailyActivity.findMany({
+    where: { userId: session.user.id },
+    select: { activityDate: true },
+    orderBy: { activityDate: "desc" },
+  });
 
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized :/' }, { status: 401 })
+  if (activities.length === 0) return NextResponse.json({ streak: 0 });
+
+  const toDateStr = (date) => date.toISOString().split("T")[0];
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const todayStr = toDateStr(today);
+  const yesterdayStr = toDateStr(yesterday);
+
+  const dateStrings = activities.map((a) => toDateStr(a.activityDate));
+  const hasToday = dateStrings.includes(todayStr);
+  const hasYesterday = dateStrings.includes(yesterdayStr);
+
+  if (!hasToday && !hasYesterday) return NextResponse.json({ streak: 0 });
+
+  let streak = 0;
+  let currentDate = hasToday ? today : yesterday;
+
+  for (const dateStr of dateStrings) {
+    const expected = toDateStr(currentDate);
+    if (dateStr === expected) {
+      streak++;
+      currentDate = new Date(currentDate);
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else if (dateStr < expected) {
+      break;
     }
+  }
 
-    const { data: activities, error } = await supabase
-        .from('user_daily_activity')
-        .select('activity_date')
-        .eq('user_id', user.id)
-        .order('activity_date', { ascending: false })
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    let streak = 0
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
-
-    const toDateString = (date) => date.toISOString().split('T')[0]
-    const todayStr = toDateString(today)
-    const yesterdayStr = toDateString(yesterday)
-
-
-    const hasActivityToday = activities.some(a => a.activity_date === todayStr)
-    const hasActivityYesterday = activities.some(a => a.activity_date === yesterdayStr)
-
-    if (!hasActivityToday && !hasActivityYesterday) {
-        return NextResponse.json({ streak: 0 })
-    }
-
-    let currentDate = hasActivityToday ? today : yesterday
-
-    for (let i = 0; i < activities.length; i++) {
-        const activityDate = activities[i].activity_date
-        const expectedDateStr = toDateString(currentDate)
-
-        if (activityDate === expectedDateStr) {
-            streak++
-            currentDate.setDate(currentDate.getDate() - 1)
-        } else if (activityDate < expectedDateStr) {
-
-            break
-        }
-
-    }
-
-    return NextResponse.json({ streak })
+  return NextResponse.json({ streak });
 }

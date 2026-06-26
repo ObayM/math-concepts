@@ -1,19 +1,13 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextResponse } from 'next/server'
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
-    const { id } = await params
-    const supabase = await createClient()
+  const { id } = await params;
 
-    const { data: course, error } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('id', id)
-        .single()
+  const course = await prisma.course.findUnique({ where: { id } });
+  if (!course) {
+    return NextResponse.json({ error: "Course not found" }, { status: 404 });
+  }
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(course)
+  return NextResponse.json(course);
 }

@@ -6,13 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "curl http://localhost:3000/api/create-lessons"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
-    "@supabase/ssr": "^0.7.0",
-    "@supabase/supabase-js": "^2.81.1",
+    "@prisma/client": "^6.0.0",
+    "better-auth": "^1.0.0",
     "clsx": "^2.1.1",
+    "nodemailer": "^6.9.0",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.553.0",
     "next": "16.0.1",
@@ -25,6 +32,7 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
+    "prisma": "^6.0.0",
     "tailwindcss": "^4"
   }
 }

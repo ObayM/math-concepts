@@ -1,34 +1,30 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextResponse } from 'next/server'
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 export async function GET() {
-    const supabase = await createClient()
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized :/' }, { status: 401 })
-    }
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    const oneYearAgo = new Date()
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
-    const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0]
+  const activities = await prisma.userDailyActivity.findMany({
+    where: {
+      userId: session.user.id,
+      activityDate: { gte: oneYearAgo },
+    },
+    select: { activityDate: true },
+    orderBy: { activityDate: "asc" },
+  });
 
-    const { data: activities, error } = await supabase
-        .from('user_daily_activity')
-        .select('activity_date')
-        .eq('user_id', user.id)
-        .gte('activity_date', oneYearAgoStr)
-        .order('activity_date', { ascending: true })
+  const activityMap = activities.map((a) => ({
+    date: a.activityDate.toISOString().split("T")[0],
+    count: 1,
+  }));
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    
-    const activityMap = activities.map(a => ({
-        date: a.activity_date,
-        count: 1
-    }))
-
-    return NextResponse.json({ activity: activityMap })
+  return NextResponse.json({ activity: activityMap });
 }

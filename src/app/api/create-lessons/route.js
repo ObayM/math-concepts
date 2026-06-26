@@ -1,5 +1,5 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextResponse } from 'next/server'
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 
 const lesson1Steps = [
@@ -1245,167 +1245,171 @@ const geometry5Data = [
 
 
 export async function GET() {
-    const supabase = await createClient()
+    const algebraCourse = await prisma.course.upsert({
+        where: { name: 'Algebra' },
+        update: {},
+        create: { name: 'Algebra', description: 'Master the fundamentals of Algebra.' },
+    });
 
-
-    const { data: algebraCourse } = await supabase.from('courses').upsert({ name: 'Algebra', description: 'Master the fundamentals of Algebra.' }, { onConflict: 'name' }).select().single()
-    const { data: geometryCourse } = await supabase.from('courses').upsert({ name: 'Geometry', description: 'Explore the world of shapes and space.' }, { onConflict: 'name' }).select().single()
-
+    const geometryCourse = await prisma.course.upsert({
+        where: { name: 'Geometry' },
+        update: {},
+        create: { name: 'Geometry', description: 'Explore the world of shapes and space.' },
+    });
 
     const lessons = [
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-1',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-1',
             data: lesson1Steps,
             title: 'Intro to Real Functions',
             description: 'Understand how to determine the domain and range of real functions, including restrictions and interval representation.',
             category: 'Algebra',
             difficulty: 'Beginner',
-            icon_name: 'FunctionSquare',
-            sort_order: 1
+            iconName: 'FunctionSquare',
+            sortOrder: 1,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-2',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-2',
             data: lesson2Steps,
             title: 'Monotonicity of Functions',
             description: 'Learn how to analyze whether a function is increasing, decreasing, or non-monotonic.',
             category: 'Algebra',
             difficulty: 'Beginner',
-            icon_name: 'TrendingUp',
-            sort_order: 2
+            iconName: 'TrendingUp',
+            sortOrder: 2,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-3',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-3',
             data: lesson3Steps,
             title: 'Operations on Functions',
             description: 'Explore how to add, subtract, multiply, divide, and compose functions.',
             category: 'Algebra',
             difficulty: 'Intermediate',
-            icon_name: 'Sigma',
-            sort_order: 3
+            iconName: 'Sigma',
+            sortOrder: 3,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-4',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-4',
             data: [],
             title: 'Properties of Functions',
             description: 'Study even, odd, and one-to-one functions and how to identify them graphically and algebraically.',
             category: 'Algebra',
             difficulty: 'Intermediate',
-            icon_name: 'LineChart',
-            sort_order: 4
+            iconName: 'LineChart',
+            sortOrder: 4,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-5',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-5',
             data: lesson5Data,
             title: 'Graphing Basic and Piecewise Functions',
             description: 'Learn how to sketch basic function graphs and piecewise-defined functions.',
             category: 'Algebra',
             difficulty: 'Intermediate',
-            icon_name: 'LineChart',
-            sort_order: 5
+            iconName: 'LineChart',
+            sortOrder: 5,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-6',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-6',
             data: lesson6Data,
             title: 'Geometric Transformations of Functions',
             description: 'Understand shifts, reflections, stretching, and compression of function graphs.',
             category: 'Algebra',
             difficulty: 'Intermediate',
-            icon_name: 'Move',
-            sort_order: 6
+            iconName: 'Move',
+            sortOrder: 6,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-7',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-7',
             data: lesson7Data,
             title: 'Inverse Functions',
             description: 'Learn how to determine whether a function is invertible, find the inverse algebraically, and interpret inverse functions graphically.',
             category: 'Algebra',
             difficulty: 'Intermediate',
-            icon_name: 'Undo2',
-            sort_order: 7
+            iconName: 'Undo2',
+            sortOrder: 7,
         },
         {
-            course_id: algebraCourse.id,
-            lesson_key: 'real-functions-8',
+            courseId: algebraCourse.id,
+            lessonKey: 'real-functions-8',
             data: lesson8Data,
             title: 'Advanced Visualizations',
             description: 'Master vectors, parametric equations, and advanced graphing techniques.',
             category: 'Algebra',
             difficulty: 'Advanced',
-            icon_name: 'Ruler',
-            sort_order: 8
+            iconName: 'Ruler',
+            sortOrder: 8,
         },
-
         {
-            course_id: geometryCourse.id,
-            lesson_key: 'geometry-basic-1',
+            courseId: geometryCourse.id,
+            lessonKey: 'geometry-basic-1',
             data: geometry1Data,
             title: 'Points & Coordinates',
             description: 'Master the Cartesian plane. Learn how to plot points and calculate the distance between them using the Distance Formula.',
             category: 'Geometry',
             difficulty: 'Beginner',
-            icon_name: 'MapPin',
-            sort_order: 1
+            iconName: 'MapPin',
+            sortOrder: 1,
         },
         {
-            course_id: geometryCourse.id,
-            lesson_key: 'geometry-basic-2',
+            courseId: geometryCourse.id,
+            lessonKey: 'geometry-basic-2',
             data: geometry2Data,
             title: 'The Slope of a Line',
             description: 'Understand the concept of slope as "Rise over Run" and how it defines the steepness and direction of a line.',
             category: 'Geometry',
             difficulty: 'Beginner',
-            icon_name: 'TrendingUp',
-            sort_order: 2
+            iconName: 'TrendingUp',
+            sortOrder: 2,
         },
         {
-            course_id: geometryCourse.id,
-            lesson_key: 'geometry-basic-3',
+            courseId: geometryCourse.id,
+            lessonKey: 'geometry-basic-3',
             data: geometry3Data,
             title: 'Triangles on the Plane',
             description: 'Explore the properties of triangles in the coordinate plane, including vertices, side lengths, and area calculations.',
             category: 'Geometry',
             difficulty: 'Intermediate',
-            icon_name: 'Triangle',
-            sort_order: 3
+            iconName: 'Triangle',
+            sortOrder: 3,
         },
         {
-            course_id: geometryCourse.id,
-            lesson_key: 'geometry-basic-4',
+            courseId: geometryCourse.id,
+            lessonKey: 'geometry-basic-4',
             data: geometry4Data,
             title: 'The Circle Equation',
             description: 'Derive and understand the standard equation of a circle (x-h)² + (y-k)² = r² and how to graph it.',
             category: 'Geometry',
             difficulty: 'Intermediate',
-            icon_name: 'Circle',
-            sort_order: 4
+            iconName: 'Circle',
+            sortOrder: 4,
         },
         {
-            course_id: geometryCourse.id,
-            lesson_key: 'geometry-basic-5',
+            courseId: geometryCourse.id,
+            lessonKey: 'geometry-basic-5',
             data: geometry5Data,
             title: 'The Parabola',
             description: 'Explore the geometric definition of a parabola using focus and directrix, and its vertex form equation.',
             category: 'Geometry',
             difficulty: 'Intermediate',
-            icon_name: 'Activity',
-            sort_order: 5
-        }
-    ]
+            iconName: 'Activity',
+            sortOrder: 5,
+        },
+    ];
 
     for (const lesson of lessons) {
-        const { error } = await supabase
-            .from('lessons')
-            .upsert(lesson, { onConflict: 'lesson_key' })
-
-        if (error) console.error('Error seeding lesson:', lesson.lesson_key, error)
+        await prisma.lesson.upsert({
+            where: { lessonKey: lesson.lessonKey },
+            update: lesson,
+            create: lesson,
+        }).catch((e) => console.error('Error seeding lesson:', lesson.lessonKey, e.message));
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
 }
