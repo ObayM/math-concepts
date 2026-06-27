@@ -3,15 +3,15 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER:     ${POSTGRES_USER:-mathly}
+      POSTGRES_USER: ${POSTGRES_USER:-mathly}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
-      POSTGRES_DB:       ${POSTGRES_DB:-mathly}
+      POSTGRES_DB: ${POSTGRES_DB:-mathly}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mathly}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-mathly}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
       # override DB URL to point at the internal service name
       DATABASE_URL: postgresql://${POSTGRES_USER:-mathly}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mathly}
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
 volumes:
   postgres_data:

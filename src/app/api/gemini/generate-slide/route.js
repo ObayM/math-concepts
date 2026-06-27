@@ -1,7 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI } from '@google/genai';
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 export async function POST(req) {
@@ -42,11 +42,10 @@ export async function POST(req) {
       Generate 1 slide. Only return JSON
     `;
 
-
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: 'gemini-2.5-flash',
       contents: prompt,
-      config: { responseMimeType: "application/json" }
+      config: { responseMimeType: 'application/json' },
     });
 
     const text = response.text;
@@ -54,7 +53,7 @@ export async function POST(req) {
 
     return Response.json({ ...slide, isAiGenerated: true });
   } catch (error) {
-    console.error("Slide generation error", error);
-    return Response.json({ error: "Slide generation failed" }, { status: 500 });
+    console.error('Slide generation error', error);
+    return Response.json({ error: 'Slide generation failed' }, { status: 500 });
   }
 }

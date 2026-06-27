@@ -1,9 +1,9 @@
-import { prisma } from "@/lib/prisma";
-import LessonTemplateNew from "../../algebra/LessonTemplateNew";
+import { prisma } from '@/lib/prisma';
+import LessonTemplateNew from '../../algebra/LessonTemplateNew';
 
 export default async function LessonPage() {
   const lesson = await prisma.lesson.findUnique({
-    where: { lessonKey: "geometry-basic-4" },
+    where: { lessonKey: 'geometry-basic-4' },
     select: { data: true },
   });
 
@@ -15,7 +15,10 @@ export default async function LessonPage() {
           <p className="text-slate-600 mb-6">
             Sorry, we couldn&apos;t load this lesson. Please try again later.
           </p>
-          <a href="/courses/geometry" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <a
+            href="/courses/geometry"
+            className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
             Return to Geometry
           </a>
         </div>

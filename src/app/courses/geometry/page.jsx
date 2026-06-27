@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import LessonCard from "@/components/lessonCard";
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import LessonCard from '@/components/lessonCard';
 
 export default async function GeometryCourse() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -25,8 +25,8 @@ export default async function GeometryCourse() {
   }
 
   const lessons = await prisma.lesson.findMany({
-    where: { category: "Geometry" },
-    orderBy: { sortOrder: "asc" },
+    where: { category: 'Geometry' },
+    orderBy: { sortOrder: 'asc' },
   });
 
   const lessonsWithProgress = lessons.map((lesson, index) => {
@@ -34,16 +34,16 @@ export default async function GeometryCourse() {
     const isCompleted = progress?.is_completed;
     const isStarted = (progress?.current_step ?? 0) > 0;
 
-    let status = "locked";
+    let status = 'locked';
     if (isCompleted) {
-      status = "completed";
+      status = 'completed';
     } else if (index === 0) {
-      status = "unlocked";
+      status = 'unlocked';
     } else {
       const prevKey = lessons[index - 1].lessonKey;
-      if (progressMap.get(prevKey)?.is_completed) status = "unlocked";
+      if (progressMap.get(prevKey)?.is_completed) status = 'unlocked';
     }
-    if (status === "locked" && isStarted) status = "unlocked";
+    if (status === 'locked' && isStarted) status = 'unlocked';
 
     return { ...lesson, id: lesson.lessonKey, status };
   });
@@ -56,14 +56,14 @@ export default async function GeometryCourse() {
             Geometry Course
           </span>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
-            Explore the{" "}
+            Explore the{' '}
             <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-teal-600">
               Shape of Space
             </span>
           </h1>
           <p className="text-xl text-slate-600 leading-relaxed">
-            Dive into the world of points, lines, and shapes. Master the
-            coordinate plane and visualize geometric concepts like never before.
+            Dive into the world of points, lines, and shapes. Master the coordinate plane and
+            visualize geometric concepts like never before.
           </p>
         </div>
 

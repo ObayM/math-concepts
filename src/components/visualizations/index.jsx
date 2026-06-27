@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -11,9 +11,8 @@ import {
   ReferenceDot,
   Area,
   ComposedChart,
-  Label
+  Label,
 } from 'recharts';
-
 
 const evaluateMath = (expr, context) => {
   if (!expr) return 0;
@@ -55,28 +54,25 @@ const evaluateMath = (expr, context) => {
 };
 
 export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
-  const [chartData, setChartData] = useState([]);
-  const [parametricData, setParametricData] = useState({});
-
-
   const t = useMemo(() => {
     const [min, max] = config.paramRange || [0, 10];
     const normalized = interactiveValue / 100;
-    return min + (normalized * (max - min));
+    return min + normalized * (max - min);
   }, [config.paramRange, interactiveValue]);
 
-
-  useEffect(() => {
+  const chartData = useMemo(() => {
     const points = [];
     const [xMin, xMax] = config.xDomain;
     const step = (xMax - xMin) / 200;
 
-    const functionElements = config.elements.filter(e => e.type === 'function' || e.type === 'area');
+    const functionElements = config.elements.filter(
+      (e) => e.type === 'function' || e.type === 'area'
+    );
 
     for (let x = xMin; x <= xMax + step / 2; x += step) {
       const point = { x };
 
-      functionElements.forEach(el => {
+      functionElements.forEach((el) => {
         if (el.expression) {
           const val = evaluateMath(el.expression, { x, t });
           point[el.id] = isNaN(val) ? null : val;
@@ -93,15 +89,14 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
       });
       points.push(point);
     }
-    setChartData(points);
+    return points;
   }, [config, t]);
 
-
-  useEffect(() => {
+  const parametricData = useMemo(() => {
     const newParametricData = {};
-    const parametricElements = config.elements.filter(e => e.type === 'parametric');
+    const parametricElements = config.elements.filter((e) => e.type === 'parametric');
 
-    parametricElements.forEach(el => {
+    parametricElements.forEach((el) => {
       const pPoints = [];
       const tMin = el.tRange ? el.tRange[0] : 0;
       const tMax = el.tRange ? el.tRange[1] : 2 * Math.PI;
@@ -109,9 +104,9 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
       const dt = (tMax - tMin) / steps;
 
       for (let pT = tMin; pT <= tMax; pT += dt) {
-        const xVal = evaluateMath(el.xExpression, { t: pT, T: t }); 
+        const xVal = evaluateMath(el.xExpression, { t: pT, T: t });
         // ^^ 't' is local param but 'T' is the global interactive one
-        
+
         const yVal = evaluateMath(el.yExpression, { t: pT, T: t });
         if (!isNaN(xVal) && !isNaN(yVal)) {
           pPoints.push({ x: xVal, y: yVal });
@@ -120,9 +115,8 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
       newParametricData[el.id] = pPoints;
     });
 
-    setParametricData(newParametricData);
+    return newParametricData;
   }, [config, t]);
-
 
   const renderDynamicElements = () => {
     return config.elements.map((el, idx) => {
@@ -149,7 +143,17 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
               stroke="white"
               strokeWidth={2}
               isFront={true}
-              label={el.label ? { value: el.label, position: 'top', fill: el.color, fontSize: 12, fontWeight: 'bold' } : undefined}
+              label={
+                el.label
+                  ? {
+                      value: el.label,
+                      position: 'top',
+                      fill: el.color,
+                      fontSize: 12,
+                      fontWeight: 'bold',
+                    }
+                  : undefined
+              }
             />
           );
         }
@@ -164,17 +168,26 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
           return (
             <ReferenceLine
               key={key}
-              segment={[{ x: x1, y: y1 }, { x: x2, y: y2 }]}
+              segment={[
+                { x: x1, y: y1 },
+                { x: x2, y: y2 },
+              ]}
               stroke={el.color}
-              strokeDasharray={el.style === 'dashed' ? "6 6" : el.style === 'dotted' ? "3 3" : undefined}
+              strokeDasharray={
+                el.style === 'dashed' ? '6 6' : el.style === 'dotted' ? '3 3' : undefined
+              }
               strokeWidth={el.strokeWidth || 2}
-              label={el.label ? { value: el.label, position: 'insideTop', fill: el.color, fontSize: 12 } : undefined}
+              label={
+                el.label
+                  ? { value: el.label, position: 'insideTop', fill: el.color, fontSize: 12 }
+                  : undefined
+              }
             />
           );
         }
 
         case 'vector': {
-          // not nice but yeah 
+          // not nice but yeah
           // We need to make this much better actually
           const x1 = evaluateMath(el.x1 || '0', { t });
           const y1 = evaluateMath(el.y1 || '0', { t });
@@ -186,7 +199,10 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
           return (
             <React.Fragment key={key}>
               <ReferenceLine
-                segment={[{ x: x1, y: y1 }, { x: x2, y: y2 }]}
+                segment={[
+                  { x: x1, y: y1 },
+                  { x: x2, y: y2 },
+                ]}
                 stroke={el.color}
                 strokeWidth={el.strokeWidth || 2}
               />
@@ -203,9 +219,13 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
               key={key}
               x={vx}
               stroke={el.color}
-              strokeDasharray={el.style === 'dashed' ? "6 6" : undefined}
+              strokeDasharray={el.style === 'dashed' ? '6 6' : undefined}
               strokeWidth={el.strokeWidth || 2}
-              label={el.label ? { value: el.label, fill: el.color, fontSize: 12, position: 'insideTopRight' } : undefined}
+              label={
+                el.label
+                  ? { value: el.label, fill: el.color, fontSize: 12, position: 'insideTopRight' }
+                  : undefined
+              }
             />
           );
         }
@@ -218,9 +238,13 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
               key={key}
               y={hy}
               stroke={el.color}
-              strokeDasharray={el.style === 'dashed' ? "6 6" : undefined}
+              strokeDasharray={el.style === 'dashed' ? '6 6' : undefined}
               strokeWidth={el.strokeWidth || 2}
-              label={el.label ? { value: el.label, fill: el.color, fontSize: 12, position: 'insideTopRight' } : undefined}
+              label={
+                el.label
+                  ? { value: el.label, fill: el.color, fontSize: 12, position: 'insideTopRight' }
+                  : undefined
+              }
             />
           );
         }
@@ -231,7 +255,12 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
           if (isNaN(tx) || isNaN(ty)) return null;
           return (
             <ReferenceDot key={key} x={tx} y={ty} r={0} stroke="none" fill="none">
-              <Label value={el.content} position="center" fill={el.color || '#334155'} fontSize={el.fontSize || 14} />
+              <Label
+                value={el.content}
+                position="center"
+                fill={el.color || '#334155'}
+                fontSize={el.fontSize || 14}
+              />
             </ReferenceDot>
           );
         }
@@ -243,70 +272,65 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
   };
 
   return (
-    <div className={`${className || "h-80"} w-full bg-white rounded-3xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] 
-    p-2 border border-slate-100 relative overflow-hidden group `}>
+    <div
+      className={`${className || 'h-80'} w-full bg-white rounded-3xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] 
+    p-2 border border-slate-100 relative overflow-hidden group `}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-          <XAxis
-            dataKey="x"
-            type="number"
-            domain={config.xDomain}
-            hide
-            allowDataOverflow
-          />
-          <YAxis
-            domain={config.yDomain}
-            hide
-            allowDataOverflow
-          />
+          <XAxis dataKey="x" type="number" domain={config.xDomain} hide allowDataOverflow />
+          <YAxis domain={config.yDomain} hide allowDataOverflow />
 
           <ReferenceLine x={0} stroke="#cbd5e1" strokeWidth={2} />
           <ReferenceLine y={0} stroke="#cbd5e1" strokeWidth={2} />
 
-
-          {config.elements.filter(e => e.type === 'area').map((area) => (
-            <Area
-              key={area.id}
-              type="monotone"
-              dataKey={area.id}
-              stroke="none"
-              fill={area.color}
-              fillOpacity={area.opacity || 0.3}
-              isAnimationActive={false}
+          {config.elements
+            .filter((e) => e.type === 'area')
+            .map((area) => (
+              <Area
+                key={area.id}
+                type="monotone"
+                dataKey={area.id}
+                stroke="none"
+                fill={area.color}
+                fillOpacity={area.opacity || 0.3}
+                isAnimationActive={false}
               />
-          ))}
-          
-          {config.elements.filter(e => e.type === 'function').map((func) => (
-            <Line
-              key={func.id}
-              type={func.id.includes('step') ? "step" : "monotone"}
-              dataKey={func.id}
-              stroke={func.color}
-              strokeWidth={func.strokeWidth || 3}
-              dot={false}
-              isAnimationActive={false}
-              connectNulls={false}
-              strokeDasharray={func.style === 'dashed' ? "5 5" : undefined}
-            />
-          ))}
+            ))}
 
-          {config.elements.filter(e => e.type === 'parametric').map((param) => (
-            <Line
-              key={param.id}
-              data={parametricData[param.id] || []}
-              type="monotone"
-              dataKey="y"
-              stroke={param.color}
-              strokeWidth={param.strokeWidth || 3}
-              dot={false}
-              isAnimationActive={false}
-            />
-          ))}
+          {config.elements
+            .filter((e) => e.type === 'function')
+            .map((func) => (
+              <Line
+                key={func.id}
+                type={func.id.includes('step') ? 'step' : 'monotone'}
+                dataKey={func.id}
+                stroke={func.color}
+                strokeWidth={func.strokeWidth || 3}
+                dot={false}
+                isAnimationActive={false}
+                connectNulls={false}
+                strokeDasharray={func.style === 'dashed' ? '5 5' : undefined}
+              />
+            ))}
 
+          {config.elements
+            .filter((e) => e.type === 'parametric')
+            .map((param) => (
+              <Line
+                key={param.id}
+                data={parametricData[param.id] || []}
+                type="monotone"
+                dataKey="y"
+                stroke={param.color}
+                strokeWidth={param.strokeWidth || 3}
+                dot={false}
+                isAnimationActive={false}
+              />
+            ))}
 
           {renderDynamicElements()}
-
         </ComposedChart>
       </ResponsiveContainer>
 
@@ -314,9 +338,7 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
           {config.paramLabel?.split(' ')[1] || 'Parameter'}
         </div>
-        <div className="font-mono text-slate-700 font-bold text-sm">
-          {t.toFixed(1)}
-        </div>
+        <div className="font-mono text-slate-700 font-bold text-sm">{t.toFixed(1)}</div>
       </div>
     </div>
   );

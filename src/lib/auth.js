@@ -1,12 +1,12 @@
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { username } from "better-auth/plugins";
-import { nextCookies } from "better-auth/next-js";
-import { prisma } from "./prisma";
-import { sendEmail } from "./email";
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { username } from 'better-auth/plugins';
+import { nextCookies } from 'better-auth/next-js';
+import { prisma } from './prisma';
+import { sendEmail } from './email';
 
 export const auth = betterAuth({
-  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  database: prismaAdapter(prisma, { provider: 'postgresql' }),
 
   emailAndPassword: {
     enabled: true,
@@ -16,11 +16,11 @@ export const auth = betterAuth({
 
   emailVerification: {
     autoSignInAfterVerification: true,
-    callbackURL: "/onboarding",
+    callbackURL: '/onboarding',
     sendVerificationEmail: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
-        subject: "Verify your Mathly account",
+        subject: 'Verify your Mathly account',
         html: `
           <div style="font-family:sans-serif;max-width:480px;margin:auto">
             <h2>Welcome to Mathly!</h2>

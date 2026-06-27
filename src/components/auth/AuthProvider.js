@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createContext, useContext } from "react";
-import { useSession } from "@/lib/auth-client";
+import { createContext, useContext } from 'react';
+import { useSession } from '@/lib/auth-client';
 
 const AuthContext = createContext({
   user: null,
@@ -17,14 +17,11 @@ export function AuthProvider({ children, initialUser }) {
   const user = session?.user ?? initialUser?.user ?? null;
   const isLoading = isPending && !initialUser;
 
-  const profile =
-    user?.username
-      ? { username: user.username, id: user.id }
-      : (initialUser?.profile ?? null);
+  const profile = user?.username
+    ? { username: user.username, id: user.id }
+    : (initialUser?.profile ?? null);
 
   return (
-    <AuthContext.Provider value={{ user, profile, isLoading }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, profile, isLoading }}>{children}</AuthContext.Provider>
   );
 }

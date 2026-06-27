@@ -1,22 +1,21 @@
-import Link from "next/link";
-import { BookOpen, Shapes } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import Link from 'next/link';
+import { BookOpen, Shapes } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
 
 export default async function CoursesPage() {
   const courses = await prisma.course.findMany({
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: 'asc' },
   });
 
   const getIcon = (name) => {
-    if (name.toLowerCase().includes("geometry"))
+    if (name.toLowerCase().includes('geometry'))
       return <Shapes className="h-8 w-8 text-purple-500" />;
     return <BookOpen className="h-8 w-8 text-blue-500" />;
   };
 
   const getColor = (name) => {
-    if (name.toLowerCase().includes("geometry"))
-      return "bg-purple-100 text-purple-700";
-    return "bg-blue-100 text-blue-700";
+    if (name.toLowerCase().includes('geometry')) return 'bg-purple-100 text-purple-700';
+    return 'bg-blue-100 text-blue-700';
   };
 
   return (
@@ -43,9 +42,9 @@ export default async function CoursesPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div
                     className={`rounded-full h-16 w-16 flex items-center justify-center ${
-                      course.name.toLowerCase().includes("geometry")
-                        ? "bg-purple-100"
-                        : "bg-blue-100"
+                      course.name.toLowerCase().includes('geometry')
+                        ? 'bg-purple-100'
+                        : 'bg-blue-100'
                     }`}
                   >
                     {getIcon(course.name)}
@@ -56,15 +55,13 @@ export default async function CoursesPage() {
                     Available Now
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  {course.name}
-                </h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{course.name}</h3>
                 <p className="text-gray-600 mb-6">{course.description}</p>
                 <div
                   className={`flex items-center text-sm font-medium group-hover:underline ${
-                    course.name.toLowerCase().includes("geometry")
-                      ? "text-purple-600"
-                      : "text-blue-600"
+                    course.name.toLowerCase().includes('geometry')
+                      ? 'text-purple-600'
+                      : 'text-blue-600'
                   }`}
                 >
                   View Course &rarr;

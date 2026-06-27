@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -8,7 +8,6 @@ import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { Menu, X, User } from 'lucide-react';
 
-
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -17,14 +16,12 @@ const useOutsideClick = (ref, callback) => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [ref, callback]);
 };
-
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -33,7 +30,12 @@ export default function Navbar() {
 
   async function handleLogout() {
     await authClient.signOut({
-      fetchOptions: { onSuccess: () => { router.push('/'); router.refresh(); } },
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/');
+          router.refresh();
+        },
+      },
     });
   }
 
@@ -45,19 +47,19 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Courses', href: '/courses' },
-    { name: 'Sandbox', href: '/sandbox'}
+    { name: 'Sandbox', href: '/sandbox' },
   ];
 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-sm">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
-
+        <nav
+          className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8"
+          aria-label="Global"
+        >
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-xl font-bold tracking-tight text-blue-900">
-                Mathly
-              </span>
+              <span className="text-xl font-bold tracking-tight text-blue-900">Mathly</span>
             </Link>
           </div>
 
@@ -78,9 +80,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`text-sm font-semibold leading-6 transition-colors ${
-                  pathname === link.href
-                    ? 'text-blue-600'
-                    : 'text-neutral-700 hover:text-black'
+                  pathname === link.href ? 'text-blue-600' : 'text-neutral-700 hover:text-black'
                 }`}
               >
                 {link.name}
@@ -99,13 +99,13 @@ export default function Navbar() {
                 </button>
 
                 {isProfileOpen && (
-                  <div
-                    className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                  >
+                  <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                       <div className="px-4 py-2 text-sm text-neutral-700 border-b">
                         <p className="font-semibold">Welcome!</p>
-                        <p className="truncate text-neutral-500">{user.email || 'No email found'}</p>
+                        <p className="truncate text-neutral-500">
+                          {user.email || 'No email found'}
+                        </p>
                       </div>
                       <Link
                         href="/profile"
@@ -126,7 +126,10 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="text-sm font-semibold leading-6 text-neutral-700 transition-colors hover:text-black">
+                <Link
+                  href="/login"
+                  className="text-sm font-semibold leading-6 text-neutral-700 transition-colors hover:text-black"
+                >
                   Log in
                 </Link>
 
@@ -189,7 +192,10 @@ export default function Navbar() {
                       >
                         <User className="w-5 h-5" /> My Profile
                       </Link>
-                      <button onClick={handleLogout} className="w-full rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500"
+                      >
                         Log Out
                       </button>
                     </div>

@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Mail, KeyRound, Eye, EyeOff, Loader2, LogIn } from "lucide-react";
-import { useAuth } from "@/components/auth/AuthProvider";
-import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Mail, KeyRound, Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { authClient } from '@/lib/auth-client';
+import { redirect } from 'next/navigation';
 
 export default function SignupPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  if (user) return redirect("/dashboard");
+  if (user) return redirect('/dashboard');
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
+    setError('');
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      setError('Password must be at least 6 characters long.');
       return;
     }
 
@@ -35,11 +35,11 @@ export default function SignupPage() {
       email,
       password,
       name: email,
-      callbackURL: "/onboarding",
+      callbackURL: '/onboarding',
     });
 
     if (authError) {
-      setError(authError.message ?? "Something went wrong. Please try again.");
+      setError(authError.message ?? 'Something went wrong. Please try again.');
       setLoading(false);
     } else {
       router.push(`/auth/email-confirm?email=${encodeURIComponent(email)}`);
@@ -77,7 +77,7 @@ export default function SignupPage() {
             <input
               id="password"
               name="password"
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               required
               placeholder="Password"
@@ -89,15 +89,13 @@ export default function SignupPage() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-blue-600"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
 
-          {error && (
-            <p className="text-sm font-medium text-center text-red-600">{error}</p>
-          )}
+          {error && <p className="text-sm font-medium text-center text-red-600">{error}</p>}
 
           <button
             type="submit"
@@ -119,8 +117,11 @@ export default function SignupPage() {
         </form>
 
         <p className="text-sm text-center text-gray-500">
-          Already have an account?{" "}
-          <Link href="/login" className="font-bold text-blue-600 hover:text-blue-500 hover:underline">
+          Already have an account?{' '}
+          <Link
+            href="/login"
+            className="font-bold text-blue-600 hover:text-blue-500 hover:underline"
+          >
             Sign In
           </Link>
         </p>

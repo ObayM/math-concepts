@@ -1,23 +1,23 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 
 export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const activities = await prisma.userDailyActivity.findMany({
     where: { userId: session.user.id },
     select: { activityDate: true },
-    orderBy: { activityDate: "desc" },
+    orderBy: { activityDate: 'desc' },
   });
 
   if (activities.length === 0) return NextResponse.json({ streak: 0 });
 
-  const toDateStr = (date) => date.toISOString().split("T")[0];
+  const toDateStr = (date) => date.toISOString().split('T')[0];
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);

@@ -1,17 +1,17 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 
 export async function POST(request) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const { lessonKey, currentStep, isCompleted } = await request.json();
   if (!lessonKey) {
-    return NextResponse.json({ error: "lessonKey is required" }, { status: 400 });
+    return NextResponse.json({ error: 'lessonKey is required' }, { status: 400 });
   }
 
   const lesson = await prisma.lesson.findUnique({
@@ -19,7 +19,7 @@ export async function POST(request) {
     select: { id: true },
   });
   if (!lesson) {
-    return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
   }
 
   const now = new Date();
@@ -47,12 +47,12 @@ export async function POST(request) {
 export async function GET(request) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const lessonKey = request.nextUrl.searchParams.get("lessonKey");
+  const lessonKey = request.nextUrl.searchParams.get('lessonKey');
   if (!lessonKey) {
-    return NextResponse.json({ error: "lessonKey is required" }, { status: 400 });
+    return NextResponse.json({ error: 'lessonKey is required' }, { status: 400 });
   }
 
   const lesson = await prisma.lesson.findUnique({

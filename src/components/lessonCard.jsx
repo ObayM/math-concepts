@@ -46,8 +46,11 @@ export default function LessonCard({ lesson, index }) {
       <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-10">
         <div
           className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${
-            status === 'unlocked' ? 'border-blue-500 bg-white' :
-            status === 'completed' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 bg-gray-100'
+            status === 'unlocked'
+              ? 'border-blue-500 bg-white'
+              : status === 'completed'
+                ? 'border-emerald-500 bg-emerald-500'
+                : 'border-gray-300 bg-gray-100'
           } transition-colors duration-300`}
         >
           {status === 'completed' ? (
@@ -74,11 +77,20 @@ export default function LessonCard({ lesson, index }) {
           </div>
 
           <div className="relative z-10">
-            <div className={`flex items-center gap-2 mb-2 ${isEven ? 'justify-end' : 'justify-start'}`}>
-              <span className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider
-                ${status === 'unlocked' ? 'bg-blue-100 text-blue-700' :
-                  status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500'}
-              `}>
+            <div
+              className={`flex items-center gap-2 mb-2 ${isEven ? 'justify-end' : 'justify-start'}`}
+            >
+              <span
+                className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider
+                ${
+                  status === 'unlocked'
+                    ? 'bg-blue-100 text-blue-700'
+                    : status === 'completed'
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-gray-200 text-gray-500'
+                }
+              `}
+              >
                 {config.label}
               </span>
             </div>
@@ -87,12 +99,11 @@ export default function LessonCard({ lesson, index }) {
               {title}
             </h3>
 
-            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
-              {description}
-            </p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">{description}</p>
 
             {!isLocked && (
-              <div className={`flex items-center gap-2 text-sm font-medium text-blue-600
+              <div
+                className={`flex items-center gap-2 text-sm font-medium text-blue-600
                 ${isEven ? 'justify-end' : 'justify-start'} group-hover:gap-3 transition-all`}
               >
                 Start Lesson <ChevronRight size={16} />

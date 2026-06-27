@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Check, X, LoaderCircle } from "lucide-react";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Check, X, LoaderCircle } from 'lucide-react';
 
 const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/;
 
@@ -17,7 +17,7 @@ function useDebounce(value, delay) {
 
 export default function OnboardingForm() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
@@ -33,14 +33,12 @@ export default function OnboardingForm() {
     }
     setIsChecking(true);
     try {
-      const res = await fetch(
-        `/api/check-username?username=${encodeURIComponent(name)}`
-      );
+      const res = await fetch(`/api/check-username?username=${encodeURIComponent(name)}`);
       const data = await res.json();
       setIsAvailable(data.available);
     } catch {
       setIsAvailable(null);
-      setError("Could not check username availability. Please try again.");
+      setError('Could not check username availability. Please try again.');
     } finally {
       setIsChecking(false);
     }
@@ -62,22 +60,22 @@ export default function OnboardingForm() {
     const candidate = username.trim().toLowerCase();
 
     if (!isAvailable) {
-      setError("This username is unavailable or invalid. Please choose another.");
+      setError('This username is unavailable or invalid. Please choose another.');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch("/api/user/username", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/user/username', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: candidate }),
       });
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error ?? "Failed to set username.");
+      if (!res.ok) throw new Error(data.error ?? 'Failed to set username.');
 
-      router.push("/dashboard");
+      router.push('/dashboard');
       router.refresh();
     } catch (err) {
       setError(err.message);
@@ -112,9 +110,9 @@ export default function OnboardingForm() {
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               {isChecking && <LoaderCircle className="h-5 w-5 text-slate-400 animate-spin" />}
               {!isChecking && isAvailable === true && <Check className="h-6 w-6 text-green-500" />}
-              {!isChecking && (isAvailable === false || hasValidationError) && username.length > 0 && (
-                <X className="h-6 w-6 text-red-500" />
-              )}
+              {!isChecking &&
+                (isAvailable === false || hasValidationError) &&
+                username.length > 0 && <X className="h-6 w-6 text-red-500" />}
             </div>
           </div>
           <p id="username-hint" className="mt-2 text-xs text-slate-500">
@@ -123,7 +121,10 @@ export default function OnboardingForm() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-xl" role="alert">
+          <div
+            className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-xl"
+            role="alert"
+          >
             <p className="font-bold">Error</p>
             <p>{error}</p>
           </div>
@@ -148,7 +149,7 @@ export default function OnboardingForm() {
               Finalizing...
             </>
           ) : (
-            "Complete Profile"
+            'Complete Profile'
           )}
         </button>
       </form>
