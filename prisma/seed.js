@@ -2092,7 +2092,7 @@ async function main() {
     },
     {
       courseId: geometryCourse.id,
-      lessonKey: 'geometry-basic-1',
+      lessonKey: 'basic-geometry-1',
       data: { slides: geometry1Data.map(migrateSlide) },
       title: 'Points & Coordinates',
       description:
@@ -2104,7 +2104,7 @@ async function main() {
     },
     {
       courseId: geometryCourse.id,
-      lessonKey: 'geometry-basic-2',
+      lessonKey: 'basic-geometry-2',
       data: { slides: geometry2Data.map(migrateSlide) },
       title: 'The Slope of a Line',
       description:
@@ -2116,7 +2116,7 @@ async function main() {
     },
     {
       courseId: geometryCourse.id,
-      lessonKey: 'geometry-basic-3',
+      lessonKey: 'basic-geometry-3',
       data: { slides: geometry3Data.map(migrateSlide) },
       title: 'Triangles on the Plane',
       description:
@@ -2128,7 +2128,7 @@ async function main() {
     },
     {
       courseId: geometryCourse.id,
-      lessonKey: 'geometry-basic-4',
+      lessonKey: 'basic-geometry-4',
       data: { slides: geometry4Data.map(migrateSlide) },
       title: 'The Circle Equation',
       description:
@@ -2140,7 +2140,7 @@ async function main() {
     },
     {
       courseId: geometryCourse.id,
-      lessonKey: 'geometry-basic-5',
+      lessonKey: 'basic-geometry-5',
       data: { slides: geometry5Data.map(migrateSlide) },
       title: 'The Parabola',
       description:
