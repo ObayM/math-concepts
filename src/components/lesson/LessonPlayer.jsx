@@ -12,11 +12,13 @@ import { askTutor } from '@/utils/geminiService';
 import TextBlock from './blocks/TextBlock';
 import GraphBlock from './blocks/GraphBlock';
 import QuizBlock from './blocks/QuizBlock';
+import SceneBlock from './blocks/SceneBlock';
 
 const blockRegistry = {
   text: TextBlock,
   graph: GraphBlock,
   quiz: QuizBlock,
+  scene: SceneBlock,
 };
 
 export default function LessonPlayer({ slides = [], lessonId, coursePath = 'algebra' }) {

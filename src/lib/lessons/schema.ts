@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { sceneSchema } from '@/engine/ir/schema';
 
 const vizElementBase = z.object({
   id: z.string(),
@@ -114,7 +115,17 @@ const quizBlock = blockBase.extend({
   skillId: z.string().optional(),
 });
 
-export const lessonBlockSchema = z.discriminatedUnion('type', [textBlock, graphBlock, quizBlock]);
+const sceneBlock = blockBase.extend({
+  type: z.literal('scene'),
+  scene: sceneSchema,
+});
+
+export const lessonBlockSchema = z.discriminatedUnion('type', [
+  textBlock,
+  graphBlock,
+  quizBlock,
+  sceneBlock,
+]);
 
 export const lessonDataSchema = z.object({
   slides: z.array(lessonBlockSchema).min(1),
@@ -125,5 +136,6 @@ export type VizSpec = z.infer<typeof vizSpecSchema>;
 export type TextBlock = z.infer<typeof textBlock>;
 export type GraphBlock = z.infer<typeof graphBlock>;
 export type QuizBlock = z.infer<typeof quizBlock>;
+export type SceneBlock = z.infer<typeof sceneBlock>;
 export type LessonBlock = z.infer<typeof lessonBlockSchema>;
 export type LessonData = z.infer<typeof lessonDataSchema>;
