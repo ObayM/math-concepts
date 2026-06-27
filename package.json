@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "curl http://localhost:3000/api/create-lessons"
+    "db:seed": "curl http://localhost:3000/api/create-lessons",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
@@ -31,6 +32,9 @@
     "@tailwindcss/postcss": "^4.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.8.5",
     "prisma": "^6.0.0",
     "tailwindcss": "^4.3.1"
   }
