@@ -184,7 +184,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
 
   if (!slides || slides.length === 0) {
     return (
-      <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7] flex items-center justify-center">
+      <div className="min-h-[calc(100vh-var(--nav-h))] bg-[#F5F5F7] flex items-center justify-center">
         <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-gray-200 min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
           <h2 className="text-2xl font-bold text-slate-800 animate-pulse">
             Loading lesson slides...
@@ -207,7 +207,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
     const nextLesson = allLessons[currentLessonIndex + 1];
 
     return (
-      <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7] flex items-center justify-center">
+      <div className="min-h-[calc(100vh-var(--nav-h))] bg-[#F5F5F7] flex items-center justify-center">
         <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-gray-200 min-h-[500px] flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
@@ -222,7 +222,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
 
   return (
     <div
-      className="min-h-[calc(100vh-73px)] bg-[#F5F5F7]
+      className="min-h-[calc(100vh-var(--nav-h))] bg-[#F5F5F7]
      text-slate-900 p-4 md:p-6 flex items-center justify-center
       selection:bg-blue-100 selection:text-blue-900 relative overflow-hidden"
     >

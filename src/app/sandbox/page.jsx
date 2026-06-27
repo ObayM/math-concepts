@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import { FunctionVisualizer } from '@/components/visualizations';
-import { FiPlus, FiTrash2, FiPlay, FiPause, FiRefreshCw } from 'react-icons/fi';
+import { Plus, Trash2, Play, Pause, RefreshCw } from 'lucide-react';
 
 const defaultElements = [
   {
@@ -74,10 +74,10 @@ export default function Sandbox() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)] bg-slate-50 flex flex-col lg:flex-row">
+    <div className="min-h-[calc(100vh-var(--nav-h))] bg-slate-50 flex flex-col lg:flex-row">
       <div
         className="w-full lg:w-96 bg-white border-r border-slate-200 p-6 flex
-            flex-col h-auto lg:h-[calc(100vh-73px)] overflow-y-auto z-10"
+            flex-col h-auto lg:h-[calc(100vh-var(--nav-h))] overflow-y-auto z-10"
       >
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">Sandbox</h1>
@@ -86,7 +86,7 @@ export default function Sandbox() {
             className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
             title="Reset to defaults"
           >
-            <FiRefreshCw />
+            <RefreshCw />
           </button>
         </div>
 
@@ -97,7 +97,7 @@ export default function Sandbox() {
               onClick={() => setIsPlaying(!isPlaying)}
               className={`p-2 rounded-lg transition-all ${isPlaying ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}
             >
-              {isPlaying ? <FiPause /> : <FiPlay />}
+              {isPlaying ? <Pause /> : <Play />}
             </button>
           </div>
           <input
@@ -122,7 +122,7 @@ export default function Sandbox() {
               onClick={addElement}
               className="flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
             >
-              <FiPlus /> Add New
+              <Plus /> Add New
             </button>
           </div>
 
@@ -152,7 +152,7 @@ export default function Sandbox() {
                         onClick={() => removeElement(el.id)}
                         className="text-slate-300 hover:text-red-500 transition-colors p-1"
                       >
-                        <FiTrash2 size={14} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
 

@@ -9,7 +9,7 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-[calc(100vh-73px)] bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-[calc(100vh-var(--nav-h))] bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900">
       <main>
         {/* Hero */}
         <section className="container mx-auto px-6 pt-32 pb-20 md:pt-48 md:pb-32">

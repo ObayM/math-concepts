@@ -50,7 +50,7 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4 bg-slate-50">
+    <main className="flex items-center justify-center min-h-[calc(100vh-var(--nav-h))] px-4 bg-slate-50">
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">

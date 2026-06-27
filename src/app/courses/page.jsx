@@ -10,7 +10,7 @@ export default async function CoursesPage() {
   });
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-73px)] bg-slate-50 text-gray-800">
+    <div className="flex flex-col min-h-[calc(100vh-var(--nav-h))] bg-slate-50 text-gray-800">
       <main className="grow container mx-auto px-6 py-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">

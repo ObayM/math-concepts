@@ -35,7 +35,7 @@ const HomePage = () => {
   const currentCourse = { title: 'Math Basics' };
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-73px)]">
+    <div className="bg-slate-50 min-h-[calc(100vh-var(--nav-h))]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-12">
           <WelcomeHeader name={profile?.username} streak={streak} />
