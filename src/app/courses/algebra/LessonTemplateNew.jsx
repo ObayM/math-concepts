@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 
-import Button from '@/components/slides/Button';
+import Button from '@/components/ui/Button';
+import Spinner from '@/components/ui/Spinner';
 import { FunctionVisualizer } from '@/components/visualizations';
 import { CheckCircle2, XCircle, Sparkles, HelpCircle, BrainCircuit, RotateCcw } from 'lucide-react';
 import { askTutor, generatePersonalizedSlide } from '@/utils/geminiService';
@@ -183,7 +184,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
 
   if (!slides || slides.length === 0) {
     return (
-      <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7] flex items-center justify-center">
+      <div className="min-h-[calc(100vh-var(--nav-h))] bg-[#F5F5F7] flex items-center justify-center">
         <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-gray-200 min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
           <h2 className="text-2xl font-bold text-slate-800 animate-pulse">
             Loading lesson slides...
@@ -206,7 +207,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
     const nextLesson = allLessons[currentLessonIndex + 1];
 
     return (
-      <div className="min-h-[calc(100vh-73px)] bg-[#F5F5F7] flex items-center justify-center">
+      <div className="min-h-[calc(100vh-var(--nav-h))] bg-[#F5F5F7] flex items-center justify-center">
         <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-gray-200 min-h-[500px] flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
@@ -221,7 +222,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
 
   return (
     <div
-      className="min-h-[calc(100vh-73px)] bg-[#F5F5F7]
+      className="min-h-[calc(100vh-var(--nav-h))] bg-[#F5F5F7]
      text-slate-900 p-4 md:p-6 flex items-center justify-center
       selection:bg-blue-100 selection:text-blue-900 relative overflow-hidden"
     >
@@ -251,7 +252,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
           {isGeneratingNext ? (
             <div className="animate-fade-in-up h-full flex flex-col items-center justify-center text-center space-y-6">
               <div className="relative">
-                <div className="w-24 h-24 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin" />
+                <Spinner size="lg" />
                 <BrainCircuit className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500 w-10 h-10" />
               </div>
               <div>
@@ -439,29 +440,29 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             {currentSlideIndex > 0 && (
-              <Button variant="secondary" onClick={handleBack} className="hidden md:flex">
+              <Button variant="neutral" onClick={handleBack} className="hidden md:flex">
                 Back
               </Button>
             )}
 
             {currentSlide.interactiveType === 'quiz' && !quizSubmitted ? (
               <Button
-                variant="primary"
+                variant="success"
                 onClick={handleQuizSubmit}
                 disabled={selectedQuizOption === null}
-                className="w-full md:w-auto bg-[#58CC02] hover:bg-[#46a302] border-b-[3px] border-[#46a302] active:border-b-0 active:translate-y-[3px]
-                         text-white font-extrabold tracking-wide uppercase"
+                className="w-full md:w-auto font-extrabold tracking-wide uppercase"
               >
                 Check
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className={`w-full md:w-auto font-extrabold tracking-wide uppercase border-b-[3px] active:border-b-0 active:translate-y-[3px] ${
+                variant={
                   isLastSlide && !currentSlide.isAiGenerated && !isGeneratingNext
-                    ? 'bg-purple-600 hover:bg-purple-700 border-purple-900'
-                    : 'bg-[#58CC02] hover:bg-[#46a302] border-[#46a302]'
-                } text-white`}
+                    ? 'accent'
+                    : 'success'
+                }
+                className="w-full md:w-auto font-extrabold tracking-wide uppercase"
               >
                 {isLastSlide && !currentSlide.isAiGenerated ? (
                   <span className="flex items-center">
