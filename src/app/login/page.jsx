@@ -44,13 +44,13 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-[calc(100vh-var(--nav-h))] px-4 bg-slate-50">
+    <main className="flex items-center justify-center min-h-[calc(100vh-var(--nav-h))] px-4 bg-surface">
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
             Welcome Back!
           </h1>
-          <p className="mt-2 text-sm text-gray-500">Sign in to access your account.</p>
+          <p className="mt-2 text-sm text-neutral-500">Sign in to access your account.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,7 +76,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {error && <p className="text-sm font-medium text-center text-red-600">{error}</p>}
+          {error && <p className="text-sm font-medium text-center text-danger-600">{error}</p>}
 
           <Button type="submit" fullWidth disabled={loading}>
             {loading ? (
@@ -93,11 +93,11 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-sm text-center text-gray-500">
+        <p className="text-sm text-center text-neutral-500">
           Don&apos;t have an account?{' '}
           <Link
             href="/signup"
-            className="font-bold text-blue-600 hover:text-blue-500 hover:underline"
+            className="font-bold text-primary-600 hover:text-primary-500 hover:underline"
           >
             Sign Up
           </Link>

@@ -10,13 +10,13 @@ export default async function CoursesPage() {
   });
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-var(--nav-h))] bg-slate-50 text-gray-800">
+    <div className="flex flex-col min-h-[calc(100vh-var(--nav-h))] bg-surface text-neutral-800">
       <main className="grow container mx-auto px-6 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900">
             Our Courses
           </h1>
-          <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
+          <p className="text-lg text-neutral-500 mt-4 max-w-2xl mx-auto">
             Pretty cool visualized way to understand a wide range of things!
           </p>
         </div>
@@ -46,8 +46,8 @@ export default async function CoursesPage() {
                     </div>
                     <Badge variant={isGeometry ? 'accent' : 'primary'}>Available Now</Badge>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{course.name}</h3>
-                  <p className="text-gray-600 mb-6">{course.description}</p>
+                  <h3 className="text-2xl font-bold text-neutral-900 mb-3">{course.name}</h3>
+                  <p className="text-neutral-500 mb-6">{course.description}</p>
                   <div
                     className={`flex items-center text-sm font-medium group-hover:underline ${
                       isGeometry ? 'text-accent-600' : 'text-primary-600'

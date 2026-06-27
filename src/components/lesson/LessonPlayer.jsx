@@ -6,7 +6,7 @@ import { Sparkles, RotateCcw, BrainCircuit } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
 import Card from '@/components/ui/Card';
-import LessonCompletion from '@/components/slides/LessonCompletion';
+import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor } from '@/utils/geminiService';
 
 import TextBlock from './blocks/TextBlock';
@@ -137,8 +137,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     return (
       <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center">
         <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-800 animate-pulse">Loading lesson...</h2>
-          <p className="text-slate-500 mt-2">Hang tight while we get things ready.</p>
+          <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">Loading lesson...</h2>
+          <p className="text-neutral-500 mt-2">Hang tight while we get things ready.</p>
           <Button onClick={handleBackToCourse} variant="ghost" className="mt-6">
             Back to Course
           </Button>
@@ -167,7 +167,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
   const BlockRenderer = slide ? (blockRegistry[slide.type] ?? TextBlock) : null;
 
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface text-slate-900 p-4 md:p-6 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface text-neutral-900 p-4 md:p-6 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
       {streak !== null && (
         <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 z-10">
           🔥 {streak} Day Streak
@@ -180,7 +180,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
             {slides.map((_, idx) => (
               <div
                 key={idx}
-                className={`flex-1 rounded-full transition-all duration-500 ${idx <= currentIndex ? 'bg-success-500' : 'bg-slate-200'}`}
+                className={`flex-1 rounded-full transition-all duration-500 ${idx <= currentIndex ? 'bg-success-500' : 'bg-neutral-200'}`}
               />
             ))}
           </div>
@@ -193,11 +193,11 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
           >
             <div className="mb-6">
               <div className="flex items-center space-x-2 mb-2">
-                <span className="text-slate-400 font-bold text-sm tracking-wider uppercase">
+                <span className="text-neutral-400 font-bold text-sm tracking-wider uppercase">
                   {slide?.category || 'Concept'}
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 tracking-tight">
                 {slide?.title}
               </h1>
             </div>
@@ -217,7 +217,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
           </div>
         </div>
 
-        <div className="px-10 py-6 border-t border-slate-100 flex items-center justify-between gap-4">
+        <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4">
           <Button onClick={handleBack} variant="ghost" disabled={currentIndex === 0}>
             Back
           </Button>
@@ -225,7 +225,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
           <div className="flex items-center gap-3">
             <button
               onClick={() => setTutorOpen((o) => !o)}
-              className="text-slate-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
+              className="text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
               title="Ask AI Tutor"
             >
               <Sparkles className="w-5 h-5" />
@@ -248,7 +248,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
         </div>
 
         <div
-          className={`border-t border-slate-100 bg-slate-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
+          className={`border-t border-neutral-100 bg-neutral-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
         >
           <div className="p-6">
             <div className="flex items-start gap-4">
@@ -259,9 +259,9 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
                 <p className="text-xs font-bold text-accent-500 uppercase mb-2">AI Math Tutor</p>
 
                 {tutorResponse ? (
-                  <div className="animate-fade-in-up bg-white p-4 rounded-2xl border border-accent-100 text-slate-700 text-sm leading-relaxed">
+                  <div className="animate-fade-in-up bg-white p-4 rounded-2xl border border-accent-100 text-neutral-700 text-sm leading-relaxed">
                     {tutorResponse}
-                    <div className="mt-3 pt-3 border-t border-slate-100 flex justify-end">
+                    <div className="mt-3 pt-3 border-t border-neutral-100 flex justify-end">
                       <button
                         onClick={() => setTutorResponse('')}
                         className="text-xs font-bold text-accent-600 flex items-center hover:underline"
@@ -271,7 +271,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
                     </div>
                   </div>
                 ) : tutorLoading ? (
-                  <div className="flex items-center gap-3 text-slate-500 text-sm">
+                  <div className="flex items-center gap-3 text-neutral-500 text-sm">
                     <BrainCircuit className="w-5 h-5 text-accent-500 animate-pulse" />
                     Thinking...
                   </div>
@@ -282,7 +282,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
                       onChange={(e) => setTutorQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
                       placeholder="e.g. Why is symmetry important?"
-                      className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-accent-500 outline-none"
+                      className="flex-1 bg-white border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-accent-500 outline-none"
                     />
                     <Button onClick={handleTutorAsk} variant="accent" size="sm">
                       Ask

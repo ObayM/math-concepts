@@ -91,10 +91,10 @@ export default function OnboardingForm() {
     <div className="animate-fade-in-up w-full max-w-md mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="bg-white border border-gray-200 rounded-2xl p-8 space-y-6"
+        className="bg-white border border-neutral-200 rounded-2xl p-8 space-y-6"
       >
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-1">
             Choose a username
           </label>
           <div className="relative">
@@ -103,27 +103,29 @@ export default function OnboardingForm() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g obay :)"
-              className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-slate-900 font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-4 pr-10 py-2.5 bg-surface border border-neutral-200 rounded-xl text-neutral-900 font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               maxLength={39}
               autoComplete="off"
               aria-describedby="username-hint"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              {isChecking && <LoaderCircle className="h-5 w-5 text-slate-400 animate-spin" />}
-              {!isChecking && isAvailable === true && <Check className="h-6 w-6 text-green-500" />}
+              {isChecking && <LoaderCircle className="h-5 w-5 text-neutral-400 animate-spin" />}
+              {!isChecking && isAvailable === true && (
+                <Check className="h-6 w-6 text-success-500" />
+              )}
               {!isChecking &&
                 (isAvailable === false || hasValidationError) &&
-                username.length > 0 && <X className="h-6 w-6 text-red-500" />}
+                username.length > 0 && <X className="h-6 w-6 text-danger-500" />}
             </div>
           </div>
-          <p id="username-hint" className="mt-2 text-xs text-slate-500">
+          <p id="username-hint" className="mt-2 text-xs text-neutral-500">
             Lowercase letters, numbers, and hyphens. 3–39 characters.
           </p>
         </div>
 
         {error && (
           <div
-            className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-xl"
+            className="bg-danger-50 border-l-4 border-danger-400 text-danger-700 p-4 rounded-xl"
             role="alert"
           >
             <p className="font-bold">Error</p>
@@ -132,11 +134,11 @@ export default function OnboardingForm() {
         )}
 
         {!error && isAvailable === false && !isChecking && username.length > 0 && (
-          <p className="text-sm text-red-600">This username has already been taken.</p>
+          <p className="text-sm text-danger-600">This username has already been taken.</p>
         )}
 
         {!error && hasValidationError && (
-          <p className="text-sm text-red-600">Invalid format. Please follow the rules above.</p>
+          <p className="text-sm text-danger-600">Invalid format. Please follow the rules above.</p>
         )}
 
         <Button

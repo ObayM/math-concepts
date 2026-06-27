@@ -59,7 +59,7 @@ export default function Navbar() {
         >
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-xl font-bold tracking-tight text-blue-900">Mathly</span>
+              <span className="text-xl font-bold tracking-tight text-primary-900">Mathly</span>
             </Link>
           </div>
 
@@ -80,7 +80,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`text-sm font-semibold leading-6 transition-colors ${
-                  pathname === link.href ? 'text-blue-600' : 'text-neutral-700 hover:text-black'
+                  pathname === link.href ? 'text-primary-600' : 'text-neutral-700 hover:text-black'
                 }`}
               >
                 {link.name}
@@ -116,7 +116,7 @@ export default function Navbar() {
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="text-red-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-100"
+                        className="text-danger-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-100"
                       >
                         Log Out
                       </button>
@@ -135,7 +135,7 @@ export default function Navbar() {
 
                 <Link
                   href="/signup"
-                  className="rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+                  className="rounded-md bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
                 >
                   Sign up
                 </Link>
@@ -173,7 +173,7 @@ export default function Navbar() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors ${
                         pathname === link.href
-                          ? 'text-blue-600 bg-blue-50'
+                          ? 'text-primary-600 bg-primary-50'
                           : 'text-neutral-900 hover:bg-neutral-100'
                       }`}
                     >
@@ -194,7 +194,7 @@ export default function Navbar() {
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="w-full rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500"
+                        className="w-full rounded-md bg-danger-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-danger-500"
                       >
                         Log Out
                       </button>
@@ -212,7 +212,7 @@ export default function Navbar() {
                       <Link
                         href="/signup"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="block w-full rounded-md bg-blue-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+                        className="block w-full rounded-md bg-primary-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
                       >
                         Sign up
                       </Link>

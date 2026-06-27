@@ -14,34 +14,69 @@ import {
   Label,
 } from 'recharts';
 
+// Identifiers allowed after replacements — blocks eval/fetch/process/etc.
+const SAFE_TOKENS = new Set([
+  'Math',
+  'sin',
+  'cos',
+  'tan',
+  'asin',
+  'acos',
+  'atan',
+  'abs',
+  'sqrt',
+  'cbrt',
+  'log2',
+  'log10',
+  'log',
+  'exp',
+  'floor',
+  'ceil',
+  'round',
+  'min',
+  'max',
+  'PI',
+  'E',
+  'x',
+  't',
+  'T',
+]);
+
 const evaluateMath = (expr, context) => {
   if (!expr) return 0;
-
   if (typeof expr === 'number') return expr;
 
   try {
+    // Longer names before shorter ones to avoid partial substitution (e.g. asin before sin)
     let cleanExpr = expr
       .replace(/\^/g, '**')
-      .replace(/sin/g, 'Math.sin')
-      .replace(/cos/g, 'Math.cos')
-      .replace(/tan/g, 'Math.tan')
-      .replace(/asin/g, 'Math.asin')
-      .replace(/acos/g, 'Math.acos')
-      .replace(/atan/g, 'Math.atan')
-      .replace(/abs/g, 'Math.abs')
-      .replace(/sqrt/g, 'Math.sqrt')
-      .replace(/cbrt/g, 'Math.cbrt')
-      .replace(/log2/g, 'Math.log2')
-      .replace(/log10/g, 'Math.log10')
-      .replace(/log/g, 'Math.log')
-      .replace(/exp/g, 'Math.exp')
-      .replace(/floor/g, 'Math.floor')
-      .replace(/ceil/g, 'Math.ceil')
-      .replace(/round/g, 'Math.round')
-      .replace(/min/g, 'Math.min')
-      .replace(/max/g, 'Math.max')
-      .replace(/PI/g, 'Math.PI')
-      .replace(/E/g, 'Math.E');
+      .replace(/\basin\b/g, 'Math.asin')
+      .replace(/\bacos\b/g, 'Math.acos')
+      .replace(/\batan\b/g, 'Math.atan')
+      .replace(/\bsin\b/g, 'Math.sin')
+      .replace(/\bcos\b/g, 'Math.cos')
+      .replace(/\btan\b/g, 'Math.tan')
+      .replace(/\babs\b/g, 'Math.abs')
+      .replace(/\bsqrt\b/g, 'Math.sqrt')
+      .replace(/\bcbrt\b/g, 'Math.cbrt')
+      .replace(/\blog2\b/g, 'Math.log2')
+      .replace(/\blog10\b/g, 'Math.log10')
+      .replace(/\blog\b/g, 'Math.log')
+      .replace(/\bexp\b/g, 'Math.exp')
+      .replace(/\bfloor\b/g, 'Math.floor')
+      .replace(/\bceil\b/g, 'Math.ceil')
+      .replace(/\bround\b/g, 'Math.round')
+      .replace(/\bmin\b/g, 'Math.min')
+      .replace(/\bmax\b/g, 'Math.max')
+      .replace(/\bPI\b/g, 'Math.PI')
+      .replace(/\bE\b/g, 'Math.E');
+
+    // Reject any identifier not in the safe list
+    const tokens = cleanExpr.match(/[a-zA-Z_]\w*/g) || [];
+    if (tokens.some((tok) => !SAFE_TOKENS.has(tok))) {
+      console.warn(`Unsafe expression blocked: ${expr}`);
+      return 0;
+    }
 
     const keys = Object.keys(context);
     const values = Object.values(context);
@@ -273,8 +308,7 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
 
   return (
     <div
-      className={`${className || 'h-80'} w-full bg-white rounded-3xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] 
-    p-2 border border-slate-100 relative overflow-hidden group `}
+      className={`${className || 'h-80'} w-full bg-white rounded-3xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] p-2 border border-neutral-100 relative overflow-hidden group`}
     >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
@@ -334,11 +368,11 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
         </ComposedChart>
       </ResponsiveContainer>
 
-      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-2 rounded-xl shadow-sm border border-slate-200/60 pointer-events-none transition-opacity duration-300">
-        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-2 rounded-xl shadow-sm border border-neutral-200/60 pointer-events-none transition-opacity duration-300">
+        <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-0.5">
           {config.paramLabel?.split(' ')[1] || 'Parameter'}
         </div>
-        <div className="font-mono text-slate-700 font-bold text-sm">{t.toFixed(1)}</div>
+        <div className="font-mono text-neutral-700 font-bold text-sm">{t.toFixed(1)}</div>
       </div>
     </div>
   );
