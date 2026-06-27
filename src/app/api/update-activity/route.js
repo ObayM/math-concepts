@@ -1,30 +1,11 @@
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { requireUser } from '@/lib/session';
+import { touchActivity } from '@/lib/db/activityService';
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 
 export async function POST() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const user = await requireUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  await prisma.userDailyActivity.upsert({
-    where: {
-      userId_activityDate: {
-        userId: session.user.id,
-        activityDate: today,
-      },
-    },
-    update: {},
-    create: {
-      userId: session.user.id,
-      activityDate: today,
-    },
-  });
-
+  await touchActivity(user.id);
   return NextResponse.json({ success: true });
 }
