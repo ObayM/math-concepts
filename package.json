@@ -12,7 +12,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "curl http://localhost:3000/api/create-lessons",
+    "db:seed": "node prisma/seed.js",
     "prepare": "husky"
   },
   "dependencies": {

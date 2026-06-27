@@ -29,9 +29,7 @@ migrate-prod:
 	npm run db:migrate
 
 seed:
-	@echo "seeding lessons... (server must be running)"
-	curl -s http://localhost:3000/api/create-lessons | python3 -mjson.tool 2>/dev/null \
-	  || curl http://localhost:3000/api/create-lessons
+	node prisma/seed.js
 
 studio:
 	npm run db:studio

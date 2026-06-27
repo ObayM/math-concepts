@@ -1,5 +1,11 @@
-import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+function migrateSlide(slide) {
+  const { interactiveType, ...rest } = slide;
+  const type = interactiveType === 'intro' ? 'text' : interactiveType;
+  return { ...rest, type };
+}
 
 const lesson1Steps = [
   {
@@ -1977,7 +1983,7 @@ const geometry5Data = [
   },
 ];
 
-export async function GET() {
+async function main() {
   const algebraCourse = await prisma.course.upsert({
     where: { name: 'Algebra' },
     update: {},
@@ -1994,7 +2000,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-1',
-      data: lesson1Steps,
+      data: { slides: lesson1Steps.map(migrateSlide) },
       title: 'Intro to Real Functions',
       description:
         'Understand how to determine the domain and range of real functions, including restrictions and interval representation.',
@@ -2006,7 +2012,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-2',
-      data: lesson2Steps,
+      data: { slides: lesson2Steps.map(migrateSlide) },
       title: 'Monotonicity of Functions',
       description:
         'Learn how to analyze whether a function is increasing, decreasing, or non-monotonic.',
@@ -2018,7 +2024,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-3',
-      data: lesson3Steps,
+      data: { slides: lesson3Steps.map(migrateSlide) },
       title: 'Operations on Functions',
       description: 'Explore how to add, subtract, multiply, divide, and compose functions.',
       category: 'Algebra',
@@ -2029,7 +2035,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-4',
-      data: [],
+      data: { slides: [].map(migrateSlide) },
       title: 'Properties of Functions',
       description:
         'Study even, odd, and one-to-one functions and how to identify them graphically and algebraically.',
@@ -2041,7 +2047,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-5',
-      data: lesson5Data,
+      data: { slides: lesson5Data.map(migrateSlide) },
       title: 'Graphing Basic and Piecewise Functions',
       description: 'Learn how to sketch basic function graphs and piecewise-defined functions.',
       category: 'Algebra',
@@ -2052,7 +2058,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-6',
-      data: lesson6Data,
+      data: { slides: lesson6Data.map(migrateSlide) },
       title: 'Geometric Transformations of Functions',
       description:
         'Understand shifts, reflections, stretching, and compression of function graphs.',
@@ -2064,7 +2070,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-7',
-      data: lesson7Data,
+      data: { slides: lesson7Data.map(migrateSlide) },
       title: 'Inverse Functions',
       description:
         'Learn how to determine whether a function is invertible, find the inverse algebraically, and interpret inverse functions graphically.',
@@ -2076,7 +2082,7 @@ export async function GET() {
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-8',
-      data: lesson8Data,
+      data: { slides: lesson8Data.map(migrateSlide) },
       title: 'Advanced Visualizations',
       description: 'Master vectors, parametric equations, and advanced graphing techniques.',
       category: 'Algebra',
@@ -2087,7 +2093,7 @@ export async function GET() {
     {
       courseId: geometryCourse.id,
       lessonKey: 'geometry-basic-1',
-      data: geometry1Data,
+      data: { slides: geometry1Data.map(migrateSlide) },
       title: 'Points & Coordinates',
       description:
         'Master the Cartesian plane. Learn how to plot points and calculate the distance between them using the Distance Formula.',
@@ -2099,7 +2105,7 @@ export async function GET() {
     {
       courseId: geometryCourse.id,
       lessonKey: 'geometry-basic-2',
-      data: geometry2Data,
+      data: { slides: geometry2Data.map(migrateSlide) },
       title: 'The Slope of a Line',
       description:
         'Understand the concept of slope as "Rise over Run" and how it defines the steepness and direction of a line.',
@@ -2111,7 +2117,7 @@ export async function GET() {
     {
       courseId: geometryCourse.id,
       lessonKey: 'geometry-basic-3',
-      data: geometry3Data,
+      data: { slides: geometry3Data.map(migrateSlide) },
       title: 'Triangles on the Plane',
       description:
         'Explore the properties of triangles in the coordinate plane, including vertices, side lengths, and area calculations.',
@@ -2123,7 +2129,7 @@ export async function GET() {
     {
       courseId: geometryCourse.id,
       lessonKey: 'geometry-basic-4',
-      data: geometry4Data,
+      data: { slides: geometry4Data.map(migrateSlide) },
       title: 'The Circle Equation',
       description:
         'Derive and understand the standard equation of a circle (x-h)² + (y-k)² = r² and how to graph it.',
@@ -2135,7 +2141,7 @@ export async function GET() {
     {
       courseId: geometryCourse.id,
       lessonKey: 'geometry-basic-5',
-      data: geometry5Data,
+      data: { slides: geometry5Data.map(migrateSlide) },
       title: 'The Parabola',
       description:
         'Explore the geometric definition of a parabola using focus and directrix, and its vertex form equation.',
@@ -2147,14 +2153,18 @@ export async function GET() {
   ];
 
   for (const lesson of lessons) {
-    await prisma.lesson
-      .upsert({
-        where: { lessonKey: lesson.lessonKey },
-        update: lesson,
-        create: lesson,
-      })
-      .catch((e) => console.error('Error seeding lesson:', lesson.lessonKey, e.message));
+    await prisma.lesson.upsert({
+      where: { lessonKey: lesson.lessonKey },
+      update: lesson,
+      create: lesson,
+    });
+    console.log('seeded:', lesson.lessonKey);
   }
-
-  return NextResponse.json({ success: true });
 }
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());
