@@ -5,6 +5,7 @@ const vizElementBase = z.object({
   color: z.string().optional(),
   strokeWidth: z.number().optional(),
   style: z.enum(['solid', 'dashed', 'dotted']).optional(),
+  label: z.string().optional(),
 });
 
 const functionElement = vizElementBase.extend({
@@ -14,8 +15,10 @@ const functionElement = vizElementBase.extend({
 
 const parametricElement = vizElementBase.extend({
   type: z.literal('parametric'),
-  x: z.string(),
-  y: z.string(),
+  xExpression: z.string(),
+  yExpression: z.string(),
+  tRange: z.tuple([z.number(), z.number()]).optional(),
+  steps: z.number().optional(),
 });
 
 const pointElement = vizElementBase.extend({
@@ -23,7 +26,6 @@ const pointElement = vizElementBase.extend({
   x: z.string(),
   y: z.string(),
   r: z.number().optional(),
-  label: z.string().optional(),
 });
 
 const lineElement = vizElementBase.extend({
@@ -34,11 +36,50 @@ const lineElement = vizElementBase.extend({
   y2: z.string(),
 });
 
+const vectorElement = vizElementBase.extend({
+  type: z.literal('vector'),
+  x1: z.string(),
+  y1: z.string(),
+  x2: z.string(),
+  y2: z.string(),
+});
+
+const vLineElement = vizElementBase.extend({
+  type: z.literal('v-line'),
+  x: z.string(),
+});
+
+const hLineElement = vizElementBase.extend({
+  type: z.literal('h-line'),
+  y: z.string(),
+});
+
+const textElement = vizElementBase.extend({
+  type: z.literal('text'),
+  x: z.string(),
+  y: z.string(),
+  content: z.string(),
+  fontSize: z.number().optional(),
+});
+
+const areaElement = vizElementBase.extend({
+  type: z.literal('area'),
+  expression: z.string().optional(),
+  y1: z.string().optional(),
+  y2: z.string().optional(),
+  opacity: z.number().optional(),
+});
+
 export const vizElementSchema = z.discriminatedUnion('type', [
   functionElement,
   parametricElement,
   pointElement,
   lineElement,
+  vectorElement,
+  vLineElement,
+  hLineElement,
+  textElement,
+  areaElement,
 ]);
 
 export const vizSpecSchema = z.object({

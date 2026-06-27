@@ -29,7 +29,7 @@ migrate-prod:
 	npm run db:migrate
 
 seed:
-	node prisma/seed.js
+	node --env-file=.env prisma/seed.js
 
 studio:
 	npm run db:studio
