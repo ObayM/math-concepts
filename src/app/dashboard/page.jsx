@@ -1,50 +1,19 @@
 'use client';
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useAuth } from '@/components/auth/AuthProvider';
 import Link from 'next/link';
-import { 
-  FiPlayCircle, 
-  FiArrowRight,
-} from 'react-icons/fi';
+import { PlayCircle, ArrowRight } from 'lucide-react';
 
 import { lessonsData } from '@/components/lib/data';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
 
-
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut",
-    },
-  },
-};
-
-
-
 const HomePage = () => {
-  const { user, profile } = useAuth()
+  const { user, profile } = useAuth();
 
   const [streak, setStreak] = React.useState(null);
   const [activityData, setActivityData] = React.useState([]);
 
   React.useEffect(() => {
-
     fetch('/api/streak')
       .then(res => res.json())
       .then(data => {
@@ -52,8 +21,7 @@ const HomePage = () => {
       })
       .catch(err => console.error('Failed to fetch streak:', err));
 
-
-      fetch('/api/activity')
+    fetch('/api/activity')
       .then(res => res.json())
       .then(data => {
         if (data.activity) setActivityData(data.activity);
@@ -61,19 +29,12 @@ const HomePage = () => {
       .catch(err => console.error('Failed to fetch activity:', err));
   }, []);
 
-  const currentCourse = {
-    title: "Math Basics",
-  };
+  const currentCourse = { title: "Math Basics" };
 
   return (
-    <div className="bg-linear-to-b from-sky-50 via-blue-100 to-amber-50 min-h-[calc(100vh-73px)]">
+    <div className="bg-slate-50 min-h-[calc(100vh-73px)]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <motion.div
-          className="space-y-12"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="space-y-12">
           <WelcomeHeader name={profile?.username} streak={streak} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
@@ -84,23 +45,22 @@ const HomePage = () => {
               <RecommendedLessons lessons={lessonsData.slice(0, 3)} />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
 };
 
-
 const WelcomeHeader = ({ name, streak }) => (
-  <motion.div variants={itemVariants} className="flex justify-between items-end">
+  <div className="animate-fade-in-up flex justify-between items-end">
     <div>
       <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
-        Welcome back, <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-sky-600">{name}!</span>
+        Welcome back, <span className="text-blue-600">{name}!</span>
       </h1>
-      <p className="mt-2 text-lg text-gray-500">Ready to continue your space adventures ?</p>
+      <p className="mt-2 text-lg text-gray-500">Ready to continue your space adventures?</p>
     </div>
     {streak !== null && (
-      <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
+      <div className="bg-white px-6 py-3 rounded-2xl border border-gray-200 flex items-center gap-3">
         <span className="text-2xl">🔥</span>
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Streak</p>
@@ -108,68 +68,55 @@ const WelcomeHeader = ({ name, streak }) => (
         </div>
       </div>
     )}
-  </motion.div>
+  </div>
 );
 
 const CurrentCourseCard = ({ course }) => (
-  <motion.div
-    variants={itemVariants}
-    className="relative bg-linear-to-br from-blue-600 to-sky-700 p-8 text-white overflow-hidden"
-  >
-    <div className="relative z-10">
-      <span className="text-sm font-semibold text-blue-200 uppercase tracking-wider">Currently Learning</span>
-      <h2 className="text-4xl font-bold mt-2">{course.title}</h2>
-
-
-      <Link href={'/courses/algebra'} className="mt-10 max-w-62 flex items-center space-x-3 bg-white text-blue-700 font-bold px-8 py-3 rounded-xl shadow-lg
-       hover:bg-slate-100 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-        <FiPlayCircle size={22} />
-        <span>Continue Learning</span>
-      </Link>
-    </div>
-
-
-  </motion.div>
+  <div className="animate-fade-in-up [animation-delay:100ms] opacity-0 bg-blue-600 p-8 text-white rounded-2xl">
+    <span className="text-sm font-semibold text-blue-200 uppercase tracking-wider">Currently Learning</span>
+    <h2 className="text-4xl font-bold mt-2">{course.title}</h2>
+    <Link
+      href="/courses/algebra"
+      className="mt-10 max-w-62 inline-flex items-center space-x-3 bg-white text-blue-700 font-bold px-8 py-3 rounded-xl border-b-[3px] border-blue-100 active:border-b-0 active:translate-y-[3px] hover:bg-blue-50 transition-colors"
+    >
+      <PlayCircle size={22} />
+      <span>Continue Learning</span>
+    </Link>
+  </div>
 );
 
-
 const ActivitySection = ({ activityData }) => (
-  <motion.div variants={itemVariants} className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+  <div className="animate-fade-in-up [animation-delay:200ms] opacity-0 bg-white p-8 rounded-2xl border border-gray-200">
     <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
       <span className="w-2 h-6 bg-green-500 rounded-full" />
       Activity Log
     </h3>
     <ActivityGraph activityData={activityData} />
-  </motion.div>
+  </div>
 );
 
 const RecommendedLessons = ({ lessons }) => (
-  <motion.div variants={itemVariants}>
-    <h3 className="text-xl font-bold text-gray-800 mb-6">Explore New lessons</h3>
+  <div className="animate-fade-in-up [animation-delay:300ms] opacity-0">
+    <h3 className="text-xl font-bold text-gray-800 mb-6">Explore New Lessons</h3>
     <div className="grid grid-cols-1 gap-4">
       {lessons.map(lesson => (
         <LessonItemCard key={lesson.id} lesson={lesson} />
       ))}
     </div>
-  </motion.div>
+  </div>
 );
 
 const LessonItemCard = ({ lesson }) => (
-  <motion.div
-    className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group"
-    whileHover={{ scale: 1.03 }}
-    transition={{ type: "spring", stiffness: 300 }}
-  >
+  <div className="bg-white p-6 rounded-2xl border border-gray-200 cursor-pointer group hover:border-blue-200 transition-colors">
     <div className="flex items-start justify-between">
-
       <p className="text-xs text-neutral-800 bg-green-100 px-2 py-1 rounded-full">{lesson.category}</p>
     </div>
     <h4 className="text-lg font-bold text-gray-800 mt-4">{lesson.title}</h4>
     <Link href={`/courses/algebra/${lesson.id}`} className="mt-6 flex items-center justify-between text-blue-600 font-semibold">
       <span>Start Lesson</span>
-      <FiArrowRight className="opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+      <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4" />
     </Link>
-  </motion.div>
+  </div>
 );
 
 export default HomePage;

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 import { FunctionVisualizer } from "@/components/visualizations";
 import { FiPlus, FiTrash2, FiPlay, FiPause, FiRefreshCw } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
 
 
 const defaultElements = [
@@ -22,7 +21,6 @@ const defaultElements = [
         strokeWidth: 3,
         style: 'dashed'
     }
-
 ];
 
 
@@ -31,7 +29,7 @@ export default function Sandbox() {
     const [interactiveValue, setInteractiveValue] = useState(50);
 
     const [isPlaying, setIsPlaying] = useState(false);
-    const [config, setConfig] = useState({
+    const [config] = useState({
         xDomain: [-10, 10],
         yDomain: [-10, 10],
         paramRange: [0, 10],
@@ -41,9 +39,8 @@ export default function Sandbox() {
     useEffect(() => {
         let interval;
 
-        if (isPlaying){
+        if (isPlaying) {
             interval = setInterval(() => {
-
                 setInteractiveValue(prev => (prev + 1) % 100);
             }, 50);
         }
@@ -51,7 +48,6 @@ export default function Sandbox() {
         return () => clearInterval(interval);
     }, [isPlaying]);
 
-   
     const addElement = () => {
         const newId = `el-${Date.now()}`;
         setElements([
@@ -82,10 +78,10 @@ export default function Sandbox() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-73px) bg-slate-50 flex flex-col lg:flex-row">
+        <div className="min-h-[calc(100vh-73px)] bg-slate-50 flex flex-col lg:flex-row">
 
-            <div className="w-full lg:w-96 bg-white border-r border-slate-200 p-6 flex 
-            flex-col h-auto lg:h-[calc(100vh-73px)] overflow-y-auto shadow-sm z-10">
+            <div className="w-full lg:w-96 bg-white border-r border-slate-200 p-6 flex
+            flex-col h-auto lg:h-[calc(100vh-73px)] overflow-y-auto z-10">
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                          Sandbox
@@ -99,8 +95,7 @@ export default function Sandbox() {
                     </button>
                 </div>
 
-
-                <div className="mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200">
                     <div className="flex items-center justify-between mb-4">
                         <label className="text-sm font-bold text-slate-700">Parameter (t)</label>
                         <button
@@ -125,7 +120,6 @@ export default function Sandbox() {
                     </div>
                 </div>
 
-
                 <div className="space-y-4 grow">
                     <div className="flex items-center justify-between mb-2">
                         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Elements</h2>
@@ -137,14 +131,11 @@ export default function Sandbox() {
                         </button>
                     </div>
 
-                    <AnimatePresence>
+                    <div className="space-y-3">
                         {elements.map((el) => (
-                            <motion.div
+                            <div
                                 key={el.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm group hover:border-blue-300 transition-all"
+                                className="animate-fade-in-up bg-white p-4 rounded-xl border border-slate-200 group hover:border-blue-300 transition-colors"
                             >
                                 <div className="flex items-start gap-3">
                                     <div
@@ -180,8 +171,6 @@ export default function Sandbox() {
                                             />
                                         )}
 
-
-
                                         <div className="flex items-center gap-2">
                                             <input
                                                 type="color"
@@ -193,18 +182,16 @@ export default function Sandbox() {
                                         </div>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
-                    </AnimatePresence>
+                    </div>
                 </div>
             </div>
 
             <div className="grow p-4 lg:p-8 flex flex-col">
-                <div className="grow bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden relative">
+                <div className="grow bg-white rounded-2xl border border-slate-200 overflow-hidden relative">
                     <div className="absolute inset-0">
-
                         <div className="w-full h-full flex flex-col">
-
                             <FunctionVisualizer
                                 config={fullConfig}
                                 interactiveValue={interactiveValue}

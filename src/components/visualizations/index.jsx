@@ -174,7 +174,8 @@ export const FunctionVisualizer = ({ config, interactiveValue, className }) => {
         }
 
         case 'vector': {
-
+          // not nice but yeah 
+          // We need to make this much better actually
           const x1 = evaluateMath(el.x1 || '0', { t });
           const y1 = evaluateMath(el.y1 || '0', { t });
           const x2 = evaluateMath(el.x2 || '0', { t });

@@ -1,5 +1,4 @@
 'use client';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Check, Lock, Play, ChevronRight } from 'lucide-react';
 import { iconMap } from './lib/IconMap';
@@ -8,7 +7,7 @@ const statusConfig = {
   locked: {
     icon: Lock,
     color: 'text-gray-400',
-    bg: 'bg-gray-100',
+    bg: 'bg-white',
     border: 'border-gray-200',
     cursor: 'cursor-not-allowed',
     label: 'Locked',
@@ -39,40 +38,17 @@ export default function LessonCard({ lesson, index }) {
   const isLocked = status === 'locked';
   const isEven = index % 2 === 0;
 
-
-  const cardVariants = {
-    hidden: { opacity: 0, x: isEven ? -50 : 50, y: 20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: { duration: 0.5, delay: index * 0.1 }
-    }
-  };
-
-  const nodeVariants = {
-    hidden: { scale: 0 },
-    visible: {
-      scale: 1,
-      transition: { type: "spring", stiffness: 260, damping: 20, delay: index * 0.1 + 0.2 }
-    }
-  };
-
   const Content = (
-    <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
-      className={`relative flex items-center w-full ${isEven ? 'flex-row' : 'flex-row-reverse'}`}
+    <div
+      className={`animate-fade-in-up opacity-0 relative flex items-center w-full ${isEven ? 'flex-row' : 'flex-row-reverse'}`}
+      style={{ animationDelay: `${index * 100}ms` }}
     >
-
       <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-10">
-        <motion.div
-          variants={nodeVariants}
-          className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${status === 'unlocked' ? 'border-blue-500 bg-white' :
-              status === 'completed' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 bg-gray-100'
-            } shadow-lg transition-colors duration-300`}
+        <div
+          className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${
+            status === 'unlocked' ? 'border-blue-500 bg-white' :
+            status === 'completed' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 bg-gray-100'
+          } transition-colors duration-300`}
         >
           {status === 'completed' ? (
             <Check size={20} className="text-white" />
@@ -81,21 +57,18 @@ export default function LessonCard({ lesson, index }) {
           ) : (
             <Lock size={18} className="text-gray-400" />
           )}
-        </motion.div>
+        </div>
       </div>
-
 
       <div className="w-1/2" />
 
-
       <div className={`w-1/2 ${isEven ? 'pr-12 text-right' : 'pl-12 text-left'}`}>
         <div
-          className={`group relative p-6  border ${config.border} ${config.bg} 
-            transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
+          className={`group relative p-6 border ${config.border} ${config.bg} rounded-2xl
+            transition-colors duration-200
             ${!isLocked && 'hover:border-blue-300'}
           `}
         >
-
           <div className={`absolute top-4 ${isEven ? 'left-4' : 'right-4'} opacity-5`}>
             <Icon size={80} />
           </div>
@@ -110,7 +83,7 @@ export default function LessonCard({ lesson, index }) {
               </span>
             </div>
 
-            <h3 className={`text-xl font-bold mb-2 text-gray-900 group-hover:text-blue-700 transition-colors`}>
+            <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-blue-700 transition-colors">
               {title}
             </h3>
 
@@ -119,7 +92,7 @@ export default function LessonCard({ lesson, index }) {
             </p>
 
             {!isLocked && (
-              <div className={`flex items-center gap-2 text-sm font-medium text-blue-600 
+              <div className={`flex items-center gap-2 text-sm font-medium text-blue-600
                 ${isEven ? 'justify-end' : 'justify-start'} group-hover:gap-3 transition-all`}
               >
                 Start Lesson <ChevronRight size={16} />
@@ -128,7 +101,7 @@ export default function LessonCard({ lesson, index }) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 
   if (isLocked) {

@@ -89,10 +89,10 @@ export default function OnboardingForm() {
   const hasValidationError = username.length > 0 && !USERNAME_REGEX.test(username);
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="animate-fade-in-up w-full max-w-md mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="bg-white border border-slate-200 rounded-xl shadow-lg p-8 space-y-6"
+        className="bg-white border border-gray-200 rounded-2xl p-8 space-y-6"
       >
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
@@ -104,7 +104,7 @@ export default function OnboardingForm() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g obay :)"
-              className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 font-mono shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-slate-900 font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               maxLength={39}
               autoComplete="off"
               aria-describedby="username-hint"
@@ -123,7 +123,7 @@ export default function OnboardingForm() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md" role="alert">
+          <div className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-xl" role="alert">
             <p className="font-bold">Error</p>
             <p>{error}</p>
           </div>
@@ -140,7 +140,7 @@ export default function OnboardingForm() {
         <button
           type="submit"
           disabled={loading || isChecking || !isAvailable || hasValidationError}
-          className="w-full flex items-center justify-center px-6 py-3 font-semibold text-white bg-blue-600 rounded-lg shadow-sm transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none"
+          className="w-full flex items-center justify-center px-6 py-3 font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl border-b-[3px] border-blue-800 active:border-b-0 active:translate-y-[3px] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:border-b-0"
         >
           {loading ? (
             <>

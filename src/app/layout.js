@@ -1,16 +1,15 @@
-import { Aldrich } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/navbar";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { getUserInfo } from "@/components/auth/getUserInfo";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import Snow from "@/components/layout/snow";
 
-const aldrich = Aldrich({
-  variable: "--font-aldrich",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "600", "700", "800"],
 });
 
 export const metadata = {
@@ -28,10 +27,9 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className={`${aldrich.className} antialiased`}>
+      <body className={`${nunito.variable} font-[family-name:var(--font-nunito)] antialiased`}>
         <AuthProvider initialUser={userInfo}>
           <Navbar />
-          <Snow />
           {children}
         </AuthProvider>
       </body>

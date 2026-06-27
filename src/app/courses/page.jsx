@@ -20,7 +20,7 @@ export default async function CoursesPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-73px)] bg-sky-50 text-gray-800">
+    <div className="flex flex-col min-h-[calc(100vh-73px)] bg-slate-50 text-gray-800">
       <main className="grow container mx-auto px-6 py-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
@@ -32,13 +32,14 @@ export default async function CoursesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {courses.map((course) => (
+          {courses.map((course, i) => (
             <Link
               key={course.id}
               href={`/courses/${course.name.toLowerCase()}`}
-              className="group block"
+              className="group block animate-fade-in-up"
+              style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
             >
-              <div className="h-full bg-white/60 p-8 border border-gray-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+              <div className="h-full bg-white p-8 border border-gray-200 rounded-2xl hover:border-blue-200 transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <div
                     className={`rounded-full h-16 w-16 flex items-center justify-center ${

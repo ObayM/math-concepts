@@ -47,16 +47,16 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4">
-      <div className="w-full max-w-md p-6 space-y-6 bg-white border rounded-2xl shadow-xl border-neutral-200/70 sm:p-8">
+    <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4 bg-slate-50">
+      <div className="animate-fade-in-up w-full max-w-md p-6 space-y-6 bg-white border border-gray-200 rounded-2xl sm:p-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             Create an Account
           </h1>
-          <p className="mt-2 text-sm text-gray-600">Join us and start your journey!</p>
+          <p className="mt-2 text-sm text-gray-500">Join us and start your journey!</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
             <Mail className="absolute w-5 h-5 text-gray-400 top-3.5 left-3" />
             <input
@@ -68,7 +68,7 @@ export default function SignupPage() {
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full py-3 pl-10 pr-3 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full py-3 pl-10 pr-3 text-gray-900 bg-gray-50 border border-gray-200 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
 
@@ -83,7 +83,7 @@ export default function SignupPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full py-3 pl-10 pr-10 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full py-3 pl-10 pr-10 text-gray-900 bg-gray-50 border border-gray-200 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
             <button
               type="button"
@@ -102,7 +102,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center justify-center w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-300 bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
+            className="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl border-b-[3px] border-blue-800 active:border-b-0 active:translate-y-[3px] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:border-b-0"
           >
             {loading ? (
               <>
@@ -118,9 +118,9 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <p className="mt-8 text-sm text-center text-gray-600">
+        <p className="text-sm text-center text-gray-500">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
+          <Link href="/login" className="font-bold text-blue-600 hover:text-blue-500 hover:underline">
             Sign In
           </Link>
         </p>

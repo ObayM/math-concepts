@@ -1,6 +1,5 @@
 'use client';
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
 
 const ActivityGraph = ({ activityData }) => {
 
@@ -14,7 +13,6 @@ const ActivityGraph = ({ activityData }) => {
         }
         return dates;
     }, []);
-
 
     const activityMap = useMemo(() => {
         const map = {};
@@ -37,15 +35,12 @@ const ActivityGraph = ({ activityData }) => {
     return (
         <div className="w-full overflow-x-auto pb-2">
             <div className="flex gap-1 min-w-max">
-
                 <div className="grid grid-rows-7 grid-flow-col gap-1">
                     {days.map(date => {
                         const count = activityMap[date] || 0;
                         return (
-                            <motion.div
+                            <div
                                 key={date}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
                                 className={`w-3 h-3 rounded-sm ${getColor(count)}`}
                                 title={`${date}: ${count} activities`}
                             />
@@ -53,7 +48,6 @@ const ActivityGraph = ({ activityData }) => {
                     })}
                 </div>
             </div>
-
 
             <div className="flex items-center justify-end gap-2 mt-2 text-xs text-slate-400">
                 <span>Less</span>
@@ -68,4 +62,3 @@ const ActivityGraph = ({ activityData }) => {
 };
 
 export default ActivityGraph;
-
