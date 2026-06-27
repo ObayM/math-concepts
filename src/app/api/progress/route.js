@@ -17,10 +17,14 @@ export async function POST(request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { lessonKey, currentStep, isCompleted } = await request.json();
+  const { lessonKey, currentStep, isCompleted, quizHistory } = await request.json();
   if (!lessonKey) return NextResponse.json({ error: 'lessonKey is required' }, { status: 400 });
 
-  const result = await upsertLessonProgress(user.id, lessonKey, { currentStep, isCompleted });
+  const result = await upsertLessonProgress(user.id, lessonKey, {
+    currentStep,
+    isCompleted,
+    quizHistory,
+  });
   if (result === null) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
   return NextResponse.json({ success: true });

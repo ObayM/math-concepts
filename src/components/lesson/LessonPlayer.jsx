@@ -46,7 +46,10 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
       .then((r) => r.json())
       .then((d) => {
         if (d.currentStep > 0 && d.currentStep < slides.length) setCurrentIndex(d.currentStep);
-        if (d.completed) setIsComplete(true);
+        if (d.completed) {
+          setIsComplete(true);
+          if (Array.isArray(d.quizHistory)) setQuizHistory(d.quizHistory);
+        }
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
@@ -95,7 +98,12 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     fetch('/api/progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lessonKey: lessonId, currentStep: currentIndex, isCompleted: true }),
+      body: JSON.stringify({
+        lessonKey: lessonId,
+        currentStep: currentIndex,
+        isCompleted: true,
+        quizHistory,
+      }),
     }).catch(console.error);
   };
 

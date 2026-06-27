@@ -5,19 +5,24 @@ export async function getLessonProgress(userId, lessonKey) {
     where: { lessonKey },
     select: { id: true },
   });
-  if (!lesson) return { currentStep: 0, completed: false };
+  if (!lesson) return { currentStep: 0, completed: false, quizHistory: null };
 
   const progress = await prisma.userLessonProgress.findUnique({
     where: { userId_lessonId: { userId, lessonId: lesson.id } },
-    select: { currentStep: true, completed: true },
+    select: { currentStep: true, completed: true, quizHistory: true },
   });
   return {
     currentStep: progress?.currentStep ?? 0,
     completed: progress?.completed ?? false,
+    quizHistory: progress?.quizHistory ?? null,
   };
 }
 
-export async function upsertLessonProgress(userId, lessonKey, { currentStep, isCompleted }) {
+export async function upsertLessonProgress(
+  userId,
+  lessonKey,
+  { currentStep, isCompleted, quizHistory }
+) {
   const lesson = await prisma.lesson.findUnique({
     where: { lessonKey },
     select: { id: true },
@@ -31,6 +36,7 @@ export async function upsertLessonProgress(userId, lessonKey, { currentStep, isC
       currentStep,
       lastPlayedAt: now,
       ...(isCompleted && { completed: true, completedAt: now }),
+      ...(quizHistory !== undefined && { quizHistory }),
     },
     create: {
       userId,
@@ -38,6 +44,7 @@ export async function upsertLessonProgress(userId, lessonKey, { currentStep, isC
       currentStep,
       lastPlayedAt: now,
       ...(isCompleted && { completed: true, completedAt: now }),
+      ...(quizHistory !== undefined && { quizHistory }),
     },
   });
   return lesson.id;

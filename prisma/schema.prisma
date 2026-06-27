@@ -120,6 +120,7 @@ model UserLessonProgress {
   completedAt  DateTime? @map("completed_at")
   currentStep  Int       @default(0) @map("current_step")
   lastPlayedAt DateTime  @default(now()) @map("last_played_at")
+  quizHistory  Json?     @map("quiz_history")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
