@@ -15,10 +15,10 @@ npm install
 **2. Duplicate your environment file!**
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Open up `.env.local` and punch in your secrets:
+Open up `.env` and put in your secrets:
 
 - `BETTER_AUTH_SECRET`: Run `openssl rand -base64 32` to generate a fresh secret!
 - `GEMINI_API_KEY`: Grab one from [Google AI Studio](https://aistudio.google.com/app/apikey) if you want the cool AI features to work (they're optional but highly recommended!).
