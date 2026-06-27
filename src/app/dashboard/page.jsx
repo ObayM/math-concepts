@@ -7,6 +7,8 @@ import { PlayCircle, ArrowRight } from 'lucide-react';
 import { lessonsData } from '@/components/lib/data';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
 import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
 
 const HomePage = () => {
   const { user, profile } = useAuth();
@@ -61,7 +63,7 @@ const WelcomeHeader = ({ name, streak }) => (
       <p className="mt-2 text-lg text-gray-500">Ready to continue your space adventures?</p>
     </div>
     {streak !== null && (
-      <div className="bg-white px-6 py-3 rounded-2xl border border-gray-200 flex items-center gap-3">
+      <Card className="flex items-center gap-3 px-6 py-3">
         <span className="text-2xl">🔥</span>
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -69,7 +71,7 @@ const WelcomeHeader = ({ name, streak }) => (
           </p>
           <p className="text-xl font-black text-slate-800">{streak} Days</p>
         </div>
-      </div>
+      </Card>
     )}
   </div>
 );
@@ -94,13 +96,13 @@ const CurrentCourseCard = ({ course }) => (
 );
 
 const ActivitySection = ({ activityData }) => (
-  <div className="animate-fade-in-up [animation-delay:200ms] opacity-0 bg-white p-8 rounded-2xl border border-gray-200">
+  <Card className="animate-fade-in-up [animation-delay:200ms] opacity-0 p-8">
     <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-      <span className="w-2 h-6 bg-green-500 rounded-full" />
+      <span className="w-2 h-6 bg-success-500 rounded-full" />
       Activity Log
     </h3>
     <ActivityGraph activityData={activityData} />
-  </div>
+  </Card>
 );
 
 const RecommendedLessons = ({ lessons }) => (
@@ -115,11 +117,9 @@ const RecommendedLessons = ({ lessons }) => (
 );
 
 const LessonItemCard = ({ lesson }) => (
-  <div className="bg-white p-6 rounded-2xl border border-gray-200 cursor-pointer group hover:border-blue-200 transition-colors">
+  <Card className="group cursor-pointer p-6 transition-colors hover:border-primary-200">
     <div className="flex items-start justify-between">
-      <p className="text-xs text-neutral-800 bg-green-100 px-2 py-1 rounded-full">
-        {lesson.category}
-      </p>
+      <Badge variant="success">{lesson.category}</Badge>
     </div>
     <h4 className="text-lg font-bold text-gray-800 mt-4">{lesson.title}</h4>
     <Link
@@ -129,7 +129,7 @@ const LessonItemCard = ({ lesson }) => (
       <span>Start Lesson</span>
       <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4" />
     </Link>
-  </div>
+  </Card>
 );
 
 export default HomePage;

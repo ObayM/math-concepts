@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Button from '@/components/ui/Button';
+import Spinner from '@/components/ui/Spinner';
 import { FunctionVisualizer } from '@/components/visualizations';
 import { CheckCircle2, XCircle, Sparkles, HelpCircle, BrainCircuit, RotateCcw } from 'lucide-react';
 import { askTutor, generatePersonalizedSlide } from '@/utils/geminiService';
@@ -251,7 +252,7 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
           {isGeneratingNext ? (
             <div className="animate-fade-in-up h-full flex flex-col items-center justify-center text-center space-y-6">
               <div className="relative">
-                <div className="w-24 h-24 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin" />
+                <Spinner size="lg" />
                 <BrainCircuit className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500 w-10 h-10" />
               </div>
               <div>

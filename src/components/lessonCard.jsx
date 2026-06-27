@@ -2,6 +2,9 @@
 import Link from 'next/link';
 import { Check, Lock, Play, ChevronRight } from 'lucide-react';
 import { iconMap } from './lib/IconMap';
+import Badge from '@/components/ui/Badge';
+
+const statusBadge = { unlocked: 'primary', completed: 'success', locked: 'neutral' };
 
 const statusConfig = {
   locked: {
@@ -80,19 +83,12 @@ export default function LessonCard({ lesson, index }) {
             <div
               className={`flex items-center gap-2 mb-2 ${isEven ? 'justify-end' : 'justify-start'}`}
             >
-              <span
-                className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider
-                ${
-                  status === 'unlocked'
-                    ? 'bg-blue-100 text-blue-700'
-                    : status === 'completed'
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-gray-200 text-gray-500'
-                }
-              `}
+              <Badge
+                variant={statusBadge[status] || 'neutral'}
+                className="uppercase tracking-wider"
               >
                 {config.label}
-              </span>
+              </Badge>
             </div>
 
             <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-blue-700 transition-colors">

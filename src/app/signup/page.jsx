@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import PasswordInput from '@/components/ui/PasswordInput';
+import Card from '@/components/ui/Card';
 
 export default function SignupPage() {
   const { user } = useAuth();
@@ -50,7 +51,7 @@ export default function SignupPage() {
 
   return (
     <main className="flex items-center justify-center min-h-[calc(100vh-70px)] px-4 bg-slate-50">
-      <div className="animate-fade-in-up w-full max-w-md p-6 space-y-6 bg-white border border-gray-200 rounded-2xl sm:p-8">
+      <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             Create an Account
@@ -107,7 +108,7 @@ export default function SignupPage() {
             Sign In
           </Link>
         </p>
-      </div>
+      </Card>
     </main>
   );
 }
