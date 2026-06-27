@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { CheckCircle2, ArrowRight, Home, Star } from 'lucide-react';
-import Button from './Button';
+import Button from '@/components/ui/Button';
 
 export default function LessonComplete({ onContinue, onBack, nextLessonId, streak }) {
   return (
@@ -36,18 +36,18 @@ export default function LessonComplete({ onContinue, onBack, nextLessonId, strea
 
       <div className="animate-fade-in-up [animation-delay:600ms] opacity-0 flex flex-col gap-3 w-full max-w-xs">
         <Button
+          variant="success"
+          size="lg"
+          fullWidth
           onClick={onContinue}
-          className="w-full bg-[#58CC02] hover:bg-[#46a302] border-b-[3px] border-[#46a302] active:border-b-0 active:translate-y-[3px] text-white font-extrabold text-lg py-4 rounded-2xl flex items-center justify-center gap-2"
+          className="rounded-2xl font-extrabold"
         >
           {nextLessonId ? 'Next Lesson' : 'Finish Course'} <ArrowRight className="w-5 h-5" />
         </Button>
 
-        <button
-          onClick={onBack}
-          className="w-full py-4 text-slate-400 font-bold hover:text-slate-600 transition-colors flex items-center justify-center gap-2"
-        >
+        <Button variant="ghost" size="lg" fullWidth onClick={onBack}>
           <Home className="w-5 h-5" /> Back to Course
-        </button>
+        </Button>
       </div>
     </div>
   );

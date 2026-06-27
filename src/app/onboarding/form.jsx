@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, X, LoaderCircle } from 'lucide-react';
+import Button from '@/components/ui/Button';
 
 const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/;
 
@@ -138,20 +139,20 @@ export default function OnboardingForm() {
           <p className="text-sm text-red-600">Invalid format. Please follow the rules above.</p>
         )}
 
-        <button
+        <Button
           type="submit"
+          fullWidth
           disabled={loading || isChecking || !isAvailable || hasValidationError}
-          className="w-full flex items-center justify-center px-6 py-3 font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl border-b-[3px] border-blue-800 active:border-b-0 active:translate-y-[3px] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:border-b-0"
         >
           {loading ? (
             <>
-              <LoaderCircle className="h-5 w-5 mr-2 animate-spin" />
+              <LoaderCircle className="h-5 w-5 animate-spin" />
               Finalizing...
             </>
           ) : (
             'Complete Profile'
           )}
-        </button>
+        </Button>
       </form>
     </div>
   );

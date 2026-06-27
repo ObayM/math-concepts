@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 
-import Button from '@/components/slides/Button';
+import Button from '@/components/ui/Button';
 import { FunctionVisualizer } from '@/components/visualizations';
 import { CheckCircle2, XCircle, Sparkles, HelpCircle, BrainCircuit, RotateCcw } from 'lucide-react';
 import { askTutor, generatePersonalizedSlide } from '@/utils/geminiService';
@@ -439,29 +439,29 @@ export default function AdvancedLessonView({ lessonData: initialSlides = [], les
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             {currentSlideIndex > 0 && (
-              <Button variant="secondary" onClick={handleBack} className="hidden md:flex">
+              <Button variant="neutral" onClick={handleBack} className="hidden md:flex">
                 Back
               </Button>
             )}
 
             {currentSlide.interactiveType === 'quiz' && !quizSubmitted ? (
               <Button
-                variant="primary"
+                variant="success"
                 onClick={handleQuizSubmit}
                 disabled={selectedQuizOption === null}
-                className="w-full md:w-auto bg-[#58CC02] hover:bg-[#46a302] border-b-[3px] border-[#46a302] active:border-b-0 active:translate-y-[3px]
-                         text-white font-extrabold tracking-wide uppercase"
+                className="w-full md:w-auto font-extrabold tracking-wide uppercase"
               >
                 Check
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className={`w-full md:w-auto font-extrabold tracking-wide uppercase border-b-[3px] active:border-b-0 active:translate-y-[3px] ${
+                variant={
                   isLastSlide && !currentSlide.isAiGenerated && !isGeneratingNext
-                    ? 'bg-purple-600 hover:bg-purple-700 border-purple-900'
-                    : 'bg-[#58CC02] hover:bg-[#46a302] border-[#46a302]'
-                } text-white`}
+                    ? 'accent'
+                    : 'success'
+                }
+                className="w-full md:w-auto font-extrabold tracking-wide uppercase"
               >
                 {isLastSlide && !currentSlide.isAiGenerated ? (
                   <span className="flex items-center">

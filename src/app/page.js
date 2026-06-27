@@ -3,6 +3,7 @@
 import { useAuth } from '@/components/auth/AuthProvider';
 import Link from 'next/link';
 import { ArrowRight, Zap } from 'lucide-react';
+import Button from '@/components/ui/Button';
 
 export default function Home() {
   const { user } = useAuth();
@@ -32,28 +33,19 @@ export default function Home() {
 
             <div className="animate-fade-in-up [animation-delay:300ms] opacity-0 flex flex-col sm:flex-row items-center justify-center gap-4">
               {user ? (
-                <Link
-                  href="/dashboard"
-                  className="group px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg border-b-[3px] border-blue-800 active:border-b-0 active:translate-y-[3px] transition-colors flex items-center gap-2"
-                >
+                <Button as={Link} href="/dashboard" size="lg">
                   Continue Learning
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                </Button>
               ) : (
                 <>
-                  <Link
-                    href="/signup"
-                    className="group px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg border-b-[3px] border-blue-800 active:border-b-0 active:translate-y-[3px] transition-colors flex items-center gap-2"
-                  >
+                  <Button as={Link} href="/signup" size="lg">
                     Start Learning Free
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-bold text-lg border border-slate-200 hover:border-slate-300 transition-colors"
-                  >
+                  </Button>
+                  <Button as={Link} href="/login" variant="outline" size="lg">
                     Log In
-                  </Link>
+                  </Button>
                 </>
               )}
             </div>

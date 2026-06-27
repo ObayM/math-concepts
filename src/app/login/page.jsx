@@ -7,6 +7,7 @@ import { Mail, KeyRound, Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
 import { redirect } from 'next/navigation';
+import Button from '@/components/ui/Button';
 
 export default function LoginPage() {
   const { user } = useAuth();
@@ -91,23 +92,19 @@ export default function LoginPage() {
 
           {error && <p className="text-sm font-medium text-center text-red-600">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl border-b-[3px] border-blue-800 active:border-b-0 active:translate-y-[3px] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:border-b-0"
-          >
+          <Button type="submit" fullWidth disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
                 Signing In...
               </>
             ) : (
               <>
-                <LogIn className="w-5 h-5 mr-2" />
+                <LogIn className="w-5 h-5" />
                 Sign In
               </>
             )}
-          </button>
+          </Button>
         </form>
 
         <p className="text-sm text-center text-gray-500">

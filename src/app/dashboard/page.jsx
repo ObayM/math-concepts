@@ -6,6 +6,7 @@ import { PlayCircle, ArrowRight } from 'lucide-react';
 
 import { lessonsData } from '@/components/lib/data';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
+import Button from '@/components/ui/Button';
 
 const HomePage = () => {
   const { user, profile } = useAuth();
@@ -79,13 +80,16 @@ const CurrentCourseCard = ({ course }) => (
       Currently Learning
     </span>
     <h2 className="text-4xl font-bold mt-2">{course.title}</h2>
-    <Link
+    <Button
+      as={Link}
       href="/courses/algebra"
-      className="mt-10 max-w-62 inline-flex items-center space-x-3 bg-white text-blue-700 font-bold px-8 py-3 rounded-xl border-b-[3px] border-blue-100 active:border-b-0 active:translate-y-[3px] hover:bg-blue-50 transition-colors"
+      variant="secondary"
+      size="lg"
+      icon={<PlayCircle size={22} />}
+      className="mt-10 max-w-62"
     >
-      <PlayCircle size={22} />
-      <span>Continue Learning</span>
-    </Link>
+      Continue Learning
+    </Button>
   </div>
 );
 
