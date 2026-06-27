@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, KeyRound, Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
+import { Mail, Loader2, LogIn } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
 import { redirect } from 'next/navigation';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import PasswordInput from '@/components/ui/PasswordInput';
 
 export default function LoginPage() {
   const { user } = useAuth();
@@ -15,7 +17,6 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -52,43 +53,27 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
-            <Mail className="absolute w-5 h-5 text-gray-400 top-3.5 left-3" />
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="block w-full py-3 pl-10 pr-3 text-gray-900 bg-gray-50 border border-gray-200 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            icon={<Mail className="w-5 h-5" />}
+          />
 
-          <div className="relative">
-            <KeyRound className="absolute w-5 h-5 text-gray-400 top-3.5 left-3" />
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
-              required
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full py-3 pl-10 pr-10 text-gray-900 bg-gray-50 border border-gray-200 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-blue-600"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            autoComplete="current-password"
+            required
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           {error && <p className="text-sm font-medium text-center text-red-600">{error}</p>}
 
