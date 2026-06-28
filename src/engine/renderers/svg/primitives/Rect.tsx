@@ -12,6 +12,7 @@ export default function Rect({ obj, scope, cx }: PrimProps) {
   const py = cx.toY(y + h);
   const width = Math.abs(cx.toX(x + w) - px);
   const height = Math.abs(cx.toY(y) - py);
+  if (![px, py, width, height].every(Number.isFinite)) return null;
   const color = resolveColor(obj.color);
 
   return (

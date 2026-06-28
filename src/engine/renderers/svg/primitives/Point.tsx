@@ -5,6 +5,7 @@ import type { PrimProps } from '@/engine/renderers/svg/types';
 export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
   const px = cx.toX(evalNumber(obj.x, scope));
   const py = cx.toY(evalNumber(obj.y, scope));
+  if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
   const color = resolveColor(obj.color);
   const r = obj.r ?? 6;
   const draggable = !!obj.draggable;

@@ -3,7 +3,7 @@ import { RotateCcw } from 'lucide-react';
 import { Scene } from '@/engine';
 
 export default function BuildBlock({ slide, value = [], checked, correct, onChange }) {
-  const placed = value;
+  const placed = value || [];
   const labelOf = (id) => slide.bank.find((t) => t.id === id)?.label ?? id;
   const usedCount = (id) => placed.filter((p) => p === id).length;
 

@@ -21,12 +21,18 @@ export default function Line({ obj, scope, cx, points }: PrimProps) {
     y2 = evalNumber(obj.y2 ?? 0, scope);
   }
 
+  const X1 = cx.toX(x1);
+  const Y1 = cx.toY(y1);
+  const X2 = cx.toX(x2);
+  const Y2 = cx.toY(y2);
+  if (![X1, Y1, X2, Y2].every(Number.isFinite)) return null;
+
   return (
     <line
-      x1={cx.toX(x1)}
-      y1={cx.toY(y1)}
-      x2={cx.toX(x2)}
-      y2={cx.toY(y2)}
+      x1={X1}
+      y1={Y1}
+      x2={X2}
+      y2={Y2}
       stroke={resolveColor(obj.color)}
       strokeWidth={obj.strokeWidth ?? 2}
       strokeDasharray={dash(obj.style)}

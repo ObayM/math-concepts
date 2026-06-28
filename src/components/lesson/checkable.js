@@ -12,7 +12,7 @@ export const checkable = {
   },
   build: {
     initial: () => [],
-    isComplete: (slide, v) => v.length === slide.slots,
-    check: (slide, v) => slide.answer.some((ans) => sameSequence(ans, v)),
+    isComplete: (slide, v) => v && v.length === slide.slots,
+    check: (slide, v) => v && slide.answer.some((ans) => sameSequence(ans, v)),
   },
 };
