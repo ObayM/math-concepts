@@ -45,7 +45,10 @@ const pointObj = z.object({
   y: expr,
   r: z.number().optional(),
   label: z.string().optional(),
-  draggable: z.object({ axis: z.enum(['x', 'y', 'xy']), bind: z.string() }).optional(),
+  // bind = x-axis state key; bindY = y-axis state key (for axis 'xy' free drag)
+  draggable: z
+    .object({ axis: z.enum(['x', 'y', 'xy']), bind: z.string(), bindY: z.string().optional() })
+    .optional(),
   ...objBase,
 });
 const lineObj = z.object({

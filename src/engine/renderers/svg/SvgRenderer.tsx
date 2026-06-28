@@ -32,21 +32,20 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
   }
 
   const startDrag =
-    (obj: { draggable?: { axis: string; bind: string } }) => (e: React.PointerEvent) => {
+    (obj: { draggable?: { axis: string; bind: string; bindY?: string } }) =>
+    (e: React.PointerEvent) => {
       if (!obj.draggable) return;
       e.preventDefault();
-      const { axis, bind } = obj.draggable;
+      const { axis, bind, bindY } = obj.draggable;
       const move = (ev: PointerEvent) => {
         const svg = svgRef.current;
         if (!svg) return;
         const rect = svg.getBoundingClientRect();
-        if (axis === 'x' || axis === 'xy') {
-          const ratio = (ev.clientX - rect.left) / rect.width;
-          set(bind, xMin + ratio * (xMax - xMin));
-        } else if (axis === 'y') {
-          const ratio = (ev.clientY - rect.top) / rect.height;
-          set(bind, yMax - ratio * (yMax - yMin));
-        }
+        const dataX = xMin + ((ev.clientX - rect.left) / rect.width) * (xMax - xMin);
+        const dataY = yMax - ((ev.clientY - rect.top) / rect.height) * (yMax - yMin);
+        if (axis === 'x' || axis === 'xy') set(bind, dataX);
+        if (axis === 'y') set(bind, dataY);
+        if (axis === 'xy' && bindY) set(bindY, dataY);
       };
       const up = () => {
         window.removeEventListener('pointermove', move);

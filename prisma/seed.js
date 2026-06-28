@@ -1991,6 +1991,419 @@ const geometry5Data = [
   },
 ];
 
+const quadraticsSteps = [
+  {
+    id: 'q-intro',
+    title: 'Meet the Quadratic',
+    category: 'Quadratics',
+    interactiveType: 'intro',
+    content:
+      'A quadratic is any equation with an x² in it, and its graph is always a U-shaped curve called a **parabola** — the path of a thrown ball, the curve of a satellite dish, an arc of water. Let us take it apart piece by piece.',
+  },
+  {
+    id: 'q-square',
+    title: 'The Squaring Function',
+    category: 'Quadratics',
+    interactiveType: 'scene',
+    content:
+      'The simplest quadratic is y = x². Every output is its input squared, so it is never negative — and it is symmetric: x and -x land at the same height.',
+    scene: {
+      state: {},
+      space: { type: 'plane', xDomain: [-4, 4], yDomain: [-1, 9], grid: true, axes: true },
+      objects: [
+        { id: 'f', type: 'curve', expr: 'x^2', color: 'primary', strokeWidth: 3 },
+        { id: 'p1', type: 'point', x: '2', y: '4', color: 'accent', r: 6, label: '(2, 4)' },
+        { id: 'p2', type: 'point', x: '-2', y: '4', color: 'accent', r: 6, label: '(-2, 4)' },
+        { id: 'o', type: 'point', x: '0', y: '0', color: 'danger', r: 6, label: 'vertex' },
+      ],
+    },
+  },
+  {
+    id: 'q-standard',
+    title: 'Standard Form: a, b, c',
+    category: 'Standard Form',
+    interactiveType: 'scene',
+    content:
+      'Every quadratic can be written y = a·x² + b·x + c. Drag the three sliders and watch each one reshape the curve. The purple dot is the vertex; the dashed line is the axis of symmetry; the green dot is the y-intercept.',
+    scene: {
+      state: {
+        a: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 },
+        b: { type: 'number', init: 0, min: -6, max: 6, step: 0.5 },
+        c: { type: 'number', init: -2, min: -6, max: 6, step: 0.5 },
+      },
+      space: { type: 'plane', xDomain: [-6, 6], yDomain: [-8, 8], grid: true, axes: true },
+      objects: [
+        {
+          id: 'axis',
+          type: 'line',
+          x1: '-b/(2*a)',
+          y1: '-8',
+          x2: '-b/(2*a)',
+          y2: '8',
+          color: 'neutral',
+          style: 'dashed',
+        },
+        { id: 'f', type: 'curve', expr: 'a*x^2 + b*x + c', color: 'primary', strokeWidth: 3 },
+        {
+          id: 'v',
+          type: 'point',
+          x: '-b/(2*a)',
+          y: 'c - b^2/(4*a)',
+          color: 'accent',
+          r: 7,
+          label: 'vertex',
+        },
+        { id: 'yint', type: 'point', x: '0', y: 'c', color: 'success', r: 5, label: 'y-int' },
+      ],
+      controls: [
+        { as: 'slider', bind: 'a', label: 'a — opens up/down & width' },
+        { as: 'slider', bind: 'b', label: 'b — shifts the vertex sideways' },
+        { as: 'slider', bind: 'c', label: 'c — the y-intercept' },
+      ],
+    },
+  },
+  {
+    id: 'q-a',
+    title: 'What "a" Does',
+    category: 'Standard Form',
+    interactiveType: 'scene',
+    content:
+      'The leading coefficient a controls the whole shape. Press play: a big a makes a narrow parabola, a small a makes it wide, and a negative a flips it upside-down.',
+    scene: {
+      state: { a: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 } },
+      space: { type: 'plane', xDomain: [-5, 5], yDomain: [-8, 8], grid: true, axes: true },
+      objects: [
+        { id: 'f', type: 'curve', expr: 'a*x^2', color: 'primary', strokeWidth: 3 },
+        {
+          id: 'lbl',
+          type: 'label',
+          x: '-4.5',
+          y: '7',
+          text: 'a = ${a}',
+          color: 'primary',
+          fontSize: 18,
+        },
+      ],
+      controls: [{ as: 'slider', bind: 'a', label: 'a' }],
+      timeline: [
+        { set: { a: 1 }, narrate: 'Start with a = 1, the basic parabola.' },
+        {
+          animate: { a: 3 },
+          duration: 1000,
+          ease: 'easeInOut',
+          narrate: 'a = 3 → tall and narrow.',
+        },
+        {
+          animate: { a: 0.3 },
+          duration: 1200,
+          ease: 'easeInOut',
+          narrate: 'a = 0.3 → short and wide.',
+        },
+        {
+          animate: { a: -1 },
+          duration: 1200,
+          ease: 'easeInOut',
+          narrate: 'a < 0 → it flips upside-down.',
+        },
+      ],
+    },
+  },
+  {
+    id: 'q-quiz-a',
+    title: 'Quick Check',
+    category: 'Standard Form',
+    interactiveType: 'quiz',
+    content: 'If a is negative, the parabola...',
+    quizOptions: ['opens upward', 'opens downward', 'becomes a straight line', 'disappears'],
+    correctOption: 1,
+    explanation:
+      'A negative a flips the U upside-down, so it opens downward and has a maximum instead of a minimum.',
+  },
+  {
+    id: 'q-vertex',
+    title: 'Vertex Form',
+    category: 'Vertex Form',
+    interactiveType: 'scene',
+    content:
+      'Vertex form y = a(x - h)² + k puts the vertex right in the equation: it sits at (h, k). Grab the vertex and drag it anywhere — the whole parabola follows.',
+    scene: {
+      state: {
+        a: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 },
+        h: { type: 'number', init: 1, min: -5, max: 5, step: 0.1 },
+        k: { type: 'number', init: -2, min: -6, max: 6, step: 0.1 },
+      },
+      space: { type: 'plane', xDomain: [-7, 7], yDomain: [-8, 8], grid: true, axes: true },
+      objects: [
+        { id: 'f', type: 'curve', expr: 'a*(x-h)^2 + k', color: 'primary', strokeWidth: 3 },
+        {
+          id: 'v',
+          type: 'point',
+          x: 'h',
+          y: 'k',
+          color: 'accent',
+          r: 8,
+          draggable: { axis: 'xy', bind: 'h', bindY: 'k' },
+          label: '(${h}, ${k})',
+        },
+      ],
+      controls: [{ as: 'slider', bind: 'a', label: 'a — shape' }],
+    },
+  },
+  {
+    id: 'q-roots',
+    title: 'Roots Are X-Intercepts',
+    category: 'Roots',
+    interactiveType: 'scene',
+    content:
+      'The roots are where the parabola crosses the x-axis. In factored form y = a(x - r₁)(x - r₂), the roots are r₁ and r₂. Drag the two red points along the axis and watch the curve snap through them.',
+    scene: {
+      state: {
+        a: { type: 'number', init: 0.5, min: -2, max: 2, step: 0.1 },
+        r1: { type: 'number', init: -3, min: -6, max: 6, step: 0.1 },
+        r2: { type: 'number', init: 2, min: -6, max: 6, step: 0.1 },
+      },
+      space: { type: 'plane', xDomain: [-7, 7], yDomain: [-8, 8], grid: true, axes: true },
+      objects: [
+        { id: 'f', type: 'curve', expr: 'a*(x-r1)*(x-r2)', color: 'primary', strokeWidth: 3 },
+        {
+          id: 'p1',
+          type: 'point',
+          x: 'r1',
+          y: '0',
+          color: 'danger',
+          r: 7,
+          draggable: { axis: 'x', bind: 'r1' },
+          label: 'r₁',
+        },
+        {
+          id: 'p2',
+          type: 'point',
+          x: 'r2',
+          y: '0',
+          color: 'danger',
+          r: 7,
+          draggable: { axis: 'x', bind: 'r2' },
+          label: 'r₂',
+        },
+      ],
+      controls: [{ as: 'slider', bind: 'a', label: 'a — stretch' }],
+    },
+  },
+  {
+    id: 'q-discriminant',
+    title: 'The Discriminant',
+    category: 'Discriminant',
+    interactiveType: 'scene',
+    content:
+      'How many roots does a quadratic have? The discriminant D = b² - 4ac answers it: D > 0 → two roots, D = 0 → one, D < 0 → none. Move the sliders and watch D and the crossings change together.',
+    scene: {
+      state: {
+        a: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 },
+        b: { type: 'number', init: 1, min: -6, max: 6, step: 0.5 },
+        c: { type: 'number', init: -3, min: -6, max: 6, step: 0.5 },
+      },
+      space: { type: 'plane', xDomain: [-6, 6], yDomain: [-8, 8], grid: true, axes: true },
+      objects: [
+        { id: 'f', type: 'curve', expr: 'a*x^2 + b*x + c', color: 'primary', strokeWidth: 3 },
+        {
+          id: 'd',
+          type: 'label',
+          x: '-5.5',
+          y: '7',
+          text: 'D = b² - 4ac = ${b^2 - 4*a*c}',
+          color: 'accent',
+          fontSize: 16,
+        },
+      ],
+      controls: [
+        { as: 'slider', bind: 'a', label: 'a' },
+        { as: 'slider', bind: 'b', label: 'b' },
+        { as: 'slider', bind: 'c', label: 'c' },
+      ],
+    },
+  },
+  {
+    id: 'q-quiz-d',
+    title: 'Discriminant Check',
+    category: 'Discriminant',
+    interactiveType: 'quiz',
+    content: 'If the discriminant D = b² - 4ac is negative, the parabola...',
+    quizOptions: [
+      'crosses the x-axis twice',
+      'touches the x-axis once',
+      'never touches the x-axis',
+      'is a straight line',
+    ],
+    correctOption: 2,
+    explanation:
+      'D < 0 means there are no real roots — the parabola floats entirely above or below the x-axis.',
+  },
+  {
+    id: 'q-area-intro',
+    title: 'Factoring with Area',
+    category: 'Factoring',
+    interactiveType: 'scene',
+    content:
+      'Factoring runs the parabola backwards: from x² + 5x + 6 to (x + 2)(x + 3). Picture it as area — a big x² square, two strips, and a small block. The side-lengths you add up are the factors.',
+    scene: {
+      space: { type: 'plane', xDomain: [-0.5, 7], yDomain: [-1, 6], axes: false },
+      state: {},
+      objects: [
+        { id: 'sq', type: 'rect', x: '0', y: '0', w: '4', h: '4', color: 'primary', opacity: 0.18 },
+        { id: 'sql', type: 'label', x: '1.7', y: '2', text: 'x²', color: 'primary', fontSize: 22 },
+        {
+          id: 'st',
+          type: 'rect',
+          x: '4.2',
+          y: '0',
+          w: '1.6',
+          h: '4',
+          color: 'accent',
+          opacity: 0.22,
+        },
+        { id: 'stl', type: 'label', x: '4.5', y: '2', text: '3x', color: 'accent', fontSize: 16 },
+        {
+          id: 'st2',
+          type: 'rect',
+          x: '0',
+          y: '4.2',
+          w: '4',
+          h: '1.6',
+          color: 'success',
+          opacity: 0.22,
+        },
+        {
+          id: 'st2l',
+          type: 'label',
+          x: '1.7',
+          y: '4.9',
+          text: '2x',
+          color: 'success',
+          fontSize: 16,
+        },
+        {
+          id: 'sm',
+          type: 'rect',
+          x: '4.2',
+          y: '4.2',
+          w: '1.6',
+          h: '1.6',
+          color: 'warning',
+          opacity: 0.3,
+        },
+        { id: 'sml', type: 'label', x: '4.7', y: '4.9', text: '6', color: 'warning', fontSize: 15 },
+      ],
+    },
+  },
+  {
+    id: 'q-factor',
+    title: 'Factor It',
+    category: 'Factoring',
+    interactiveType: 'build',
+    content:
+      'Factor x² + 5x + 6. Find two numbers that multiply to 6 and add to 5, then build the factored form.',
+    slots: 10,
+    reusable: true,
+    bank: [
+      { id: 'lp', label: '(', kind: 'operator' },
+      { id: 'rp', label: ')', kind: 'operator' },
+      { id: 'x', label: 'x', kind: 'operand' },
+      { id: 'plus', label: '+', kind: 'operator' },
+      { id: 'two', label: '2', kind: 'operand' },
+      { id: 'three', label: '3', kind: 'operand' },
+    ],
+    answer: [
+      ['lp', 'x', 'plus', 'two', 'rp', 'lp', 'x', 'plus', 'three', 'rp'],
+      ['lp', 'x', 'plus', 'three', 'rp', 'lp', 'x', 'plus', 'two', 'rp'],
+    ],
+    explanation: '2 × 3 = 6 and 2 + 3 = 5, so x² + 5x + 6 = (x + 2)(x + 3).',
+  },
+  {
+    id: 'q-expand',
+    title: 'Expand the Square',
+    category: 'Factoring',
+    interactiveType: 'build',
+    content: 'Expand (x + 3)². The middle term is twice the product (2·3·x). Build x² + ? + ?.',
+    slots: 5,
+    reusable: true,
+    bank: [
+      { id: 'x2', label: 'x²', kind: 'operand' },
+      { id: '6x', label: '6x', kind: 'operand' },
+      { id: '3x', label: '3x', kind: 'operand' },
+      { id: 'nine', label: '9', kind: 'operand' },
+      { id: 'six', label: '6', kind: 'operand' },
+      { id: 'plus', label: '+', kind: 'operator' },
+    ],
+    answer: [['x2', 'plus', '6x', 'plus', 'nine']],
+    explanation: '(x + 3)² = x² + 2·3·x + 9 = x² + 6x + 9.',
+  },
+  {
+    id: 'q-sweep',
+    title: 'Vertex on the Move',
+    category: 'Putting It Together',
+    interactiveType: 'scene',
+    content:
+      'Changing b alone drags the vertex along a hidden path while the y-intercept stays pinned at c. Press play and watch.',
+    scene: {
+      state: {
+        a: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 },
+        b: { type: 'number', init: -4, min: -6, max: 6, step: 0.5 },
+        c: { type: 'number', init: 1, min: -6, max: 6, step: 0.5 },
+      },
+      space: { type: 'plane', xDomain: [-7, 7], yDomain: [-8, 8], grid: true, axes: true },
+      objects: [
+        { id: 'f', type: 'curve', expr: 'a*x^2 + b*x + c', color: 'primary', strokeWidth: 3 },
+        {
+          id: 'v',
+          type: 'point',
+          x: '-b/(2*a)',
+          y: 'c - b^2/(4*a)',
+          color: 'accent',
+          r: 7,
+          label: 'vertex',
+        },
+        { id: 'yi', type: 'point', x: '0', y: 'c', color: 'success', r: 5 },
+      ],
+      controls: [{ as: 'slider', bind: 'b', label: 'b' }],
+      timeline: [
+        { set: { b: -4 }, narrate: 'b = -4, vertex sits on the right.' },
+        {
+          animate: { b: 0 },
+          duration: 1200,
+          ease: 'easeInOut',
+          narrate: 'b = 0 → vertex jumps onto the y-axis.',
+        },
+        {
+          animate: { b: 4 },
+          duration: 1200,
+          ease: 'easeInOut',
+          narrate: 'b = 4 → vertex swings left. The y-intercept never moved.',
+        },
+      ],
+    },
+  },
+  {
+    id: 'q-final',
+    title: 'Final Check',
+    category: 'Assessment',
+    interactiveType: 'quiz',
+    content:
+      'A parabola has vertex (3, -4) and opens upward. Which equation shows this most directly?',
+    quizOptions: ['y = (x + 3)² - 4', 'y = (x - 3)² - 4', 'y = (x - 3)² + 4', 'y = -(x - 3)² - 4'],
+    correctOption: 1,
+    explanation:
+      'Vertex form is y = a(x - h)² + k with vertex (h, k) = (3, -4), and a > 0 for upward — giving y = (x - 3)² - 4.',
+  },
+  {
+    id: 'q-recap',
+    title: 'You Did It!',
+    category: 'Quadratics',
+    interactiveType: 'intro',
+    content:
+      'You met quadratics from every angle: **standard form** (a, b, c), **vertex form** (h, k), **factored form** (the roots), the **discriminant**, and **factoring**. One curve, five lenses — that is what it means to *see* math instead of memorizing it.',
+  },
+];
+
 async function main() {
   const algebraCourse = await prisma.course.upsert({
     where: { name: 'Algebra' },
@@ -2005,6 +2418,18 @@ async function main() {
   });
 
   const lessons = [
+    {
+      courseId: algebraCourse.id,
+      lessonKey: 'quadratics-1',
+      data: { slides: quadraticsSteps.map(migrateSlide) },
+      title: 'Quadratic Equations',
+      description:
+        'Explore parabolas from every angle — standard, vertex, and factored form, the discriminant, and factoring — with draggable, animated graphs and hands-on tiles.',
+      category: 'Algebra',
+      difficulty: 'Intermediate',
+      iconName: 'FunctionSquare',
+      sortOrder: 9,
+    },
     {
       courseId: algebraCourse.id,
       lessonKey: 'real-functions-1',
