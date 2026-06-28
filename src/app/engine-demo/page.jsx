@@ -1,8 +1,6 @@
 'use client';
 import { Scene } from '@/engine';
 
-// hand-wrote this scene IR — same shape the DSL will spit out later
-// derivative as slope: drag the point, tangent + slope move live
 const demo = {
   state: {
     t: { type: 'number', init: 1, min: -3, max: 3, step: 0.05 },
@@ -44,6 +42,25 @@ const demo = {
   controls: [
     { as: 'slider', bind: 't', label: 'x position (or drag the point)' },
     { as: 'toggle', bind: 'showTangent', label: 'Show tangent line' },
+  ],
+  timeline: [
+    {
+      set: { t: -2.5, showTangent: false },
+      narrate: 'we start way out on the left, just the curve.',
+    },
+    {
+      animate: { t: 0 },
+      duration: 1000,
+      ease: 'easeInOut',
+      set: { showTangent: true },
+      narrate: 'slide down to the bottom — the tangent flattens, slope hits 0.',
+    },
+    {
+      animate: { t: 2.5 },
+      duration: 1200,
+      ease: 'easeInOut',
+      narrate: 'climb the right side — the slope shoots up to 2x. that IS the derivative.',
+    },
   ],
 };
 

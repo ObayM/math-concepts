@@ -85,9 +85,20 @@ const toggleControl = z.object({
 });
 const control = z.discriminatedUnion('as', [sliderControl, toggleControl]);
 
+// timeline = ordered steps you play thru. set = instant, animate = tween (numbers only)
+const timelineStep = z.object({
+  label: z.string().optional(),
+  set: z.record(z.string(), z.union([z.number(), z.boolean()])).optional(),
+  animate: z.record(z.string(), z.number()).optional(),
+  duration: z.number().optional(),
+  ease: z.enum(['linear', 'easeIn', 'easeOut', 'easeInOut']).optional(),
+  narrate: z.string().optional(),
+});
+
 export const sceneSchema = z.object({
   state: z.record(z.string(), stateVar),
   space,
   objects: z.array(sceneObject),
   controls: z.array(control).optional(),
+  timeline: z.array(timelineStep).optional(),
 });

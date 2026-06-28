@@ -1,5 +1,6 @@
 'use client';
 import { SceneProvider } from './SceneProvider';
+import Timeline from './Timeline';
 import SvgRenderer from '../renderers/svg/SvgRenderer';
 import { controlRegistry } from '../controls/registry';
 import type { SceneIR } from '../ir/types';
@@ -13,6 +14,7 @@ export function Scene({ ir }: { ir: SceneIR }) {
     <SceneProvider ir={ir}>
       <div className="flex flex-col gap-4">
         <Renderer ir={ir} />
+        {ir.timeline && ir.timeline.length > 0 && <Timeline ir={ir} />}
         {ir.controls && ir.controls.length > 0 && (
           <div className="flex flex-col gap-3">
             {ir.controls.map((control, i) => {
