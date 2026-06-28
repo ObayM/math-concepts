@@ -1,9 +1,9 @@
 'use client';
 import React, { useRef } from 'react';
-import { useScene } from '../../runtime/SceneProvider';
-import { evalNumber, evalBool } from '../../runtime/eval';
+import { useScene } from '@/engine/runtime/SceneProvider';
+import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { svgPrimitives } from './registry';
-import type { SceneIR } from '../../ir/types';
+import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 
 const W = 640;

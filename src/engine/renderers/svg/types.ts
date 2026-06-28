@@ -1,5 +1,5 @@
 import type { PointerEvent } from 'react';
-import type { Scope } from '../../ir/types';
+import type { Scope } from '@/engine/ir/types';
 
 export interface CoordSystem {
   toX: (x: number) => number;

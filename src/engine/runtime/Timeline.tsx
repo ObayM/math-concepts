@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw, ChevronLeft } from 'lucide-react';
 import { useScene } from './SceneProvider';
-import type { SceneIR } from '../ir/types';
+import type { SceneIR } from '@/engine/ir/types';
 
 function baseState(ir: SceneIR): Record<string, number | boolean> {
   const s: Record<string, number | boolean> = {};

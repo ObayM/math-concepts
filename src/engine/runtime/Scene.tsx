@@ -1,9 +1,9 @@
 'use client';
 import { SceneProvider } from './SceneProvider';
 import Timeline from './Timeline';
-import SvgRenderer from '../renderers/svg/SvgRenderer';
-import { controlRegistry } from '../controls/registry';
-import type { SceneIR } from '../ir/types';
+import SvgRenderer from '@/engine/renderers/svg/SvgRenderer';
+import { controlRegistry } from '@/engine/controls/registry';
+import type { SceneIR } from '@/engine/ir/types';
 
 // pick the backend from the scene (svg by default). canvas/webgl slot in here later
 const renderers = { svg: SvgRenderer };

@@ -1,6 +1,6 @@
-import { evalNumber, interpolate } from '../../../runtime/eval';
-import { resolveColor } from '../../../colors';
-import type { PrimProps } from '../types';
+import { evalNumber, interpolate } from '@/engine/runtime/eval';
+import { resolveColor } from '@/engine/colors';
+import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
   const px = cx.toX(evalNumber(obj.x, scope));

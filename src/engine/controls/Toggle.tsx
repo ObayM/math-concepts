@@ -1,5 +1,5 @@
 'use client';
-import { useScene } from '../runtime/SceneProvider';
+import { useScene } from '@/engine/runtime/SceneProvider';
 
 type ToggleControl = { as: 'toggle'; bind: string; label?: string };
 

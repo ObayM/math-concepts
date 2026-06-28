@@ -1,5 +1,5 @@
-import { sceneSchema } from '../ir/schema';
-import type { SceneIR } from '../ir/types';
+import { sceneSchema } from '@/engine/ir/schema';
+import type { SceneIR } from '@/engine/ir/types';
 import { scanLine } from './scan';
 import { CompileError } from './errors';
 

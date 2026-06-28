@@ -1,6 +1,6 @@
-import { evalNumber } from '../../../runtime/eval';
-import { resolveColor, dash } from '../../../colors';
-import type { PrimProps } from '../types';
+import { evalNumber } from '@/engine/runtime/eval';
+import { resolveColor, dash } from '@/engine/colors';
+import type { PrimProps } from '@/engine/renderers/svg/types';
 
 const SAMPLES = 240;
 

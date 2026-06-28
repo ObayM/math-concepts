@@ -1,4 +1,4 @@
-import type { Scope } from '../ir/types';
+import type { Scope } from '@/engine/ir/types';
 
 // safe expr evaluator. same trick as the old FunctionVisualizer:
 // i whitelist the identifiers, build it with new Function, nothing sketchy gets thru.

@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useCallback, useEffect, useRef, useState } from 'react';
-import type { SceneIR, Scope } from '../ir/types';
+import type { SceneIR, Scope } from '@/engine/ir/types';
 
 type SceneCtx = {
   scope: Scope;
