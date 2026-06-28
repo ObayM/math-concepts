@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "node prisma/seed.js",
+    "build:lessons": "node scripts/build-lessons.mjs",
+    "db:seed": "npm run build:lessons && node prisma/seed.js",
     "prepare": "husky"
   },
   "dependencies": {

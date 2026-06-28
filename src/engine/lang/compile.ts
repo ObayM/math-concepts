@@ -137,8 +137,9 @@ export function compile(source: string): SceneIR {
         if (o.r) obj.r = Number(o.r);
         if (o.label) obj.label = o.label;
         if (o.drag) {
-          const [axis, bind] = o.drag.split('->');
-          obj.draggable = { axis, bind };
+          const [axis, binds] = o.drag.split('->');
+          const [bind, bindY] = binds.split(',');
+          obj.draggable = bindY ? { axis, bind, bindY } : { axis, bind };
         }
         applyCommon(obj, o);
         ir.objects.push(obj);
@@ -186,6 +187,21 @@ export function compile(source: string): SceneIR {
           text: unq(textTok),
         };
         if (o.size) obj.fontSize = Number(o.size);
+        applyCommon(obj, o);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'rect': {
+        // rect <id> = (x, y) (w, h) [opts]   - (x,y) is bottom-left corner
+        const id = rest[0];
+        const eq = rest.indexOf('=');
+        if (eq < 0) throw new CompileError('rect needs `= (x, y) (w, h)`', ln);
+        const [x, y] = splitPair(rest[eq + 1], ln);
+        const [w, h] = splitPair(rest[eq + 2], ln);
+        const o = opts(rest.slice(eq + 3));
+        const obj: any = { id, type: 'rect', x, y, w, h };
+        if (o.opacity) obj.opacity = Number(o.opacity);
         applyCommon(obj, o);
         ir.objects.push(obj);
         break;

@@ -45,3 +45,5 @@ next-env.d.ts
 plan.md
 CLAUDE.md
 branding.md
+# generated from prisma/lessons/*.dsl by scripts/build-lessons.mjs
+prisma/lessons/*.json
