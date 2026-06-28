@@ -67,7 +67,18 @@ const labelObj = z.object({
   ...objBase,
 });
 
-const sceneObject = z.discriminatedUnion('type', [curveObj, pointObj, lineObj, labelObj]);
+// (x, y) is the bottom-left corner in scene coords; w/h in scene units
+const rectObj = z.object({
+  type: z.literal('rect'),
+  x: expr,
+  y: expr,
+  w: expr,
+  h: expr,
+  opacity: z.number().optional(),
+  ...objBase,
+});
+
+const sceneObject = z.discriminatedUnion('type', [curveObj, pointObj, lineObj, labelObj, rectObj]);
 
 // controls = the widgets, wired both ways to state
 const sliderControl = z.object({

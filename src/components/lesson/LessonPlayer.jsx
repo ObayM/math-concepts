@@ -13,12 +13,15 @@ import TextBlock from './blocks/TextBlock';
 import GraphBlock from './blocks/GraphBlock';
 import QuizBlock from './blocks/QuizBlock';
 import SceneBlock from './blocks/SceneBlock';
+import BuildBlock from './blocks/BuildBlock';
+import { checkable } from './checkable';
 
 const blockRegistry = {
   text: TextBlock,
   graph: GraphBlock,
   quiz: QuizBlock,
   scene: SceneBlock,
+  build: BuildBlock,
 };
 
 export default function LessonPlayer({ slides = [], lessonId, coursePath = 'algebra' }) {
@@ -27,8 +30,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDir, setSlideDir] = useState('right');
   const [interactiveValue, setInteractiveValue] = useState(50);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [answer, setAnswer] = useState(null);
+  const [checked, setChecked] = useState(false);
   const [quizHistory, setQuizHistory] = useState([]);
   const [isComplete, setIsComplete] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -41,6 +44,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
 
   const slide = slides[currentIndex] ?? null;
   const isLast = currentIndex === slides.length - 1;
+  const checker = slide ? checkable[slide.type] : null;
 
   useEffect(() => {
     if (!lessonId) return;
@@ -77,12 +81,14 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
+    const next = slides[currentIndex];
+    const c = next ? checkable[next.type] : null;
     setInteractiveValue(50);
-    setSelectedOption(null);
-    setQuizSubmitted(false);
+    setAnswer(c ? c.initial(next) : null);
+    setChecked(false);
     setTutorOpen(false);
     setTutorResponse('');
-  }, [currentIndex]);
+  }, [currentIndex, slides]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const markComplete = () => {
@@ -126,10 +132,16 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     }
   };
 
-  const handleQuizSubmit = () => {
-    setQuizSubmitted(true);
-    const correct = selectedOption === slide.correctOption;
+  const handleCheck = () => {
+    if (!checker) return;
+    setChecked(true);
+    const correct = checker.check(slide, answer);
     setQuizHistory((h) => [...h, { title: slide.title, question: slide.content, correct }]);
+  };
+
+  const handleAnswerChange = (val) => {
+    setAnswer(val);
+    setChecked(false);
   };
 
   const handleTutorAsk = async () => {
@@ -172,8 +184,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     );
   }
 
-  const isQuiz = slide?.type === 'quiz';
-  const canAdvance = !isQuiz || quizSubmitted;
+  const canAdvance = !checker || checked;
+  const correct = checked && checker ? checker.check(slide, answer) : null;
   const BlockRenderer = slide ? (blockRegistry[slide.type] ?? TextBlock) : null;
 
   return (
@@ -218,9 +230,10 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
                   slide={slide}
                   interactiveValue={interactiveValue}
                   onInteractiveChange={setInteractiveValue}
-                  selectedOption={selectedOption}
-                  submitted={quizSubmitted}
-                  onSelect={setSelectedOption}
+                  value={answer}
+                  checked={checked}
+                  correct={correct}
+                  onChange={handleAnswerChange}
                 />
               )}
             </div>
@@ -241,13 +254,13 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
               <Sparkles className="w-5 h-5" />
             </button>
 
-            {isQuiz && !quizSubmitted ? (
+            {checker && !checked ? (
               <Button
-                onClick={handleQuizSubmit}
+                onClick={handleCheck}
                 variant="success"
-                disabled={selectedOption === null}
+                disabled={!checker.isComplete(slide, answer)}
               >
-                Check Answer
+                Check
               </Button>
             ) : (
               <Button onClick={handleNext} variant="success" disabled={!canAdvance}>

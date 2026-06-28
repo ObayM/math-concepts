@@ -1,7 +1,9 @@
 'use client';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
-export default function QuizBlock({ slide, selectedOption, submitted, onSelect }) {
+export default function QuizBlock({ slide, value, checked, onChange }) {
+  const selectedOption = value;
+  const submitted = checked;
   return (
     <div className="flex flex-col h-full">
       <p className="text-xl text-neutral-600 leading-relaxed font-medium mb-6">{slide.content}</p>
@@ -23,7 +25,7 @@ export default function QuizBlock({ slide, selectedOption, submitted, onSelect }
           return (
             <button
               key={idx}
-              onClick={() => !submitted && onSelect(idx)}
+              onClick={() => !submitted && onChange(idx)}
               className={`p-5 rounded-2xl text-left text-lg font-bold transition-all flex items-center justify-between active:scale-95 ${cls}`}
             >
               <span

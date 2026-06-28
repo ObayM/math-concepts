@@ -120,11 +120,30 @@ const sceneBlock = blockBase.extend({
   scene: sceneSchema,
 });
 
+const buildToken = z.object({
+  id: z.string(),
+  label: z.string(),
+  kind: z.enum(['operand', 'operator']).optional(),
+});
+
+const buildBlock = blockBase.extend({
+  type: z.literal('build'),
+  slots: z.number().int().min(1),
+  bank: z.array(buildToken).min(1),
+  // each accepted answer is an ordered list of token ids
+  answer: z.array(z.array(z.string()).min(1)).min(1),
+  reusable: z.boolean().optional(),
+  visual: sceneSchema.optional(),
+  explanation: z.string().optional(),
+  skillId: z.string().optional(),
+});
+
 export const lessonBlockSchema = z.discriminatedUnion('type', [
   textBlock,
   graphBlock,
   quizBlock,
   sceneBlock,
+  buildBlock,
 ]);
 
 export const lessonDataSchema = z.object({
@@ -137,5 +156,6 @@ export type TextBlock = z.infer<typeof textBlock>;
 export type GraphBlock = z.infer<typeof graphBlock>;
 export type QuizBlock = z.infer<typeof quizBlock>;
 export type SceneBlock = z.infer<typeof sceneBlock>;
+export type BuildBlock = z.infer<typeof buildBlock>;
 export type LessonBlock = z.infer<typeof lessonBlockSchema>;
 export type LessonData = z.infer<typeof lessonDataSchema>;

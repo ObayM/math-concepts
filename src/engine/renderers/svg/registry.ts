@@ -4,6 +4,7 @@ import Curve from './primitives/Curve';
 import Point from './primitives/Point';
 import Line from './primitives/Line';
 import Label from './primitives/Label';
+import Rect from './primitives/Rect';
 
 // type -> renderer. adding a primitive is just dropping one in here (like blockRegistry)
 export const svgPrimitives: Record<string, ComponentType<PrimProps>> = {
@@ -11,4 +12,5 @@ export const svgPrimitives: Record<string, ComponentType<PrimProps>> = {
   point: Point,
   line: Line,
   label: Label,
+  rect: Rect,
 };
