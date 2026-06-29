@@ -1,10 +1,35 @@
 'use client';
 import { useState } from 'react';
-import { Scene } from '@/engine';
+import { Scene, compile } from '@/engine';
 import Button from '@/components/ui/Button';
 import BuildBlock from '@/components/lesson/blocks/BuildBlock';
 import RichText from '@/components/lesson/RichText';
 import { checkable } from '@/components/lesson/checkable';
+
+const barSrc = `scene plane x:[-5.5, 5.5] y:[-3.2, 3] axes grid
+
+repeat i in -4..4 {
+  if {{i}} >= 0 {
+    rect r{{i}} = ({{i - 0.4}}, 0) (0.8, {{i * 0.6 + 0.1}}) color:success
+  } else {
+    rect r{{i}} = ({{i - 0.4}}, {{i * 0.6 - 0.1}}) (0.8, {{-i * 0.6 + 0.1}}) color:danger
+  }
+  label lbl{{i}} at ({{i}}, -2.9) "{{i}}"
+}`;
+
+const clockSrc = `scene plane x:[-2.2, 2.2] y:[-1.9, 1.9] axes
+
+circle ring = (0, 0) 1 color:neutral
+
+repeat i in 0..11 {
+  point pt{{i}} = ({{cos(i * 3.14159 / 6)}}, {{sin(i * 3.14159 / 6)}}) color:primary r:5
+  if {{i % 3}} == 0 {
+    label lbl{{i}} at ({{1.55 * cos(i * 3.14159 / 6)}}, {{1.55 * sin(i * 3.14159 / 6)}}) "{{i * 30}}\xb0"
+  }
+}`;
+
+const barScene = compile(barSrc);
+const clockScene = compile(clockSrc);
 
 const parabola = {
   state: {
@@ -481,6 +506,28 @@ export default function EngineDemoPage() {
         blurb="Drag either arrowhead; the resultant and parallelogram follow."
       >
         <Scene ir={vecAdd} />
+      </Card>
+
+      <Card
+        tag="DSL · loops · if/else"
+        title="Bar chart from source"
+        blurb="9 bars in 7 lines of DSL — repeat unrolls at compile time, if/else colors each bar by sign."
+      >
+        <pre className="text-xs font-mono bg-neutral-50 border border-neutral-100 rounded-xl p-4 overflow-x-auto text-neutral-500 mb-5 leading-relaxed whitespace-pre">
+          {barSrc}
+        </pre>
+        <Scene ir={barScene} />
+      </Card>
+
+      <Card
+        tag="DSL · repeat · conditional labels"
+        title="Polar grid from source"
+        blurb="12 points at 30° intervals; labels only every 90° — one repeat block, one if inside."
+      >
+        <pre className="text-xs font-mono bg-neutral-50 border border-neutral-100 rounded-xl p-4 overflow-x-auto text-neutral-500 mb-5 leading-relaxed whitespace-pre">
+          {clockSrc}
+        </pre>
+        <Scene ir={clockScene} />
       </Card>
 
       <Card tag="Tiles" title="Build the factors" blurb="Tap tiles into the slots, then check.">
