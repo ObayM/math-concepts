@@ -5,14 +5,13 @@ import Button from '@/components/ui/Button';
 import BuildBlock from '@/components/lesson/blocks/BuildBlock';
 import { checkable } from '@/components/lesson/checkable';
 
-// 1 — graphs: the parabola with a/b/c sliders + tracked vertex/axis
 const parabola = {
   state: {
     a: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 },
     b: { type: 'number', init: 0, min: -6, max: 6, step: 0.5 },
     c: { type: 'number', init: -2, min: -6, max: 6, step: 0.5 },
   },
-  space: { type: 'plane', xDomain: [-5, 5], yDomain: [-8, 8], grid: true, axes: true },
+  space: { type: 'plane', xDomain: [-6, 6], yDomain: [-8, 8], grid: true, axes: true },
   objects: [
     {
       id: 'axis',
@@ -39,126 +38,316 @@ const parabola = {
     { as: 'slider', bind: 'a', label: 'a' },
     { as: 'slider', bind: 'b', label: 'b' },
     { as: 'slider', bind: 'c', label: 'c' },
-  ],
-};
-
-// 2 — shapes gallery: circle, polygon, vector, arc (no graph in sight)
-const shapes = {
-  state: {},
-  space: { type: 'plane', xDomain: [-6, 6], yDomain: [-3.5, 3.5] },
-  objects: [
-    { id: 'c', type: 'circle', x: '-4.2', y: '0.4', r: '1.3', color: 'primary' },
-    { id: 'cl', type: 'label', x: '-5', y: '-1.8', text: 'circle', color: 'neutral' },
     {
-      id: 'tri',
-      type: 'polygon',
-      points: [
-        ['-1.6', '-1'],
-        ['0.8', '-1'],
-        ['-0.4', '1.4'],
-      ],
-      color: 'accent',
-      opacity: 0.2,
+      as: 'button',
+      label: 'morph',
+      animate: { a: -1.5, b: 3, c: 2 },
+      duration: 1400,
+      ease: 'easeInOut',
     },
-    { id: 'tl', type: 'label', x: '-1.4', y: '-1.8', text: 'polygon', color: 'neutral' },
-    { id: 'vec', type: 'vector', x1: '2.4', y1: '-1', x2: '4.8', y2: '1.3', color: 'success' },
-    { id: 'arc', type: 'arc', x: '2.4', y: '-1', r: '1', start: '0', end: '44', color: 'danger' },
-    { id: 'vl', type: 'label', x: '2.6', y: '-1.8', text: 'vector + arc', color: 'neutral' },
+    { as: 'button', label: 'reset', set: { a: 1, b: 0, c: -2 } },
+  ],
+  timeline: [
+    { set: { a: 1, b: 0, c: -2 }, narrate: 'A plain upward parabola.' },
+    { animate: { a: 0.3 }, duration: 900, ease: 'easeInOut', narrate: 'Small a → wide bowl.' },
+    {
+      animate: { a: -1, b: 2 },
+      duration: 1100,
+      ease: 'easeInOut',
+      narrate: 'Negative a flips it; b slides the vertex.',
+    },
   ],
 };
 
-// 3 — buttons & steppers: a circle whose radius is state, driven by buttons
-const buttons = {
+const trig = {
   state: {
-    r: { type: 'number', init: 1.5, min: 0.3, max: 4, step: 0.3 },
-    showArea: { type: 'boolean', init: true },
+    theta: { type: 'number', init: 0.9, min: 0, max: 6.2832, step: 0.01 },
+    showProj: { type: 'boolean', init: true },
   },
-  space: { type: 'plane', xDomain: [-5, 5], yDomain: [-4, 4], grid: true, axes: true },
+  space: { type: 'plane', xDomain: [-1.9, 1.9], yDomain: [-1.25, 1.25], grid: true, axes: true },
   objects: [
-    { id: 'c', type: 'circle', x: '0', y: '0', r: 'r', color: 'primary', opacity: 0.15 },
-    { id: 'rad', type: 'vector', x1: '0', y1: '0', x2: 'r', y2: '0', color: 'accent' },
-    { id: 'o', type: 'point', x: '0', y: '0', color: 'danger', r: 5 },
+    { id: 'circ', type: 'circle', x: '0', y: '0', r: '1', color: 'neutral' },
     {
-      id: 'lbl',
-      type: 'label',
-      x: '-4.6',
-      y: '3.4',
-      text: 'r = ${r}',
-      color: 'primary',
-      fontSize: 16,
+      id: 'ang',
+      type: 'arc',
+      x: '0',
+      y: '0',
+      r: '0.32',
+      start: '0',
+      end: 'theta*180/3.14159',
+      color: 'warning',
+      strokeWidth: 3,
     },
     {
-      id: 'area',
+      id: 'cos',
+      type: 'line',
+      x1: '0',
+      y1: '0',
+      x2: 'cos(theta)',
+      y2: '0',
+      color: 'success',
+      strokeWidth: 4,
+      visibleIf: 'showProj',
+    },
+    {
+      id: 'sin',
+      type: 'line',
+      x1: 'cos(theta)',
+      y1: '0',
+      x2: 'cos(theta)',
+      y2: 'sin(theta)',
+      color: 'danger',
+      strokeWidth: 4,
+      visibleIf: 'showProj',
+    },
+    {
+      id: 'r',
+      type: 'vector',
+      x1: '0',
+      y1: '0',
+      x2: 'cos(theta)',
+      y2: 'sin(theta)',
+      color: 'primary',
+    },
+    { id: 'P', type: 'point', x: 'cos(theta)', y: 'sin(theta)', color: 'primary', r: 6 },
+    {
+      id: 'lc',
       type: 'label',
-      x: '-4.6',
-      y: '2.6',
-      text: 'area = ${3.14159*r*r}',
-      color: 'accent',
-      fontSize: 16,
-      visibleIf: 'showArea',
+      x: '-1.85',
+      y: '1.1',
+      text: 'cos θ = ${cos(theta)}',
+      color: 'success',
+      fontSize: 15,
+    },
+    {
+      id: 'ls',
+      type: 'label',
+      x: '-1.85',
+      y: '0.88',
+      text: 'sin θ = ${sin(theta)}',
+      color: 'danger',
+      fontSize: 15,
     },
   ],
   controls: [
-    { as: 'button', label: 'grow', step: { r: 0.5 } },
-    { as: 'button', label: 'shrink', step: { r: -0.5 } },
-    { as: 'button', label: 'pop!', animate: { r: 4 }, duration: 500, ease: 'easeOut' },
-    { as: 'button', label: 'reset', set: { r: 1.5 } },
-    { as: 'stepper', bind: 'r', label: 'radius' },
-    { as: 'toggle', bind: 'showArea', label: 'show area' },
+    { as: 'slider', bind: 'theta', label: 'angle θ (radians)' },
+    { as: 'button', label: 'spin', animate: { theta: 6.2832 }, duration: 2400, ease: 'linear' },
+    { as: 'button', label: 'reset', set: { theta: 0 } },
+    { as: 'toggle', bind: 'showProj', label: 'show sin / cos' },
   ],
 };
 
-// 4 — drag a shape: a triangle whose apex you drag in 2D
-const dragTri = {
+const pyth = {
   state: {
-    ax: { type: 'number', init: 0.6, min: -3, max: 3, step: 0.1 },
-    ay: { type: 'number', init: 2, min: -1, max: 3.5, step: 0.1 },
+    a: { type: 'number', init: 3, min: 1, max: 4.5, step: 0.1 },
+    b: { type: 'number', init: 4, min: 1, max: 6, step: 0.1 },
   },
-  space: { type: 'plane', xDomain: [-5, 5], yDomain: [-3, 4], grid: true, axes: true },
+  space: { type: 'plane', xDomain: [-5.5, 7], yDomain: [-6.8, 5], grid: true, axes: true },
   objects: [
+    { id: 'sqb', type: 'rect', x: '0', y: '-b', w: 'b', h: 'b', color: 'success', opacity: 0.16 },
+    { id: 'lb', type: 'label', x: 'b/2 - 0.3', y: '-b/2', text: 'b² = ${b*b}', color: 'success' },
+    { id: 'sqa', type: 'rect', x: '-a', y: '0', w: 'a', h: 'a', color: 'accent', opacity: 0.16 },
+    { id: 'la', type: 'label', x: '-a/2 - 0.3', y: 'a/2', text: 'a² = ${a*a}', color: 'accent' },
     {
       id: 'tri',
       type: 'polygon',
       points: [
-        ['-2', '-1'],
-        ['2', '-1'],
-        ['ax', 'ay'],
+        ['0', '0'],
+        ['b', '0'],
+        ['0', 'a'],
       ],
-      color: 'accent',
-      opacity: 0.2,
+      color: 'primary',
+      opacity: 0.18,
     },
-    { id: 'a', type: 'point', x: '-2', y: '-1', color: 'neutral', r: 4 },
-    { id: 'b', type: 'point', x: '2', y: '-1', color: 'neutral', r: 4 },
     {
-      id: 'apex',
+      id: 'sq',
+      type: 'rect',
+      x: '0',
+      y: '0',
+      w: '0.35',
+      h: '0.35',
+      color: 'neutral',
+      opacity: 0.6,
+    },
+    {
+      id: 'hyp',
+      type: 'vector',
+      x1: 'b',
+      y1: '0',
+      x2: '0',
+      y2: 'a',
+      color: 'danger',
+      strokeWidth: 3,
+    },
+    {
+      id: 'pb',
       type: 'point',
-      x: 'ax',
-      y: 'ay',
-      color: 'accent',
+      x: 'b',
+      y: '0',
+      color: 'primary',
       r: 7,
-      draggable: { axis: 'xy', bind: 'ax', bindY: 'ay' },
-      label: '(${ax}, ${ay})',
+      draggable: { axis: 'x', bind: 'b' },
+      label: 'b',
+    },
+    {
+      id: 'pa',
+      type: 'point',
+      x: '0',
+      y: 'a',
+      color: 'primary',
+      r: 7,
+      draggable: { axis: 'y', bind: 'a' },
+      label: 'a',
+    },
+    {
+      id: 'res',
+      type: 'label',
+      x: '1.4',
+      y: '4.2',
+      text: 'a² + b² = ${a*a + b*b} → c = ${sqrt(a*a + b*b)}',
+      color: 'danger',
+      fontSize: 15,
+    },
+  ],
+  controls: [
+    { as: 'stepper', bind: 'a', label: 'leg a' },
+    { as: 'stepper', bind: 'b', label: 'leg b' },
+  ],
+};
+
+const wave = {
+  state: {
+    amp: { type: 'number', init: 1.5, min: 0, max: 3, step: 0.1 },
+    freq: { type: 'number', init: 1, min: 0.2, max: 3, step: 0.1 },
+    phase: { type: 'number', init: 0, min: -3.14, max: 3.14, step: 0.05 },
+    shift: { type: 'number', init: 0, min: -2, max: 2, step: 0.1 },
+    t: { type: 'number', init: 1, min: -6, max: 6, step: 0.05 },
+  },
+  space: { type: 'plane', xDomain: [-6.5, 6.5], yDomain: [-4, 4], grid: true, axes: true },
+  objects: [
+    {
+      id: 'w',
+      type: 'curve',
+      expr: 'amp*sin(freq*x + phase) + shift',
+      color: 'primary',
+      strokeWidth: 3,
+    },
+    {
+      id: 'vl',
+      type: 'line',
+      x1: 't',
+      y1: '0',
+      x2: 't',
+      y2: 'amp*sin(freq*t + phase) + shift',
+      color: 'neutral',
+      style: 'dashed',
+    },
+    {
+      id: 'P',
+      type: 'point',
+      x: 't',
+      y: 'amp*sin(freq*t + phase) + shift',
+      color: 'accent',
+      r: 6,
+      draggable: { axis: 'x', bind: 't' },
+      label: 'y = ${amp*sin(freq*t + phase) + shift}',
+    },
+  ],
+  controls: [
+    { as: 'slider', bind: 'amp', label: 'amplitude' },
+    { as: 'slider', bind: 'freq', label: 'frequency' },
+    { as: 'slider', bind: 'phase', label: 'phase' },
+    { as: 'slider', bind: 'shift', label: 'vertical shift' },
+    { as: 'button', label: 'roll phase', animate: { phase: 3.14 }, duration: 2600, ease: 'linear' },
+    { as: 'button', label: 'reset', set: { phase: 0, amp: 1.5, freq: 1, shift: 0 } },
+  ],
+};
+
+const vecAdd = {
+  state: {
+    ux: { type: 'number', init: 2.5, min: -4, max: 4, step: 0.1 },
+    uy: { type: 'number', init: 1, min: -3, max: 3, step: 0.1 },
+    vx: { type: 'number', init: 1, min: -4, max: 4, step: 0.1 },
+    vy: { type: 'number', init: 2.5, min: -3, max: 3, step: 0.1 },
+  },
+  space: { type: 'plane', xDomain: [-5, 6], yDomain: [-4, 4], grid: true, axes: true },
+  objects: [
+    {
+      id: 'par',
+      type: 'polygon',
+      points: [
+        ['0', '0'],
+        ['ux', 'uy'],
+        ['ux+vx', 'uy+vy'],
+        ['vx', 'vy'],
+      ],
+      color: 'neutral',
+      opacity: 0.08,
+    },
+    { id: 'u', type: 'vector', x1: '0', y1: '0', x2: 'ux', y2: 'uy', color: 'primary' },
+    { id: 'v', type: 'vector', x1: '0', y1: '0', x2: 'vx', y2: 'vy', color: 'success' },
+    {
+      id: 'sum',
+      type: 'vector',
+      x1: '0',
+      y1: '0',
+      x2: 'ux+vx',
+      y2: 'uy+vy',
+      color: 'accent',
+      strokeWidth: 3,
+    },
+    {
+      id: 'pu',
+      type: 'point',
+      x: 'ux',
+      y: 'uy',
+      color: 'primary',
+      r: 6,
+      draggable: { axis: 'xy', bind: 'ux', bindY: 'uy' },
+      label: 'u',
+    },
+    {
+      id: 'pv',
+      type: 'point',
+      x: 'vx',
+      y: 'vy',
+      color: 'success',
+      r: 6,
+      draggable: { axis: 'xy', bind: 'vx', bindY: 'vy' },
+      label: 'v',
+    },
+    {
+      id: 'ls',
+      type: 'label',
+      x: '-4.8',
+      y: '3.6',
+      text: 'u + v = (${ux+vx}, ${uy+vy})',
+      color: 'accent',
+      fontSize: 15,
     },
   ],
 };
 
-// 5 — build block (tiles)
-const areaBuild = {
-  id: 'q-area',
+const factor = {
+  id: 'q-factor',
   type: 'build',
-  title: 'Area model',
-  content: 'A rectangle is x tall and (x + 3) wide. Build the expression for its total area.',
-  slots: 3,
+  title: 'Factor it',
+  content: 'Factor x² + 5x + 6 — two numbers that multiply to 6 and add to 5.',
+  slots: 10,
+  reusable: true,
   bank: [
-    { id: 'x2', label: 'x²', kind: 'operand' },
-    { id: '3x', label: '3x', kind: 'operand' },
-    { id: '3', label: '3', kind: 'operand' },
+    { id: 'lp', label: '(', kind: 'operator' },
+    { id: 'rp', label: ')', kind: 'operator' },
     { id: 'x', label: 'x', kind: 'operand' },
     { id: 'plus', label: '+', kind: 'operator' },
-    { id: 'dot', label: '·', kind: 'operator' },
+    { id: 'two', label: '2', kind: 'operand' },
+    { id: 'three', label: '3', kind: 'operand' },
   ],
-  answer: [['x2', 'plus', '3x']],
-  explanation: 'The x·x square is x², the 3·x strip is 3x, so the area is x² + 3x.',
+  answer: [
+    ['lp', 'x', 'plus', 'two', 'rp', 'lp', 'x', 'plus', 'three', 'rp'],
+    ['lp', 'x', 'plus', 'three', 'rp', 'lp', 'x', 'plus', 'two', 'rp'],
+  ],
+  explanation: '2 × 3 = 6 and 2 + 3 = 5, so x² + 5x + 6 = (x + 2)(x + 3).',
 };
 
 function BuildDemo({ slide }) {
@@ -188,7 +377,7 @@ function BuildDemo({ slide }) {
         </Button>
         {checked && (
           <span className={`font-bold ${correct ? 'text-success-600' : 'text-danger-600'}`}>
-            {correct ? '✓ nice!' : '✗ not quite'}
+            {correct ? '✓ nailed it' : '✗ try again'}
           </span>
         )}
       </div>
@@ -211,47 +400,57 @@ export default function EngineDemoPage() {
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex flex-col items-center gap-8 p-6">
       <div className="w-full max-w-3xl pt-2">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900">Engine gallery</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900">
+          Engine — full capability
+        </h1>
         <p className="text-neutral-500 mt-1">
-          One scene model — graphs, shapes, animation, drag, buttons, and tiles. Everything below is
-          plain Scene IR.
+          Every primitive and control, combined into real interactive explorers. Drag points, press
+          play, push the sliders, build with tiles.
         </p>
       </div>
 
       <Card
-        tag="Graphs"
-        title="y = a·x² + b·x + c"
-        blurb="Drag the sliders; the vertex and axis track live."
+        tag="Graphs + animation"
+        title="The parabola"
+        blurb="3 sliders, a tracked vertex, a morph button, and a play-through timeline."
       >
         <Scene ir={parabola} />
       </Card>
 
       <Card
-        tag="Shapes"
-        title="Not just curves"
-        blurb="Circle, polygon, vector, and arc — all first-class primitives."
+        tag="Circle · vector · arc · trig"
+        title="Unit circle explorer"
+        blurb="Slide or spin θ; the vector, angle arc, and sin/cos projections track live."
       >
-        <Scene ir={shapes} />
+        <Scene ir={trig} />
       </Card>
 
       <Card
-        tag="Interactivity"
-        title="Buttons & steppers"
-        blurb="Buttons fire actions: step, animate, set. Watch the area update."
+        tag="Polygon · rect · drag"
+        title="Pythagoras, by hand"
+        blurb="Drag the legs (or use the steppers). The squares and a² + b² = c² update as you go."
       >
-        <Scene ir={buttons} />
+        <Scene ir={pyth} />
       </Card>
 
       <Card
-        tag="Direct manipulation"
-        title="Drag the apex"
-        blurb="Grab the purple point and reshape the triangle in 2D."
+        tag="4 params · drag · animate"
+        title="Sine wave lab"
+        blurb="Amplitude, frequency, phase, shift — plus a draggable readout point and a rolling animation."
       >
-        <Scene ir={dragTri} />
+        <Scene ir={wave} />
       </Card>
 
-      <Card tag="Tiles" title="Build the answer" blurb="Tap tiles into the slots, then check.">
-        <BuildDemo slide={areaBuild} />
+      <Card
+        tag="Vectors · 2D drag"
+        title="Vector addition"
+        blurb="Drag either arrowhead; the resultant and parallelogram follow."
+      >
+        <Scene ir={vecAdd} />
+      </Card>
+
+      <Card tag="Tiles" title="Build the factors" blurb="Tap tiles into the slots, then check.">
+        <BuildDemo slide={factor} />
       </Card>
     </div>
   );
