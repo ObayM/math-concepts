@@ -207,12 +207,127 @@ export function compile(source: string): SceneIR {
         break;
       }
 
+      case 'circle': {
+        // circle <id> = (x, y) <r> [opts]
+        const id = rest[0];
+        const eq = rest.indexOf('=');
+        if (eq < 0) throw new CompileError('circle needs `= (x, y) <r>`', ln);
+        const [x, y] = splitPair(rest[eq + 1], ln);
+        const after = rest.slice(eq + 2);
+        const r = after.find((t) => !isOpt(t));
+        if (r == null) throw new CompileError('circle needs a radius', ln);
+        const o = opts(after);
+        const obj: any = { id, type: 'circle', x, y, r };
+        if (o.opacity) obj.opacity = Number(o.opacity);
+        applyCommon(obj, o);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'polygon': {
+        // polygon <id> = (x1,y1) (x2,y2) (x3,y3) ... [opts]
+        const id = rest[0];
+        const eq = rest.indexOf('=');
+        if (eq < 0) throw new CompileError('polygon needs `= (x1,y1) (x2,y2) ...`', ln);
+        const after = rest.slice(eq + 1);
+        const points = after.filter((t) => t.startsWith('(')).map((t) => splitPair(t, ln));
+        if (points.length < 2) throw new CompileError('polygon needs at least 2 points', ln);
+        const o = opts(after);
+        const obj: any = { id, type: 'polygon', points };
+        if (o.opacity) obj.opacity = Number(o.opacity);
+        applyCommon(obj, o);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'vector': {
+        // vector <id> = (x1,y1)->(x2,y2) [opts]
+        const id = rest[0];
+        const eq = rest.indexOf('=');
+        if (eq < 0) throw new CompileError('vector needs `= (x1,y1)->(x2,y2)`', ln);
+        const seg = rest[eq + 1].split('->');
+        if (seg.length !== 2) throw new CompileError('vector must be (a,b)->(c,d)', ln);
+        const [x1, y1] = splitPair(seg[0], ln);
+        const [x2, y2] = splitPair(seg[1], ln);
+        const obj: any = { id, type: 'vector', x1, y1, x2, y2 };
+        applyCommon(obj, opts(rest.slice(eq + 2)));
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'arc': {
+        // arc <id> = (x, y) <r> <start> <end> [opts]   (degrees, CCW)
+        const id = rest[0];
+        const eq = rest.indexOf('=');
+        if (eq < 0) throw new CompileError('arc needs `= (x, y) <r> <start> <end>`', ln);
+        const [x, y] = splitPair(rest[eq + 1], ln);
+        const after = rest.slice(eq + 2);
+        const nums = after.filter((t) => !isOpt(t));
+        if (nums.length < 3) throw new CompileError('arc needs radius, start, end', ln);
+        const [r, start, end] = nums;
+        const obj: any = { id, type: 'arc', x, y, r, start, end };
+        applyCommon(obj, opts(after));
+        ir.objects.push(obj);
+        break;
+      }
+
       case 'slider':
       case 'toggle': {
         const bind = rest[0];
         const ctrl: any = { as: kw, bind };
         const labelTok = rest.find((t) => t.startsWith('"'));
         if (labelTok) ctrl.label = unq(labelTok);
+        ir.controls.push(ctrl);
+        break;
+      }
+
+      case 'stepper': {
+        // stepper <bind> ["label"] [step:<n>]
+        const ctrl: any = { as: 'stepper', bind: rest[0] };
+        const labelTok = rest.find((t) => t.startsWith('"'));
+        if (labelTok) ctrl.label = unq(labelTok);
+        const o = opts(rest);
+        if (o.step) ctrl.step = Number(o.step);
+        ir.controls.push(ctrl);
+        break;
+      }
+
+      case 'button': {
+        // button "label" [set k=v] [step k=v] [toggle k] [animate k=v] [ease:.. dur:..]
+        const ctrl: any = { as: 'button', label: '' };
+        const set: Record<string, number | boolean | string> = {};
+        const step: Record<string, number> = {};
+        const animate: Record<string, number> = {};
+        let i = 0;
+        while (i < rest.length) {
+          const t = rest[i];
+          if (t.startsWith('"')) {
+            ctrl.label = unq(t);
+            i++;
+          } else if (t === 'toggle') {
+            ctrl.toggle = rest[i + 1];
+            i += 2;
+          } else if (t === 'set' || t === 'step' || t === 'animate') {
+            const pair = rest[i + 1] ?? '';
+            const eqi = pair.indexOf('=');
+            if (eqi < 0) throw new CompileError(`button ${t} needs key=value`, ln);
+            const key = pair.slice(0, eqi);
+            const val = coerce(pair.slice(eqi + 1));
+            if (t === 'set') set[key] = val;
+            else if (t === 'step') step[key] = Number(val);
+            else animate[key] = Number(val);
+            i += 2;
+          } else {
+            i++;
+          }
+        }
+        const o = opts(rest);
+        if (Object.keys(set).length) ctrl.set = set;
+        if (Object.keys(step).length) ctrl.step = step;
+        if (Object.keys(animate).length) ctrl.animate = animate;
+        if (o.ease) ctrl.ease = o.ease;
+        if (o.dur) ctrl.duration = Number(o.dur);
+        if (!ctrl.label) throw new CompileError('button needs a "label"', ln);
         ir.controls.push(ctrl);
         break;
       }
