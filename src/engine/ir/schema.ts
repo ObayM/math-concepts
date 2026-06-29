@@ -67,6 +67,7 @@ const labelObj = z.object({
   y: expr,
   text: z.string(), // you can drop ${expr} in here
   fontSize: z.number().optional(),
+  tex: z.boolean().optional(), // render text as LaTeX (KaTeX) instead of plain
   ...objBase,
 });
 

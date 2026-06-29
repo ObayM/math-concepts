@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Scene } from '@/engine';
 import Button from '@/components/ui/Button';
 import BuildBlock from '@/components/lesson/blocks/BuildBlock';
+import RichText from '@/components/lesson/RichText';
 import { checkable } from '@/components/lesson/checkable';
 
 const parabola = {
@@ -350,6 +351,24 @@ const factor = {
   explanation: '2 × 3 = 6 and 2 + 3 = 5, so x² + 5x + 6 = (x + 2)(x + 3).',
 };
 
+const formula = {
+  state: {},
+  space: { type: 'plane', xDomain: [-6, 6], yDomain: [-2, 8], grid: true, axes: true },
+  objects: [
+    { id: 'f', type: 'curve', expr: 'x^2 - 2', color: 'primary', strokeWidth: 3 },
+    {
+      id: 'ql',
+      type: 'label',
+      x: '-5.6',
+      y: '7',
+      tex: true,
+      text: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+      color: 'accent',
+      fontSize: 22,
+    },
+  ],
+};
+
 function BuildDemo({ slide }) {
   const [value, setValue] = useState([]);
   const [checked, setChecked] = useState(false);
@@ -408,6 +427,21 @@ export default function EngineDemoPage() {
           play, push the sliders, build with tiles.
         </p>
       </div>
+
+      <Card
+        tag="Typeset math · KaTeX"
+        title="Real equations"
+        blurb="Inline and display math in prose, plus LaTeX labels rendered inside scenes."
+      >
+        <RichText className="block text-lg text-neutral-600 leading-relaxed">
+          {
+            'The **quadratic formula** solves $ax^2 + bx + c = 0$:\n$$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$\nThe part under the root, $b^2 - 4ac$, is the *discriminant*.'
+          }
+        </RichText>
+        <div className="mt-5">
+          <Scene ir={formula} />
+        </div>
+      </Card>
 
       <Card
         tag="Graphs + animation"

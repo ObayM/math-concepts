@@ -1,12 +1,15 @@
 'use client';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import RichText from '../RichText';
 
 export default function QuizBlock({ slide, value, checked, onChange }) {
   const selectedOption = value;
   const submitted = checked;
   return (
     <div className="flex flex-col h-full">
-      <p className="text-xl text-neutral-600 leading-relaxed font-medium mb-6">{slide.content}</p>
+      <RichText className="text-xl text-neutral-600 leading-relaxed font-medium mb-6">
+        {slide.content}
+      </RichText>
 
       <div className="grid gap-3">
         {slide.quizOptions.map((option, idx) => {
@@ -37,7 +40,7 @@ export default function QuizBlock({ slide, value, checked, onChange }) {
                       : 'text-neutral-700'
                 }
               >
-                {option}
+                <RichText>{option}</RichText>
               </span>
               {submitted && isCorrect && (
                 <CheckCircle2 className="text-success-500 w-6 h-6 shrink-0" />
@@ -51,9 +54,9 @@ export default function QuizBlock({ slide, value, checked, onChange }) {
       </div>
 
       {submitted && slide.explanation && (
-        <p className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed">
+        <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {slide.explanation}
-        </p>
+        </RichText>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import { Nunito } from 'next/font/google';
 import './globals.css';
+import 'katex/dist/katex.min.css';
 import Navbar from '@/components/layout/navbar';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { getUserInfo } from '@/components/auth/getUserInfo';

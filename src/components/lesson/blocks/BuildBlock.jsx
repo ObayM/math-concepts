@@ -1,6 +1,7 @@
 'use client';
 import { RotateCcw } from 'lucide-react';
 import { Scene } from '@/engine';
+import RichText from '../RichText';
 
 export default function BuildBlock({ slide, value = [], checked, correct, onChange }) {
   const placed = value || [];
@@ -17,9 +18,9 @@ export default function BuildBlock({ slide, value = [], checked, correct, onChan
   return (
     <div className="flex flex-col items-center gap-6 h-full justify-center">
       {slide.content && (
-        <p className="text-xl text-neutral-600 leading-relaxed font-medium text-center">
+        <RichText className="text-xl text-neutral-600 leading-relaxed font-medium text-center block">
           {slide.content}
-        </p>
+        </RichText>
       )}
 
       {slide.visual && (
@@ -80,9 +81,9 @@ export default function BuildBlock({ slide, value = [], checked, correct, onChan
       </button>
 
       {checked && slide.explanation && (
-        <p className="text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed max-w-md text-center">
+        <RichText className="block text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed max-w-md text-center">
           {slide.explanation}
-        </p>
+        </RichText>
       )}
     </div>
   );
