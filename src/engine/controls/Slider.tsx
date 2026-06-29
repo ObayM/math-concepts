@@ -22,7 +22,7 @@ export default function Slider({ control }: { control: SliderControl }) {
   const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
 
   return (
-    <div className="bg-neutral-100 rounded-2xl p-4">
+    <div className="w-full bg-neutral-100 rounded-2xl p-4">
       <div className="flex justify-between items-center mb-2">
         <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
           {control.label || control.bind}

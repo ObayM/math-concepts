@@ -81,7 +81,55 @@ const rectObj = z.object({
   ...objBase,
 });
 
-const sceneObject = z.discriminatedUnion('type', [curveObj, pointObj, lineObj, labelObj, rectObj]);
+// (x, y) is the center; r is the radius in scene units
+const circleObj = z.object({
+  type: z.literal('circle'),
+  x: expr,
+  y: expr,
+  r: expr,
+  opacity: z.number().optional(),
+  ...objBase,
+});
+
+const polygonObj = z.object({
+  type: z.literal('polygon'),
+  points: z.array(z.tuple([expr, expr])).min(2),
+  opacity: z.number().optional(),
+  ...objBase,
+});
+
+// an arrow from (x1,y1) to (x2,y2)
+const vectorObj = z.object({
+  type: z.literal('vector'),
+  x1: expr,
+  y1: expr,
+  x2: expr,
+  y2: expr,
+  ...objBase,
+});
+
+// arc/angle marker: center (x,y), radius r, from `start`° to `end`° (CCW)
+const arcObj = z.object({
+  type: z.literal('arc'),
+  x: expr,
+  y: expr,
+  r: expr,
+  start: expr,
+  end: expr,
+  ...objBase,
+});
+
+const sceneObject = z.discriminatedUnion('type', [
+  curveObj,
+  pointObj,
+  lineObj,
+  labelObj,
+  rectObj,
+  circleObj,
+  polygonObj,
+  vectorObj,
+  arcObj,
+]);
 
 // controls = the widgets, wired both ways to state
 const sliderControl = z.object({
@@ -97,7 +145,29 @@ const toggleControl = z.object({
   bind: z.string(),
   label: z.string().optional(),
 });
-const control = z.discriminatedUnion('as', [sliderControl, toggleControl]);
+const stepperControl = z.object({
+  as: z.literal('stepper'),
+  bind: z.string(),
+  label: z.string().optional(),
+  step: z.number().optional(),
+});
+// a button fires one or more actions on click
+const buttonControl = z.object({
+  as: z.literal('button'),
+  label: z.string(),
+  set: z.record(z.string(), z.union([z.number(), z.boolean()])).optional(),
+  step: z.record(z.string(), z.number()).optional(),
+  toggle: z.string().optional(),
+  animate: z.record(z.string(), z.number()).optional(),
+  duration: z.number().optional(),
+  ease: z.enum(['linear', 'easeIn', 'easeOut', 'easeInOut']).optional(),
+});
+const control = z.discriminatedUnion('as', [
+  sliderControl,
+  toggleControl,
+  stepperControl,
+  buttonControl,
+]);
 
 // timeline = ordered steps you play thru. set = instant, animate = tween (numbers only)
 const timelineStep = z.object({

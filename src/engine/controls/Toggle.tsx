@@ -11,7 +11,7 @@ export default function Toggle({ control }: { control: ToggleControl }) {
     <button
       type="button"
       onClick={() => set(control.bind, !on)}
-      className="flex items-center justify-between bg-neutral-100 rounded-2xl p-4 text-left"
+      className="w-full flex items-center justify-between bg-neutral-100 rounded-2xl p-4 text-left"
     >
       <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
         {control.label || control.bind}
