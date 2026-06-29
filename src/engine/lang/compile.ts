@@ -1,6 +1,6 @@
 import { sceneSchema } from '@/engine/ir/schema';
 import type { SceneIR } from '@/engine/ir/types';
-import { evalNumber } from '@/engine/runtime/eval';
+import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { scanLine } from './scan';
 import { CompileError } from './errors';
 
@@ -68,6 +68,19 @@ export function compile(source: string): SceneIR {
     line.replace(/\{\{([^}]+)\}\}/g, (_, e) =>
       String(Math.round(evalNumber(e.trim(), scope) * 1e6) / 1e6)
     );
+
+  // a line that opens a new braced block (repeat/if). `} else {` is net-zero, not an opener.
+  const opensBlock = (bt: string) => bt.endsWith('{') && bt !== '} else {';
+
+  // index of the `}` matching the `{` at position `from` (for single-line if)
+  const matchBrace = (s: string, from: number) => {
+    let d = 0;
+    for (let k = from; k < s.length; k++) {
+      if (s[k] === '{') d++;
+      else if (s[k] === '}' && --d === 0) return k;
+    }
+    return -1;
+  };
 
   function runLine(line: string, ln: number) {
     const toks = scanLine(line);
@@ -423,11 +436,88 @@ export function compile(source: string): SceneIR {
             continue;
           }
           body.push(block[i]);
-          if (bt.endsWith('{')) depth++;
+          if (opensBlock(bt)) depth++;
           i++;
         }
         if (depth > 0) throw new CompileError('unclosed `repeat {`', ln);
         for (const v of values) processBlock(body, { ...scope, [name]: v });
+      } else if (t.startsWith('if ') && !t.endsWith('{')) {
+        const st = subst(t, scope);
+        const open = st.indexOf('{');
+        const close = open >= 0 ? matchBrace(st, open) : -1;
+        if (close < 0) throw new CompileError('if needs `{ ... }`', ln);
+        const cond = st.slice(2, open).trim();
+        const thenSrc = st.slice(open + 1, close).trim();
+        let elseSrc = '';
+        const after = st.slice(close + 1).trim();
+        if (after.startsWith('else')) {
+          const eo = after.indexOf('{');
+          const ec = eo >= 0 ? matchBrace(after, eo) : -1;
+          if (ec < 0) throw new CompileError('else needs `{ ... }`', ln);
+          elseSrc = after.slice(eo + 1, ec).trim();
+        }
+        const picked = evalBool(cond, scope) ? thenSrc : elseSrc;
+        if (picked) runLine(picked, ln);
+        i++;
+      } else if (t.startsWith('if ')) {
+        const take = evalBool(subst(t.slice(2, -1).trim(), scope), scope);
+        i++;
+        const thenBody: Ln[] = [];
+        const elseBody: Ln[] = [];
+        let target = thenBody;
+        let depth = 1;
+        let inlineElse = false;
+        while (i < block.length && depth > 0) {
+          const bt = strip(block[i].text);
+          if (bt === '} else {' && depth === 1) {
+            target = elseBody;
+            inlineElse = true;
+            i++;
+            continue;
+          }
+          if (bt === '}') {
+            depth--;
+            if (depth === 0) {
+              i++;
+              break;
+            }
+            target.push(block[i]);
+            i++;
+            continue;
+          }
+          target.push(block[i]);
+          if (opensBlock(bt)) depth++;
+          i++;
+        }
+        if (depth > 0) throw new CompileError('unclosed `if {`', ln);
+        // also accept `else {` on its own line (after the closing `}`)
+
+        if (!inlineElse) {
+          let j = i;
+          while (j < block.length && !strip(block[j].text)) j++;
+          if (j < block.length && strip(block[j].text) === 'else {') {
+            i = j + 1;
+            let d2 = 1;
+            while (i < block.length && d2 > 0) {
+              const bt = strip(block[i].text);
+              if (bt === '}') {
+                d2--;
+                if (d2 === 0) {
+                  i++;
+                  break;
+                }
+                elseBody.push(block[i]);
+                i++;
+                continue;
+              }
+              elseBody.push(block[i]);
+              if (opensBlock(bt)) d2++;
+              i++;
+            }
+            if (d2 > 0) throw new CompileError('unclosed `else {`', ln);
+          }
+        }
+        processBlock(take ? thenBody : elseBody, scope);
       } else {
         runLine(subst(t, scope), ln);
         i++;
