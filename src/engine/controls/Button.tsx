@@ -32,7 +32,7 @@ export default function Button({ control }: { control: ButtonControl }) {
     <button
       type="button"
       onClick={onClick}
-      className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm px-5 py-3 rounded-2xl border-b-4 border-primary-700 active:border-b-0 active:translate-y-1 transition-all"
+      className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm px-5 py-3 rounded-2xl border-b-4 border-primary-700 active:border-b-0 active:translate-y-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
     >
       {control.label}
     </button>

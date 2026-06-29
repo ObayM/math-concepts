@@ -31,7 +31,7 @@ export default function Slider({ control }: { control: SliderControl }) {
           {Math.round(val * 100) / 100}
         </span>
       </div>
-      <div className="relative h-4">
+      <div className="group relative h-5">
         <input
           type="range"
           min={min}
@@ -39,7 +39,7 @@ export default function Slider({ control }: { control: SliderControl }) {
           step={step}
           value={val}
           onChange={(e) => set(control.bind, Number(e.target.value))}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
         <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-neutral-200 rounded-full" />
         <div
@@ -47,7 +47,7 @@ export default function Slider({ control }: { control: SliderControl }) {
           style={{ width: `${pct}%` }}
         />
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 -ml-2 bg-white border-2 border-primary-500 rounded-full"
+          className="absolute top-1/2 -translate-y-1/2 w-5 h-5 -ml-2.5 bg-white border-2 border-primary-500 rounded-full shadow-sm transition-transform group-hover:scale-110 peer-active:scale-125 peer-focus-visible:ring-2 peer-focus-visible:ring-primary-300"
           style={{ left: `${pct}%` }}
         />
       </div>

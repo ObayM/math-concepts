@@ -13,6 +13,9 @@ export default function Label({ obj, scope, cx }: PrimProps) {
       fontSize={obj.fontSize ?? 14}
       fontWeight={600}
       fill={resolveColor(obj.color ?? 'neutral')}
+      stroke="white"
+      strokeWidth={3}
+      paintOrder="stroke"
     >
       {interpolate(obj.text, scope)}
     </text>

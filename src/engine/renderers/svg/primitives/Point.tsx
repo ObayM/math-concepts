@@ -12,10 +12,13 @@ export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
   const onPointerDown = draggable ? startDrag(obj) : undefined;
 
   return (
-    <g style={draggable ? { cursor: 'grab' } : undefined}>
-      {/* fat invisible hit area so dragging isn't fiddly */}
+    <g className={draggable ? 'cursor-grab active:cursor-grabbing' : undefined}>
+      {/* soft halo signals "you can grab me" + a fat invisible hit area */}
       {draggable && (
-        <circle cx={px} cy={py} r={r + 12} fill="transparent" onPointerDown={onPointerDown} />
+        <>
+          <circle cx={px} cy={py} r={r + 5} fill={color} opacity={0.18} />
+          <circle cx={px} cy={py} r={r + 14} fill="transparent" onPointerDown={onPointerDown} />
+        </>
       )}
       <circle
         cx={px}
@@ -27,7 +30,16 @@ export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
         onPointerDown={onPointerDown}
       />
       {obj.label && (
-        <text x={px + r + 6} y={py - r - 2} fontSize={13} fontWeight={700} fill={color}>
+        <text
+          x={px + r + 6}
+          y={py - r - 2}
+          fontSize={13}
+          fontWeight={700}
+          fill={color}
+          stroke="white"
+          strokeWidth={3}
+          paintOrder="stroke"
+        >
           {interpolate(obj.label, scope)}
         </text>
       )}

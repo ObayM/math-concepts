@@ -11,7 +11,7 @@ export default function Stepper({ control }: { control: StepperControl }) {
   const val = Number(scope[control.bind] ?? 0);
 
   const btn =
-    'w-9 h-9 rounded-xl bg-white border border-neutral-200 font-bold text-lg text-neutral-600 hover:border-primary-400 active:scale-90 transition flex items-center justify-center';
+    'w-9 h-9 rounded-xl bg-white border border-neutral-200 font-bold text-lg text-neutral-600 hover:border-primary-400 active:scale-90 transition flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300';
 
   return (
     <div className="w-full flex items-center justify-between bg-neutral-100 rounded-2xl p-4">

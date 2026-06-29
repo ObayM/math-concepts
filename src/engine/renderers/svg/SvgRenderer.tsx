@@ -55,17 +55,62 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
       window.addEventListener('pointerup', up);
     };
 
+  // pick a "nice" tick spacing (1/2/5 × 10^k) so grid + numbers aren't cramped
+  const niceStep = (range: number, target: number) => {
+    const raw = range / target;
+    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    const n = raw / pow;
+    return (n >= 5 ? 5 : n >= 2 ? 2 : 1) * pow;
+  };
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  const fmt = (v: number) => String(Math.round(v * 1000) / 1000);
+
   const grid: React.ReactNode[] = [];
+  const ticks: React.ReactNode[] = [];
   if (ir.space.grid) {
-    for (let gx = Math.ceil(xMin); gx <= xMax; gx++) {
-      grid.push(
-        <line key={`gx${gx}`} x1={cx.toX(gx)} y1={0} x2={cx.toX(gx)} y2={H} stroke="#f1f5f9" />
-      );
+    const sx = niceStep(xMax - xMin, 10);
+    const sy = niceStep(yMax - yMin, 10);
+    const axisXpx = cx.toX(clamp(0, xMin, xMax));
+    const axisYpx = cx.toY(clamp(0, yMin, yMax));
+    for (let t = Math.ceil(xMin / sx) * sx, k = 0; t <= xMax + 1e-9; t += sx, k++) {
+      const X = cx.toX(t);
+      grid.push(<line key={`gx${k}`} x1={X} y1={0} x2={X} y2={H} stroke="#eef2f7" />);
+      if (Math.abs(t) > 1e-9)
+        ticks.push(
+          <text
+            key={`tx${k}`}
+            x={X}
+            y={axisYpx + 14}
+            textAnchor="middle"
+            fontSize={11}
+            fill="#94a3b8"
+            stroke="white"
+            strokeWidth={3}
+            paintOrder="stroke"
+          >
+            {fmt(t)}
+          </text>
+        );
     }
-    for (let gy = Math.ceil(yMin); gy <= yMax; gy++) {
-      grid.push(
-        <line key={`gy${gy}`} x1={0} y1={cx.toY(gy)} x2={W} y2={cx.toY(gy)} stroke="#f1f5f9" />
-      );
+    for (let t = Math.ceil(yMin / sy) * sy, k = 0; t <= yMax + 1e-9; t += sy, k++) {
+      const Y = cx.toY(t);
+      grid.push(<line key={`gy${k}`} x1={0} y1={Y} x2={W} y2={Y} stroke="#eef2f7" />);
+      if (Math.abs(t) > 1e-9)
+        ticks.push(
+          <text
+            key={`ty${k}`}
+            x={axisXpx - 7}
+            y={Y + 4}
+            textAnchor="end"
+            fontSize={11}
+            fill="#94a3b8"
+            stroke="white"
+            strokeWidth={3}
+            paintOrder="stroke"
+          >
+            {fmt(t)}
+          </text>
+        );
     }
   }
 
@@ -107,6 +152,7 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
       >
         {grid}
         {axes}
+        {ticks}
         {ir.objects.map((obj, i) => {
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
           const Prim = svgPrimitives[obj.type];
