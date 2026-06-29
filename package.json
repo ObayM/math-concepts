@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "build:lessons": "node scripts/build-lessons.mjs",
     "db:seed": "npm run build:lessons && node prisma/seed.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dsl": "tsx scripts/dsl.ts"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",

@@ -1,4 +1,4 @@
-.PHONY: dev stop up down logs migrate seed studio clean install
+.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-compile dsl-preview
 
 
 dev: install
@@ -40,3 +40,17 @@ clean:
 	docker compose down -v
 	docker compose -f docker-compose.dev.yml down -v
 	rm -rf .next node_modules
+
+
+dsl-check:
+	npx tsx scripts/dsl.ts check $(f)
+
+dsl-check-all:
+	npx tsx scripts/dsl.ts check-all
+
+dsl-compile:
+	npx tsx scripts/dsl.ts compile $(f) $(or $(scene),1)
+
+dsl-preview:
+	@echo "open http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.dsl)"
+	@xdg-open "http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.dsl)" 2>/dev/null || open "http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.dsl)" 2>/dev/null || true
