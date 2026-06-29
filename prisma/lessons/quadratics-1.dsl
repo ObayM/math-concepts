@@ -19,9 +19,9 @@ line axis = (-b/(2*a), -8) -> (-b/(2*a), 8), color: neutral, style: dashed
 curve f = a*x^2 + b*x + c, color: primary, width: 3
 point v = (-b/(2*a), c - b^2/(4*a)), color: accent, r: 7, label: "vertex"
 point yint = (0, c), color: success, r: 5, label: "y-int"
-slider a, label: "a — opens up/down & width"
-slider b, label: "b — shifts the vertex sideways"
-slider c, label: "c — the y-intercept"
+slider a, label: "a - opens up/down & width"
+slider b, label: "b - shifts the vertex sideways"
+slider c, label: "c - the y-intercept"
 
 @scene title="The Role of a" cat="Standard Form"
 > The leading coefficient a controls the whole shape. Press play: a big a makes a narrow parabola, a small a makes it wide, and a negative a flips it upside-down.

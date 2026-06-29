@@ -6,8 +6,6 @@ export function parse(tokens: Token[]): Stmt[] {
   let pos = 0;
 
   const peek = () => tokens[pos];
-  const peekIs = (type: TT, raw?: string) =>
-    tokens[pos].type === type && (raw == null || tokens[pos].raw === raw);
   const at = (raw: string) => tokens[pos].type === 'IDENT' && tokens[pos].raw === raw;
   const check = (type: TT) => tokens[pos].type === type;
 
@@ -23,9 +21,6 @@ export function parse(tokens: Token[]): Stmt[] {
   }
 
   const eatIdent = () => eat('IDENT').raw;
-  const eatNL = () => {
-    while (check('NL')) pos++;
-  };
   const skipNL = () => {
     while (check('NL')) pos++;
   };
@@ -486,7 +481,7 @@ export function parse(tokens: Token[]): Stmt[] {
       id = parseId();
     }
     eat('IDENT', 'at');
-    const at = parseExpr(); // expects a tuple (x, y)
+    const at = parseExpr();
     eat('COMMA');
     const text = parseExpr();
     const props = parseProps();

@@ -136,11 +136,16 @@ function evalId(expr: Expr, cScope: CompileScope, ln: number): string {
   throw new CompileError('expected an identifier or string as object id', ln);
 }
 
-function propNum(props: PropMap, key: string, ln: number): number | undefined {
+function propNum(
+  props: PropMap,
+  key: string,
+  ln: number,
+  cScope: CompileScope = {}
+): number | undefined {
   const v = props.get(key);
   if (v == null || v === true) return undefined;
   try {
-    return evalNumber(ser(v, {}), {});
+    return evalNumber(ser(v, cScope), cScope);
   } catch {
     throw new CompileError(`prop "${key}" must be a number`, ln);
   }
@@ -188,7 +193,7 @@ function applyCommon(obj: any, props: PropMap, cScope: CompileScope) {
   if (color) obj.color = color;
   if (style) obj.style = style;
   if (show && show !== true) obj.visibleIf = ser(show, cScope);
-  if (width && width !== true) obj.strokeWidth = evalNumber(ser(width, cScope), {});
+  if (width && width !== true) obj.strokeWidth = serOrNum(width, cScope);
 }
 
 function niceNum(v: number): string {
@@ -288,7 +293,7 @@ export function emit(stmts: Stmt[]): SceneIR {
           varDef.min = evalNumber(ser(range.items[0], cScope), {});
           varDef.max = evalNumber(ser(range.items[1], cScope), {});
         }
-        const step = propNum(s.props, 'step', s.ln);
+        const step = propNum(s.props, 'step', s.ln, cScope);
         if (step != null) varDef.step = step;
         ir.state[s.name] = varDef;
         break;
@@ -318,7 +323,7 @@ export function emit(stmts: Stmt[]): SceneIR {
           obj.x = '0';
           obj.y = '0';
         }
-        const r = propNum(s.props, 'r', s.ln);
+        const r = propNum(s.props, 'r', s.ln, cScope);
         if (r != null) obj.r = r;
         const label = propStr(s.props, 'label', cScope);
         if (label) obj.label = label;
@@ -376,7 +381,7 @@ export function emit(stmts: Stmt[]): SceneIR {
           text = ser(s.text, cScope);
         }
         const obj: any = { id, type: 'label', x, y, text };
-        const size = propNum(s.props, 'size', s.ln);
+        const size = propNum(s.props, 'size', s.ln, cScope);
         if (size != null) obj.fontSize = size;
         if (s.props.has('tex')) obj.tex = true;
         applyCommon(obj, s.props, cScope);
@@ -391,7 +396,7 @@ export function emit(stmts: Stmt[]): SceneIR {
         const h = propExpr(s.props, 'h', cScope);
         if (w == null || h == null) throw new CompileError('rect needs w: and h: props', s.ln);
         const obj: any = { id, type: 'rect', x, y, w, h };
-        const opacity = propNum(s.props, 'opacity', s.ln);
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
         applyCommon(obj, s.props, cScope);
         ir.objects.push(obj);
@@ -404,7 +409,7 @@ export function emit(stmts: Stmt[]): SceneIR {
         const r = propExpr(s.props, 'r', cScope);
         if (r == null) throw new CompileError('circle needs an r: prop', s.ln);
         const obj: any = { id, type: 'circle', x, y, r };
-        const opacity = propNum(s.props, 'opacity', s.ln);
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
         applyCommon(obj, s.props, cScope);
         ir.objects.push(obj);
@@ -422,7 +427,7 @@ export function emit(stmts: Stmt[]): SceneIR {
           ];
         });
         const obj: any = { id, type: 'polygon', points };
-        const opacity = propNum(s.props, 'opacity', s.ln);
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
         applyCommon(obj, s.props, cScope);
         ir.objects.push(obj);
@@ -458,9 +463,9 @@ export function emit(stmts: Stmt[]): SceneIR {
         const ctrl: any = { as: 'slider', bind: s.bind };
         const label = propStr(s.props, 'label', cScope);
         if (label) ctrl.label = label;
-        const min = propNum(s.props, 'min', s.ln);
-        const max = propNum(s.props, 'max', s.ln);
-        const step = propNum(s.props, 'step', s.ln);
+        const min = propNum(s.props, 'min', s.ln, cScope);
+        const max = propNum(s.props, 'max', s.ln, cScope);
+        const step = propNum(s.props, 'step', s.ln, cScope);
         if (min != null) ctrl.min = min;
         if (max != null) ctrl.max = max;
         if (step != null) ctrl.step = step;
@@ -479,7 +484,7 @@ export function emit(stmts: Stmt[]): SceneIR {
       case 'stepper': {
         const ctrl: any = { as: 'stepper', bind: s.bind };
         const label = propStr(s.props, 'label', cScope);
-        const step = propNum(s.props, 'step', s.ln);
+        const step = propNum(s.props, 'step', s.ln, cScope);
         if (label) ctrl.label = label;
         if (step != null) ctrl.step = step;
         ir.controls.push(ctrl);
@@ -492,7 +497,7 @@ export function emit(stmts: Stmt[]): SceneIR {
         const step = propDict(s.props, 'step', s.ln);
         const animate = propDict(s.props, 'animate', s.ln);
         const toggle = propStr(s.props, 'toggle', cScope);
-        const dur = propNum(s.props, 'dur', s.ln);
+        const dur = propNum(s.props, 'dur', s.ln, cScope);
         const ease = propStr(s.props, 'ease', cScope);
         if (set) ctrl.set = set;
         if (step) ctrl.step = step;
@@ -509,7 +514,7 @@ export function emit(stmts: Stmt[]): SceneIR {
         if (s.narrate) obj.narrate = s.narrate;
         const set = propDict(s.props, 'set', s.ln);
         const animate = propDict(s.props, 'animate', s.ln);
-        const dur = propNum(s.props, 'dur', s.ln);
+        const dur = propNum(s.props, 'dur', s.ln, cScope);
         const ease = propStr(s.props, 'ease', cScope);
         if (set) obj.set = set;
         if (animate) obj.animate = animate;
