@@ -1,4 +1,5 @@
-import { compile as compileScene, CompileError, scanLine } from '@/engine/lang';
+import { compile as compileScene, CompileError } from '@/engine/lang';
+import { scanLine } from '@/engine/lang/scan';
 import { lessonDataSchema } from './schema';
 
 // a lesson is a sequence of @blocks. each @line opens a block; the lines under it

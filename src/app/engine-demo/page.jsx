@@ -6,27 +6,23 @@ import BuildBlock from '@/components/lesson/blocks/BuildBlock';
 import RichText from '@/components/lesson/RichText';
 import { checkable } from '@/components/lesson/checkable';
 
-const barSrc = `scene plane x:[-5.5, 5.5] y:[-3.2, 3] axes grid
+const barSrc = `scene, plane, x: [-5.5, 5.5], y: [-3.2, 3], axes, grid
 
-repeat i in -4..4 {
-  if {{i}} >= 0 {
-    rect r{{i}} = ({{i - 0.4}}, 0) (0.8, {{i * 0.6 + 0.1}}) color:success
-  } else {
-    rect r{{i}} = ({{i - 0.4}}, {{i * 0.6 - 0.1}}) (0.8, {{-i * 0.6 + 0.1}}) color:danger
-  }
-  label lbl{{i}} at ({{i}}, -2.9) "{{i}}"
-}`;
+for i in range(-4, 5):
+    if i >= 0:
+        rect f"r{i}" = (i - 0.4, 0), w: 0.8, h: i * 0.6 + 0.1, color: success
+    else:
+        rect f"r{i}" = (i - 0.4, i * 0.6 - 0.1), w: 0.8, h: -i * 0.6 + 0.1, color: danger
+    label at (i, -2.9), f"{i}"`;
 
-const clockSrc = `scene plane x:[-2.2, 2.2] y:[-1.9, 1.9] axes
+const clockSrc = `scene, plane, x: [-2.2, 2.2], y: [-1.9, 1.9], axes
 
-circle ring = (0, 0) 1 color:neutral
+circle ring = (0, 0), r: 1, color: neutral
 
-repeat i in 0..11 {
-  point pt{{i}} = ({{cos(i * 3.14159 / 6)}}, {{sin(i * 3.14159 / 6)}}) color:primary r:5
-  if {{i % 3}} == 0 {
-    label lbl{{i}} at ({{1.55 * cos(i * 3.14159 / 6)}}, {{1.55 * sin(i * 3.14159 / 6)}}) "{{i * 30}}\xb0"
-  }
-}`;
+for i in range(0, 12):
+    point f"pt{i}" = (cos(i * 3.14159 / 6), sin(i * 3.14159 / 6)), color: primary, r: 5
+    if i % 3 == 0:
+        label at (1.55 * cos(i * 3.14159 / 6), 1.55 * sin(i * 3.14159 / 6)), f"{i * 30}°"`;
 
 const barScene = compile(barSrc);
 const clockScene = compile(clockSrc);
