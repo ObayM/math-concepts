@@ -1,5 +1,6 @@
 import { sceneSchema } from '@/engine/ir/schema';
 import type { SceneIR } from '@/engine/ir/types';
+import { evalNumber } from '@/engine/runtime/eval';
 import { scanLine } from './scan';
 import { CompileError } from './errors';
 
@@ -58,18 +59,20 @@ function applyCommon(obj: any, o: Record<string, string>) {
 export function compile(source: string): SceneIR {
   const ir: any = { state: {}, space: null, objects: [], controls: [], timeline: [] };
 
-  const lines = source.split('\n');
-  for (let n = 0; n < lines.length; n++) {
-    let raw = lines[n];
-    const hash = raw.indexOf('#');
-    if (hash >= 0) raw = raw.slice(0, hash);
-    const line = raw.trim();
-    if (!line) continue;
+  const strip = (s: string) => {
+    const h = s.indexOf('#');
+    return (h >= 0 ? s.slice(0, h) : s).trim();
+  };
 
+  const subst = (line: string, scope: Record<string, number>) =>
+    line.replace(/\{\{([^}]+)\}\}/g, (_, e) =>
+      String(Math.round(evalNumber(e.trim(), scope) * 1e6) / 1e6)
+    );
+
+  function runLine(line: string, ln: number) {
     const toks = scanLine(line);
     const kw = toks[0];
     const rest = toks.slice(1);
-    const ln = n + 1;
 
     switch (kw) {
       case 'scene': {
@@ -370,6 +373,72 @@ export function compile(source: string): SceneIR {
         throw new CompileError(`unknown keyword "${kw}"`, ln);
     }
   }
+
+  type Ln = { text: string; ln: number };
+
+  function parseRepeat(header: string, ln: number) {
+    const toks = scanLine(header);
+    if (!toks[1] || toks[2] !== 'in')
+      throw new CompileError('repeat needs `repeat <var> in a..b {`', ln);
+    const name = toks[1];
+    const mm = (toks[3] ?? '').match(/^(-?\d+(?:\.\d+)?)\.\.(-?\d+(?:\.\d+)?)$/);
+    if (!mm) throw new CompileError('repeat range must be a..b (numbers)', ln);
+    const a = Number(mm[1]);
+    const b = Number(mm[2]);
+    const stepIdx = toks.indexOf('step');
+    const s = stepIdx >= 0 ? Number(toks[stepIdx + 1]) : 1;
+    if (!(s > 0)) throw new CompileError('repeat step must be > 0', ln);
+    const values: number[] = [];
+    for (let v = a; v <= b + 1e-9; v += s) {
+      values.push(Math.round(v * 1e6) / 1e6);
+      if (values.length > 5000) throw new CompileError('repeat exceeds 5000 iterations', ln);
+    }
+    return { name, values };
+  }
+
+  function processBlock(block: Ln[], scope: Record<string, number>) {
+    let i = 0;
+    while (i < block.length) {
+      const t = strip(block[i].text);
+      const ln = block[i].ln;
+      if (!t) {
+        i++;
+        continue;
+      }
+      if (t.startsWith('repeat')) {
+        const { name, values } = parseRepeat(subst(t, scope), ln);
+        i++;
+        const body: Ln[] = [];
+        let depth = 1;
+        while (i < block.length && depth > 0) {
+          const bt = strip(block[i].text);
+          if (bt === '}') {
+            depth--;
+            if (depth === 0) {
+              i++;
+              break;
+            }
+            body.push(block[i]);
+            i++;
+            continue;
+          }
+          body.push(block[i]);
+          if (bt.endsWith('{')) depth++;
+          i++;
+        }
+        if (depth > 0) throw new CompileError('unclosed `repeat {`', ln);
+        for (const v of values) processBlock(body, { ...scope, [name]: v });
+      } else {
+        runLine(subst(t, scope), ln);
+        i++;
+      }
+    }
+  }
+
+  processBlock(
+    source.split('\n').map((text, k) => ({ text, ln: k + 1 })),
+    {}
+  );
 
   if (!ir.space) throw new CompileError('missing a `scene ...` line');
   if (!ir.controls.length) delete ir.controls;
