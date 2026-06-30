@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { PRISM_DOCS } from '@/engine/lang/docs';
 import type { DocEntry, DocSection } from '@/engine/lang/docs';
