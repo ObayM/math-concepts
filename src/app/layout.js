@@ -30,7 +30,7 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`${nunito.variable} font-[family-name:var(--font-nunito)] antialiased`}>
         <AuthProvider initialUser={userInfo}>
-          {!pathname.startsWith('/dsl-preview') && <Navbar />}
+          {!pathname.startsWith('/dsl-preview') && !pathname.startsWith('/prism') && <Navbar />}
           {children}
         </AuthProvider>
       </body>
