@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
 import Card from '@/components/ui/Card';
 import LessonCompletion from '@/components/lesson/LessonCompletion';
-import { askTutor } from '@/utils/geminiService';
+import { askTutor } from '@/utils/aiService';
 
 import TextBlock from './blocks/TextBlock';
 import GraphBlock from './blocks/GraphBlock';

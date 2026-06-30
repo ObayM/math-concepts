@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
 import { FunctionVisualizer } from '@/components/visualizations';
 import { CheckCircle2, XCircle, Sparkles, HelpCircle, BrainCircuit, RotateCcw } from 'lucide-react';
-import { askTutor, generatePersonalizedSlide } from '@/utils/geminiService';
+import { askTutor, generateScene } from '@/utils/aiService';
 import LessonCompletion from '@/components/slides/LessonCompletion';
 import { lessonsData, geometryLessonsData } from '@/components/lib/data';
 import { useRouter } from 'next/navigation';
