@@ -1,7 +1,12 @@
 import { z } from 'zod';
+import { exprIRSchema, textSchema } from '@/engine/expr';
 
-// expr = a number, or a string i eval against scene state
-const expr = z.union([z.string(), z.number()]);
+// expr = a number, an expression AST, or (v1, being phased out) a string.
+// the string form dies with the runtime cutover — new compiles emit trees.
+const expr = z.union([z.string(), z.number(), exprIRSchema]);
+
+// text that can carry live ${} values: v1 plain string or v2 {parts}
+const liveText = z.union([z.string(), textSchema]);
 
 // state = named typed params. ditched the old single interactiveValue
 const numberVar = z.object({
@@ -40,16 +45,16 @@ const objBase = {
   color: z.string().optional(),
   strokeWidth: z.number().optional(),
   style: z.enum(['solid', 'dashed', 'dotted']).optional(),
-  visibleIf: z.string().optional(),
+  visibleIf: z.union([z.string(), exprIRSchema]).optional(),
 };
 
-const curveObj = z.object({ type: z.literal('curve'), expr: z.string(), ...objBase });
+const curveObj = z.object({ type: z.literal('curve'), expr, ...objBase });
 const pointObj = z.object({
   type: z.literal('point'),
   x: expr,
   y: expr,
   r: z.number().optional(),
-  label: z.string().optional(),
+  label: liveText.optional(),
   // bind = x-axis state key; bindY = y-axis state key (for axis 'xy' free drag)
   draggable: z
     .object({ axis: z.enum(['x', 'y', 'xy']), bind: z.string(), bindY: z.string().optional() })
@@ -70,7 +75,7 @@ const labelObj = z.object({
   type: z.literal('label'),
   x: expr,
   y: expr,
-  text: z.string(), // you can drop ${expr} in here
+  text: liveText, // you can drop ${expr} in here
   fontSize: z.number().optional(),
   tex: z.boolean().optional(), // render text as LaTeX (KaTeX) instead of plain
   ...objBase,
@@ -186,6 +191,9 @@ const timelineStep = z.object({
 });
 
 export const sceneSchema = z.object({
+  // v2 = expression trees instead of strings. optional while v1 data is still
+  // seeded; the loader starts requiring it once everything is reseeded.
+  version: z.literal(2).optional(),
   state: z.record(z.string(), stateVar),
   space,
   objects: z.array(sceneObject),

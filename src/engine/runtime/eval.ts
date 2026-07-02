@@ -1,8 +1,10 @@
 import type { Scope } from '@/engine/ir/types';
+import type { ExprIR, Text } from '@/engine/expr';
+import { evalExpr as evalTree, evalText as evalTextTree } from '@/engine/expr';
 
-// safe expr evaluator. same trick as the old FunctionVisualizer:
-// i whitelist the identifiers, build it with new Function, nothing sketchy gets thru.
-// made it generic so it works with any state vars + ${} interpolation
+// dual-read while v1 string IR is still seeded: expression trees (v2) go to
+// the tree-walker; strings take the old new Function path below. the string
+// path dies once everything is reseeded as v2.
 
 // longer names first so the regex grabs them first (atan2 before atan)
 const FUNCS = [
@@ -66,8 +68,16 @@ function compile(expr: string, keys: string[]) {
   }
 }
 
-export function evaluate(expr: string | number, scope: Scope): number | boolean {
+export function evaluate(expr: string | number | ExprIR, scope: Scope): number | boolean {
   if (typeof expr === 'number') return expr;
+  if (typeof expr === 'object' && expr !== null) {
+    try {
+      const v = evalTree(expr, scope);
+      return typeof v === 'string' ? 0 : v;
+    } catch {
+      return 0;
+    }
+  }
   if (typeof expr !== 'string' || expr.trim() === '') return 0;
 
   const keys = Object.keys(scope);
@@ -83,19 +93,26 @@ export function evaluate(expr: string | number, scope: Scope): number | boolean 
   }
 }
 
-export function evalNumber(expr: string | number, scope: Scope): number {
+export function evalNumber(expr: string | number | ExprIR, scope: Scope): number {
   const v = evaluate(expr, scope);
   if (typeof v === 'boolean') return v ? 1 : 0;
   return v;
 }
 
-export function evalBool(expr: string | number, scope: Scope): boolean {
+export function evalBool(expr: string | number | ExprIR, scope: Scope): boolean {
   const v = evaluate(expr, scope);
   return typeof v === 'boolean' ? v : v !== 0;
 }
 
-// swap every ${expr} in the string for its rounded value
-export function interpolate(text: string, scope: Scope): string {
+// v2 text is {parts}; v1 is a string with ${expr} spans. both render 2dp values.
+export function interpolate(text: string | Text, scope: Scope): string {
+  if (typeof text === 'object' && text !== null) {
+    try {
+      return evalTextTree(text, scope);
+    } catch {
+      return '—';
+    }
+  }
   return text.replace(/\$\{([^}]+)\}/g, (_, e: string) => {
     const v = evalNumber(e.trim(), scope);
     if (!isFinite(v)) return '—';

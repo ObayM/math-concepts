@@ -19,6 +19,23 @@ const sceneCases: Record<string, string> = {
   'call to undefined macro': 'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  tick(1, 0.2)\n}',
   'bad identifier': 'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param 3x = 1\n}',
   'missing y domain on plane': 'scene plane {\n  x: [-1, 1]\n  curve f = x^2\n}',
+  // strictness added in P0.4 — these used to compile silently broken
+  'string in domain': 'scene plane {\n  x: [-1, "a"]\n  y: [-1, 1]\n}',
+  'unknown id in for bound':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  for i in range(0, n) {\n    point f"p{i}" = (i, 0)\n  }\n}',
+  'typo in curve expr gets did-you-mean':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param radius = 2\n  curve f = raduis * x\n}',
+  'state declared after use':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  curve f = a * x^2\n  param a = 1\n}',
+  'slider binds unknown state':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param t = 1\n  slider s { label: "?" }\n}',
+  'unknown function in expr':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param t = 1\n  curve f = wobble(x) * t\n}',
+  'typo in label template':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param t = 1\n  label at (0, 0) = "v = ${tt}"\n}',
+  'None is gone': 'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  point p = (None, 0)\n}',
+  'member access is not a thing':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  point p = (1, 2)\n  label at (0, 0) = p.x\n}',
 };
 
 const lessonCases: Record<string, string> = {
@@ -40,13 +57,6 @@ describe('scene compile errors', () => {
       expect((err as CompileError).message).toMatchSnapshot();
     });
   }
-});
-
-describe('current silent failures (characterized, should become errors in P0.4)', () => {
-  it('a string in a numeric slot silently compiles to 0 (known bug)', () => {
-    const ir = compile('scene plane {\n  x: [-1, "a"]\n  y: [-1, 1]\n}');
-    expect(ir.space.xDomain).toEqual([-1, 0]);
-  });
 });
 
 describe('lesson compile errors', () => {

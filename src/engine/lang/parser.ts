@@ -4,7 +4,9 @@ import { CompileError } from './errors';
 
 const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes']);
 
-export function parse(tokens: Token[]): Stmt[] {
+// the whole parser lives in one closure over (tokens, pos); makeParser exposes
+// the two entry points — a full file, or a bare expression (f-string fragments etc.)
+function makeParser(tokens: Token[]) {
   let pos = 0;
 
   const peek = () => tokens[pos];
@@ -140,6 +142,14 @@ export function parse(tokens: Token[]): Stmt[] {
       eat('RP');
       l = { k: 'call', fn: l.name, args };
     }
+    if (check('DOT')) {
+      const t = peek();
+      throw new CompileError(
+        'member access ("a.b") is not supported — positions are expressions of state',
+        t.line,
+        t.col
+      );
+    }
     return l;
   }
 
@@ -171,8 +181,8 @@ export function parse(tokens: Token[]): Stmt[] {
         return { k: 'bool', v: false };
       }
       if (t.raw === 'None') {
-        pos++;
-        return { k: 'num', v: Infinity };
+        // used to silently become Infinity, which made baffling off-screen geometry
+        throw new CompileError('"None" is not supported — omit the prop instead', t.line, t.col);
       }
       pos++;
       return { k: 'id', name: t.raw };
@@ -618,20 +628,45 @@ export function parse(tokens: Token[]): Stmt[] {
     return tok.raw;
   }
 
-  skipNL();
-  if (!at('scene')) {
-    const t = peek();
-    throw new CompileError(
-      'a Prism file must start with a "scene <type> { ... }" block',
-      t.line,
-      t.col
-    );
+  function parseFile(): Stmt[] {
+    skipNL();
+    if (!at('scene')) {
+      const t = peek();
+      throw new CompileError(
+        'a Prism file must start with a "scene <type> { ... }" block',
+        t.line,
+        t.col
+      );
+    }
+    const scene = parseScene(peek().line);
+    skipNL();
+    if (!check('EOF')) {
+      const t = peek();
+      throw new CompileError('unexpected content after the scene block', t.line, t.col);
+    }
+    return [scene];
   }
-  const scene = parseScene(peek().line);
-  skipNL();
-  if (!check('EOF')) {
-    const t = peek();
-    throw new CompileError('unexpected content after the scene block', t.line, t.col);
+
+  function parseBareExpr(): Expr {
+    skipNL();
+    const e = parseExpr();
+    skipNL();
+    if (!check('EOF')) {
+      const t = peek();
+      throw new CompileError(`unexpected "${t.raw}" after expression`, t.line, t.col);
+    }
+    return e;
   }
-  return [scene];
+
+  return { parseFile, parseBareExpr };
+}
+
+export function parse(tokens: Token[]): Stmt[] {
+  return makeParser(tokens).parseFile();
+}
+
+// parse a standalone expression string into an Expr tree — used by the emitter
+// for f-string fragments, and later by the legacy-content converter
+export function parseExprTokens(tokens: Token[]): Expr {
+  return makeParser(tokens).parseBareExpr();
 }

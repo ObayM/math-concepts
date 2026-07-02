@@ -6,6 +6,8 @@ exports[`lesson compile errors > quiz without correct option 1`] = `"quiz "q" ne
 
 exports[`lesson compile errors > unknown block type 1`] = `"unknown block type "@wat""`;
 
+exports[`scene compile errors > None is gone 1`] = `"line 4:14: "None" is not supported — omit the prop instead"`;
+
 exports[`scene compile errors > bad expression 1`] = `"line 4:14: unexpected token "^" (CARET)"`;
 
 exports[`scene compile errors > bad identifier 1`] = `"line 4:9: expected IDENT, got NUM"`;
@@ -13,6 +15,8 @@ exports[`scene compile errors > bad identifier 1`] = `"line 4:9: expected IDENT,
 exports[`scene compile errors > call to undefined macro 1`] = `"line 4: undefined macro "tick""`;
 
 exports[`scene compile errors > empty source 1`] = `"line 2:1: a Prism file must start with a "scene <type> { ... }" block"`;
+
+exports[`scene compile errors > member access is not a thing 1`] = `"line 5:21: member access ("a.b") is not supported — positions are expressions of state"`;
 
 exports[`scene compile errors > missing y domain on plane 1`] = `"line 1: scene needs y: [min, max]"`;
 
@@ -22,7 +26,21 @@ exports[`scene compile errors > point missing y coord 1`] = `"line 4: expected a
 
 exports[`scene compile errors > range with no args 1`] = `"line 4:17: unexpected token ")" (RP)"`;
 
+exports[`scene compile errors > slider binds unknown state 1`] = `"line 5: slider binds "s" but there is no such state"`;
+
+exports[`scene compile errors > state declared after use 1`] = `"line 4: "a" is not defined here"`;
+
+exports[`scene compile errors > string in domain 1`] = `"line 1: expected a number, got a string"`;
+
+exports[`scene compile errors > typo in curve expr gets did-you-mean 1`] = `"line 5: "raduis" is not defined here — did you mean "radius"?"`;
+
+exports[`scene compile errors > typo in label template 1`] = `"line 5: "tt" is not defined here — did you mean "t"?"`;
+
 exports[`scene compile errors > unclosed brace 1`] = `"line 5:1: expected RC, got EOF"`;
+
+exports[`scene compile errors > unknown function in expr 1`] = `"line 5: unknown function "wobble""`;
+
+exports[`scene compile errors > unknown id in for bound 1`] = `"line 4: "n" is not a compile-time value here"`;
 
 exports[`scene compile errors > unknown space type 1`] = `"invalid scene IR: space.type - Invalid option: expected one of "plane"|"numberline"|"geometry"|"free""`;
 

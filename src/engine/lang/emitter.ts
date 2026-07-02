@@ -1,73 +1,206 @@
 import type { Expr, PropMap, Stmt } from './ast';
 import type { SceneIR } from '@/engine/ir/types';
+import type { ExprIR, NumExpr, UnOp, BinOp, Value } from '@/engine/expr';
 import { sceneSchema } from '@/engine/ir/schema';
-import { evalNumber, evalBool } from '@/engine/runtime/eval';
+import { evalExpr, ExprError, BUILTINS, BUILTIN_NAMES, CONSTS } from '@/engine/expr';
+import { lex } from './lexer';
+import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
 
 type CompileScope = Record<string, number | boolean>;
 type Macros = Map<string, { params: string[]; body: Stmt[] }>;
 
-function compileEval(expr: Expr, scope: CompileScope): number | boolean {
+// parser Expr → ExprIR for the evaluable subset. tuple/list/dict/arrow are
+// compile-time shapes the emitter destructures itself — they never evaluate.
+function toExprIR(expr: Expr): ExprIR {
   switch (expr.k) {
     case 'num':
-      return expr.v;
+      return { k: 'num', v: expr.v };
     case 'bool':
-      return expr.v;
-    case 'id': {
-      if (expr.name in scope) return scope[expr.name];
-      throw new CompileError(`"${expr.name}" is not in compile-time scope`);
-    }
-    case 'un': {
-      const v = compileEval(expr.e, scope);
-      if (expr.op === '-') return -(v as number);
-      if (expr.op === '+') return +(v as number);
-      if (expr.op === 'not') return !v;
-      throw new CompileError(`unknown unary op "${expr.op}"`);
-    }
-    case 'bin': {
-      const l = () => compileEval(expr.l, scope);
-      const r = () => compileEval(expr.r, scope);
-      switch (expr.op) {
-        case '+':
-          return (l() as number) + (r() as number);
-        case '-':
-          return (l() as number) - (r() as number);
-        case '*':
-          return (l() as number) * (r() as number);
-        case '/':
-          return (l() as number) / (r() as number);
-        case '%':
-          return (l() as number) % (r() as number);
-        case '^':
-          return Math.pow(l() as number, r() as number);
-        case '==':
-          return l() === r();
-        case '!=':
-          return l() !== r();
-        case '<':
-          return (l() as number) < (r() as number);
-        case '<=':
-          return (l() as number) <= (r() as number);
-        case '>':
-          return (l() as number) > (r() as number);
-        case '>=':
-          return (l() as number) >= (r() as number);
-        case 'and':
-          return Boolean(l()) && Boolean(r());
-        case 'or':
-          return Boolean(l()) || Boolean(r());
-        default:
-          throw new CompileError(`unknown binary op "${expr.op}"`);
-      }
-    }
-    case 'call': {
-      const args = expr.args.map((a) => compileEval(a, scope)) as number[];
-      const fn = Math[expr.fn as keyof Math] as ((...a: number[]) => number) | undefined;
-      if (typeof fn === 'function') return fn(...args);
-      throw new CompileError(`unknown compile-time function "${expr.fn}"`);
-    }
+      return { k: 'bool', v: expr.v };
+    case 'str':
+      return { k: 'str', v: expr.v };
+    case 'id':
+      return { k: 'id', name: expr.name };
+    case 'un':
+      return { k: 'un', op: expr.op as UnOp, e: toExprIR(expr.e) };
+    case 'bin':
+      return { k: 'bin', op: expr.op as BinOp, l: toExprIR(expr.l), r: toExprIR(expr.r) };
+    case 'call':
+      return { k: 'call', fn: expr.fn, args: expr.args.map(toExprIR) };
     default:
       throw new CompileError(`cannot evaluate "${expr.k}" at compile time`);
+  }
+}
+
+function compileEval(expr: Expr, scope: CompileScope): number | boolean {
+  let v;
+  try {
+    v = evalExpr(toExprIR(expr), scope);
+  } catch (e) {
+    if (e instanceof ExprError) throw new CompileError(e.message);
+    throw e;
+  }
+  if (typeof v === 'string') throw new CompileError(`cannot use a string here`);
+  return v;
+}
+
+// tiny levenshtein so typos get a "did you mean" hint
+function lev(a: string, b: string): number {
+  const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) => {
+    const row = new Array<number>(b.length + 1).fill(0);
+    row[0] = i;
+    return row;
+  });
+  for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+function suggest(name: string, cands: Iterable<string>): string {
+  let best = '';
+  let bestD = Infinity;
+  for (const c of cands) {
+    const d = lev(name, c);
+    if (d < bestD) {
+      best = c;
+      bestD = d;
+    }
+  }
+  // bestD < name.length keeps single-char typos from matching random single-char names
+  return best && bestD <= 2 && bestD < name.length ? ` — did you mean "${best}"?` : '';
+}
+
+function treeAt(expr: Expr, ln: number): ExprIR {
+  try {
+    return toExprIR(expr);
+  } catch (e) {
+    if (e instanceof CompileError) throw new CompileError(e.message, ln);
+    throw e;
+  }
+}
+
+// compile-time positions (loop bounds, param inits, prop numbers...) must fully
+// resolve against the compile scope — unknowns are errors now, not silent zeros
+function checkCompileIds(tree: ExprIR, scope: CompileScope, ln: number): void {
+  const walk = (e: ExprIR): void => {
+    switch (e.k) {
+      case 'id':
+        if (!(e.name in scope) && !(e.name in CONSTS)) {
+          const cands = [...Object.keys(scope), ...Object.keys(CONSTS)];
+          throw new CompileError(
+            `"${e.name}" is not a compile-time value here${suggest(e.name, cands)}`,
+            ln
+          );
+        }
+        return;
+      case 'un':
+        return walk(e.e);
+      case 'bin':
+        walk(e.l);
+        walk(e.r);
+        return;
+      case 'call':
+        if (!(e.fn in BUILTINS)) {
+          throw new CompileError(`unknown function "${e.fn}"${suggest(e.fn, BUILTIN_NAMES)}`, ln);
+        }
+        e.args.forEach(walk);
+        return;
+      default:
+        return;
+    }
+  };
+  walk(tree);
+}
+
+function cNum(expr: Expr, scope: CompileScope, ln: number): number {
+  const tree = treeAt(expr, ln);
+  checkCompileIds(tree, scope, ln);
+  let v: Value;
+  try {
+    v = evalExpr(tree, scope);
+  } catch (e) {
+    if (e instanceof ExprError) throw new CompileError(e.message, ln);
+    throw e;
+  }
+  if (typeof v === 'string') throw new CompileError('expected a number, got a string', ln);
+  return typeof v === 'boolean' ? (v ? 1 : 0) : v;
+}
+
+// substitute compile-time bindings (loop vars, lets, macro params) into the
+// tree so the IR never references them — they don't exist at runtime
+function lowerTree(expr: Expr, cScope: CompileScope): ExprIR {
+  switch (expr.k) {
+    case 'id': {
+      if (expr.name in cScope) {
+        const v = cScope[expr.name];
+        return typeof v === 'boolean' ? { k: 'bool', v } : { k: 'num', v };
+      }
+      return { k: 'id', name: expr.name };
+    }
+    case 'num':
+      return { k: 'num', v: expr.v };
+    case 'bool':
+      return { k: 'bool', v: expr.v };
+    case 'str':
+      return { k: 'str', v: expr.v };
+    case 'un':
+      return { k: 'un', op: expr.op as UnOp, e: lowerTree(expr.e, cScope) };
+    case 'bin':
+      return {
+        k: 'bin',
+        op: expr.op as BinOp,
+        l: lowerTree(expr.l, cScope),
+        r: lowerTree(expr.r, cScope),
+      };
+    case 'call':
+      return { k: 'call', fn: expr.fn, args: expr.args.map((a) => lowerTree(a, cScope)) };
+    default:
+      throw new CompileError(`cannot use a ${expr.k} as a runtime expression`);
+  }
+}
+
+const asIR = (n: NumExpr): ExprIR => (typeof n === 'number' ? { k: 'num', v: n } : n);
+
+// bottom-up constant folding: children first, then the node. pure math becomes
+// a plain number in the IR; anything referencing state stays a tree.
+function foldIR(e: ExprIR): NumExpr {
+  let node: ExprIR = e;
+  if (e.k === 'un') node = { ...e, e: asIR(foldIR(e.e)) };
+  else if (e.k === 'bin') node = { ...e, l: asIR(foldIR(e.l)), r: asIR(foldIR(e.r)) };
+  else if (e.k === 'call') node = { ...e, args: e.args.map((a) => asIR(foldIR(a))) };
+  try {
+    const v = evalExpr(node, {});
+    // JSON can't carry Infinity/NaN, so non-finite results stay as trees
+    if (typeof v === 'number') return Number.isFinite(v) ? v : node;
+    if (typeof v === 'boolean') return { k: 'bool', v };
+    return node;
+  } catch {
+    return node;
+  }
+}
+
+function lower(expr: Expr, cScope: CompileScope): NumExpr {
+  return foldIR(lowerTree(expr, cScope));
+}
+
+function cBool(expr: Expr, scope: CompileScope, ln: number): boolean {
+  const tree = treeAt(expr, ln);
+  checkCompileIds(tree, scope, ln);
+  try {
+    const v = evalExpr(tree, scope);
+    return typeof v === 'string' ? v !== '' : Boolean(v);
+  } catch (e) {
+    if (e instanceof ExprError) throw new CompileError(e.message, ln);
+    throw e;
   }
 }
 
@@ -105,26 +238,13 @@ function ser(expr: Expr, cScope: CompileScope): string {
   }
 }
 
-function serOrNum(expr: Expr, cScope: CompileScope): string | number {
-  try {
-    const v = compileEval(expr, cScope);
-    if (typeof v === 'number') return Number.isFinite(v) ? v : niceNum(v);
-  } catch {}
-  return ser(expr, cScope);
-}
-
-function serPair(expr: Expr, cScope: CompileScope, ln: number): [string | number, string | number] {
-  if (expr.k !== 'tuple' || expr.items.length < 2) {
-    throw new CompileError('expected a (x, y) pair', ln);
-  }
-  return [serOrNum(expr.items[0], cScope), serOrNum(expr.items[1], cScope)];
-}
-
 function evalFstr(raw: string, cScope: CompileScope): string {
   return raw.replace(/\{([^}]+)\}/g, (_, e: string) => {
     try {
-      const v = evalNumber(e.trim(), cScope);
-      if (Number.isFinite(v)) return niceNum(v);
+      // the {} fragment is raw source — parse it properly, no string eval
+      const v = compileEval(parseExprTokens(lex(e.trim())), cScope);
+      const num = typeof v === 'boolean' ? (v ? 1 : 0) : v;
+      if (Number.isFinite(num)) return niceNum(num);
     } catch {}
     return '${' + e + '}';
   });
@@ -144,11 +264,10 @@ function propNum(
 ): number | undefined {
   const v = props.get(key);
   if (v == null || v === true) return undefined;
-  try {
-    return evalNumber(ser(v, cScope), cScope);
-  } catch {
+  if (v.k === 'list' || v.k === 'dict' || v.k === 'arrow' || v.k === 'tuple') {
     throw new CompileError(`prop "${key}" must be a number`, ln);
   }
+  return cNum(v, cScope, ln);
 }
 
 function propStr(props: PropMap, key: string, cScope: CompileScope): string | undefined {
@@ -157,12 +276,6 @@ function propStr(props: PropMap, key: string, cScope: CompileScope): string | un
   if (v.k === 'str') return v.fstr ? evalFstr(v.v, cScope) : v.v;
   if (v.k === 'id') return v.name;
   return ser(v, cScope);
-}
-
-function propExpr(props: PropMap, key: string, cScope: CompileScope): string | number | undefined {
-  const v = props.get(key);
-  if (v == null || v === true) return undefined;
-  return serOrNum(v, cScope);
 }
 
 function propDict(
@@ -180,20 +293,9 @@ function propDict(
       out[k] = e.v;
       continue;
     }
-    out[k] = evalNumber(ser(e, {}), {});
+    out[k] = cNum(e, {}, ln);
   }
   return out;
-}
-
-function applyCommon(obj: any, props: PropMap, cScope: CompileScope) {
-  const color = propStr(props, 'color', cScope);
-  const style = propStr(props, 'style', cScope);
-  const show = props.get('show');
-  const width = props.get('width');
-  if (color) obj.color = color;
-  if (style) obj.style = style;
-  if (show && show !== true) obj.visibleIf = ser(show, cScope);
-  if (width && width !== true) obj.strokeWidth = serOrNum(width, cScope);
 }
 
 function niceNum(v: number): string {
@@ -201,9 +303,133 @@ function niceNum(v: number): string {
 }
 
 export function emit(stmts: Stmt[]): SceneIR {
-  const ir: any = { state: {}, space: null, objects: [], controls: [], timeline: [] };
+  const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
   const macros: Macros = new Map();
   let autoLabelId = 0;
+
+  // runtime-bound expressions may only reference declared state (+ frame vars
+  // like `x` in a curve). typos and use-before-declare become compile errors
+  // here instead of silent zeros at runtime.
+  function checkRuntime(expr: Expr, cScope: CompileScope, ln: number, extra: string[] = []): void {
+    const walk = (e: Expr): void => {
+      switch (e.k) {
+        case 'id': {
+          const ok =
+            e.name in cScope || e.name in ir.state || e.name in CONSTS || extra.includes(e.name);
+          if (!ok) {
+            const cands = [
+              ...Object.keys(cScope),
+              ...Object.keys(ir.state),
+              ...extra,
+              ...Object.keys(CONSTS),
+            ];
+            throw new CompileError(`"${e.name}" is not defined here${suggest(e.name, cands)}`, ln);
+          }
+          return;
+        }
+        case 'un':
+          return walk(e.e);
+        case 'bin':
+          walk(e.l);
+          walk(e.r);
+          return;
+        case 'call':
+          if (!(e.fn in BUILTINS)) {
+            throw new CompileError(`unknown function "${e.fn}"${suggest(e.fn, BUILTIN_NAMES)}`, ln);
+          }
+          e.args.forEach(walk);
+          return;
+        case 'tuple':
+        case 'list':
+          e.items.forEach(walk);
+          return;
+        case 'dict':
+          e.entries.forEach(([, v]) => walk(v));
+          return;
+        case 'arrow':
+          walk(e.from);
+          walk(e.to);
+          return;
+        default:
+          return;
+      }
+    };
+    walk(expr);
+  }
+
+  function lowerR(expr: Expr, cScope: CompileScope, ln: number, extra: string[] = []): NumExpr {
+    checkRuntime(expr, cScope, ln, extra);
+    return lower(expr, cScope);
+  }
+
+  function lowerPairR(expr: Expr, cScope: CompileScope, ln: number): [NumExpr, NumExpr] {
+    if (expr.k !== 'tuple' || expr.items.length < 2) {
+      throw new CompileError('expected a (x, y) pair', ln);
+    }
+    return [lowerR(expr.items[0], cScope, ln), lowerR(expr.items[1], cScope, ln)];
+  }
+
+  function propLowerR(
+    props: PropMap,
+    key: string,
+    cScope: CompileScope,
+    ln: number
+  ): NumExpr | undefined {
+    const v = props.get(key);
+    if (v == null || v === true) return undefined;
+    return lowerR(v, cScope, ln);
+  }
+
+  // text with ${} becomes {parts}: static strings + lowered expression trees.
+  // plain text stays a plain string.
+  function liveText(text: string, cScope: CompileScope, ln: number) {
+    if (!text.includes('${')) return text;
+    const parts: (string | ExprIR)[] = [];
+    const re = /\$\{([^}]+)\}/g;
+    let last = 0;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) parts.push(text.slice(last, m.index));
+      let frag: Expr;
+      try {
+        frag = parseExprTokens(lex(m[1]));
+      } catch {
+        throw new CompileError(`bad expression in \${${m[1]}}`, ln);
+      }
+      checkRuntime(frag, cScope, ln);
+      parts.push(asIR(lower(frag, cScope)));
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) parts.push(text.slice(last));
+    return { parts };
+  }
+
+  function bindTo(name: string, what: string, ln: number): string {
+    if (!(name in ir.state)) {
+      throw new CompileError(
+        `${what} binds "${name}" but there is no such state${suggest(name, Object.keys(ir.state))}`,
+        ln
+      );
+    }
+    return name;
+  }
+
+  function applyCommon(obj: any, props: PropMap, cScope: CompileScope, ln: number) {
+    const color = propStr(props, 'color', cScope);
+    const style = propStr(props, 'style', cScope);
+    const show = props.get('show');
+    const width = props.get('width');
+    if (color) obj.color = color;
+    if (style) obj.style = style;
+    if (show && show !== true) obj.visibleIf = asIR(lowerR(show, cScope, ln));
+    if (width && width !== true) {
+      const w = lowerR(width, cScope, ln);
+      if (typeof w !== 'number') {
+        throw new CompileError('width must be a constant number', ln);
+      }
+      obj.strokeWidth = w;
+    }
+  }
 
   function run(stmts: Stmt[], cScope: CompileScope) {
     for (const s of stmts) emitStmt(s, cScope);
@@ -222,9 +448,9 @@ export function emit(stmts: Stmt[]): SceneIR {
       }
 
       case 'for_s': {
-        const startV = evalNumber(ser(s.start, cScope), cScope);
-        const endV = evalNumber(ser(s.end, cScope), cScope);
-        const stepV = s.step ? evalNumber(ser(s.step, cScope), cScope) : 1;
+        const startV = cNum(s.start, cScope, s.ln);
+        const endV = cNum(s.end, cScope, s.ln);
+        const stepV = s.step ? cNum(s.step, cScope, s.ln) : 1;
         if (!(stepV > 0)) throw new CompileError('range step must be > 0', s.ln);
         let count = 0;
         for (let v = startV; v < endV - 1e-9; v += stepV) {
@@ -237,7 +463,7 @@ export function emit(stmts: Stmt[]): SceneIR {
 
       case 'if_s': {
         for (const { cond, body } of s.cases) {
-          const take = evalBool(ser(cond, cScope), cScope);
+          const take = cBool(cond, cScope, s.ln);
           if (take) {
             run(body, { ...cScope });
             return;
@@ -272,10 +498,10 @@ export function emit(stmts: Stmt[]): SceneIR {
         const isNumberline = s.spaceType === 'numberline';
         if (!isNumberline && (!yV || yV === true || yV.k !== 'list'))
           throw new CompileError('scene needs y: [min, max]', s.ln);
-        const xD = xV.items.map((e) => evalNumber(ser(e, cScope), {})) as [number, number];
+        const xD = xV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number];
         const yD =
           yV && yV !== true && yV.k === 'list'
-            ? (yV.items.map((e) => evalNumber(ser(e, cScope), {})) as [number, number])
+            ? (yV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number])
             : undefined;
         ir.space = {
           type: s.spaceType,
@@ -289,12 +515,12 @@ export function emit(stmts: Stmt[]): SceneIR {
       }
 
       case 'param': {
-        const init = evalNumber(ser(s.init, cScope), cScope);
+        const init = cNum(s.init, cScope, s.ln);
         const varDef: any = { type: 'number', init };
         const range = s.props.get('range');
         if (range && range !== true && range.k === 'list' && range.items.length >= 2) {
-          varDef.min = evalNumber(ser(range.items[0], cScope), {});
-          varDef.max = evalNumber(ser(range.items[1], cScope), {});
+          varDef.min = cNum(range.items[0], cScope, s.ln);
+          varDef.max = cNum(range.items[1], cScope, s.ln);
         }
         const step = propNum(s.props, 'step', s.ln, cScope);
         if (step != null) varDef.step = step;
@@ -309,8 +535,8 @@ export function emit(stmts: Stmt[]): SceneIR {
 
       case 'curve': {
         const id = evalId(s.id, cScope, s.ln);
-        const obj: any = { id, type: 'curve', expr: ser(s.expr, cScope) };
-        applyCommon(obj, s.props, cScope);
+        const obj: any = { id, type: 'curve', expr: lowerR(s.expr, cScope, s.ln, ['x']) };
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
@@ -319,32 +545,36 @@ export function emit(stmts: Stmt[]): SceneIR {
         const id = evalId(s.id, cScope, s.ln);
         const obj: any = { id, type: 'point' };
         if (s.pos) {
-          const [x, y] = serPair(s.pos, cScope, s.ln);
+          const [x, y] = lowerPairR(s.pos, cScope, s.ln);
           obj.x = x;
           obj.y = y;
         } else {
-          obj.x = '0';
-          obj.y = '0';
+          obj.x = 0;
+          obj.y = 0;
         }
         const r = propNum(s.props, 'r', s.ln, cScope);
         if (r != null) obj.r = r;
         const label = propStr(s.props, 'label', cScope);
-        if (label) obj.label = label;
+        if (label) obj.label = liveText(label, cScope, s.ln);
         const drag = s.props.get('drag');
         if (drag && drag !== true) {
           if (drag.k !== 'arrow') throw new CompileError('drag must be axis -> bind', s.ln);
           const axis = drag.from.k === 'id' ? drag.from.name : ser(drag.from, cScope);
           if (drag.to.k === 'id') {
-            obj.draggable = { axis, bind: drag.to.name };
+            obj.draggable = { axis, bind: bindTo(drag.to.name, 'drag', s.ln) };
           } else if (drag.to.k === 'tuple' && drag.to.items.length === 2) {
             const bindX =
               drag.to.items[0].k === 'id' ? drag.to.items[0].name : ser(drag.to.items[0], cScope);
             const bindY =
               drag.to.items[1].k === 'id' ? drag.to.items[1].name : ser(drag.to.items[1], cScope);
-            obj.draggable = { axis, bind: bindX, bindY };
+            obj.draggable = {
+              axis,
+              bind: bindTo(bindX, 'drag', s.ln),
+              bindY: bindTo(bindY, 'drag', s.ln),
+            };
           }
         }
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
@@ -353,19 +583,30 @@ export function emit(stmts: Stmt[]): SceneIR {
         const id = evalId(s.id, cScope, s.ln);
         const obj: any = { id, type: 'line' };
         if (s.seg) {
-          const [x1, y1] = serPair(s.seg[0], cScope, s.ln);
-          const [x2, y2] = serPair(s.seg[1], cScope, s.ln);
+          const [x1, y1] = lowerPairR(s.seg[0], cScope, s.ln);
+          const [x2, y2] = lowerPairR(s.seg[1], cScope, s.ln);
           obj.x1 = x1;
           obj.y1 = y1;
           obj.x2 = x2;
           obj.y2 = y2;
         } else {
           const through = propStr(s.props, 'through', cScope);
-          const slope = propExpr(s.props, 'slope', cScope);
-          if (through) obj.through = through;
+          const slope = propLowerR(s.props, 'slope', cScope, s.ln);
+          if (through) {
+            if (!ir.objects.some((o: any) => o.id === through)) {
+              throw new CompileError(
+                `line goes through "${through}" but no such object exists yet${suggest(
+                  through,
+                  ir.objects.map((o: any) => o.id)
+                )}`,
+                s.ln
+              );
+            }
+            obj.through = through;
+          }
           if (slope != null) obj.slope = slope;
         }
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
@@ -375,46 +616,48 @@ export function emit(stmts: Stmt[]): SceneIR {
         if (s.at.k !== 'tuple' || s.at.items.length < 2) {
           throw new CompileError('label at needs a (x, y) position', s.ln);
         }
-        const x = serOrNum(s.at.items[0], cScope);
-        const y = serOrNum(s.at.items[1], cScope);
-        let text: string;
+        const x = lowerR(s.at.items[0], cScope, s.ln);
+        const y = lowerR(s.at.items[1], cScope, s.ln);
+        let text;
         if (s.text.k === 'str') {
-          text = s.text.fstr ? evalFstr(s.text.v, cScope) : s.text.v;
+          const folded = s.text.fstr ? evalFstr(s.text.v, cScope) : s.text.v;
+          text = liveText(folded, cScope, s.ln);
         } else {
-          text = ser(s.text, cScope);
+          // a bare expression as text renders as its live value
+          text = { parts: [asIR(lowerR(s.text, cScope, s.ln))] };
         }
         const obj: any = { id, type: 'label', x, y, text };
         const size = propNum(s.props, 'size', s.ln, cScope);
         if (size != null) obj.fontSize = size;
         if (s.props.has('tex')) obj.tex = true;
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
 
       case 'rect': {
         const id = evalId(s.id, cScope, s.ln);
-        const [x, y] = serPair(s.pos, cScope, s.ln);
-        const w = propExpr(s.props, 'w', cScope);
-        const h = propExpr(s.props, 'h', cScope);
+        const [x, y] = lowerPairR(s.pos, cScope, s.ln);
+        const w = propLowerR(s.props, 'w', cScope, s.ln);
+        const h = propLowerR(s.props, 'h', cScope, s.ln);
         if (w == null || h == null) throw new CompileError('rect needs w: and h: props', s.ln);
         const obj: any = { id, type: 'rect', x, y, w, h };
         const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
 
       case 'circle': {
         const id = evalId(s.id, cScope, s.ln);
-        const [x, y] = serPair(s.center, cScope, s.ln);
-        const r = propExpr(s.props, 'r', cScope);
+        const [x, y] = lowerPairR(s.center, cScope, s.ln);
+        const r = propLowerR(s.props, 'r', cScope, s.ln);
         if (r == null) throw new CompileError('circle needs an r: prop', s.ln);
         const obj: any = { id, type: 'circle', x, y, r };
         const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
@@ -424,7 +667,7 @@ export function emit(stmts: Stmt[]): SceneIR {
         const points = s.pts.map((pt) => {
           if (pt.k !== 'tuple' || pt.items.length < 2)
             throw new CompileError('polygon point must be (x, y)', s.ln);
-          return [serOrNum(pt.items[0], cScope), serOrNum(pt.items[1], cScope)] as [
+          return [lowerR(pt.items[0], cScope, s.ln), lowerR(pt.items[1], cScope, s.ln)] as [
             string | number,
             string | number,
           ];
@@ -432,38 +675,38 @@ export function emit(stmts: Stmt[]): SceneIR {
         const obj: any = { id, type: 'polygon', points };
         const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
 
       case 'vector': {
         const id = evalId(s.id, cScope, s.ln);
-        const [x1, y1] = serPair(s.from, cScope, s.ln);
-        const [x2, y2] = serPair(s.to, cScope, s.ln);
+        const [x1, y1] = lowerPairR(s.from, cScope, s.ln);
+        const [x2, y2] = lowerPairR(s.to, cScope, s.ln);
         const obj: any = { id, type: 'vector', x1, y1, x2, y2 };
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
 
       case 'arc': {
         const id = evalId(s.id, cScope, s.ln);
-        const [x, y] = serPair(s.center, cScope, s.ln);
-        const r = propExpr(s.props, 'r', cScope);
-        const start = propExpr(s.props, 'from', cScope);
-        const end = propExpr(s.props, 'to', cScope);
+        const [x, y] = lowerPairR(s.center, cScope, s.ln);
+        const r = propLowerR(s.props, 'r', cScope, s.ln);
+        const start = propLowerR(s.props, 'from', cScope, s.ln);
+        const end = propLowerR(s.props, 'to', cScope, s.ln);
         if (r == null) throw new CompileError('arc needs an r: prop', s.ln);
         if (start == null || end == null)
           throw new CompileError('arc needs from: and to: props', s.ln);
         const obj: any = { id, type: 'arc', x, y, r, start, end };
-        applyCommon(obj, s.props, cScope);
+        applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
       }
 
       case 'slider': {
-        const ctrl: any = { as: 'slider', bind: s.bind };
+        const ctrl: any = { as: 'slider', bind: bindTo(s.bind, 'slider', s.ln) };
         const label = propStr(s.props, 'label', cScope);
         if (label) ctrl.label = label;
         const min = propNum(s.props, 'min', s.ln, cScope);
@@ -477,7 +720,7 @@ export function emit(stmts: Stmt[]): SceneIR {
       }
 
       case 'toggle': {
-        const ctrl: any = { as: 'toggle', bind: s.bind };
+        const ctrl: any = { as: 'toggle', bind: bindTo(s.bind, 'toggle', s.ln) };
         const label = propStr(s.props, 'label', cScope);
         if (label) ctrl.label = label;
         ir.controls.push(ctrl);
@@ -485,7 +728,7 @@ export function emit(stmts: Stmt[]): SceneIR {
       }
 
       case 'stepper': {
-        const ctrl: any = { as: 'stepper', bind: s.bind };
+        const ctrl: any = { as: 'stepper', bind: bindTo(s.bind, 'stepper', s.ln) };
         const label = propStr(s.props, 'label', cScope);
         const step = propNum(s.props, 'step', s.ln, cScope);
         if (label) ctrl.label = label;
@@ -502,10 +745,13 @@ export function emit(stmts: Stmt[]): SceneIR {
         const toggle = propStr(s.props, 'toggle', cScope);
         const dur = propNum(s.props, 'dur', s.ln, cScope);
         const ease = propStr(s.props, 'ease', cScope);
+        for (const d of [set, step, animate]) {
+          if (d) Object.keys(d).forEach((k) => bindTo(k, 'button', s.ln));
+        }
         if (set) ctrl.set = set;
         if (step) ctrl.step = step;
         if (animate) ctrl.animate = animate;
-        if (toggle) ctrl.toggle = toggle;
+        if (toggle) ctrl.toggle = bindTo(toggle, 'button toggle', s.ln);
         if (dur != null) ctrl.duration = dur;
         if (ease) ctrl.ease = ease;
         ir.controls.push(ctrl);
@@ -517,6 +763,9 @@ export function emit(stmts: Stmt[]): SceneIR {
         if (s.narrate) obj.narrate = s.narrate;
         const set = propDict(s.props, 'set', s.ln);
         const animate = propDict(s.props, 'animate', s.ln);
+        for (const d of [set, animate]) {
+          if (d) Object.keys(d).forEach((k) => bindTo(k, 'step', s.ln));
+        }
         const dur = propNum(s.props, 'dur', s.ln, cScope);
         const ease = propStr(s.props, 'ease', cScope);
         if (set) obj.set = set;

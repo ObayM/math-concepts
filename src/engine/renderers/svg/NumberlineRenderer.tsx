@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
-import { evalNumber, evalBool } from '@/engine/runtime/eval';
+import { evalNumber, evalBool, interpolate } from '@/engine/runtime/eval';
 import { resolveColor } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
@@ -135,7 +135,7 @@ export default function NumberlineRenderer({ ir }: { ir: SceneIR }) {
                     strokeWidth={3}
                     paintOrder="stroke"
                   >
-                    {obj.label}
+                    {interpolate(obj.label, scope)}
                   </text>
                 )}
               </g>
@@ -157,7 +157,7 @@ export default function NumberlineRenderer({ ir }: { ir: SceneIR }) {
                 strokeWidth={2}
                 paintOrder="stroke"
               >
-                {obj.text}
+                {interpolate(obj.text, scope)}
               </text>
             );
           }

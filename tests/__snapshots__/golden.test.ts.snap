@@ -18,7 +18,18 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
         "objects": [
           {
             "color": "primary",
-            "expr": "(x^2)",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "x",
+              },
+              "op": "^",
+              "r": {
+                "k": "num",
+                "v": 2,
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -65,6 +76,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
           ],
         },
         "state": {},
+        "version": 2,
       },
       "title": "The Squaring Function",
       "type": "scene",
@@ -97,14 +109,103 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "id": "axis",
             "style": "dashed",
             "type": "line",
-            "x1": "((-b)/(2*a))",
-            "x2": "((-b)/(2*a))",
+            "x1": {
+              "k": "bin",
+              "l": {
+                "e": {
+                  "k": "id",
+                  "name": "b",
+                },
+                "k": "un",
+                "op": "-",
+              },
+              "op": "/",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "num",
+                  "v": 2,
+                },
+                "op": "*",
+                "r": {
+                  "k": "id",
+                  "name": "a",
+                },
+              },
+            },
+            "x2": {
+              "k": "bin",
+              "l": {
+                "e": {
+                  "k": "id",
+                  "name": "b",
+                },
+                "k": "un",
+                "op": "-",
+              },
+              "op": "/",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "num",
+                  "v": 2,
+                },
+                "op": "*",
+                "r": {
+                  "k": "id",
+                  "name": "a",
+                },
+              },
+            },
             "y1": -8,
             "y2": 8,
           },
           {
             "color": "primary",
-            "expr": "(((a*(x^2))+(b*x))+c)",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "bin",
+                "l": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "a",
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "bin",
+                    "l": {
+                      "k": "id",
+                      "name": "x",
+                    },
+                    "op": "^",
+                    "r": {
+                      "k": "num",
+                      "v": 2,
+                    },
+                  },
+                },
+                "op": "+",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "b",
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "id",
+                    "name": "x",
+                  },
+                },
+              },
+              "op": "+",
+              "r": {
+                "k": "id",
+                "name": "c",
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -115,8 +216,66 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "label": "vertex",
             "r": 7,
             "type": "point",
-            "x": "((-b)/(2*a))",
-            "y": "(c-((b^2)/(4*a)))",
+            "x": {
+              "k": "bin",
+              "l": {
+                "e": {
+                  "k": "id",
+                  "name": "b",
+                },
+                "k": "un",
+                "op": "-",
+              },
+              "op": "/",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "num",
+                  "v": 2,
+                },
+                "op": "*",
+                "r": {
+                  "k": "id",
+                  "name": "a",
+                },
+              },
+            },
+            "y": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "c",
+              },
+              "op": "-",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "b",
+                  },
+                  "op": "^",
+                  "r": {
+                    "k": "num",
+                    "v": 2,
+                  },
+                },
+                "op": "/",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 4,
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "id",
+                    "name": "a",
+                  },
+                },
+              },
+            },
           },
           {
             "color": "success",
@@ -125,7 +284,10 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "r": 5,
             "type": "point",
             "x": 0,
-            "y": "c",
+            "y": {
+              "k": "id",
+              "name": "c",
+            },
           },
         ],
         "space": {
@@ -164,6 +326,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "type": "number",
           },
         },
+        "version": 2,
       },
       "title": "Standard Form: a, b, c",
       "type": "scene",
@@ -183,7 +346,26 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
         "objects": [
           {
             "color": "primary",
-            "expr": "(a*(x^2))",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "a",
+              },
+              "op": "*",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "id",
+                  "name": "x",
+                },
+                "op": "^",
+                "r": {
+                  "k": "num",
+                  "v": 2,
+                },
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -192,7 +374,15 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "color": "primary",
             "fontSize": 18,
             "id": "lbl",
-            "text": "a = \${a}",
+            "text": {
+              "parts": [
+                "a = ",
+                {
+                  "k": "id",
+                  "name": "a",
+                },
+              ],
+            },
             "type": "label",
             "x": -4.5,
             "y": 7,
@@ -252,6 +442,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "narrate": "a < 0 → it flips upside-down.",
           },
         ],
+        "version": 2,
       },
       "title": "The Role of a",
       "type": "scene",
@@ -286,7 +477,42 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
         "objects": [
           {
             "color": "primary",
-            "expr": "((a*((x-h)^2))+k)",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "bin",
+                "l": {
+                  "k": "id",
+                  "name": "a",
+                },
+                "op": "*",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "bin",
+                    "l": {
+                      "k": "id",
+                      "name": "x",
+                    },
+                    "op": "-",
+                    "r": {
+                      "k": "id",
+                      "name": "h",
+                    },
+                  },
+                  "op": "^",
+                  "r": {
+                    "k": "num",
+                    "v": 2,
+                  },
+                },
+              },
+              "op": "+",
+              "r": {
+                "k": "id",
+                "name": "k",
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -299,11 +525,31 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
               "bindY": "k",
             },
             "id": "v",
-            "label": "(\${h}, \${k})",
+            "label": {
+              "parts": [
+                "(",
+                {
+                  "k": "id",
+                  "name": "h",
+                },
+                ", ",
+                {
+                  "k": "id",
+                  "name": "k",
+                },
+                ")",
+              ],
+            },
             "r": 8,
             "type": "point",
-            "x": "h",
-            "y": "k",
+            "x": {
+              "k": "id",
+              "name": "h",
+            },
+            "y": {
+              "k": "id",
+              "name": "k",
+            },
           },
         ],
         "space": {
@@ -342,6 +588,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "type": "number",
           },
         },
+        "version": 2,
       },
       "title": "Vertex Form",
       "type": "scene",
@@ -361,7 +608,42 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
         "objects": [
           {
             "color": "primary",
-            "expr": "((a*(x-r1))*(x-r2))",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "bin",
+                "l": {
+                  "k": "id",
+                  "name": "a",
+                },
+                "op": "*",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "x",
+                  },
+                  "op": "-",
+                  "r": {
+                    "k": "id",
+                    "name": "r1",
+                  },
+                },
+              },
+              "op": "*",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "id",
+                  "name": "x",
+                },
+                "op": "-",
+                "r": {
+                  "k": "id",
+                  "name": "r2",
+                },
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -376,7 +658,10 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "label": "r₁",
             "r": 7,
             "type": "point",
-            "x": "r1",
+            "x": {
+              "k": "id",
+              "name": "r1",
+            },
             "y": 0,
           },
           {
@@ -389,7 +674,10 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "label": "r₂",
             "r": 7,
             "type": "point",
-            "x": "r2",
+            "x": {
+              "k": "id",
+              "name": "r2",
+            },
             "y": 0,
           },
         ],
@@ -429,6 +717,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "type": "number",
           },
         },
+        "version": 2,
       },
       "title": "Roots Are X-Intercepts",
       "type": "scene",
@@ -458,7 +747,50 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
         "objects": [
           {
             "color": "primary",
-            "expr": "(((a*(x^2))+(b*x))+c)",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "bin",
+                "l": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "a",
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "bin",
+                    "l": {
+                      "k": "id",
+                      "name": "x",
+                    },
+                    "op": "^",
+                    "r": {
+                      "k": "num",
+                      "v": 2,
+                    },
+                  },
+                },
+                "op": "+",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "b",
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "id",
+                    "name": "x",
+                  },
+                },
+              },
+              "op": "+",
+              "r": {
+                "k": "id",
+                "name": "c",
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -467,7 +799,47 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "color": "accent",
             "fontSize": 16,
             "id": "d",
-            "text": "D = b² - 4ac = \${b^2 - 4*a*c}",
+            "text": {
+              "parts": [
+                "D = b² - 4ac = ",
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "bin",
+                    "l": {
+                      "k": "id",
+                      "name": "b",
+                    },
+                    "op": "^",
+                    "r": {
+                      "k": "num",
+                      "v": 2,
+                    },
+                  },
+                  "op": "-",
+                  "r": {
+                    "k": "bin",
+                    "l": {
+                      "k": "bin",
+                      "l": {
+                        "k": "num",
+                        "v": 4,
+                      },
+                      "op": "*",
+                      "r": {
+                        "k": "id",
+                        "name": "a",
+                      },
+                    },
+                    "op": "*",
+                    "r": {
+                      "k": "id",
+                      "name": "c",
+                    },
+                  },
+                },
+              ],
+            },
             "type": "label",
             "x": -5.5,
             "y": 7,
@@ -509,6 +881,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "type": "number",
           },
         },
+        "version": 2,
       },
       "title": "The Discriminant",
       "type": "scene",
@@ -623,6 +996,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
           ],
         },
         "state": {},
+        "version": 2,
       },
       "title": "Factoring with Area",
       "type": "scene",
@@ -761,7 +1135,50 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
         "objects": [
           {
             "color": "primary",
-            "expr": "(((a*(x^2))+(b*x))+c)",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "bin",
+                "l": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "a",
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "bin",
+                    "l": {
+                      "k": "id",
+                      "name": "x",
+                    },
+                    "op": "^",
+                    "r": {
+                      "k": "num",
+                      "v": 2,
+                    },
+                  },
+                },
+                "op": "+",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "b",
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "id",
+                    "name": "x",
+                  },
+                },
+              },
+              "op": "+",
+              "r": {
+                "k": "id",
+                "name": "c",
+              },
+            },
             "id": "f",
             "strokeWidth": 3,
             "type": "curve",
@@ -772,8 +1189,66 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "label": "vertex",
             "r": 7,
             "type": "point",
-            "x": "((-b)/(2*a))",
-            "y": "(c-((b^2)/(4*a)))",
+            "x": {
+              "k": "bin",
+              "l": {
+                "e": {
+                  "k": "id",
+                  "name": "b",
+                },
+                "k": "un",
+                "op": "-",
+              },
+              "op": "/",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "num",
+                  "v": 2,
+                },
+                "op": "*",
+                "r": {
+                  "k": "id",
+                  "name": "a",
+                },
+              },
+            },
+            "y": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "c",
+              },
+              "op": "-",
+              "r": {
+                "k": "bin",
+                "l": {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "b",
+                  },
+                  "op": "^",
+                  "r": {
+                    "k": "num",
+                    "v": 2,
+                  },
+                },
+                "op": "/",
+                "r": {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 4,
+                  },
+                  "op": "*",
+                  "r": {
+                    "k": "id",
+                    "name": "a",
+                  },
+                },
+              },
+            },
           },
           {
             "color": "success",
@@ -781,7 +1256,10 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "r": 5,
             "type": "point",
             "x": 0,
-            "y": "c",
+            "y": {
+              "k": "id",
+              "name": "c",
+            },
           },
         ],
         "space": {
@@ -844,6 +1322,7 @@ exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson dat
             "narrate": "b = 4 → vertex swings left. The y-intercept never moved.",
           },
         ],
+        "version": 2,
       },
       "title": "Vertex on the Move",
       "type": "scene",
@@ -893,7 +1372,18 @@ exports[`scene compiler goldens > compiles basics.prism to stable IR 1`] = `
   "objects": [
     {
       "color": "primary",
-      "expr": "(x^2)",
+      "expr": {
+        "k": "bin",
+        "l": {
+          "k": "id",
+          "name": "x",
+        },
+        "op": "^",
+        "r": {
+          "k": "num",
+          "v": 2,
+        },
+      },
       "id": "f",
       "strokeWidth": 3,
       "type": "curve",
@@ -905,11 +1395,47 @@ exports[`scene compiler goldens > compiles basics.prism to stable IR 1`] = `
         "bind": "t",
       },
       "id": "p",
-      "label": "(\${t}, \${t^2})",
+      "label": {
+        "parts": [
+          "(",
+          {
+            "k": "id",
+            "name": "t",
+          },
+          ", ",
+          {
+            "k": "bin",
+            "l": {
+              "k": "id",
+              "name": "t",
+            },
+            "op": "^",
+            "r": {
+              "k": "num",
+              "v": 2,
+            },
+          },
+          ")",
+        ],
+      },
       "r": 6,
       "type": "point",
-      "x": "t",
-      "y": "(t^2)",
+      "x": {
+        "k": "id",
+        "name": "t",
+      },
+      "y": {
+        "k": "bin",
+        "l": {
+          "k": "id",
+          "name": "t",
+        },
+        "op": "^",
+        "r": {
+          "k": "num",
+          "v": 2,
+        },
+      },
     },
     {
       "color": "danger",
@@ -920,8 +1446,14 @@ exports[`scene compiler goldens > compiles basics.prism to stable IR 1`] = `
       },
       "id": "v",
       "type": "point",
-      "x": "t",
-      "y": "k",
+      "x": {
+        "k": "id",
+        "name": "t",
+      },
+      "y": {
+        "k": "id",
+        "name": "k",
+      },
     },
     {
       "color": "neutral",
@@ -935,14 +1467,44 @@ exports[`scene compiler goldens > compiles basics.prism to stable IR 1`] = `
     },
     {
       "id": "tangent",
-      "slope": "(2*t)",
+      "slope": {
+        "k": "bin",
+        "l": {
+          "k": "num",
+          "v": 2,
+        },
+        "op": "*",
+        "r": {
+          "k": "id",
+          "name": "t",
+        },
+      },
       "through": "p",
       "type": "line",
-      "visibleIf": "showTangent",
+      "visibleIf": {
+        "k": "id",
+        "name": "showTangent",
+      },
     },
     {
       "id": "__lbl_0",
-      "text": "slope = \${2*t}",
+      "text": {
+        "parts": [
+          "slope = ",
+          {
+            "k": "bin",
+            "l": {
+              "k": "num",
+              "v": 2,
+            },
+            "op": "*",
+            "r": {
+              "k": "id",
+              "name": "t",
+            },
+          },
+        ],
+      },
       "type": "label",
       "x": 0,
       "y": 4.5,
@@ -988,6 +1550,7 @@ exports[`scene compiler goldens > compiles basics.prism to stable IR 1`] = `
       "type": "number",
     },
   },
+  "version": 2,
 }
 `;
 
@@ -1106,6 +1669,7 @@ exports[`scene compiler goldens > compiles logic.prism to stable IR 1`] = `
     ],
   },
   "state": {},
+  "version": 2,
 }
 `;
 
@@ -1169,12 +1733,65 @@ exports[`scene compiler goldens > compiles shapes.prism to stable IR 1`] = `
       "id": "v",
       "type": "vector",
       "x1": 0,
-      "x2": "cos(((t*PI)/180))",
+      "x2": {
+        "args": [
+          {
+            "k": "bin",
+            "l": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "t",
+              },
+              "op": "*",
+              "r": {
+                "k": "num",
+                "v": 3.141592653589793,
+              },
+            },
+            "op": "/",
+            "r": {
+              "k": "num",
+              "v": 180,
+            },
+          },
+        ],
+        "fn": "cos",
+        "k": "call",
+      },
       "y1": 0,
-      "y2": "sin(((t*PI)/180))",
+      "y2": {
+        "args": [
+          {
+            "k": "bin",
+            "l": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "t",
+              },
+              "op": "*",
+              "r": {
+                "k": "num",
+                "v": 3.141592653589793,
+              },
+            },
+            "op": "/",
+            "r": {
+              "k": "num",
+              "v": 180,
+            },
+          },
+        ],
+        "fn": "sin",
+        "k": "call",
+      },
     },
     {
-      "end": "t",
+      "end": {
+        "k": "id",
+        "name": "t",
+      },
       "id": "angle",
       "r": 0.5,
       "start": 0,
@@ -1213,6 +1830,7 @@ exports[`scene compiler goldens > compiles shapes.prism to stable IR 1`] = `
       "type": "number",
     },
   },
+  "version": 2,
 }
 `;
 
@@ -1228,7 +1846,26 @@ exports[`scene compiler goldens > compiles timeline.prism to stable IR 1`] = `
   "objects": [
     {
       "color": "primary",
-      "expr": "(a*(x^2))",
+      "expr": {
+        "k": "bin",
+        "l": {
+          "k": "id",
+          "name": "a",
+        },
+        "op": "*",
+        "r": {
+          "k": "bin",
+          "l": {
+            "k": "id",
+            "name": "x",
+          },
+          "op": "^",
+          "r": {
+            "k": "num",
+            "v": 2,
+          },
+        },
+      },
       "id": "f",
       "strokeWidth": 3,
       "type": "curve",
@@ -1280,5 +1917,6 @@ exports[`scene compiler goldens > compiles timeline.prism to stable IR 1`] = `
       "narrate": "negative a flips it",
     },
   ],
+  "version": 2,
 }
 `;
