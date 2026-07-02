@@ -282,6 +282,7 @@ export function emit(stmts: Stmt[]): SceneIR {
         };
         const render = propStr(s.props, 'render', cScope);
         if (render) ir.space.render = render;
+        run(s.children, cScope);
         break;
       }
 

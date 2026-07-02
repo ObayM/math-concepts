@@ -49,3 +49,16 @@ export async function upsertLessonProgress(
   });
   return lesson.id;
 }
+
+export async function resetLessonProgress(userId, lessonKey) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { lessonKey },
+    select: { id: true },
+  });
+  if (!lesson) return null;
+
+  await prisma.userLessonProgress.deleteMany({
+    where: { userId, lessonId: lesson.id },
+  });
+  return lesson.id;
+}

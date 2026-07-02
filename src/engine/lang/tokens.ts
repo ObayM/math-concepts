@@ -27,8 +27,6 @@ export type TT =
   | 'COLON'
   | 'DOT'
   | 'NL'
-  | 'INDENT'
-  | 'DEDENT'
   | 'EOF';
 
 export interface Token {

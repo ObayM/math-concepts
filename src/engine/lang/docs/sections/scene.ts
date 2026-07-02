@@ -4,31 +4,31 @@ export const sceneSection: DocSection = {
   id: 'scene',
   title: 'Scene & State',
   description:
-    'Every Prism file starts with a scene declaration that sets the coordinate space, then zero or more state variables.',
+    'A Prism file is exactly one `scene <type> { ... }` block. Everything else — space config, state, objects, controls, timeline — lives inside it.',
   entries: [
     {
       keyword: 'scene',
-      syntax: 'scene, <type>, x:[min,max], y:[min,max], [grid], [axes]',
+      syntax: 'scene <type> {\n  x: [min,max]\n  y: [min,max]\n  [grid]\n  [axes]\n  ...\n}',
       description:
-        'Declares the coordinate space. Must come first. `type` is one of: `plane`, `numberline`, `geometry`, `free`. All props are comma-separated.',
+        '`type` is one of: `plane`, `numberline`, `geometry`, `free`. The space config lines (`x`, `y`, `grid`, `axes`) can appear anywhere in the block, in any order, alongside state/object/control declarations.',
       props: [
         { name: 'x', type: '[number, number]', description: 'x-axis domain', required: true },
         { name: 'y', type: '[number, number]', description: 'y-axis domain', required: true },
         { name: 'grid', type: 'flag', description: 'draw a background grid' },
         { name: 'axes', type: 'flag', description: 'draw x/y axes' },
       ],
-      example: 'scene, plane, x:[-5,5], y:[-5,5], grid, axes',
+      example: 'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n}',
     },
     {
       keyword: 'param',
-      syntax: 'param <name> = <number>, [range:[min,max]], [step:<number>]',
+      syntax: 'param <name> = <number> { [range: [min,max]], [step: <number>] }',
       description:
-        'Declares a numeric state variable. Controls (sliders, steppers) and draggable objects write to it; object expressions read from it.',
+        'Declares a numeric state variable. Controls (sliders, steppers) and draggable objects write to it; object expressions read from it. The `{ ... }` block is optional — omit it if there is nothing to configure.',
       props: [
         { name: 'range', type: '[number, number]', description: 'min/max bounds for controls' },
         { name: 'step', type: 'number', description: 'discrete step size' },
       ],
-      example: 'param t = 0, range:[-3,3]',
+      example: 'param t = 0 { range: [-3, 3] }',
     },
     {
       keyword: 'bool',

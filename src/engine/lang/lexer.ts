@@ -1,10 +1,12 @@
 import type { Token, TT } from './tokens';
 import { CompileError } from './errors';
 
+// block structure is fully brace-delimited (no indentation sensitivity), so the
+// lexer only tracks () / [] to let expressions and arg lists wrap across lines —
+// {} never suppresses NL, since NL is what separates statements/props inside a block
 export function lex(source: string): Token[] {
   const out: Token[] = [];
   const lines = source.split('\n');
-  const indentStack = [0];
   let bracketDepth = 0;
 
   for (let li = 0; li < lines.length; li++) {
@@ -17,28 +19,10 @@ export function lex(source: string): Token[] {
     const content = stripComment(raw);
     if (content.trim() === '') continue;
 
-    if (bracketDepth === 0) {
-      const indent = countIndent(raw, ln);
-      const top = indentStack[indentStack.length - 1];
-      if (indent > top) {
-        indentStack.push(indent);
-        out.push(tok('INDENT', '', ln, 1));
-      } else {
-        while (indent < indentStack[indentStack.length - 1]) {
-          indentStack.pop();
-          out.push(tok('DEDENT', '', ln, 1));
-        }
-        if (indent !== indentStack[indentStack.length - 1]) {
-          throw new CompileError('inconsistent indentation', ln);
-        }
-      }
-    }
-
     const lineTokens = lexLine(content.trimStart(), ln, contentStart + 1);
     for (const t of lineTokens) {
-      if (t.type === 'LP' || t.type === 'LB' || t.type === 'LC') bracketDepth++;
-      if (t.type === 'RP' || t.type === 'RB' || t.type === 'RC')
-        bracketDepth = Math.max(0, bracketDepth - 1);
+      if (t.type === 'LP' || t.type === 'LB') bracketDepth++;
+      if (t.type === 'RP' || t.type === 'RB') bracketDepth = Math.max(0, bracketDepth - 1);
       out.push(t);
     }
 
@@ -47,10 +31,6 @@ export function lex(source: string): Token[] {
     }
   }
 
-  while (indentStack.length > 1) {
-    indentStack.pop();
-    out.push(tok('DEDENT', '', lines.length + 1, 1));
-  }
   out.push(tok('EOF', '', lines.length + 1, 1));
   return out;
 }
@@ -80,16 +60,6 @@ function stripComment(line: string): string {
   return line;
 }
 
-function countIndent(line: string, ln: number): number {
-  let n = 0;
-  for (const c of line) {
-    if (c === ' ') n++;
-    else if (c === '\t') throw new CompileError('tabs not allowed, use spaces', ln);
-    else break;
-  }
-  return n;
-}
-
 function lexLine(line: string, ln: number, startCol: number): Token[] {
   const out: Token[] = [];
   let i = 0;
@@ -100,7 +70,7 @@ function lexLine(line: string, ln: number, startCol: number): Token[] {
   };
 
   while (i < line.length) {
-    if (line[i] === ' ') {
+    if (line[i] === ' ' || line[i] === '\t') {
       i++;
       continue;
     }

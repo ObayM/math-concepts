@@ -155,6 +155,18 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
   const handleContinue = () => router.push(`/courses/${coursePath}`);
   const handleBackToCourse = () => router.push(`/courses/${coursePath}`);
 
+  const handleReset = () => {
+    if (!confirm('Restart this lesson from the beginning? Your progress will be cleared.')) return;
+    fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
+    setCurrentIndex(0);
+    setQuizHistory([]);
+    setIsComplete(false);
+    setChecked(false);
+    setAnswer(null);
+    setInteractiveValue(50);
+    setSlideDir('right');
+  };
+
   if (!slides.length) {
     return (
       <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center">
@@ -176,6 +188,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
           <LessonCompletion
             onContinue={handleContinue}
             onBack={handleBackToCourse}
+            onRetake={handleReset}
             streak={streak}
             quizHistory={quizHistory}
           />
@@ -190,11 +203,20 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
 
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface text-neutral-900 p-4 md:p-6 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
-      {streak !== null && (
-        <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 z-10">
-          🔥 {streak} Day Streak
-        </div>
-      )}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        {streak !== null && (
+          <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2">
+            🔥 {streak} Day Streak
+          </div>
+        )}
+        <button
+          onClick={handleReset}
+          className="bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors"
+          title="Restart lesson"
+        >
+          <RotateCcw className="w-4 h-4" />
+        </button>
+      </div>
 
       <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-2xl overflow-hidden border border-neutral-200 flex flex-col relative">
         <div className="pt-8 px-10 pb-2 flex items-center justify-between">

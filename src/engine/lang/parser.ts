@@ -2,6 +2,8 @@ import type { Token, TT } from './tokens';
 import type { Expr, PropMap, Stmt, IfCase } from './ast';
 import { CompileError } from './errors';
 
+const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes', 'render']);
+
 export function parse(tokens: Token[]): Stmt[] {
   let pos = 0;
 
@@ -24,6 +26,14 @@ export function parse(tokens: Token[]): Stmt[] {
   const skipNL = () => {
     while (check('NL')) pos++;
   };
+
+  function endStmt() {
+    if (!check('NL') && !check('RC') && !check('EOF')) {
+      const t = peek();
+      throw new CompileError(`expected end of statement, got ${t.type} "${t.raw}"`, t.line, t.col);
+    }
+    skipNL();
+  }
 
   function parseExpr(): Expr {
     return parseArrow();
@@ -202,12 +212,14 @@ export function parse(tokens: Token[]): Stmt[] {
 
     if (t.type === 'LC') {
       pos++;
+      skipNL();
       const entries: [string, Expr][] = [];
       while (!check('RC') && !check('EOF')) {
         const key = eatIdent();
         eat('COLON');
         entries.push([key, parseExpr()]);
-        if (!check('RC')) eat('COMMA');
+        if (check('COMMA')) pos++;
+        skipNL();
       }
       eat('RC');
       return { k: 'dict', entries };
@@ -216,49 +228,45 @@ export function parse(tokens: Token[]): Stmt[] {
     throw new CompileError(`unexpected token "${t.raw}" (${t.type})`, t.line, t.col);
   }
 
-  function parseProps(): PropMap {
+  // trailing `{ key: value, ... }` modifier block. optional — omit entirely if
+  // there's nothing to configure. lines can be newline- or comma-separated (or both).
+  function parsePropsBlock(): PropMap {
     const props: PropMap = new Map();
-    while (check('COMMA')) {
-      pos++;
-      if (!check('IDENT')) break; // trailing comma guard
-      const key = t().raw;
-      pos++;
+    if (!check('LC')) return props;
+    pos++;
+    skipNL();
+    while (!check('RC') && !check('EOF')) {
+      const key = eatIdent();
       if (check('COLON')) {
         pos++;
         props.set(key, parseExpr());
       } else {
         props.set(key, true);
       }
+      if (check('COMMA')) pos++;
+      skipNL();
     }
+    eat('RC');
     return props;
   }
 
-  const t = () => tokens[pos];
-
-  function expectNL() {
-    if (!check('NL') && !check('EOF') && !check('DEDENT')) {
-      throw new CompileError(`expected newline, got ${t().type} "${t().raw}"`, t().line, t().col);
-    }
-    while (check('NL')) pos++;
-  }
-
-  function parseBlock(): Stmt[] {
-    eat('INDENT');
+  function parseBraceBlock(): Stmt[] {
+    eat('LC');
     skipNL();
     const stmts: Stmt[] = [];
-    while (!check('DEDENT') && !check('EOF')) {
+    while (!check('RC') && !check('EOF')) {
       const s = parseStmt();
       if (s) stmts.push(s);
       skipNL();
     }
-    if (check('DEDENT')) pos++;
+    eat('RC');
     return stmts;
   }
 
   function parseStmt(): Stmt | null {
     skipNL();
     const tok = tokens[pos];
-    if (tok.type === 'EOF' || tok.type === 'DEDENT') return null;
+    if (tok.type === 'EOF' || tok.type === 'RC') return null;
 
     const ln = tok.line;
 
@@ -267,8 +275,6 @@ export function parse(tokens: Token[]): Stmt[] {
     }
 
     switch (tok.raw) {
-      case 'scene':
-        return parseScene(ln);
       case 'param':
         return parseParam(ln);
       case 'bool':
@@ -316,11 +322,29 @@ export function parse(tokens: Token[]): Stmt[] {
 
   function parseScene(ln: number): Stmt {
     eat('IDENT', 'scene');
-    eat('COMMA');
     const spaceType = eatIdent();
-    const props = parseProps();
-    expectNL();
-    return { k: 'scene', spaceType, props, ln };
+    eat('LC');
+    skipNL();
+    const props: PropMap = new Map();
+    const children: Stmt[] = [];
+    while (!check('RC') && !check('EOF')) {
+      if (check('IDENT') && SPACE_PROPS.has(peek().raw)) {
+        const key = eatIdent();
+        if (check('COLON')) {
+          pos++;
+          props.set(key, parseExpr());
+        } else {
+          props.set(key, true);
+        }
+        endStmt();
+      } else {
+        const s = parseStmt();
+        if (s) children.push(s);
+        skipNL();
+      }
+    }
+    eat('RC');
+    return { k: 'scene', spaceType, props, children, ln };
   }
 
   function parseParam(ln: number): Stmt {
@@ -328,8 +352,8 @@ export function parse(tokens: Token[]): Stmt[] {
     const name = eatIdent();
     eat('ASSIGN');
     const init = parseExpr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'param', name, init, props, ln };
   }
 
@@ -338,7 +362,7 @@ export function parse(tokens: Token[]): Stmt[] {
     const name = eatIdent();
     eat('ASSIGN');
     const init = parseExpr();
-    expectNL();
+    endStmt();
     return { k: 'bool_d', name, init, ln };
   }
 
@@ -347,7 +371,7 @@ export function parse(tokens: Token[]): Stmt[] {
     const name = eatIdent();
     eat('ASSIGN');
     const value = parseExpr();
-    expectNL();
+    endStmt();
     return { k: 'let', name, value, ln };
   }
 
@@ -361,9 +385,7 @@ export function parse(tokens: Token[]): Stmt[] {
       if (!check('RP')) eat('COMMA');
     }
     eat('RP');
-    eat('COLON');
-    expectNL();
-    const body = parseBlock();
+    const body = parseBraceBlock();
     return { k: 'def', name, params, body, ln };
   }
 
@@ -382,9 +404,7 @@ export function parse(tokens: Token[]): Stmt[] {
       step = parseExpr();
     }
     eat('RP');
-    eat('COLON');
-    expectNL();
-    const body = parseBlock();
+    const body = parseBraceBlock();
     return { k: 'for_s', var: varName, start, end, step, body, ln };
   }
 
@@ -394,23 +414,17 @@ export function parse(tokens: Token[]): Stmt[] {
 
     eat('IDENT', 'if');
     const cond = parseOr();
-    eat('COLON');
-    expectNL();
-    cases.push({ cond, body: parseBlock() });
+    cases.push({ cond, body: parseBraceBlock() });
 
     while (true) {
       skipNL();
       if (at('elif')) {
         pos++;
         const c = parseOr();
-        eat('COLON');
-        expectNL();
-        cases.push({ cond: c, body: parseBlock() });
+        cases.push({ cond: c, body: parseBraceBlock() });
       } else if (at('else')) {
         pos++;
-        eat('COLON');
-        expectNL();
-        elseBody = parseBlock();
+        elseBody = parseBraceBlock();
         break;
       } else break;
     }
@@ -439,8 +453,8 @@ export function parse(tokens: Token[]): Stmt[] {
     const id = parseId();
     eat('ASSIGN');
     const expr = parseExpr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'curve', id, expr, props, ln };
   }
 
@@ -452,8 +466,8 @@ export function parse(tokens: Token[]): Stmt[] {
       eat('ASSIGN');
       pos_ = parseExpr();
     }
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'point', id, pos: pos_, props, ln };
   }
 
@@ -467,8 +481,8 @@ export function parse(tokens: Token[]): Stmt[] {
       if (e.k !== 'arrow') throw new CompileError('line segment must be (x1,y1) -> (x2,y2)', ln);
       seg = [e.from, e.to];
     }
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'line', id, seg, props, ln };
   }
 
@@ -482,10 +496,10 @@ export function parse(tokens: Token[]): Stmt[] {
     }
     eat('IDENT', 'at');
     const at = parseExpr();
-    eat('COMMA');
+    eat('ASSIGN');
     const text = parseExpr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'label', id, at, text, props, ln };
   }
 
@@ -494,8 +508,8 @@ export function parse(tokens: Token[]): Stmt[] {
     const id = parseId();
     eat('ASSIGN');
     const pos_ = parseExpr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'rect', id, pos: pos_, props, ln };
   }
 
@@ -504,8 +518,8 @@ export function parse(tokens: Token[]): Stmt[] {
     const id = parseId();
     eat('ASSIGN');
     const center = parseExpr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'circle', id, center, props, ln };
   }
 
@@ -515,8 +529,8 @@ export function parse(tokens: Token[]): Stmt[] {
     eat('ASSIGN');
     const listExpr = parseExpr();
     if (listExpr.k !== 'list') throw new CompileError('polygon needs [...] point list', ln);
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'polygon', id, pts: listExpr.items, props, ln };
   }
 
@@ -526,8 +540,8 @@ export function parse(tokens: Token[]): Stmt[] {
     eat('ASSIGN');
     const e = parseExpr();
     if (e.k !== 'arrow') throw new CompileError('vector must be (x1,y1) -> (x2,y2)', ln);
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'vector', id, from: e.from, to: e.to, props, ln };
   }
 
@@ -536,40 +550,40 @@ export function parse(tokens: Token[]): Stmt[] {
     const id = parseId();
     eat('ASSIGN');
     const center = parseExpr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'arc', id, center, props, ln };
   }
 
   function parseSlider(ln: number): Stmt {
     eat('IDENT', 'slider');
     const bind = eatIdent();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'slider', bind, props, ln };
   }
 
   function parseToggle(ln: number): Stmt {
     eat('IDENT', 'toggle');
     const bind = eatIdent();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'toggle', bind, props, ln };
   }
 
   function parseStepper(ln: number): Stmt {
     eat('IDENT', 'stepper');
     const bind = eatIdent();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'stepper', bind, props, ln };
   }
 
   function parseButton(ln: number): Stmt {
     eat('IDENT', 'button');
     const label = eatStr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'button', label, props, ln };
   }
 
@@ -577,8 +591,8 @@ export function parse(tokens: Token[]): Stmt[] {
     eat('IDENT', 'step');
     let narrate: string | null = null;
     if (check('STR') || check('FSTR')) narrate = eatStr();
-    const props = parseProps();
-    expectNL();
+    const props = parsePropsBlock();
+    endStmt();
     return { k: 'step', narrate, props, ln };
   }
 
@@ -591,7 +605,7 @@ export function parse(tokens: Token[]): Stmt[] {
       if (!check('RP')) eat('COMMA');
     }
     eat('RP');
-    expectNL();
+    endStmt();
     return { k: 'call_s', fn, args, ln };
   }
 
@@ -605,11 +619,19 @@ export function parse(tokens: Token[]): Stmt[] {
   }
 
   skipNL();
-  const stmts: Stmt[] = [];
-  while (!check('EOF')) {
-    const s = parseStmt();
-    if (s) stmts.push(s);
-    skipNL();
+  if (!at('scene')) {
+    const t = peek();
+    throw new CompileError(
+      'a Prism file must start with a "scene <type> { ... }" block',
+      t.line,
+      t.col
+    );
   }
-  return stmts;
+  const scene = parseScene(peek().line);
+  skipNL();
+  if (!check('EOF')) {
+    const t = peek();
+    throw new CompileError('unexpected content after the scene block', t.line, t.col);
+  }
+  return [scene];
 }

@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { CheckCircle2, ArrowRight, Home, Star } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Home, RotateCcw, Star } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function LessonCompletion({
   onContinue,
   onBack,
+  onRetake,
   nextLessonId,
   streak,
   quizHistory = [],
@@ -60,6 +61,12 @@ export default function LessonCompletion({
         <Button variant="ghost" size="lg" fullWidth onClick={onBack}>
           <Home className="w-5 h-5" /> Back to Course
         </Button>
+
+        {onRetake && (
+          <Button variant="ghost" size="sm" fullWidth onClick={onRetake}>
+            <RotateCcw className="w-4 h-4" /> Retake Lesson
+          </Button>
+        )}
       </div>
     </div>
   );

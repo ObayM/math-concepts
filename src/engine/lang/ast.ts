@@ -16,7 +16,7 @@ export type PropMap = Map<string, Expr | true>;
 export type IfCase = { cond: Expr; body: Stmt[] };
 
 export type Stmt =
-  | { k: 'scene'; spaceType: string; props: PropMap; ln: number }
+  | { k: 'scene'; spaceType: string; props: PropMap; children: Stmt[]; ln: number }
   | { k: 'param'; name: string; init: Expr; props: PropMap; ln: number }
   | { k: 'bool_d'; name: string; init: Expr; ln: number }
   | { k: 'let'; name: string; value: Expr; ln: number }

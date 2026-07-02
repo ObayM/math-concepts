@@ -11,7 +11,11 @@ export const PRISM_DOCS = {
   tagline: 'A language for interactive math scenes.',
   intro: `Prism compiles to the Scene IR that powers Mathly's interactive lesson engine.
 Write a Prism scene and the runtime renders it as a live, manipulable visualization.
-The compiler runs at seed-time or on the server — never in the browser.`,
+The compiler runs at seed-time or on the server — never in the browser.
+
+A Prism file is exactly one "scene <type> { ... }" block — everything else nests inside it.
+Object/control properties go in a trailing "{ key: value }" block; the opening "{" must be
+on the same line as the statement it belongs to.`,
   sections: [
     sceneSection,
     objectsSection,
@@ -23,23 +27,28 @@ The compiler runs at seed-time or on the server — never in the browser.`,
 };
 
 const COMPLETE_EXAMPLE = `# derivative as slope of tangent
-scene, plane, x:[-5,5], y:[-5,5], grid, axes
+scene plane {
+  x: [-5, 5]
+  y: [-5, 5]
+  grid
+  axes
 
-param t = 0, range:[-3,3]
-bool show = false
+  param t = 0 { range: [-3, 3] }
+  bool show = false
 
-curve f = x^2, color:"primary"
-point p = (t, t^2), drag:x->t, color:"accent"
-line tan, through:p, slope:2*t, style:dashed, show:show
+  curve f = x^2 { color: primary }
+  point p = (t, t^2) { drag: x -> t, color: accent }
+  line tan { through: p, slope: 2*t, style: dashed, show: show }
 
-label at (t, t^2+0.6), "slope = \${2*t}", show:show
+  label at (t, t^2+0.6) = "slope = \${2*t}" { show: show }
 
-slider t, label:"move the point"
-toggle show, label:"show tangent line"
+  slider t { label: "move the point" }
+  toggle show { label: "show tangent line" }
 
-step "here's f(x) = x²"
-step "the tangent at x has slope 2x", set:{show:true}
-step "drag the point and watch the slope update", animate:{t:3}, dur:2000, ease:easeInOut`;
+  step "here's f(x) = x²"
+  step "the tangent at x has slope 2x" { set: { show: true } }
+  step "drag the point and watch the slope update" { animate: { t: 3 }, dur: 2000, ease: easeInOut }
+}`;
 
 export function toAIContext(): string {
   const lines: string[] = [
