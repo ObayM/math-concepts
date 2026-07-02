@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { compile, CompileError } from '@/engine/lang';
+import { compile, CompileError, formatCompileError } from '@/engine/lang';
 
 const G = '\x1b[32m';
 const R = '\x1b[31m';
@@ -45,7 +45,14 @@ function checkFile(filePath: string): boolean {
       console.log(`${G}✓${X} ${name}`);
       return true;
     } catch (e) {
-      console.log(`${R}✗${X} ${name}: ${e instanceof CompileError ? e.message : e}`);
+      console.log(`${R}✗${X} ${name}`);
+      const frame = e instanceof CompileError ? formatCompileError(text, e) : String(e);
+      console.log(
+        frame
+          .split('\n')
+          .map((l) => `  ${R}${l}${X}`)
+          .join('\n')
+      );
       return false;
     }
   }
@@ -63,9 +70,14 @@ function checkFile(filePath: string): boolean {
       compile(src);
       console.log(`  ${G}✓${X} ${DIM}[${i + 1}]${X} ${title}`);
     } catch (e) {
-      const msg = e instanceof CompileError ? e.message : String(e);
       console.log(`  ${R}✗${X} ${DIM}[${i + 1}]${X} ${title}`);
-      console.log(`       ${R}${msg}${X}`);
+      const frame = e instanceof CompileError ? formatCompileError(src, e) : String(e);
+      console.log(
+        frame
+          .split('\n')
+          .map((l) => `       ${R}${l}${X}`)
+          .join('\n')
+      );
       ok = false;
     }
   }

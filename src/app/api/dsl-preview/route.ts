@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { compile, CompileError } from '@/engine/lang';
+import { compile, CompileError, formatCompileError } from '@/engine/lang';
 
 const LESSONS_DIR = path.resolve(process.cwd(), 'prisma/lessons');
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       const ir = compile(text);
       return NextResponse.json({ file, sceneCount: 1, scene: 1, title: file, ir, mtime });
     } catch (e) {
-      const error = e instanceof CompileError ? e.message : String(e);
+      const error = e instanceof CompileError ? formatCompileError(text, e) : String(e);
       return NextResponse.json({ file, sceneCount: 1, scene: 1, title: file, error, mtime });
     }
   }
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     const ir = compile(src);
     return NextResponse.json({ file, sceneCount: scenes.length, scene: idx + 1, title, ir, mtime });
   } catch (e) {
-    const error = e instanceof CompileError ? e.message : String(e);
+    const error = e instanceof CompileError ? formatCompileError(src, e) : String(e);
     return NextResponse.json({
       file,
       sceneCount: scenes.length,

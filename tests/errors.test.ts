@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '@/engine/lang';
-import { CompileError } from '@/engine/lang/errors';
+import { CompileError, formatCompileError } from '@/engine/lang/errors';
 import { compileLesson } from '@/lib/lessons/dsl';
 
 // error table: every case should throw a CompileError with a useful message.
@@ -72,4 +72,26 @@ describe('lesson compile errors', () => {
       expect((err as CompileError).message).toMatchSnapshot();
     });
   }
+});
+
+describe('formatCompileError caret frame', () => {
+  it('points at the offending column with a caret', () => {
+    const src = 'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  curve f = x^^2\n}';
+    let err!: CompileError;
+    try {
+      compile(src);
+    } catch (e) {
+      err = e as CompileError;
+    }
+    const frame = formatCompileError(src, err);
+    expect(frame).toContain('curve f = x^^2');
+    expect(frame).toContain('^');
+    expect(frame.split('\n').length).toBeGreaterThanOrEqual(3);
+    expect(frame).toMatchSnapshot();
+  });
+
+  it('falls back to the plain message when there is no line info', () => {
+    const err = new CompileError('something went wrong');
+    expect(formatCompileError('whatever', err)).toBe('something went wrong');
+  });
 });

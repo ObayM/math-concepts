@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/session';
 import { consume } from '@/lib/rate-limit';
 import { SCENE_GEN_MODEL } from '@/lib/ai';
-import { compile } from '@/engine';
+import { compile, CompileError, formatCompileError } from '@/engine';
 import { toAIContext } from '@/engine/lang/docs';
 
 const INSTRUCTIONS = toAIContext();
@@ -31,7 +31,13 @@ Return ONLY the Prism source. No markdown, no explanation.`,
     const scene = compile(prism);
     return NextResponse.json({ scene, prism });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: 'Compile failed', detail: message }, { status: 422 });
+    // a caret frame in the detail lets the model see exactly what broke and retry
+    const detail =
+      err instanceof CompileError
+        ? formatCompileError(prism, err)
+        : err instanceof Error
+          ? err.message
+          : String(err);
+    return NextResponse.json({ error: 'Compile failed', detail, prism }, { status: 422 });
   }
 }
