@@ -15,7 +15,8 @@
     "build:lessons": "node scripts/build-lessons.mjs",
     "db:seed": "npm run build:lessons && node prisma/seed.js",
     "prepare": "husky",
-    "dsl": "tsx scripts/dsl.ts"
+    "dsl": "tsx scripts/dsl.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.3",
@@ -46,6 +47,7 @@
     "prettier": "^3.8.5",
     "prisma": "^6.0.0",
     "tailwindcss": "^4.3.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }

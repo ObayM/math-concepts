@@ -1,0 +1,14 @@
+scene plane {
+  x: [-3, 3]
+  y: [-3, 3]
+
+  param t = 45 { range: [0, 360], step: 5 }
+  circle unit = (0, 0) { r: 1, color: primary }
+  polygon tri = [(0, 0), (2, 0), (1, sqrt(3))] { color: accent, opacity: 0.3 }
+  vector v = (0, 0) -> (cos(t * PI / 180), sin(t * PI / 180)) { color: accent }
+  arc angle = (0, 0) { r: 0.5, from: 0, to: t }
+  rect bar = (1, -2) { w: 0.5, h: 1.5, color: primary, opacity: 0.4 }
+  stepper t { label: "angle", step: 5 }
+  button "reset" { set: { t: 0 } }
+  button "spin" { animate: { t: 360 }, dur: 2000, ease: easeInOut }
+}

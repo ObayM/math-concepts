@@ -1,0 +1,19 @@
+scene plane {
+  x: [-5, 5]
+  y: [-5, 5]
+  grid
+  axes
+
+  param t = 1 { range: [-3, 3], step: 0.1 }
+  param k = 0 { range: [-5, 5] }
+  bool showTangent = true
+  curve f = x^2 { color: primary, width: 3 }
+  point p = (t, t^2) { color: accent, r: 6, drag: x -> t, label: "(${t}, ${t^2})" }
+  point v = (t, k) { drag: xy -> (t, k), color: danger }
+  line seg = (-2, 0) -> (2, 4) { color: neutral, style: dashed }
+  line tangent { through: p, slope: 2*t, show: showTangent }
+  label at (0, 4.5) = "slope = ${2*t}"
+  label eq at (-4, 4) = "x^2" { tex }
+  slider t { label: "move the point", min: -3, max: 3 }
+  toggle showTangent { label: "tangent" }
+}

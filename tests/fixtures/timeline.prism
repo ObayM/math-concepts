@@ -1,0 +1,14 @@
+scene plane {
+  x: [-4, 4]
+  y: [-1, 9]
+  grid
+  axes
+
+  param a = 1 { range: [-3, 3], step: 0.1 }
+  curve f = a * x^2 { color: primary, width: 3 }
+  slider a { label: "a" }
+
+  step "start with a = 1, the basic parabola" { set: { a: 1 } }
+  step "a = 3 makes it tall and narrow" { animate: { a: 3 }, dur: 1000, ease: easeInOut }
+  step "negative a flips it" { animate: { a: -1 }, dur: 1200, ease: easeInOut }
+}

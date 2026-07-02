@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`lesson compile errors > build without bank 1`] = `"build "b" needs a bank:"`;
+
+exports[`lesson compile errors > quiz without correct option 1`] = `"quiz "q" needs a * correct option"`;
+
+exports[`lesson compile errors > unknown block type 1`] = `"unknown block type "@wat""`;
+
+exports[`scene compile errors > bad expression 1`] = `"line 4:14: unexpected token "^" (CARET)"`;
+
+exports[`scene compile errors > bad identifier 1`] = `"line 4:9: expected IDENT, got NUM"`;
+
+exports[`scene compile errors > call to undefined macro 1`] = `"line 4: undefined macro "tick""`;
+
+exports[`scene compile errors > empty source 1`] = `"line 2:1: a Prism file must start with a "scene <type> { ... }" block"`;
+
+exports[`scene compile errors > missing y domain on plane 1`] = `"line 1: scene needs y: [min, max]"`;
+
+exports[`scene compile errors > no scene root 1`] = `"line 1:1: a Prism file must start with a "scene <type> { ... }" block"`;
+
+exports[`scene compile errors > point missing y coord 1`] = `"line 4: expected a (x, y) pair"`;
+
+exports[`scene compile errors > range with no args 1`] = `"line 4:17: unexpected token ")" (RP)"`;
+
+exports[`scene compile errors > unclosed brace 1`] = `"line 5:1: expected RC, got EOF"`;
+
+exports[`scene compile errors > unknown space type 1`] = `"invalid scene IR: space.type - Invalid option: expected one of "plane"|"numberline"|"geometry"|"free""`;
+
+exports[`scene compile errors > unknown statement keyword 1`] = `"line 4:10: expected LP, got "p""`;

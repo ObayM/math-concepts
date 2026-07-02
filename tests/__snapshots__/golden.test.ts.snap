@@ -1,0 +1,1284 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson data 1`] = `
+{
+  "slides": [
+    {
+      "category": "Quadratics",
+      "content": "A quadratic is any equation with an x² in it, and its graph is always a U-shaped curve called a **parabola** — the path of a thrown ball, the curve of a satellite dish, an arc of water. Let us take it apart piece by piece.",
+      "id": "meet-the-quadratic",
+      "title": "Meet the Quadratic",
+      "type": "text",
+    },
+    {
+      "category": "Quadratics",
+      "content": "The simplest quadratic is y = x². Every output is its input squared, so it is never negative — and it is symmetric: x and -x land at the same height.",
+      "id": "the-squaring-function",
+      "scene": {
+        "objects": [
+          {
+            "color": "primary",
+            "expr": "(x^2)",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "accent",
+            "id": "p1",
+            "label": "(2, 4)",
+            "r": 6,
+            "type": "point",
+            "x": 2,
+            "y": 4,
+          },
+          {
+            "color": "accent",
+            "id": "p2",
+            "label": "(-2, 4)",
+            "r": 6,
+            "type": "point",
+            "x": -2,
+            "y": 4,
+          },
+          {
+            "color": "danger",
+            "id": "o",
+            "label": "vertex",
+            "r": 6,
+            "type": "point",
+            "x": 0,
+            "y": 0,
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -4,
+            4,
+          ],
+          "yDomain": [
+            -1,
+            9,
+          ],
+        },
+        "state": {},
+      },
+      "title": "The Squaring Function",
+      "type": "scene",
+    },
+    {
+      "category": "Standard Form",
+      "content": "Every quadratic can be written y = a·x² + b·x + c. Drag the three sliders and watch each reshape the curve. The purple dot is the vertex; the dashed line is the axis of symmetry; the green dot is the y-intercept.",
+      "id": "standard-form-a-b-c",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "a",
+            "label": "a - opens up/down & width",
+          },
+          {
+            "as": "slider",
+            "bind": "b",
+            "label": "b - shifts the vertex sideways",
+          },
+          {
+            "as": "slider",
+            "bind": "c",
+            "label": "c - the y-intercept",
+          },
+        ],
+        "objects": [
+          {
+            "color": "neutral",
+            "id": "axis",
+            "style": "dashed",
+            "type": "line",
+            "x1": "((-b)/(2*a))",
+            "x2": "((-b)/(2*a))",
+            "y1": -8,
+            "y2": 8,
+          },
+          {
+            "color": "primary",
+            "expr": "(((a*(x^2))+(b*x))+c)",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "accent",
+            "id": "v",
+            "label": "vertex",
+            "r": 7,
+            "type": "point",
+            "x": "((-b)/(2*a))",
+            "y": "(c-((b^2)/(4*a)))",
+          },
+          {
+            "color": "success",
+            "id": "yint",
+            "label": "y-int",
+            "r": 5,
+            "type": "point",
+            "x": 0,
+            "y": "c",
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -6,
+            6,
+          ],
+          "yDomain": [
+            -8,
+            8,
+          ],
+        },
+        "state": {
+          "a": {
+            "init": 1,
+            "max": 3,
+            "min": -3,
+            "step": 0.1,
+            "type": "number",
+          },
+          "b": {
+            "init": 0,
+            "max": 6,
+            "min": -6,
+            "step": 0.5,
+            "type": "number",
+          },
+          "c": {
+            "init": -2,
+            "max": 6,
+            "min": -6,
+            "step": 0.5,
+            "type": "number",
+          },
+        },
+      },
+      "title": "Standard Form: a, b, c",
+      "type": "scene",
+    },
+    {
+      "category": "Standard Form",
+      "content": "The leading coefficient a controls the whole shape. Press play: a big a makes a narrow parabola, a small a makes it wide, and a negative a flips it upside-down.",
+      "id": "the-role-of-a",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "a",
+            "label": "a",
+          },
+        ],
+        "objects": [
+          {
+            "color": "primary",
+            "expr": "(a*(x^2))",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "primary",
+            "fontSize": 18,
+            "id": "lbl",
+            "text": "a = \${a}",
+            "type": "label",
+            "x": -4.5,
+            "y": 7,
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -5,
+            5,
+          ],
+          "yDomain": [
+            -8,
+            8,
+          ],
+        },
+        "state": {
+          "a": {
+            "init": 1,
+            "max": 3,
+            "min": -3,
+            "step": 0.1,
+            "type": "number",
+          },
+        },
+        "timeline": [
+          {
+            "narrate": "Start with a = 1, the basic parabola.",
+            "set": {
+              "a": 1,
+            },
+          },
+          {
+            "animate": {
+              "a": 3,
+            },
+            "duration": 1000,
+            "ease": "easeInOut",
+            "narrate": "a = 3 → tall and narrow.",
+          },
+          {
+            "animate": {
+              "a": 0.3,
+            },
+            "duration": 1200,
+            "ease": "easeInOut",
+            "narrate": "a = 0.3 → short and wide.",
+          },
+          {
+            "animate": {
+              "a": -1,
+            },
+            "duration": 1200,
+            "ease": "easeInOut",
+            "narrate": "a < 0 → it flips upside-down.",
+          },
+        ],
+      },
+      "title": "The Role of a",
+      "type": "scene",
+    },
+    {
+      "category": "Standard Form",
+      "content": "If a is negative, the parabola...",
+      "correctOption": 1,
+      "explanation": "A negative a flips the U upside-down, so it opens downward and has a maximum instead of a minimum.",
+      "id": "quick-check",
+      "quizOptions": [
+        "opens upward",
+        "opens downward",
+        "becomes a straight line",
+        "disappears",
+      ],
+      "title": "Quick Check",
+      "type": "quiz",
+    },
+    {
+      "category": "Vertex Form",
+      "content": "Vertex form y = a(x - h)² + k puts the vertex right in the equation: it sits at (h, k). Grab the vertex and drag it anywhere — the whole parabola follows.",
+      "id": "vertex-form",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "a",
+            "label": "a — shape",
+          },
+        ],
+        "objects": [
+          {
+            "color": "primary",
+            "expr": "((a*((x-h)^2))+k)",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "accent",
+            "draggable": {
+              "axis": "xy",
+              "bind": "h",
+              "bindY": "k",
+            },
+            "id": "v",
+            "label": "(\${h}, \${k})",
+            "r": 8,
+            "type": "point",
+            "x": "h",
+            "y": "k",
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -7,
+            7,
+          ],
+          "yDomain": [
+            -8,
+            8,
+          ],
+        },
+        "state": {
+          "a": {
+            "init": 1,
+            "max": 3,
+            "min": -3,
+            "step": 0.1,
+            "type": "number",
+          },
+          "h": {
+            "init": 1,
+            "max": 5,
+            "min": -5,
+            "step": 0.1,
+            "type": "number",
+          },
+          "k": {
+            "init": -2,
+            "max": 6,
+            "min": -6,
+            "step": 0.1,
+            "type": "number",
+          },
+        },
+      },
+      "title": "Vertex Form",
+      "type": "scene",
+    },
+    {
+      "category": "Roots",
+      "content": "The roots are where the parabola crosses the x-axis. In factored form y = a(x - r₁)(x - r₂), the roots are r₁ and r₂. Drag the two red points along the axis and watch the curve snap through them.",
+      "id": "roots-are-x-intercepts",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "a",
+            "label": "a — stretch",
+          },
+        ],
+        "objects": [
+          {
+            "color": "primary",
+            "expr": "((a*(x-r1))*(x-r2))",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "danger",
+            "draggable": {
+              "axis": "x",
+              "bind": "r1",
+            },
+            "id": "p1",
+            "label": "r₁",
+            "r": 7,
+            "type": "point",
+            "x": "r1",
+            "y": 0,
+          },
+          {
+            "color": "danger",
+            "draggable": {
+              "axis": "x",
+              "bind": "r2",
+            },
+            "id": "p2",
+            "label": "r₂",
+            "r": 7,
+            "type": "point",
+            "x": "r2",
+            "y": 0,
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -7,
+            7,
+          ],
+          "yDomain": [
+            -8,
+            8,
+          ],
+        },
+        "state": {
+          "a": {
+            "init": 0.5,
+            "max": 2,
+            "min": -2,
+            "step": 0.1,
+            "type": "number",
+          },
+          "r1": {
+            "init": -3,
+            "max": 6,
+            "min": -6,
+            "step": 0.1,
+            "type": "number",
+          },
+          "r2": {
+            "init": 2,
+            "max": 6,
+            "min": -6,
+            "step": 0.1,
+            "type": "number",
+          },
+        },
+      },
+      "title": "Roots Are X-Intercepts",
+      "type": "scene",
+    },
+    {
+      "category": "Discriminant",
+      "content": "How many roots does a quadratic have? The discriminant D = b² - 4ac answers it: D > 0 → two roots, D = 0 → one, D < 0 → none. Move the sliders and watch D and the crossings change together.",
+      "id": "the-discriminant",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "a",
+            "label": "a",
+          },
+          {
+            "as": "slider",
+            "bind": "b",
+            "label": "b",
+          },
+          {
+            "as": "slider",
+            "bind": "c",
+            "label": "c",
+          },
+        ],
+        "objects": [
+          {
+            "color": "primary",
+            "expr": "(((a*(x^2))+(b*x))+c)",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "accent",
+            "fontSize": 16,
+            "id": "d",
+            "text": "D = b² - 4ac = \${b^2 - 4*a*c}",
+            "type": "label",
+            "x": -5.5,
+            "y": 7,
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -6,
+            6,
+          ],
+          "yDomain": [
+            -8,
+            8,
+          ],
+        },
+        "state": {
+          "a": {
+            "init": 1,
+            "max": 3,
+            "min": -3,
+            "step": 0.1,
+            "type": "number",
+          },
+          "b": {
+            "init": 1,
+            "max": 6,
+            "min": -6,
+            "step": 0.5,
+            "type": "number",
+          },
+          "c": {
+            "init": -3,
+            "max": 6,
+            "min": -6,
+            "step": 0.5,
+            "type": "number",
+          },
+        },
+      },
+      "title": "The Discriminant",
+      "type": "scene",
+    },
+    {
+      "category": "Discriminant",
+      "content": "If the discriminant D = b² - 4ac is negative, the parabola...",
+      "correctOption": 2,
+      "explanation": "D < 0 means there are no real roots — the parabola floats entirely above or below the x-axis.",
+      "id": "discriminant-check",
+      "quizOptions": [
+        "crosses the x-axis twice",
+        "touches the x-axis once",
+        "never touches the x-axis",
+        "is a straight line",
+      ],
+      "title": "Discriminant Check",
+      "type": "quiz",
+    },
+    {
+      "category": "Factoring",
+      "content": "Factoring runs the parabola backwards: from x² + 5x + 6 to (x + 2)(x + 3). Picture it as area — a big x² square, two strips, and a small block. The side-lengths you add up are the factors.",
+      "id": "factoring-with-area",
+      "scene": {
+        "objects": [
+          {
+            "color": "primary",
+            "h": 4,
+            "id": "sq",
+            "opacity": 0.18,
+            "type": "rect",
+            "w": 4,
+            "x": 0,
+            "y": 0,
+          },
+          {
+            "color": "primary",
+            "fontSize": 22,
+            "id": "sql",
+            "text": "x²",
+            "type": "label",
+            "x": 1.7,
+            "y": 2,
+          },
+          {
+            "color": "accent",
+            "h": 4,
+            "id": "st",
+            "opacity": 0.22,
+            "type": "rect",
+            "w": 1.6,
+            "x": 4.2,
+            "y": 0,
+          },
+          {
+            "color": "accent",
+            "fontSize": 16,
+            "id": "stl",
+            "text": "3x",
+            "type": "label",
+            "x": 4.5,
+            "y": 2,
+          },
+          {
+            "color": "success",
+            "h": 1.6,
+            "id": "st2",
+            "opacity": 0.22,
+            "type": "rect",
+            "w": 4,
+            "x": 0,
+            "y": 4.2,
+          },
+          {
+            "color": "success",
+            "fontSize": 16,
+            "id": "st2l",
+            "text": "2x",
+            "type": "label",
+            "x": 1.7,
+            "y": 4.9,
+          },
+          {
+            "color": "warning",
+            "h": 1.6,
+            "id": "sm",
+            "opacity": 0.3,
+            "type": "rect",
+            "w": 1.6,
+            "x": 4.2,
+            "y": 4.2,
+          },
+          {
+            "color": "warning",
+            "fontSize": 15,
+            "id": "sml",
+            "text": "6",
+            "type": "label",
+            "x": 4.7,
+            "y": 4.9,
+          },
+        ],
+        "space": {
+          "type": "plane",
+          "xDomain": [
+            -0.5,
+            7,
+          ],
+          "yDomain": [
+            -1,
+            6,
+          ],
+        },
+        "state": {},
+      },
+      "title": "Factoring with Area",
+      "type": "scene",
+    },
+    {
+      "answer": [
+        [
+          "(",
+          "x",
+          "+",
+          "2",
+          ")",
+          "(",
+          "x",
+          "+",
+          "3",
+          ")",
+        ],
+        [
+          "(",
+          "x",
+          "+",
+          "3",
+          ")",
+          "(",
+          "x",
+          "+",
+          "2",
+          ")",
+        ],
+      ],
+      "bank": [
+        {
+          "id": "(",
+          "kind": "operator",
+          "label": "(",
+        },
+        {
+          "id": ")",
+          "kind": "operator",
+          "label": ")",
+        },
+        {
+          "id": "x",
+          "kind": "operand",
+          "label": "x",
+        },
+        {
+          "id": "+",
+          "kind": "operator",
+          "label": "+",
+        },
+        {
+          "id": "2",
+          "kind": "operand",
+          "label": "2",
+        },
+        {
+          "id": "3",
+          "kind": "operand",
+          "label": "3",
+        },
+      ],
+      "category": "Factoring",
+      "content": "Factor x² + 5x + 6. Find two numbers that multiply to 6 and add to 5, then build the factored form.",
+      "explanation": "2 × 3 = 6 and 2 + 3 = 5, so x² + 5x + 6 = (x + 2)(x + 3).",
+      "id": "factor-it",
+      "reusable": true,
+      "slots": 10,
+      "title": "Factor It",
+      "type": "build",
+    },
+    {
+      "answer": [
+        [
+          "x²",
+          "+",
+          "6x",
+          "+",
+          "9",
+        ],
+      ],
+      "bank": [
+        {
+          "id": "x²",
+          "kind": "operand",
+          "label": "x²",
+        },
+        {
+          "id": "6x",
+          "kind": "operand",
+          "label": "6x",
+        },
+        {
+          "id": "3x",
+          "kind": "operand",
+          "label": "3x",
+        },
+        {
+          "id": "9",
+          "kind": "operand",
+          "label": "9",
+        },
+        {
+          "id": "6",
+          "kind": "operand",
+          "label": "6",
+        },
+        {
+          "id": "+",
+          "kind": "operator",
+          "label": "+",
+        },
+      ],
+      "category": "Factoring",
+      "content": "Expand (x + 3)². The middle term is twice the product (2·3·x). Build x² + ? + ?.",
+      "explanation": "(x + 3)² = x² + 2·3·x + 9 = x² + 6x + 9.",
+      "id": "expand-the-square",
+      "reusable": true,
+      "slots": 5,
+      "title": "Expand the Square",
+      "type": "build",
+    },
+    {
+      "category": "Putting It Together",
+      "content": "Changing b alone drags the vertex along a hidden path while the y-intercept stays pinned at c. Press play and watch.",
+      "id": "vertex-on-the-move",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "b",
+            "label": "b",
+          },
+        ],
+        "objects": [
+          {
+            "color": "primary",
+            "expr": "(((a*(x^2))+(b*x))+c)",
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "accent",
+            "id": "v",
+            "label": "vertex",
+            "r": 7,
+            "type": "point",
+            "x": "((-b)/(2*a))",
+            "y": "(c-((b^2)/(4*a)))",
+          },
+          {
+            "color": "success",
+            "id": "yi",
+            "r": 5,
+            "type": "point",
+            "x": 0,
+            "y": "c",
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -7,
+            7,
+          ],
+          "yDomain": [
+            -8,
+            8,
+          ],
+        },
+        "state": {
+          "a": {
+            "init": 1,
+            "max": 3,
+            "min": -3,
+            "step": 0.1,
+            "type": "number",
+          },
+          "b": {
+            "init": -4,
+            "max": 6,
+            "min": -6,
+            "step": 0.5,
+            "type": "number",
+          },
+          "c": {
+            "init": 1,
+            "max": 6,
+            "min": -6,
+            "step": 0.5,
+            "type": "number",
+          },
+        },
+        "timeline": [
+          {
+            "narrate": "b = -4, vertex sits on the right.",
+            "set": {
+              "b": -4,
+            },
+          },
+          {
+            "animate": {
+              "b": 0,
+            },
+            "duration": 1200,
+            "ease": "easeInOut",
+            "narrate": "b = 0 → vertex jumps onto the y-axis.",
+          },
+          {
+            "animate": {
+              "b": 4,
+            },
+            "duration": 1200,
+            "ease": "easeInOut",
+            "narrate": "b = 4 → vertex swings left. The y-intercept never moved.",
+          },
+        ],
+      },
+      "title": "Vertex on the Move",
+      "type": "scene",
+    },
+    {
+      "category": "Assessment",
+      "content": "A parabola has vertex (3, -4) and opens upward. Which equation shows this most directly?",
+      "correctOption": 1,
+      "explanation": "Vertex form is y = a(x - h)² + k with vertex (h, k) = (3, -4), and a > 0 for upward — giving y = (x - 3)² - 4.",
+      "id": "final-check",
+      "quizOptions": [
+        "y = (x + 3)² - 4",
+        "y = (x - 3)² - 4",
+        "y = (x - 3)² + 4",
+        "y = -(x - 3)² - 4",
+      ],
+      "title": "Final Check",
+      "type": "quiz",
+    },
+    {
+      "category": "Quadratics",
+      "content": "You met quadratics from every angle: **standard form** (a, b, c), **vertex form** (h, k), **factored form** (the roots), the **discriminant**, and **factoring**. One curve, five lenses — that is what it means to *see* math instead of memorizing it.",
+      "id": "you-did-it",
+      "title": "You Did It!",
+      "type": "text",
+    },
+  ],
+}
+`;
+
+exports[`scene compiler goldens > compiles basics.prism to stable IR 1`] = `
+{
+  "controls": [
+    {
+      "as": "slider",
+      "bind": "t",
+      "label": "move the point",
+      "max": 3,
+      "min": -3,
+    },
+    {
+      "as": "toggle",
+      "bind": "showTangent",
+      "label": "tangent",
+    },
+  ],
+  "objects": [
+    {
+      "color": "primary",
+      "expr": "(x^2)",
+      "id": "f",
+      "strokeWidth": 3,
+      "type": "curve",
+    },
+    {
+      "color": "accent",
+      "draggable": {
+        "axis": "x",
+        "bind": "t",
+      },
+      "id": "p",
+      "label": "(\${t}, \${t^2})",
+      "r": 6,
+      "type": "point",
+      "x": "t",
+      "y": "(t^2)",
+    },
+    {
+      "color": "danger",
+      "draggable": {
+        "axis": "xy",
+        "bind": "t",
+        "bindY": "k",
+      },
+      "id": "v",
+      "type": "point",
+      "x": "t",
+      "y": "k",
+    },
+    {
+      "color": "neutral",
+      "id": "seg",
+      "style": "dashed",
+      "type": "line",
+      "x1": -2,
+      "x2": 2,
+      "y1": 0,
+      "y2": 4,
+    },
+    {
+      "id": "tangent",
+      "slope": "(2*t)",
+      "through": "p",
+      "type": "line",
+      "visibleIf": "showTangent",
+    },
+    {
+      "id": "__lbl_0",
+      "text": "slope = \${2*t}",
+      "type": "label",
+      "x": 0,
+      "y": 4.5,
+    },
+    {
+      "id": "eq",
+      "tex": true,
+      "text": "x^2",
+      "type": "label",
+      "x": -4,
+      "y": 4,
+    },
+  ],
+  "space": {
+    "axes": true,
+    "grid": true,
+    "type": "plane",
+    "xDomain": [
+      -5,
+      5,
+    ],
+    "yDomain": [
+      -5,
+      5,
+    ],
+  },
+  "state": {
+    "k": {
+      "init": 0,
+      "max": 5,
+      "min": -5,
+      "type": "number",
+    },
+    "showTangent": {
+      "init": true,
+      "type": "boolean",
+    },
+    "t": {
+      "init": 1,
+      "max": 3,
+      "min": -3,
+      "step": 0.1,
+      "type": "number",
+    },
+  },
+}
+`;
+
+exports[`scene compiler goldens > compiles logic.prism to stable IR 1`] = `
+{
+  "objects": [
+    {
+      "color": "neutral",
+      "id": "t1",
+      "type": "line",
+      "x1": 1,
+      "x2": 1,
+      "y1": 0,
+      "y2": 0.2,
+    },
+    {
+      "color": "neutral",
+      "id": "t2",
+      "type": "line",
+      "x1": 2,
+      "x2": 2,
+      "y1": 0,
+      "y2": 0.4,
+    },
+    {
+      "color": "neutral",
+      "h": 4,
+      "id": "neg-4",
+      "type": "rect",
+      "w": 0.45,
+      "x": -4,
+      "y": -4,
+    },
+    {
+      "color": "neutral",
+      "h": 3,
+      "id": "neg-3",
+      "type": "rect",
+      "w": 0.45,
+      "x": -3,
+      "y": -3,
+    },
+    {
+      "color": "neutral",
+      "h": 2,
+      "id": "neg-2",
+      "type": "rect",
+      "w": 0.45,
+      "x": -2,
+      "y": -2,
+    },
+    {
+      "color": "neutral",
+      "h": 1,
+      "id": "neg-1",
+      "type": "rect",
+      "w": 0.45,
+      "x": -1,
+      "y": -1,
+    },
+    {
+      "color": "primary",
+      "h": 0,
+      "id": "pos0",
+      "type": "rect",
+      "w": 0.45,
+      "x": 0,
+      "y": 0,
+    },
+    {
+      "color": "primary",
+      "h": 1,
+      "id": "pos1",
+      "type": "rect",
+      "w": 0.45,
+      "x": 1,
+      "y": 0,
+    },
+    {
+      "color": "primary",
+      "h": 2,
+      "id": "pos2",
+      "type": "rect",
+      "w": 0.45,
+      "x": 2,
+      "y": 0,
+    },
+    {
+      "color": "primary",
+      "h": 3,
+      "id": "pos3",
+      "type": "rect",
+      "w": 0.45,
+      "x": 3,
+      "y": 0,
+    },
+    {
+      "color": "primary",
+      "h": 4,
+      "id": "pos4",
+      "type": "rect",
+      "w": 0.45,
+      "x": 4,
+      "y": 0,
+    },
+  ],
+  "space": {
+    "type": "plane",
+    "xDomain": [
+      -5,
+      5,
+    ],
+    "yDomain": [
+      -5,
+      5,
+    ],
+  },
+  "state": {},
+}
+`;
+
+exports[`scene compiler goldens > compiles shapes.prism to stable IR 1`] = `
+{
+  "controls": [
+    {
+      "as": "stepper",
+      "bind": "t",
+      "label": "angle",
+      "step": 5,
+    },
+    {
+      "as": "button",
+      "label": "reset",
+      "set": {
+        "t": 0,
+      },
+    },
+    {
+      "animate": {
+        "t": 360,
+      },
+      "as": "button",
+      "duration": 2000,
+      "ease": "easeInOut",
+      "label": "spin",
+    },
+  ],
+  "objects": [
+    {
+      "color": "primary",
+      "id": "unit",
+      "r": 1,
+      "type": "circle",
+      "x": 0,
+      "y": 0,
+    },
+    {
+      "color": "accent",
+      "id": "tri",
+      "opacity": 0.3,
+      "points": [
+        [
+          0,
+          0,
+        ],
+        [
+          2,
+          0,
+        ],
+        [
+          1,
+          1.7320508075688772,
+        ],
+      ],
+      "type": "polygon",
+    },
+    {
+      "color": "accent",
+      "id": "v",
+      "type": "vector",
+      "x1": 0,
+      "x2": "cos(((t*PI)/180))",
+      "y1": 0,
+      "y2": "sin(((t*PI)/180))",
+    },
+    {
+      "end": "t",
+      "id": "angle",
+      "r": 0.5,
+      "start": 0,
+      "type": "arc",
+      "x": 0,
+      "y": 0,
+    },
+    {
+      "color": "primary",
+      "h": 1.5,
+      "id": "bar",
+      "opacity": 0.4,
+      "type": "rect",
+      "w": 0.5,
+      "x": 1,
+      "y": -2,
+    },
+  ],
+  "space": {
+    "type": "plane",
+    "xDomain": [
+      -3,
+      3,
+    ],
+    "yDomain": [
+      -3,
+      3,
+    ],
+  },
+  "state": {
+    "t": {
+      "init": 45,
+      "max": 360,
+      "min": 0,
+      "step": 5,
+      "type": "number",
+    },
+  },
+}
+`;
+
+exports[`scene compiler goldens > compiles timeline.prism to stable IR 1`] = `
+{
+  "controls": [
+    {
+      "as": "slider",
+      "bind": "a",
+      "label": "a",
+    },
+  ],
+  "objects": [
+    {
+      "color": "primary",
+      "expr": "(a*(x^2))",
+      "id": "f",
+      "strokeWidth": 3,
+      "type": "curve",
+    },
+  ],
+  "space": {
+    "axes": true,
+    "grid": true,
+    "type": "plane",
+    "xDomain": [
+      -4,
+      4,
+    ],
+    "yDomain": [
+      -1,
+      9,
+    ],
+  },
+  "state": {
+    "a": {
+      "init": 1,
+      "max": 3,
+      "min": -3,
+      "step": 0.1,
+      "type": "number",
+    },
+  },
+  "timeline": [
+    {
+      "narrate": "start with a = 1, the basic parabola",
+      "set": {
+        "a": 1,
+      },
+    },
+    {
+      "animate": {
+        "a": 3,
+      },
+      "duration": 1000,
+      "ease": "easeInOut",
+      "narrate": "a = 3 makes it tall and narrow",
+    },
+    {
+      "animate": {
+        "a": -1,
+      },
+      "duration": 1200,
+      "ease": "easeInOut",
+      "narrate": "negative a flips it",
+    },
+  ],
+}
+`;
