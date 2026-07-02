@@ -1,5 +1,5 @@
 import type { Token, TT } from './tokens';
-import type { Expr, PropMap, Stmt, IfCase } from './ast';
+import type { Expr, PropMap, Stmt, IfCase, SlideStmt, QuizOption, ExerciseCommon } from './ast';
 import { CompileError } from './errors';
 
 const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes']);
@@ -357,6 +357,216 @@ function makeParser(tokens: Token[]) {
     return { k: 'scene', spaceType, props, children, ln };
   }
 
+  // --- lesson-level grammar -------------------------------------------------
+
+  function parseLesson(ln: number): Stmt {
+    eat('IDENT', 'lesson');
+    const title = eatStr();
+    eat('LC');
+    skipNL();
+    const props: PropMap = new Map();
+    const slides: SlideStmt[] = [];
+    while (!check('RC') && !check('EOF')) {
+      skipNL();
+      if (check('RC') || check('EOF')) break;
+      if (at('slide')) {
+        slides.push(parseSlide(peek().line));
+        skipNL();
+      } else if (at('def')) {
+        const t = peek();
+        throw new CompileError(
+          'lesson-level macros are not supported yet — define `def` inside a scene',
+          t.line,
+          t.col
+        );
+      } else if (check('IDENT')) {
+        const key = eatIdent();
+        eat('COLON');
+        props.set(key, parseExpr());
+        endStmt();
+      } else {
+        const t = peek();
+        throw new CompileError(`expected a slide or lesson property, got ${t.type}`, t.line, t.col);
+      }
+    }
+    eat('RC');
+    return { k: 'lesson', title, props, slides, ln };
+  }
+
+  const SLIDE_PROPS = new Set(['cat', 'id', 'skill']);
+
+  function parseSlide(ln: number): SlideStmt {
+    eat('IDENT', 'slide');
+    const title = eatStr();
+    eat('LC');
+    skipNL();
+    const props: PropMap = new Map();
+    const items: Stmt[] = [];
+    while (!check('RC') && !check('EOF')) {
+      skipNL();
+      if (check('RC') || check('EOF')) break;
+      if (check('PROSE')) {
+        items.push(parseProse());
+      } else if (at('scene')) {
+        items.push(parseScene(peek().line));
+        skipNL();
+      } else if (at('goal')) {
+        items.push(parseGoal(peek().line));
+      } else if (at('quiz')) {
+        items.push(parseQuiz(peek().line));
+      } else if (at('build')) {
+        items.push(parseBuild(peek().line));
+      } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
+        const key = eatIdent();
+        eat('COLON');
+        props.set(key, parseExpr());
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(`unexpected ${what} in slide`, t.line, t.col);
+      }
+    }
+    eat('RC');
+    return { k: 'slide', title, props, items, ln };
+  }
+
+  function parseProse(): Stmt {
+    const ln = peek().line;
+    const parts: string[] = [];
+    while (check('PROSE')) {
+      parts.push(peek().raw);
+      pos++;
+      skipNL();
+    }
+    return { k: 'prose', text: parts.join('\n'), ln };
+  }
+
+  function parseGoal(ln: number): Stmt {
+    eat('IDENT', 'goal');
+    const prompt = eatStr();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'goal', prompt, props, ln };
+  }
+
+  // a bracketed list of strings: ["(", ")", "x", "+"]
+  function parseStrList(): string[] {
+    eat('LB');
+    const out: string[] = [];
+    while (!check('RB') && !check('EOF')) {
+      out.push(eatStr());
+      if (!check('RB')) eat('COMMA');
+    }
+    eat('RB');
+    return out;
+  }
+
+  // ask / hint / skill / ! lines are shared by every exercise kind. returns
+  // true if it consumed a common line, false if the caller should handle it.
+  function parseCommonLine(common: ExerciseCommon): boolean {
+    if (at('ask')) {
+      pos++;
+      common.ask = eatStr();
+      endStmt();
+      return true;
+    }
+    if (at('hint')) {
+      pos++;
+      common.hints.push(eatStr());
+      endStmt();
+      return true;
+    }
+    if (at('skill')) {
+      pos++;
+      eat('COLON');
+      common.skill = eatStr();
+      endStmt();
+      return true;
+    }
+    if (check('BANG')) {
+      pos++;
+      common.explanation = eatStr();
+      endStmt();
+      return true;
+    }
+    return false;
+  }
+
+  function parseQuiz(ln: number): Stmt {
+    eat('IDENT', 'quiz');
+    eat('LC');
+    skipNL();
+    const options: QuizOption[] = [];
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (check('MINUS') || check('STAR')) {
+        const correct = check('STAR');
+        pos++;
+        const text = eatStr();
+        let why: string | undefined;
+        if (check('LC')) {
+          const p = parsePropsBlock();
+          const w = p.get('why');
+          if (w && w !== true && w.k === 'str') why = w.v;
+        }
+        options.push({ text, correct, why });
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(`unexpected ${what} in quiz — use ask/-/*/!/hint`, t.line, t.col);
+      }
+    }
+    eat('RC');
+    return { k: 'quiz', options, common, ln };
+  }
+
+  function parseBuild(ln: number): Stmt {
+    eat('IDENT', 'build');
+    eat('LC');
+    skipNL();
+    const bank: string[] = [];
+    const answers: string[][] = [];
+    let slots: number | null = null;
+    let reusable = false;
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('bank')) {
+        pos++;
+        eat('COLON');
+        bank.push(...parseStrList());
+        endStmt();
+      } else if (at('answer')) {
+        pos++;
+        eat('COLON');
+        answers.push(parseStrList());
+        endStmt();
+      } else if (at('slots')) {
+        pos++;
+        eat('COLON');
+        slots = parseFloat(eat('NUM').raw);
+        endStmt();
+      } else if (at('reusable')) {
+        pos++;
+        reusable = true;
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in build — use ask/bank/answer/slots/reusable/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'build', bank, answers, slots, reusable, common, ln };
+  }
+
   function parseParam(ln: number): Stmt {
     eat('IDENT', 'param');
     const name = eatIdent();
@@ -630,10 +840,19 @@ function makeParser(tokens: Token[]) {
 
   function parseFile(): Stmt[] {
     skipNL();
+    if (at('lesson')) {
+      const lesson = parseLesson(peek().line);
+      skipNL();
+      if (!check('EOF')) {
+        const t = peek();
+        throw new CompileError('unexpected content after the lesson block', t.line, t.col);
+      }
+      return [lesson];
+    }
     if (!at('scene')) {
       const t = peek();
       throw new CompileError(
-        'a Prism file must start with a "scene <type> { ... }" block',
+        'a Prism file must start with a "scene <type> { ... }" or "lesson" block',
         t.line,
         t.col
       );

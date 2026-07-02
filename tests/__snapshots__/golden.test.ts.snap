@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`lesson compiler golden > compiles quadratics-1.dsl to stable lesson data 1`] = `
+exports[`lesson compiler golden (legacy @block container) > compiles quadratics-1.dsl to stable lesson data 1`] = `
 {
   "slides": [
     {
@@ -1917,6 +1917,246 @@ exports[`scene compiler goldens > compiles timeline.prism to stable IR 1`] = `
       "narrate": "negative a flips it",
     },
   ],
+  "version": 2,
+}
+`;
+
+exports[`unified Prism lesson grammar (v2) > compiles lesson.prism to a stable Lesson IR 1`] = `
+{
+  "course": "algebra",
+  "skills": [
+    "quad-vertex",
+    "quad-roots",
+  ],
+  "slides": [
+    {
+      "category": "Basics",
+      "goals": [
+        {
+          "hint": "The vertex is at the origin.",
+          "prompt": "Put the point at the bottom",
+          "when": {
+            "k": "bin",
+            "l": {
+              "k": "id",
+              "name": "t",
+            },
+            "op": "==",
+            "r": {
+              "k": "num",
+              "v": 0,
+            },
+          },
+        },
+      ],
+      "id": "what-is-a-parabola",
+      "prose": "A **parabola** is the graph of $y = x^2$ — a U-shaped curve.
+Drag the point and watch it ride the curve.",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "t",
+            "label": "move the point",
+          },
+        ],
+        "objects": [
+          {
+            "color": "primary",
+            "expr": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "x",
+              },
+              "op": "^",
+              "r": {
+                "k": "num",
+                "v": 2,
+              },
+            },
+            "id": "f",
+            "strokeWidth": 3,
+            "type": "curve",
+          },
+          {
+            "color": "accent",
+            "draggable": {
+              "axis": "x",
+              "bind": "t",
+            },
+            "id": "p",
+            "label": {
+              "parts": [
+                "(",
+                {
+                  "k": "id",
+                  "name": "t",
+                },
+                ", ",
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "id",
+                    "name": "t",
+                  },
+                  "op": "^",
+                  "r": {
+                    "k": "num",
+                    "v": 2,
+                  },
+                },
+                ")",
+              ],
+            },
+            "type": "point",
+            "x": {
+              "k": "id",
+              "name": "t",
+            },
+            "y": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "t",
+              },
+              "op": "^",
+              "r": {
+                "k": "num",
+                "v": 2,
+              },
+            },
+          },
+        ],
+        "space": {
+          "axes": true,
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -4,
+            4,
+          ],
+          "yDomain": [
+            -1,
+            9,
+          ],
+        },
+        "state": {
+          "t": {
+            "init": 1,
+            "max": 3,
+            "min": -3,
+            "step": 0.1,
+            "type": "number",
+          },
+        },
+        "version": 2,
+      },
+      "title": "What is a parabola?",
+    },
+    {
+      "category": "Basics",
+      "exercise": {
+        "correct": 1,
+        "explanation": "A negative a flips the U so it opens downward.",
+        "hints": [
+          "Picture y = -x².",
+          "The arms point down.",
+        ],
+        "kind": "quiz",
+        "options": [
+          {
+            "text": "opens upward",
+            "why": "Check the sign — a negative leading term flips it.",
+          },
+          {
+            "text": "opens downward",
+          },
+          {
+            "text": "becomes a line",
+            "why": "It still has an x² term, so it stays curved.",
+          },
+        ],
+        "prompt": "If $a < 0$ in $y = ax^2$, the parabola...",
+      },
+      "id": "which-way-does-it-open",
+      "title": "Which way does it open?",
+    },
+    {
+      "category": "Forms",
+      "exercise": {
+        "answers": [
+          [
+            "a",
+            "(",
+            "x",
+            "-",
+            "h",
+            ")",
+            "^2",
+            "+",
+            "k",
+          ],
+        ],
+        "bank": [
+          {
+            "id": "a",
+            "kind": "operand",
+            "label": "a",
+          },
+          {
+            "id": "(",
+            "kind": "operator",
+            "label": "(",
+          },
+          {
+            "id": "x",
+            "kind": "operand",
+            "label": "x",
+          },
+          {
+            "id": "-",
+            "kind": "operator",
+            "label": "-",
+          },
+          {
+            "id": "h",
+            "kind": "operand",
+            "label": "h",
+          },
+          {
+            "id": ")",
+            "kind": "operator",
+            "label": ")",
+          },
+          {
+            "id": "^2",
+            "kind": "operator",
+            "label": "^2",
+          },
+          {
+            "id": "+",
+            "kind": "operator",
+            "label": "+",
+          },
+          {
+            "id": "k",
+            "kind": "operand",
+            "label": "k",
+          },
+        ],
+        "explanation": "y = a(x − h)² + k puts the vertex at (h, k).",
+        "hints": [],
+        "kind": "build",
+        "prompt": "Arrange the vertex form.",
+        "slots": 9,
+      },
+      "id": "build-the-vertex-form",
+      "prose": "Assemble the vertex form of a parabola.",
+      "title": "Build the vertex form",
+    },
+  ],
+  "title": "Intro to Parabolas",
   "version": 2,
 }
 `;

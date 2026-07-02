@@ -1,7 +1,9 @@
-import type { Expr, PropMap, Stmt } from './ast';
+import type { Expr, PropMap, Stmt, SlideStmt } from './ast';
 import type { SceneIR } from '@/engine/ir/types';
+import type { LessonIR } from '@/engine/ir/lesson';
 import type { ExprIR, NumExpr, UnOp, BinOp, Value } from '@/engine/expr';
 import { sceneSchema } from '@/engine/ir/schema';
+import { lessonSchema } from '@/engine/ir/lesson';
 import { evalExpr, ExprError, BUILTINS, BUILTIN_NAMES, CONSTS } from '@/engine/expr';
 import { lex } from './lexer';
 import { parseExprTokens } from './parser';
@@ -788,6 +790,134 @@ export function emit(stmts: Stmt[]): SceneIR {
   if (!result.success) {
     const first = result.error.issues[0];
     throw new CompileError(`invalid scene IR: ${first.path.join('.')} - ${first.message}`);
+  }
+  return result.data;
+}
+
+// --- lesson emission --------------------------------------------------------
+
+function slug(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function pStr(props: PropMap, key: string): string | undefined {
+  const v = props.get(key);
+  if (v && v !== true && v.k === 'str') return v.v;
+  return undefined;
+}
+
+function pStrList(props: PropMap, key: string): string[] | undefined {
+  const v = props.get(key);
+  if (v && v !== true && v.k === 'list') {
+    return v.items.map((e) => (e.k === 'str' ? e.v : ''));
+  }
+  return undefined;
+}
+
+function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
+  if (!s.common.ask) throw new CompileError('quiz needs an ask "..."', s.ln);
+  const correct = s.options.findIndex((o) => o.correct);
+  if (correct < 0) throw new CompileError('quiz needs a * correct option', s.ln);
+  return {
+    kind: 'quiz' as const,
+    prompt: s.common.ask,
+    options: s.options.map((o) => ({ text: o.text, ...(o.why && { why: o.why }) })),
+    correct,
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
+function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
+  if (!s.common.ask) throw new CompileError('build needs an ask "..."', s.ln);
+  if (!s.bank.length) throw new CompileError('build needs a bank: [...]', s.ln);
+  if (!s.answers.length) throw new CompileError('build needs an answer: [...]', s.ln);
+  const bank = s.bank.map((label) => ({
+    id: label,
+    label,
+    kind: /^[a-zA-Z0-9]/.test(label) ? ('operand' as const) : ('operator' as const),
+  }));
+  return {
+    kind: 'build' as const,
+    prompt: s.common.ask,
+    bank,
+    answers: s.answers,
+    slots: s.slots ?? s.answers[0].length,
+    ...(s.reusable && { reusable: true }),
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
+function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
+  const whenExpr = s.props.get('when');
+  if (!whenExpr || whenExpr === true) throw new CompileError('goal needs a when: condition', s.ln);
+  const when = asIR(lower(whenExpr, {}));
+  const hint = pStr(s.props, 'hint');
+  return { prompt: s.prompt, when, ...(hint && { hint }) };
+}
+
+function emitSlide(s: SlideStmt, i: number) {
+  const id = pStr(s.props, 'id') || slug(s.title) || `slide-${i + 1}`;
+  const prose: string[] = [];
+  let scene: SceneIR | undefined;
+  let exercise: ReturnType<typeof emitQuiz> | ReturnType<typeof emitBuild> | undefined;
+  const goals: ReturnType<typeof emitGoal>[] = [];
+
+  for (const item of s.items) {
+    if (item.k === 'prose') {
+      prose.push(item.text);
+    } else if (item.k === 'scene') {
+      if (scene) throw new CompileError('a slide can have at most one scene', item.ln);
+      scene = emit([item]);
+    } else if (item.k === 'quiz') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitQuiz(item);
+    } else if (item.k === 'build') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitBuild(item);
+    } else if (item.k === 'goal') {
+      goals.push(emitGoal(item));
+    }
+  }
+
+  const category = pStr(s.props, 'cat');
+  const skill = pStr(s.props, 'skill');
+  return {
+    id,
+    title: s.title,
+    ...(category && { category }),
+    ...(skill && { skill }),
+    ...(prose.length && { prose: prose.join('\n\n') }),
+    ...(scene && { scene }),
+    ...(exercise && { exercise }),
+    ...(goals.length && { goals }),
+  };
+}
+
+export function emitLesson(stmts: Stmt[]): LessonIR {
+  const root = stmts[0];
+  if (!root || root.k !== 'lesson') throw new CompileError('expected a lesson block');
+
+  const course = pStr(root.props, 'course');
+  const skills = pStrList(root.props, 'skills');
+  const ir = {
+    version: 2 as const,
+    title: root.title,
+    ...(course && { course }),
+    ...(skills && { skills }),
+    slides: root.slides.map(emitSlide),
+  };
+
+  const result = lessonSchema.safeParse(ir);
+  if (!result.success) {
+    const first = result.error.issues[0];
+    throw new CompileError(`invalid lesson IR: ${first.path.join('.')} - ${first.message}`);
   }
   return result.data;
 }

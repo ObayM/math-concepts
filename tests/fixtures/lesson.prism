@@ -1,0 +1,47 @@
+lesson "Intro to Parabolas" {
+  course: "algebra"
+  skills: ["quad-vertex", "quad-roots"]
+
+  slide "What is a parabola?" {
+    cat: "Basics"
+    > A **parabola** is the graph of $y = x^2$ — a U-shaped curve.
+    > Drag the point and watch it ride the curve.
+
+    scene plane {
+      x: [-4, 4]
+      y: [-1, 9]
+      grid
+      axes
+      param t = 1 { range: [-3, 3], step: 0.1 }
+      curve f = x^2 { color: primary, width: 3 }
+      point p = (t, t^2) { color: accent, drag: x -> t, label: "(${t}, ${t^2})" }
+      slider t { label: "move the point" }
+    }
+
+    goal "Put the point at the bottom" { when: t == 0, hint: "The vertex is at the origin." }
+  }
+
+  slide "Which way does it open?" {
+    cat: "Basics"
+    quiz {
+      ask "If $a < 0$ in $y = ax^2$, the parabola..."
+      - "opens upward" { why: "Check the sign — a negative leading term flips it." }
+      * "opens downward"
+      - "becomes a line" { why: "It still has an x² term, so it stays curved." }
+      hint "Picture y = -x²."
+      hint "The arms point down."
+      ! "A negative a flips the U so it opens downward."
+    }
+  }
+
+  slide "Build the vertex form" {
+    cat: "Forms"
+    > Assemble the vertex form of a parabola.
+    build {
+      ask "Arrange the vertex form."
+      bank: ["a", "(", "x", "-", "h", ")", "^2", "+", "k"]
+      answer: ["a", "(", "x", "-", "h", ")", "^2", "+", "k"]
+      ! "y = a(x − h)² + k puts the vertex at (h, k)."
+    }
+  }
+}

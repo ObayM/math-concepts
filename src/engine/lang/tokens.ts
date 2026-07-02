@@ -26,6 +26,8 @@ export type TT =
   | 'COMMA'
   | 'COLON'
   | 'DOT'
+  | 'BANG'
+  | 'PROSE'
   | 'NL'
   | 'EOF';
 

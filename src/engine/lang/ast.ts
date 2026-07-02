@@ -37,4 +37,36 @@ export type Stmt =
   | { k: 'toggle'; bind: string; props: PropMap; ln: number }
   | { k: 'stepper'; bind: string; props: PropMap; ln: number }
   | { k: 'button'; label: string; props: PropMap; ln: number }
-  | { k: 'step'; narrate: string | null; props: PropMap; ln: number };
+  | { k: 'step'; narrate: string | null; props: PropMap; ln: number }
+  // lesson-level nodes
+  | { k: 'lesson'; title: string; props: PropMap; slides: SlideStmt[]; ln: number }
+  | { k: 'prose'; text: string; ln: number }
+  | { k: 'goal'; prompt: string; props: PropMap; ln: number }
+  | { k: 'quiz'; options: QuizOption[]; common: ExerciseCommon; ln: number }
+  | {
+      k: 'build';
+      bank: string[];
+      answers: string[][];
+      slots: number | null;
+      reusable: boolean;
+      common: ExerciseCommon;
+      ln: number;
+    };
+
+export type SlideStmt = {
+  k: 'slide';
+  title: string;
+  props: PropMap;
+  items: Stmt[];
+  ln: number;
+};
+
+export type QuizOption = { text: string; correct: boolean; why?: string };
+
+// shared bits every exercise can declare: prompt (ask), hint ladder, explanation
+export type ExerciseCommon = {
+  ask: string;
+  hints: string[];
+  explanation?: string;
+  skill?: string;
+};

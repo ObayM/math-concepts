@@ -20,13 +20,13 @@ exports[`scene compile errors > bad identifier 1`] = `"line 4:9: expected IDENT,
 
 exports[`scene compile errors > call to undefined macro 1`] = `"line 4: undefined macro "tick""`;
 
-exports[`scene compile errors > empty source 1`] = `"line 2:1: a Prism file must start with a "scene <type> { ... }" block"`;
+exports[`scene compile errors > empty source 1`] = `"line 2:1: a Prism file must start with a "scene <type> { ... }" or "lesson" block"`;
 
 exports[`scene compile errors > member access is not a thing 1`] = `"line 5:21: member access ("a.b") is not supported — positions are expressions of state"`;
 
 exports[`scene compile errors > missing y domain on plane 1`] = `"line 1: scene needs y: [min, max]"`;
 
-exports[`scene compile errors > no scene root 1`] = `"line 1:1: a Prism file must start with a "scene <type> { ... }" block"`;
+exports[`scene compile errors > no scene root 1`] = `"line 1:1: a Prism file must start with a "scene <type> { ... }" or "lesson" block"`;
 
 exports[`scene compile errors > point missing y coord 1`] = `"line 4: expected a (x, y) pair"`;
 

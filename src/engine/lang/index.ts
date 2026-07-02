@@ -1,2 +1,2 @@
-export { compile } from './compile';
+export { compile, compileLesson } from './compile';
 export { CompileError, formatCompileError } from './errors';

@@ -1,10 +1,11 @@
 import type { SceneIR } from '@/engine/ir/types';
+import type { LessonIR } from '@/engine/ir/lesson';
 import { lex } from './lexer';
 import { parse } from './parser';
-import { emit } from './emitter';
+import { emit, emitLesson } from './emitter';
 import { CompileError } from './errors';
 
-export function compile(source: string): SceneIR {
+function parseSource(source: string): ReturnType<typeof parse> {
   let tokens;
   try {
     tokens = lex(source);
@@ -12,14 +13,20 @@ export function compile(source: string): SceneIR {
     if (e instanceof CompileError) throw e;
     throw new CompileError(String(e));
   }
-
-  let ast;
   try {
-    ast = parse(tokens);
+    return parse(tokens);
   } catch (e) {
     if (e instanceof CompileError) throw e;
     throw new CompileError(String(e));
   }
+}
 
-  return emit(ast);
+// compile a standalone scene (bare `scene {}` source)
+export function compile(source: string): SceneIR {
+  return emit(parseSource(source));
+}
+
+// compile a whole lesson (`lesson {}` source with slides)
+export function compileLesson(source: string): LessonIR {
+  return emitLesson(parseSource(source));
 }

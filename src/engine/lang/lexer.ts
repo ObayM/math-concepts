@@ -16,6 +16,15 @@ export function lex(source: string): Token[] {
     const contentStart = raw.search(/\S/);
     if (contentStart === -1) continue;
 
+    // line-initial "> " is prose (lesson text): the rest of the line is raw —
+    // markdown, $latex$, even #, all preserved. never tokenized.
+    const trimmed = raw.slice(contentStart);
+    if (trimmed[0] === '>' && (trimmed[1] === ' ' || trimmed.length === 1)) {
+      out.push(tok('PROSE', trimmed.slice(1).replace(/^ /, ''), ln, contentStart + 1));
+      if (bracketDepth === 0) out.push(tok('NL', '\n', ln, raw.length + 1));
+      continue;
+    }
+
     const content = stripComment(raw);
     if (content.trim() === '') continue;
 
@@ -177,6 +186,7 @@ function lexLine(line: string, ln: number, startCol: number): Token[] {
       ',': 'COMMA',
       ':': 'COLON',
       '.': 'DOT',
+      '!': 'BANG',
     };
     if (single[c]) {
       emit(single[c], c);
