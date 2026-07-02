@@ -269,19 +269,21 @@ export function emit(stmts: Stmt[]): SceneIR {
         const yV = s.props.get('y');
         if (!xV || xV === true || xV.k !== 'list')
           throw new CompileError('scene needs x: [min, max]', s.ln);
-        if (!yV || yV === true || yV.k !== 'list')
+        const isNumberline = s.spaceType === 'numberline';
+        if (!isNumberline && (!yV || yV === true || yV.k !== 'list'))
           throw new CompileError('scene needs y: [min, max]', s.ln);
         const xD = xV.items.map((e) => evalNumber(ser(e, cScope), {})) as [number, number];
-        const yD = yV.items.map((e) => evalNumber(ser(e, cScope), {})) as [number, number];
+        const yD =
+          yV && yV !== true && yV.k === 'list'
+            ? (yV.items.map((e) => evalNumber(ser(e, cScope), {})) as [number, number])
+            : undefined;
         ir.space = {
           type: s.spaceType,
           xDomain: xD,
-          yDomain: yD,
+          ...(yD && { yDomain: yD }),
           ...(s.props.has('grid') && { grid: true }),
           ...(s.props.has('axes') && { axes: true }),
         };
-        const render = propStr(s.props, 'render', cScope);
-        if (render) ir.space.render = render;
         run(s.children, cScope);
         break;
       }

@@ -2,14 +2,12 @@
 import { SceneProvider } from './SceneProvider';
 import Timeline from './Timeline';
 import SvgRenderer from '@/engine/renderers/svg/SvgRenderer';
+import NumberlineRenderer from '@/engine/renderers/svg/NumberlineRenderer';
 import { controlRegistry } from '@/engine/controls/registry';
 import type { SceneIR } from '@/engine/ir/types';
 
-// pick the backend from the scene (svg by default). canvas/webgl slot in here later
-const renderers = { svg: SvgRenderer };
-
 export function Scene({ ir }: { ir: SceneIR }) {
-  const Renderer = renderers[ir.space.render ?? 'svg'];
+  const Renderer = ir.space.type === 'numberline' ? NumberlineRenderer : SvgRenderer;
   return (
     <SceneProvider ir={ir}>
       <div className="flex flex-col gap-4">

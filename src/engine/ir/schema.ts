@@ -20,14 +20,19 @@ const enumVar = z.object({
 const stateVar = z.discriminatedUnion('type', [numberVar, booleanVar, enumVar]);
 
 // space = the coord system the scene lives in
-const space = z.object({
-  type: z.enum(['plane', 'numberline', 'geometry', 'free']),
-  xDomain: z.tuple([z.number(), z.number()]),
-  yDomain: z.tuple([z.number(), z.number()]),
-  grid: z.boolean().optional(),
-  axes: z.boolean().optional(),
-  render: z.enum(['svg']).optional(),
-});
+// yDomain is required for everything except numberline (which is 1D)
+const space = z
+  .object({
+    type: z.enum(['plane', 'numberline', 'geometry', 'free']),
+    xDomain: z.tuple([z.number(), z.number()]),
+    yDomain: z.tuple([z.number(), z.number()]).optional(),
+    grid: z.boolean().optional(),
+    axes: z.boolean().optional(),
+  })
+  .refine((s) => s.type === 'numberline' || s.yDomain !== undefined, {
+    message: 'yDomain is required unless type is "numberline"',
+    path: ['yDomain'],
+  });
 
 // objects = the visual stuff, props are exprs over state
 const objBase = {

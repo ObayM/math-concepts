@@ -8,16 +8,17 @@ export const sceneSection: DocSection = {
   entries: [
     {
       keyword: 'scene',
-      syntax: 'scene <type> {\n  x: [min,max]\n  y: [min,max]\n  [grid]\n  [axes]\n  ...\n}',
+      syntax: 'scene <type> {\n  x: [min,max]\n  [y: [min,max]]\n  [grid]\n  [axes]\n  ...\n}',
       description:
-        '`type` is one of: `plane`, `numberline`, `geometry`, `free`. The space config lines (`x`, `y`, `grid`, `axes`) can appear anywhere in the block, in any order, alongside state/object/control declarations.',
+        '`type` is `plane` (2D cartesian) or `numberline` (1D axis). For `plane`, both `x:` and `y:` are required. For `numberline`, only `x:` is needed. The space config lines can appear anywhere in the block, in any order, alongside state/object/control declarations.',
       props: [
         { name: 'x', type: '[number, number]', description: 'x-axis domain', required: true },
-        { name: 'y', type: '[number, number]', description: 'y-axis domain', required: true },
-        { name: 'grid', type: 'flag', description: 'draw a background grid' },
-        { name: 'axes', type: 'flag', description: 'draw x/y axes' },
+        { name: 'y', type: '[number, number]', description: 'y-axis domain (plane only)' },
+        { name: 'grid', type: 'flag', description: 'draw a background grid (plane only)' },
+        { name: 'axes', type: 'flag', description: 'draw axes' },
       ],
-      example: 'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n}',
+      example:
+        'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n}\n\nscene numberline {\n  x: [-10, 10]\n  axes\n}',
     },
     {
       keyword: 'param',

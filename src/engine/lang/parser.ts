@@ -2,7 +2,7 @@ import type { Token, TT } from './tokens';
 import type { Expr, PropMap, Stmt, IfCase } from './ast';
 import { CompileError } from './errors';
 
-const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes', 'render']);
+const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes']);
 
 export function parse(tokens: Token[]): Stmt[] {
   let pos = 0;

@@ -13,6 +13,7 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
   const { scope, set } = useScene();
   const svgRef = useRef<SVGSVGElement>(null);
 
+  if (!ir.space.yDomain) return null; // plane scenes must have yDomain
   const [xMin, xMax] = ir.space.xDomain;
   const [yMin, yMax] = ir.space.yDomain;
 

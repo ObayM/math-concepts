@@ -4,7 +4,7 @@ export const objectsSection: DocSection = {
   id: 'objects',
   title: 'Objects',
   description:
-    'Objects are the visual elements of a scene. Properties go in a trailing `{ key: value }` block — omit it entirely if the object needs no configuration. All objects accept: `color`, `style` (solid/dashed/dotted), `show:<expr>`, `width:<number>`.',
+    'Objects are the visual elements of a scene. Properties go in a trailing `{ key: value }` block — omit it entirely if the object needs no configuration. All objects accept: `color`, `style` (solid/dashed/dotted), `show:<expr>`, `width:<number>`. **Note:** `curve`, `line`, `rect`, `circle`, `polygon`, `vector`, `arc` require `plane` scenes; only `point` and `label` work on `numberline` scenes.',
   entries: [
     {
       keyword: 'curve',
