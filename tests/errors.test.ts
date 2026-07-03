@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { compile } from '@/engine/lang';
+import { compile, compileLesson } from '@/engine/lang';
 import { CompileError, formatCompileError } from '@/engine/lang/errors';
-import { compileLesson } from '@/lib/lessons/dsl';
 
 // error table: every case should throw a CompileError with a useful message.
 // i snapshot the messages so error *quality* regressions show up in review.
@@ -39,9 +38,15 @@ const sceneCases: Record<string, string> = {
 };
 
 const lessonCases: Record<string, string> = {
-  'quiz without correct option': '@quiz title="q"\nWhich one?\n- nope\n- also nope',
-  'build without bank': '@build title="b"\nanswer: x + 2',
-  'unknown block type': '@wat title="huh"\nsome text',
+  'quiz without a correct option':
+    'lesson "L" {\n  slide "s" {\n    quiz {\n      ask "?"\n      - "a"\n      - "b"\n    }\n  }\n}',
+  'quiz without an ask':
+    'lesson "L" {\n  slide "s" {\n    quiz {\n      - "a"\n      * "b"\n    }\n  }\n}',
+  'build without a bank':
+    'lesson "L" {\n  slide "s" {\n    build {\n      ask "?"\n      answer: ["x"]\n    }\n  }\n}',
+  'two exercises on one slide':
+    'lesson "L" {\n  slide "s" {\n    quiz { ask "?"\n - "a"\n * "b" }\n    quiz { ask "?"\n - "c"\n * "d" }\n  }\n}',
+  'unknown thing in slide': 'lesson "L" {\n  slide "s" {\n    wobble\n  }\n}',
 };
 
 describe('scene compile errors', () => {

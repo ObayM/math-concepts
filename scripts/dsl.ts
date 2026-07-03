@@ -1,87 +1,49 @@
 import fs from 'fs';
 import path from 'path';
-import { compile, CompileError, formatCompileError } from '@/engine/lang';
+import { compile, compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 
 const G = '\x1b[32m';
 const R = '\x1b[31m';
 const Y = '\x1b[33m';
 const C = '\x1b[36m';
-const DIM = '\x1b[2m';
 const B = '\x1b[1m';
 const X = '\x1b[0m';
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 
-type Scene = { title: string; src: string };
+// a .prism file is either a `lesson { ... }` or a bare `scene { ... }`
+function isLesson(src: string): boolean {
+  return /^\s*lesson\b/.test(src);
+}
 
-function extractScenes(text: string): Scene[] {
-  const scenes: Scene[] = [];
-  let i = 0;
-  const lines = text.split('\n');
-  while (i < lines.length) {
-    if (lines[i].startsWith('@scene')) {
-      const m = lines[i].match(/title="([^"]+)"/);
-      const title = m ? m[1] : `line ${i + 1}`;
-      const body: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].startsWith('@')) body.push(lines[i++]);
-      const src = body.filter((l) => !l.trim().startsWith('>')).join('\n');
-      scenes.push({ title, src });
-    } else {
-      i++;
-    }
-  }
-  return scenes;
+function printError(src: string, e: unknown, indent = '  ') {
+  const frame = e instanceof CompileError ? formatCompileError(src, e) : String(e);
+  console.log(
+    frame
+      .split('\n')
+      .map((l) => `${indent}${R}${l}${X}`)
+      .join('\n')
+  );
 }
 
 function checkFile(filePath: string): boolean {
-  const text = fs.readFileSync(filePath, 'utf8');
+  const src = fs.readFileSync(filePath, 'utf8');
   const name = path.basename(filePath);
-
-  if (!text.includes('@scene')) {
-    try {
-      compile(text);
-      console.log(`${G}✓${X} ${name}`);
-      return true;
-    } catch (e) {
-      console.log(`${R}✗${X} ${name}`);
-      const frame = e instanceof CompileError ? formatCompileError(text, e) : String(e);
-      console.log(
-        frame
-          .split('\n')
-          .map((l) => `  ${R}${l}${X}`)
-          .join('\n')
-      );
-      return false;
-    }
-  }
-
-  const scenes = extractScenes(text);
-  if (!scenes.length) {
-    console.log(`${Y}?${X} ${name}: no @scene blocks`);
-    return true;
-  }
-
-  let ok = true;
-  for (let i = 0; i < scenes.length; i++) {
-    const { title, src } = scenes[i];
-    try {
+  try {
+    if (isLesson(src)) {
+      const lesson = compileLesson(src);
+      console.log(`${G}✓${X} ${name} ${Y}(lesson, ${lesson.slides.length} slides)${X}`);
+    } else {
       compile(src);
-      console.log(`  ${G}✓${X} ${DIM}[${i + 1}]${X} ${title}`);
-    } catch (e) {
-      console.log(`  ${R}✗${X} ${DIM}[${i + 1}]${X} ${title}`);
-      const frame = e instanceof CompileError ? formatCompileError(src, e) : String(e);
-      console.log(
-        frame
-          .split('\n')
-          .map((l) => `       ${R}${l}${X}`)
-          .join('\n')
-      );
-      ok = false;
+      console.log(`${G}✓${X} ${name} ${Y}(scene)${X}`);
     }
+    return true;
+  } catch (e) {
+    console.log(`${R}✗${X} ${name}`);
+    printError(src, e);
+    return false;
   }
-  return ok;
 }
 
 if (cmd === 'check') {
@@ -93,54 +55,38 @@ if (cmd === 'check') {
   process.exit(checkFile(path.resolve(file)) ? 0 : 1);
 } else if (cmd === 'check-all') {
   const dir = argv[1] ?? 'prisma/lessons';
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.dsl'));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.prism'));
   let anyFail = false;
   for (const f of files) {
-    console.log(`${B}${C}${f}${X}`);
     if (!checkFile(path.join(dir, f))) anyFail = true;
   }
   process.exit(anyFail ? 1 : 0);
 } else if (cmd === 'compile') {
   const file = argv[1];
-  const n = parseInt(argv[2] ?? '1', 10);
   if (!file) {
-    console.error('usage: dsl compile <file> [scene-number]');
+    console.error('usage: dsl compile <file>');
     process.exit(1);
   }
-  const text = fs.readFileSync(path.resolve(file), 'utf8');
-  let src = text;
-  let title = path.basename(file);
-  if (text.includes('@scene')) {
-    const scenes = extractScenes(text);
-    if (!scenes.length) {
-      console.error('no @scene blocks found');
-      process.exit(1);
-    }
-    if (n < 1 || n > scenes.length) {
-      console.error(`scene ${n} out of range (file has ${scenes.length} scenes)`);
-      process.exit(1);
-    }
-    ({ src, title } = scenes[n - 1]);
-  }
+  const src = fs.readFileSync(path.resolve(file), 'utf8');
   try {
-    const ir = compile(src);
-    console.log(`${B}${C}${title}${X}`);
+    const ir = isLesson(src) ? compileLesson(src) : compile(src);
+    console.log(`${B}${C}${path.basename(file)}${X}`);
     console.log(JSON.stringify(ir, null, 2));
   } catch (e) {
-    console.error(`${R}error:${X} ${e instanceof CompileError ? e.message : e}`);
+    printError(src, e, '');
     process.exit(1);
   }
 } else {
-  console.log(`${B}dsl${X} - Mathly scene DSL compiler
+  console.log(`${B}dsl${X} - Prism compiler
 
 ${B}commands:${X}
-  check <file>          validate all @scene blocks in a lesson file
-  check-all [dir]       validate every .dsl file (default: prisma/lessons)
-  compile <file> [n]    compile scene n (default: 1) and print the IR as JSON
+  check <file>       validate a .prism lesson or scene file
+  check-all [dir]    validate every .prism file (default: prisma/lessons)
+  compile <file>     compile and print the IR as JSON
 
 ${B}examples:${X}
-  make dsl-check f=prisma/lessons/quadratics-1.dsl
+  make dsl-check f=prisma/lessons/quadratics-1.prism
   make dsl-check-all
-  make dsl-compile f=prisma/lessons/quadratics-1.dsl scene=2
+  make dsl-compile f=prisma/lessons/quadratics-1.prism
 `);
 }

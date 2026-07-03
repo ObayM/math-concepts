@@ -6,11 +6,15 @@ exports[`formatCompileError caret frame > points at the offending column with a 
   | line 4:14: unexpected token "^" (CARET)"
 `;
 
-exports[`lesson compile errors > build without bank 1`] = `"build "b" needs a bank:"`;
+exports[`lesson compile errors > build without a bank 1`] = `"line 3: build needs a bank: [...]"`;
 
-exports[`lesson compile errors > quiz without correct option 1`] = `"quiz "q" needs a * correct option"`;
+exports[`lesson compile errors > quiz without a correct option 1`] = `"line 3: quiz needs a * correct option"`;
 
-exports[`lesson compile errors > unknown block type 1`] = `"unknown block type "@wat""`;
+exports[`lesson compile errors > quiz without an ask 1`] = `"line 3: quiz needs an ask "...""`;
+
+exports[`lesson compile errors > two exercises on one slide 1`] = `"line 6: a slide can have at most one exercise"`;
+
+exports[`lesson compile errors > unknown thing in slide 1`] = `"line 3:5: unexpected "wobble" in slide"`;
 
 exports[`scene compile errors > None is gone 1`] = `"line 4:14: "None" is not supported — omit the prop instead"`;
 

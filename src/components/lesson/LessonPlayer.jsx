@@ -14,7 +14,9 @@ import GraphBlock from './blocks/GraphBlock';
 import QuizBlock from './blocks/QuizBlock';
 import SceneBlock from './blocks/SceneBlock';
 import BuildBlock from './blocks/BuildBlock';
+import SlideView from './SlideView';
 import { checkable } from './checkable';
+import { exercises } from './exercises';
 
 const blockRegistry = {
   text: TextBlock,
@@ -22,6 +24,16 @@ const blockRegistry = {
   quiz: QuizBlock,
   scene: SceneBlock,
   build: BuildBlock,
+};
+
+// v2 slides are compositions (no `type`); v1 slides carry a `type`. one player,
+// both shapes, until the legacy lessons are ported.
+const isV2 = (s) => s && !s.type;
+const getChecker = (s) => {
+  if (!s) return null;
+  if (s.type) return checkable[s.type] ?? null;
+  if (s.exercise) return exercises[s.exercise.kind] ?? null;
+  return null;
 };
 
 export default function LessonPlayer({ slides = [], lessonId, coursePath = 'algebra' }) {
@@ -44,7 +56,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
 
   const slide = slides[currentIndex] ?? null;
   const isLast = currentIndex === slides.length - 1;
-  const checker = slide ? checkable[slide.type] : null;
+  const checker = getChecker(slide);
 
   useEffect(() => {
     if (!lessonId) return;
@@ -82,7 +94,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const next = slides[currentIndex];
-    const c = next ? checkable[next.type] : null;
+    const c = getChecker(next);
     setInteractiveValue(50);
     setAnswer(c ? c.initial(next) : null);
     setChecked(false);
@@ -136,7 +148,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     if (!checker) return;
     setChecked(true);
     const correct = checker.check(slide, answer);
-    setQuizHistory((h) => [...h, { title: slide.title, question: slide.content, correct }]);
+    const question = slide.exercise?.prompt ?? slide.content ?? '';
+    setQuizHistory((h) => [...h, { title: slide.title, question, correct }]);
   };
 
   const handleAnswerChange = (val) => {
@@ -147,7 +160,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
   const handleTutorAsk = async () => {
     if (!tutorQuery.trim()) return;
     setTutorLoading(true);
-    const answer = await askTutor(slide.content, tutorQuery);
+    const context = slide.content ?? slide.prose ?? slide.exercise?.prompt ?? slide.title;
+    const answer = await askTutor(context, tutorQuery);
     setTutorResponse(answer);
     setTutorLoading(false);
   };
@@ -199,7 +213,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
 
   const canAdvance = !checker || checked;
   const correct = checked && checker ? checker.check(slide, answer) : null;
-  const BlockRenderer = slide ? (blockRegistry[slide.type] ?? TextBlock) : null;
+  const BlockRenderer = slide && slide.type ? (blockRegistry[slide.type] ?? TextBlock) : null;
 
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface text-neutral-900 p-4 md:p-6 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
@@ -247,16 +261,26 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
             </div>
 
             <div className="flex-1 w-full">
-              {BlockRenderer && (
-                <BlockRenderer
+              {isV2(slide) ? (
+                <SlideView
                   slide={slide}
-                  interactiveValue={interactiveValue}
-                  onInteractiveChange={setInteractiveValue}
                   value={answer}
                   checked={checked}
                   correct={correct}
                   onChange={handleAnswerChange}
                 />
+              ) : (
+                BlockRenderer && (
+                  <BlockRenderer
+                    slide={slide}
+                    interactiveValue={interactiveValue}
+                    onInteractiveChange={setInteractiveValue}
+                    value={answer}
+                    checked={checked}
+                    correct={correct}
+                    onChange={handleAnswerChange}
+                  />
+                )
               )}
             </div>
           </div>

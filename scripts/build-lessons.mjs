@@ -1,6 +1,6 @@
-// compiles every prisma/lessons/*.dsl to *.json using the DSL compiler.
+// compiles every prisma/lessons/*.prism to *.json using the Prism compiler.
 // transpiles the compiler chain with the local tsc (no extra deps, works offline),
-// then runs compileLesson over each .dsl. run via `npm run build:lessons`.
+// then runs compileLesson over each .prism. run via `npm run build:lessons`.
 import { execSync } from 'node:child_process';
 import Module, { createRequire } from 'node:module';
 import fs from 'node:fs';
@@ -30,7 +30,7 @@ fs.writeFileSync(
       jsx: 'react-jsx',
       ignoreDeprecations: '6.0',
     },
-    include: ['src/engine/lang/**/*.ts', 'src/engine/ir/**/*.ts', 'src/lib/lessons/**/*.ts'],
+    include: ['src/engine/lang/**/*.ts', 'src/engine/ir/**/*.ts', 'src/engine/expr/**/*.ts'],
   })
 );
 
@@ -49,13 +49,13 @@ try {
   };
 
   const require = createRequire(import.meta.url);
-  const { compileLesson } = require(path.join(out, 'lib/lessons/dsl.js'));
+  const { compileLesson } = require(path.join(out, 'engine/lang/compile.js'));
 
-  const files = fs.readdirSync(lessonsDir).filter((f) => f.endsWith('.dsl'));
+  const files = fs.readdirSync(lessonsDir).filter((f) => f.endsWith('.prism'));
   for (const file of files) {
     const src = fs.readFileSync(path.join(lessonsDir, file), 'utf8');
     const data = compileLesson(src);
-    const jsonPath = path.join(lessonsDir, file.replace(/\.dsl$/, '.json'));
+    const jsonPath = path.join(lessonsDir, file.replace(/\.prism$/, '.json'));
     fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2) + '\n');
     console.log(`built ${file} -> ${path.basename(jsonPath)} (${data.slides.length} slides)`);
   }
