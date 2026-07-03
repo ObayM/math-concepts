@@ -1,0 +1,125 @@
+lesson "Differentiation IV — Trigonometric Functions" {
+  course: "calculus"
+
+  slide "The Star Result" {
+    id: "d4-intro"
+    cat: "Sine & Cosine"
+    > Here is one of the most beautiful facts in calculus:
+    >
+    > $$\frac{d}{dx}\,\sin x = \cos x$$
+    >
+    > The slope of the sine curve, at every point, is exactly the **height of the
+    > cosine curve**. Drag the point below and watch it: where sine is steepest
+    > (at $x = 0$) its slope is $1 = \cos 0$; at the crest of sine the slope is
+    > $0 = \cos(\tfrac{\pi}{2})$.
+
+    scene plane {
+      x: [-6.5, 6.5]
+      y: [-1.6, 1.6]
+      grid
+      axes
+      param a = 0.6 { range: [-6.2, 6.2], step: 0.1 }
+      curve s = sin(x) { color: primary, width: 3 }
+      curve c = cos(x) { color: accent, width: 2, style: dashed }
+      point P = (a, sin(a)) { color: primary, r: 7, drag: x -> a }
+      point S = (a, cos(a)) { color: accent, r: 5, label: "slope = ${cos(a)}" }
+      line tangent { through: P, slope: cos(a), color: success, width: 2 }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "And Its Partner" {
+    id: "d4-cos"
+    cat: "Sine & Cosine"
+    > Cosine differentiates into sine — but watch the **sign**:
+    >
+    > $$\frac{d}{dx}\,\cos x = -\sin x$$
+    >
+    > The minus sign appears because cosine is *falling* where sine is positive.
+    > These two derivatives are the seed for every other trig rule.
+  }
+
+  slide "The Other Four" {
+    id: "d4-table"
+    cat: "All Six"
+    > From $\sin$ and $\cos$ (via the quotient rule) come the rest. Notice the
+    > pattern: every **co**-function ($\cos,\ \cot,\ \csc$) carries a **minus sign**.
+    >
+    > $$\frac{d}{dx}\,\tan x = \sec^{2} x \qquad \frac{d}{dx}\,\cot x = -\csc^{2} x$$
+    >
+    > $$\frac{d}{dx}\,\sec x = \sec x\,\tan x \qquad \frac{d}{dx}\,\csc x = -\csc x\,\cot x$$
+  }
+
+  slide "Tangent and Its Derivative" {
+    id: "d4-tan"
+    cat: "All Six"
+    > Between its vertical asymptotes, $\tan x$ (blue) only ever climbs — never
+    > flat, never falling. That matches its derivative $\sec^{2}x$ (dashed), which
+    > is **always positive**. Drag the point to feel how steep $\tan$ gets near the
+    > edges.
+
+    scene plane {
+      x: [-1.4, 1.4]
+      y: [-6, 6]
+      grid
+      axes
+      param a = 0.5 { range: [-1.4, 1.4], step: 0.05 }
+      curve t = tan(x) { color: primary, width: 3 }
+      curve dt = 1 / (cos(x))^2 { color: accent, width: 2, style: dashed }
+      point P = (a, tan(a)) { color: primary, r: 7, drag: x -> a }
+      line tangent { through: P, slope: 1 / (cos(a))^2, color: success, width: 2 }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "Derivative of Cosine" {
+    id: "d4-quiz-cos"
+    cat: "Check"
+    quiz {
+      ask "What is $\frac{d}{dx}\,\cos x$?"
+      - "$\sin x$" { why: "Almost — cosine's derivative carries a minus sign." }
+      * "$-\sin x$"
+      - "$\cos x$"
+      - "$-\cos x$"
+      hint "Cosine is falling where sine is positive."
+      ! "$\frac{d}{dx}\cos x = -\sin x$."
+    }
+  }
+
+  slide "Derivative of Tangent" {
+    id: "d4-quiz-tan"
+    cat: "Check"
+    quiz {
+      ask "What is $\frac{d}{dx}\,\tan x$?"
+      * "$\sec^2 x$"
+      - "$-\csc^2 x$" { why: "That's the derivative of cot x, the co-function." }
+      - "$\sec x \tan x$" { why: "That's the derivative of sec x." }
+      - "$\cot x$"
+      hint "Write tan as sin/cos and apply the quotient rule."
+      ! "$\frac{d}{dx}\tan x = \sec^2 x$."
+    }
+  }
+
+  slide "Chain Rule Meets Sine" {
+    id: "d4-num"
+    cat: "Check"
+    numeric {
+      ask "Let $h(x) = \sin(2x)$. Find $h'(0)$."
+      answer: 2
+      hint "Chain rule: $h'(x) = \cos(2x)\cdot 2$."
+      ! "$h'(x) = 2\cos(2x)$, so $h'(0) = 2\cos 0 = 2$."
+    }
+  }
+
+  slide "Build a Trig Derivative" {
+    id: "d4-build"
+    cat: "Check"
+    build {
+      ask "Assemble $\frac{d}{dx}\,\sec x$."
+      bank: ["sec x", "·", "tan x", "csc x", "-"]
+      answer: ["sec x", "·", "tan x"]
+      hint "It's a product of two trig functions, no minus sign."
+      ! "$\frac{d}{dx}\sec x = \sec x\,\tan x$."
+    }
+  }
+}

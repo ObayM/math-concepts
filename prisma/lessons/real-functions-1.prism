@@ -1,0 +1,135 @@
+lesson "Intro to Real Functions" {
+  course: "algebra"
+
+  slide "Welcome to Functions!" {
+    id: "l1-intro"
+    cat: "Basics"
+    > Functions are the fundamental building blocks of mathematics. Think of a
+    > function as a machine: you input one number, and it outputs exactly one
+    > corresponding number. Our goal is to understand the two main rules:
+    > **Domain** (valid inputs) and **Range** (possible outputs).
+  }
+
+  slide "The 'Plus 2' Machine" {
+    id: "l1-machine"
+    cat: "Basics"
+    > Consider the function f(x) = x + 2. This machine takes any input and adds 2
+    > to it. Drag the point to feed the machine different inputs and watch the output.
+
+    scene plane {
+      x: [-5, 10]
+      y: [-5, 15]
+      grid
+      axes
+      param t = 3 { range: [-2, 8], step: 0.1 }
+      curve f = x + 2 { color: primary, width: 3 }
+      line drop = (t, 0) -> (t, t + 2) { color: neutral, style: dashed }
+      line over = (0, t + 2) -> (t, t + 2) { color: neutral, style: dashed }
+      point p = (t, t + 2) { color: danger, r: 7, drag: x -> t, label: "f(${t}) = ${t + 2}" }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "The Domain: Valid Inputs" {
+    id: "l1-domain"
+    cat: "Domain"
+    > What numbers can we put into f(x) = x + 2? Any real number! There are no
+    > restrictions. The **Domain** is all real numbers, written as (-∞, ∞).
+
+    scene plane {
+      x: [-10, 10]
+      y: [-10, 10]
+      grid
+      axes
+      param t = 2 { range: [-8, 8], step: 0.1 }
+      curve f = x + 2 { color: primary, width: 3 }
+      line domain = (-10, 0) -> (10, 0) { color: success, width: 4 }
+      label at (7, 0.8) = "Domain" { color: success }
+      point p = (t, t + 2) { color: danger, r: 6 }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "The Range: Possible Outputs" {
+    id: "l1-range"
+    cat: "Range"
+    > Since we can input any number, we can also get any number out. The **Range**
+    > is also all real numbers, (-∞, ∞).
+
+    scene plane {
+      x: [-10, 10]
+      y: [-10, 10]
+      grid
+      axes
+      param t = 2 { range: [-8, 8], step: 0.1 }
+      curve f = x + 2 { color: primary, width: 3 }
+      line range = (0, -10) -> (0, 10) { color: accent, width: 4 }
+      label at (1.4, 8) = "Range" { color: accent }
+      point p = (t, t + 2) { color: danger, r: 6 }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Rule #1: Division by Zero" {
+    id: "l1-div-zero"
+    cat: "Restrictions"
+    > Some functions have restrictions. You cannot divide by zero. Consider
+    > f(x) = 1/x. As x gets closer to 0, the value explodes. At x=0, it's undefined.
+
+    scene plane {
+      x: [-5, 5]
+      y: [-10, 10]
+      grid
+      axes
+      param t = 2 { range: [-4, 4], step: 0.1 }
+      curve f = 1 / x { color: danger, width: 3 }
+      line asymp = (0, -10) -> (0, 10) { color: neutral, style: dashed }
+      label at (0.6, 8) = "x≠0" { color: neutral }
+      point p = (t, 1 / t) { color: primary, r: 6 }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Quiz: Identify the Restriction" {
+    id: "l1-quiz-1"
+    cat: "Assessment"
+    quiz {
+      ask "For the function f(x) = 5 / (x - 3), which input value is not allowed?"
+      - "All real numbers"
+      * "All real numbers except x = 3"
+      - "All real numbers except x = 5"
+      - "x > 3"
+    }
+  }
+
+  slide "Rule #2: Negative Square Roots" {
+    id: "l1-sqrt"
+    cat: "Restrictions"
+    > In the real number system, you cannot take the square root of a negative
+    > number. Try f(x) = √x. The graph only exists for x ≥ 0.
+
+    scene plane {
+      x: [-2, 10]
+      y: [-2, 5]
+      grid
+      axes
+      param t = 4 { range: [0, 9], step: 0.1 }
+      curve f = sqrt(x) { color: success, width: 3 }
+      point p = (t, sqrt(t)) { color: danger, r: 6 }
+      label at (-1, 1) = "No Graph Here" { color: neutral }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Challenge: Find the Domain" {
+    id: "l1-quiz-2"
+    cat: "Assessment"
+    quiz {
+      ask "For f(x) = √(x - 2), what is the smallest valid x ?"
+      - "(-∞, 2)"
+      - "(-∞, 2]"
+      - "(2, ∞)"
+      * "[2, ∞)"
+    }
+  }
+}

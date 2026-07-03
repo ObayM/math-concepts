@@ -1,0 +1,102 @@
+lesson "Differentiation III — The Chain Rule" {
+  course: "calculus"
+
+  slide "Functions Inside Functions" {
+    id: "d3-intro"
+    cat: "Chain Rule"
+    > Many functions are **composites** — one function wrapped inside another. In
+    > $h(x) = (3x + 1)^{5}$, the *inside* is $g(x) = 3x + 1$ and the *outside* is
+    > $f(u) = u^{5}$. You can't power-rule this directly, because the base isn't
+    > just $x$. Enter the **chain rule**.
+  }
+
+  slide "Rates Multiply" {
+    id: "d3-rule"
+    cat: "Chain Rule"
+    > The chain rule says the rates **multiply**:
+    >
+    > $$\frac{d}{dx}\,f\!\left(g(x)\right) = f'\!\left(g(x)\right)\cdot g'(x)$$
+    >
+    > Think of gears: if the outer function turns twice as fast as its input, and
+    > the inner turns three times as fast as $x$, the whole chain runs $2 \times 3 = 6$
+    > times as fast. Below, $h(x) = (x^2 - 2)^2$ with its chain-rule derivative
+    > $4x(x^2-2)$ dashed. Drag the point — the tangent's slope is always the product.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-4, 10]
+      grid
+      axes
+      param a = 1.5 { range: [-3, 3], step: 0.1 }
+      curve h = (x^2 - 2)^2 { color: primary, width: 3 }
+      curve hprime = 4*x*(x^2 - 2) { color: accent, width: 2, style: dashed }
+      point P = (a, (a^2 - 2)^2) { color: primary, r: 7, drag: x -> a }
+      line tangent { through: P, slope: 4*a*(a^2 - 2), color: success, width: 2 }
+      point S = (a, 4*a*(a^2 - 2)) { color: accent, r: 5, label: "h'(a) = ${4*a*(a^2 - 2)}" }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "The Recipe" {
+    id: "d3-recipe"
+    cat: "Chain Rule"
+    > Two steps, every time:
+    >
+    > 1. **Differentiate the outside**, leaving the inside untouched.
+    > 2. **Multiply by the derivative of the inside.**
+    >
+    > For $h(x) = (3x + 1)^{5}$: the outside power gives $5(3x+1)^{4}$, the inside
+    > $3x+1$ gives $3$, so
+    >
+    > $$h'(x) = 5(3x + 1)^{4}\cdot 3 = 15(3x + 1)^{4}.$$
+  }
+
+  slide "Spot the Chain Rule" {
+    id: "d3-quiz"
+    cat: "Chain Rule"
+    quiz {
+      ask "What is $\frac{d}{dx}\left[(x^{2} + 1)^{3}\right]$?"
+      - "$3(x^2 + 1)^2$" { why: "You forgot to multiply by the derivative of the inside, 2x." }
+      * "$6x(x^2 + 1)^2$"
+      - "$3(2x)^2$" { why: "Differentiate the outside first, keeping the inside intact." }
+      - "$(x^2+1)^2 \cdot 2x$" { why: "Close, but the outer power 3 must come down too." }
+      hint "Outside: 3(inside)². Inside derivative: 2x. Multiply."
+      ! "$3(x^2+1)^2 \cdot 2x = 6x(x^2+1)^2$."
+    }
+  }
+
+  slide "Chain + Power" {
+    id: "d3-num-cube"
+    cat: "Chain Rule"
+    numeric {
+      ask "Let $h(x) = (2x + 1)^{3}$. Find $h'(0)$."
+      answer: 6
+      hint "$h'(x) = 3(2x+1)^2 \cdot 2 = 6(2x+1)^2$."
+      ! "$h'(x) = 6(2x+1)^2$, so $h'(0) = 6 \cdot 1 = 6$."
+    }
+  }
+
+  slide "Chain Under a Root" {
+    id: "d3-num-root"
+    cat: "Chain Rule"
+    numeric {
+      ask "Let $h(x) = \sqrt{x^{2} + 9}$. Find $h'(4)$."
+      answer: 0.8
+      tolerance: 0.001
+      hint "Write it as $(x^2+9)^{1/2}$; the inside derivative is $2x$."
+      ! "$h'(x) = \dfrac{x}{\sqrt{x^2+9}}$, so $h'(4) = \dfrac{4}{5} = 0.8$."
+    }
+  }
+
+  slide "Build the Chain Rule" {
+    id: "d3-build"
+    cat: "Chain Rule"
+    build {
+      ask "Assemble the chain rule for $\frac{d}{dx}\,f(g(x))$."
+      bank: ["f'(g(x))", "·", "g'(x)", "g'(f(x))", "f'(x)"]
+      answer: ["f'(g(x))", "·", "g'(x)"]
+      hint "Outer derivative at the inner function, times the inner derivative."
+      ! "$f'(g(x)) \cdot g'(x)$ — outside-at-inside times inside's derivative."
+    }
+  }
+}

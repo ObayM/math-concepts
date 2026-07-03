@@ -1,0 +1,118 @@
+lesson "Operations on Functions" {
+  course: "algebra"
+
+  slide "Operations on Functions" {
+    id: "l3-intro"
+    cat: "Basics"
+    > Just like numbers, we can add, subtract, multiply, and divide functions.
+    > We can also compose them!
+  }
+
+  slide "Adding Functions" {
+    id: "l3-add"
+    cat: "Addition"
+    > If f(x) = x + 2 and g(x) = 3x, then (f + g)(x) = (x + 2) + 3x = 4x + 2.
+    > We simply add their outputs.
+
+    scene plane {
+      x: [-5, 5]
+      y: [-10, 20]
+      grid
+      axes
+      param t = 1 { range: [-3, 3], step: 0.1 }
+      curve f = x + 2 { color: neutral, width: 2, style: dashed }
+      curve g = 3*x { color: neutral, width: 2, style: dashed }
+      curve sum = 4*x + 2 { color: primary, width: 4 }
+      point p = (t, 4*t + 2) { color: danger, r: 6, label: "f+g" }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Subtracting Functions" {
+    id: "l3-sub"
+    cat: "Subtraction"
+    > f(x) = 2x + 1 and g(x) = x. (f - g)(x) = (2x + 1) - x = x + 1.
+
+    scene plane {
+      x: [-5, 5]
+      y: [-5, 10]
+      grid
+      axes
+      param t = 1 { range: [-3, 3], step: 0.1 }
+      curve f = 2*x + 1 { color: neutral, width: 2, style: dashed }
+      curve g = x { color: neutral, width: 2, style: dashed }
+      curve diff = x + 1 { color: danger, width: 4 }
+      point p = (t, t + 1) { color: primary, r: 6, label: "f-g" }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Multiplying Functions" {
+    id: "l3-mul"
+    cat: "Multiplication"
+    > f(x) = x and g(x) = x + 1. (f * g)(x) = x(x + 1) = x² + x.
+    > Multiplication can change the type of function (linear to quadratic).
+
+    scene plane {
+      x: [-5, 5]
+      y: [-5, 20]
+      grid
+      axes
+      param t = 1 { range: [-3, 3], step: 0.1 }
+      curve f = x { color: neutral, width: 2, style: dashed }
+      curve g = x + 1 { color: neutral, width: 2, style: dashed }
+      curve prod = x^2 + x { color: accent, width: 4 }
+      point p = (t, t^2 + t) { color: danger, r: 6, label: "f*g" }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Dividing Functions" {
+    id: "l3-div"
+    cat: "Division"
+    > Be careful with division! (f / g)(x) = f(x) / g(x). The domain excludes
+    > values where g(x) = 0 — here the hole at x = 1 marks that gap.
+
+    scene plane {
+      x: [-5, 5]
+      y: [-5, 10]
+      grid
+      axes
+      param t = 2 { range: [-3, 3], step: 0.1 }
+      curve quot = x + 1 { color: success, width: 4 }
+      circle hole = (1, 2) { r: 0.12, color: success }
+      point p = (t, t + 1) { color: danger, r: 6 }
+      slider t { label: "Input x" }
+    }
+  }
+
+  slide "Quiz: Division Domain" {
+    id: "l3-quiz"
+    cat: "Assessment"
+    quiz {
+      ask "For (f / g)(x) = (x² - 1) / (x - 1), what value is excluded from the domain?"
+      - "x = 0"
+      * "x = 1"
+      - "x = -1"
+      - "x = 2"
+    }
+  }
+
+  slide "Composition of Functions" {
+    id: "l3-comp"
+    cat: "Composition"
+    > Composition (f ∘ g)(x) means applying g first, then f. f(g(x)).
+    > If f(x) = x + 2 and g(x) = 3x, then f(g(x)) = 3x + 2.
+
+    scene plane {
+      x: [-5, 5]
+      y: [-10, 20]
+      grid
+      axes
+      param t = 1 { range: [-3, 3], step: 0.1 }
+      curve comp = 3*x + 2 { color: warning, width: 4 }
+      point p = (t, 3*t + 2) { color: primary, r: 6, label: "f(g(x))" }
+      slider t { label: "Input x" }
+    }
+  }
+}

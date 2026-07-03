@@ -1,0 +1,112 @@
+lesson "Differentiation V — Mixed Drill" {
+  course: "calculus"
+
+  slide "Read the Structure First" {
+    id: "d5-intro"
+    cat: "Strategy"
+    > You now have every core rule: **power, sum/difference, product, quotient,
+    > chain**, and the **trig** derivatives. The skill now is choosing the right one.
+    >
+    > Before differentiating, ask: *what is the outermost operation?* A sum? Handle
+    > each term. A product or quotient? Reach for that rule. Something raised to a
+    > power or a trig function of an expression? That's a chain. Then work
+    > **outside-in**. Let's drill.
+  }
+
+  slide "Which Rule?" {
+    id: "d5-quiz-which"
+    cat: "Strategy"
+    quiz {
+      ask "Which rule do you apply **first** to differentiate $f(x) = x^{2}\sin x$?"
+      - "Chain rule" { why: "There's no function-inside-a-function here." }
+      * "Product rule" { why: "Correct — it's x² times sin x, a product." }
+      - "Quotient rule" { why: "Nothing is being divided." }
+      - "Power rule alone" { why: "Power rule handles x², but not the product with sin x." }
+      hint "It's one thing multiplied by another."
+      ! "$x^2 \sin x$ is a product, so start with the product rule."
+    }
+  }
+
+  slide "Product Drill" {
+    id: "d5-num-product"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = x^{2}(x + 3)$. Find $f'(2)$."
+      answer: 24
+      hint "$f'(x) = 2x(x+3) + x^2 = 3x^2 + 6x$."
+      ! "$f'(x) = 3x^2 + 6x$, so $f'(2) = 12 + 12 = 24$."
+    }
+  }
+
+  slide "Chain Drill" {
+    id: "d5-num-chain"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = (x^{2} + 1)^{4}$. Find $f'(1)$."
+      answer: 64
+      hint "$f'(x) = 4(x^2+1)^3 \cdot 2x = 8x(x^2+1)^3$."
+      ! "$f'(x) = 8x(x^2+1)^3$, so $f'(1) = 8 \cdot 8 = 64$."
+    }
+  }
+
+  slide "Quotient Drill" {
+    id: "d5-num-quotient"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = \dfrac{x + 2}{x - 2}$. Find $f'(0)$."
+      answer: -1
+      tolerance: 0.001
+      hint "$f'(x) = \dfrac{(1)(x-2) - (x+2)(1)}{(x-2)^2} = \dfrac{-4}{(x-2)^2}$."
+      ! "$f'(x) = \dfrac{-4}{(x-2)^2}$, so $f'(0) = \dfrac{-4}{4} = -1$."
+    }
+  }
+
+  slide "Product Meets Trig" {
+    id: "d5-num-trig"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = x\cos x$. Find $f'(0)$."
+      answer: 1
+      hint "Product rule: $f'(x) = \cos x - x\sin x$."
+      ! "$f'(x) = \cos x - x\sin x$, so $f'(0) = 1 - 0 = 1$."
+    }
+  }
+
+  slide "Chain Meets Trig" {
+    id: "d5-quiz-chaintrig"
+    cat: "Drills"
+    quiz {
+      ask "What is $\frac{d}{dx}\left[\sin(x^{2})\right]$?"
+      - "$\cos(x^2)$" { why: "Multiply by the derivative of the inside, 2x." }
+      * "$2x\cos(x^2)$"
+      - "$2x\cos x$" { why: "The inside x² stays inside the cosine." }
+      - "$\cos(2x)$"
+      hint "Outer: cos(inside). Inner derivative: 2x."
+      ! "$\cos(x^2)\cdot 2x = 2x\cos(x^2)$."
+    }
+  }
+
+  slide "Build a Product Derivative" {
+    id: "d5-build"
+    cat: "Drills"
+    build {
+      ask "Assemble $\frac{d}{dx}\left[x\sin x\right]$."
+      bank: ["sin x", "+", "x", "·", "cos x", "-"]
+      answer: ["sin x", "+", "x", "·", "cos x"]
+      hint "Product rule: (derivative of x)·sin x + x·(derivative of sin x)."
+      ! "$\frac{d}{dx}[x\sin x] = \sin x + x\cos x$."
+    }
+  }
+
+  slide "Capstone" {
+    id: "d5-capstone"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = \sqrt{x^{2} + 9}$. Find $f'(4)$. (Chain + power together.)"
+      answer: 0.8
+      tolerance: 0.001
+      hint "$(x^2+9)^{1/2}$ gives $f'(x) = \dfrac{x}{\sqrt{x^2+9}}$."
+      ! "$f'(4) = \dfrac{4}{\sqrt{25}} = \dfrac{4}{5} = 0.8$. You've got the toolkit."
+    }
+  }
+}

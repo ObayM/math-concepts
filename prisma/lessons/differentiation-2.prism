@@ -1,0 +1,112 @@
+lesson "Differentiation II — Product & Quotient Rules" {
+  course: "calculus"
+
+  slide "The Tempting Trap" {
+    id: "d2-trap"
+    cat: "Product Rule"
+    > It would be lovely if the derivative of a product were the product of the
+    > derivatives. It is **not**. Take $f(x) = x \cdot x = x^2$: we know $f'(x) = 2x$,
+    > but $f'(x)\,{\cdot}\,g'(x) = 1 \cdot 1 = 1$. Not even close. Products need their
+    > own rule.
+  }
+
+  slide "The Product Rule" {
+    id: "d2-product"
+    cat: "Product Rule"
+    > For a product of two functions $u(x)$ and $v(x)$:
+    >
+    > $$\left[u\,v\right]' = u'\,v + u\,v'$$
+    >
+    > **Differentiate one factor at a time, keep the other, and add.** A picture
+    > helps: think of $u$ and $v$ as the width and height of a rectangle, so the
+    > product $uv$ is its **area**. Grow the input and the area grows by a strip on
+    > the right *plus* a strip on top — exactly $u'v + uv'$.
+
+    scene plane {
+      x: [-0.5, 6]
+      y: [-0.5, 6]
+      grid
+      axes
+      param s = 2 { range: [0.2, 5], step: 0.1 }
+      rect box = (0, 0) { w: s, h: 0.5*s + 1, color: primary, opacity: 0.25 }
+      point corner = (s, 0.5*s + 1) { color: primary, r: 6, label: "area = u·v" }
+      label at (0.2, 5.6) = "u = s,  v = ½s + 1" { color: neutral }
+      slider s { label: "input s" }
+    }
+  }
+
+  slide "Product Rule in Action" {
+    id: "d2-num-product"
+    cat: "Product Rule"
+    numeric {
+      ask "Let $f(x) = (x + 1)(x^{2})$. Using the product rule, find $f'(2)$."
+      answer: 16
+      hint "With $u = x+1,\ v = x^2$: $f' = (1)(x^2) + (x+1)(2x)$."
+      ! "$f'(x) = x^2 + 2x(x+1) = 3x^2 + 2x$, so $f'(2) = 12 + 4 = 16$."
+    }
+  }
+
+  slide "Pick the Product Rule" {
+    id: "d2-quiz-product"
+    cat: "Product Rule"
+    quiz {
+      ask "Which expression is $\frac{d}{dx}\left[u\,v\right]$?"
+      - "$u'v'$" { why: "That's the trap — the derivative of a product is not the product of derivatives." }
+      * "$u'v + uv'$"
+      - "$u'v - uv'$" { why: "That's the numerator of the quotient rule, not the product rule." }
+      - "$u'v + u'v'$"
+      hint "Differentiate one factor, keep the other, then swap and add."
+      ! "$[uv]' = u'v + uv'$."
+    }
+  }
+
+  slide "The Quotient Rule" {
+    id: "d2-quotient"
+    cat: "Quotient Rule"
+    > Dividing? There's a rule for that too. For $\dfrac{u}{v}$:
+    >
+    > $$\left[\frac{u}{v}\right]' = \frac{u'\,v - u\,v'}{v^{2}}$$
+    >
+    > Order matters here — it's $u'v$ **minus** $uv'$, all over $v^2$. Below,
+    > $f(x) = \dfrac{x}{x^2+1}$ (blue) and its derivative $\dfrac{1-x^2}{(x^2+1)^2}$
+    > (dashed). Drag the point: the tangent is flat exactly where the derivative
+    > crosses zero, at $x = \pm 1$.
+
+    scene plane {
+      x: [-4, 4]
+      y: [-1.2, 1.2]
+      grid
+      axes
+      param a = 1 { range: [-4, 4], step: 0.1 }
+      curve f = x / (x^2 + 1) { color: primary, width: 3 }
+      curve fprime = (1 - x^2) / ((x^2 + 1)^2) { color: accent, width: 2, style: dashed }
+      point P = (a, a / (a^2 + 1)) { color: primary, r: 7, drag: x -> a }
+      line tangent { through: P, slope: (1 - a^2) / ((a^2 + 1)^2), color: success, width: 2 }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "Quotient Rule in Action" {
+    id: "d2-num-quotient"
+    cat: "Quotient Rule"
+    numeric {
+      ask "Let $f(x) = \dfrac{x}{x + 1}$. Find $f'(1)$."
+      answer: 0.25
+      tolerance: 0.001
+      hint "$f'(x) = \dfrac{(1)(x+1) - x(1)}{(x+1)^2} = \dfrac{1}{(x+1)^2}$."
+      ! "$f'(x) = \dfrac{1}{(x+1)^2}$, so $f'(1) = \dfrac{1}{4} = 0.25$."
+    }
+  }
+
+  slide "Build the Quotient Numerator" {
+    id: "d2-build"
+    cat: "Quotient Rule"
+    build {
+      ask "Assemble the numerator of $\left[\dfrac{u}{v}\right]'$."
+      bank: ["u'", "v", "-", "u", "v'", "+"]
+      answer: ["u'", "v", "-", "u", "v'"]
+      hint "It starts with the derivative of the top times the bottom."
+      ! "Numerator is $u'v - uv'$ (then divide by $v^2$)."
+    }
+  }
+}
