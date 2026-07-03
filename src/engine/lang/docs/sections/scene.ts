@@ -38,5 +38,20 @@ export const sceneSection: DocSection = {
         'Declares a boolean state variable. Toggles write to it; `show:` on objects reads from it.',
       example: 'bool showTangent = false',
     },
+    {
+      keyword: 'choice',
+      syntax: 'choice <name> = "<option>" { options: ["a", "b", ...] }',
+      description:
+        'Declares a string-valued state variable restricted to a fixed set of options. A `picker` control writes to it; object expressions read it and compare with `==`.',
+      props: [
+        {
+          name: 'options',
+          type: 'string[]',
+          description: 'the allowed values, required',
+          required: true,
+        },
+      ],
+      example: 'choice shape = "circle" { options: ["circle", "square", "triangle"] }',
+    },
   ],
 };

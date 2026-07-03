@@ -289,12 +289,16 @@ function makeParser(tokens: Token[]) {
         return parseParam(ln);
       case 'bool':
         return parseBoolDecl(ln);
+      case 'choice':
+        return parseChoice(ln);
       case 'let':
         return parseLet(ln);
       case 'def':
         return parseDef(ln);
       case 'for':
         return parseFor(ln);
+      case 'repeat':
+        return parseRepeat(ln);
       case 'if':
         return parseIf(ln);
       case 'curve':
@@ -323,6 +327,8 @@ function makeParser(tokens: Token[]) {
         return parseToggle(ln);
       case 'stepper':
         return parseStepper(ln);
+      case 'picker':
+        return parsePicker(ln);
       case 'button':
         return parseButton(ln);
       case 'step':
@@ -629,6 +635,16 @@ function makeParser(tokens: Token[]) {
     return { k: 'bool_d', name, init, ln };
   }
 
+  function parseChoice(ln: number): Stmt {
+    eat('IDENT', 'choice');
+    const name = eatIdent();
+    eat('ASSIGN');
+    const init = parseExpr();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'choice_d', name, init, props, ln };
+  }
+
   function parseLet(ln: number): Stmt {
     eat('IDENT', 'let');
     const name = eatIdent();
@@ -669,6 +685,20 @@ function makeParser(tokens: Token[]) {
     eat('RP');
     const body = parseBraceBlock();
     return { k: 'for_s', var: varName, start, end, step, body, ln };
+  }
+
+  function parseRepeat(ln: number): Stmt {
+    eat('IDENT', 'repeat');
+    const varName = eatIdent();
+    eat('IDENT', 'in');
+    eat('IDENT', 'range');
+    eat('LP');
+    const start = parseExpr();
+    eat('COMMA');
+    const count = parseExpr();
+    eat('RP');
+    const body = parseBraceBlock();
+    return { k: 'repeat_s', var: varName, start, count, body, ln };
   }
 
   function parseIf(ln: number): Stmt {
@@ -851,6 +881,14 @@ function makeParser(tokens: Token[]) {
     const props = parsePropsBlock();
     endStmt();
     return { k: 'stepper', bind, props, ln };
+  }
+
+  function parsePicker(ln: number): Stmt {
+    eat('IDENT', 'picker');
+    const bind = eatIdent();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'picker', bind, props, ln };
   }
 
   function parseButton(ln: number): Stmt {

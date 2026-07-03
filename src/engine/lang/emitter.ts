@@ -258,6 +258,16 @@ function evalId(expr: Expr, cScope: CompileScope, ln: number): string {
   throw new CompileError('expected an identifier or string as object id', ln);
 }
 
+function parseSnap(expr: Expr, ln: number): number | [number, number] | 'grid' {
+  if (expr.k === 'id' && expr.name === 'grid') return 'grid';
+  if (expr.k === 'num') return expr.v;
+  if (expr.k === 'tuple' && expr.items.length === 2) {
+    const [a, b] = expr.items;
+    if (a.k === 'num' && b.k === 'num') return [a.v, b.v];
+  }
+  throw new CompileError('snap must be a number, (number, number), or grid', ln);
+}
+
 function propNum(
   props: PropMap,
   key: string,
@@ -308,21 +318,25 @@ export function emit(stmts: Stmt[]): SceneIR {
   const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
   const macros: Macros = new Map();
   let autoLabelId = 0;
+  // vars bound by an enclosing `repeat` — valid runtime ids inside its body,
+  // resolved by the renderer at expand time, not here
+  let repeatVars: string[] = [];
 
   // runtime-bound expressions may only reference declared state (+ frame vars
   // like `x` in a curve). typos and use-before-declare become compile errors
   // here instead of silent zeros at runtime.
   function checkRuntime(expr: Expr, cScope: CompileScope, ln: number, extra: string[] = []): void {
+    const allowed = [...repeatVars, ...extra];
     const walk = (e: Expr): void => {
       switch (e.k) {
         case 'id': {
           const ok =
-            e.name in cScope || e.name in ir.state || e.name in CONSTS || extra.includes(e.name);
+            e.name in cScope || e.name in ir.state || e.name in CONSTS || allowed.includes(e.name);
           if (!ok) {
             const cands = [
               ...Object.keys(cScope),
               ...Object.keys(ir.state),
-              ...extra,
+              ...allowed,
               ...Object.keys(CONSTS),
             ];
             throw new CompileError(`"${e.name}" is not defined here${suggest(e.name, cands)}`, ln);
@@ -463,6 +477,31 @@ export function emit(stmts: Stmt[]): SceneIR {
         break;
       }
 
+      case 'repeat_s': {
+        const startV = cNum(s.start, cScope, s.ln);
+        if (startV !== 0) throw new CompileError('repeat range must start at 0', s.ln);
+        const count = lowerR(s.count, cScope, s.ln);
+
+        const savedObjects = ir.objects;
+        const savedRepeatVars = repeatVars;
+        ir.objects = [];
+        repeatVars = [...repeatVars, s.var];
+        run(s.body, cScope);
+        const body = ir.objects;
+        ir.objects = savedObjects;
+        repeatVars = savedRepeatVars;
+
+        if (!body.length) throw new CompileError('repeat body has no objects', s.ln);
+        ir.objects.push({
+          id: `__repeat_${autoLabelId++}`,
+          type: 'repeat',
+          var: s.var,
+          count,
+          body,
+        });
+        break;
+      }
+
       case 'if_s': {
         for (const { cond, body } of s.cases) {
           const take = cBool(cond, cScope, s.ln);
@@ -535,6 +574,24 @@ export function emit(stmts: Stmt[]): SceneIR {
         break;
       }
 
+      case 'choice_d': {
+        if (s.init.k !== 'str')
+          throw new CompileError('choice init must be a string literal', s.ln);
+        const optsExpr = s.props.get('options');
+        if (!optsExpr || optsExpr === true || optsExpr.k !== 'list' || !optsExpr.items.length) {
+          throw new CompileError('choice needs options: [...]', s.ln);
+        }
+        const options = optsExpr.items.map((item) => {
+          if (item.k !== 'str') throw new CompileError('choice options must be strings', s.ln);
+          return item.v;
+        });
+        if (!options.includes(s.init.v)) {
+          throw new CompileError(`choice init "${s.init.v}" is not in options`, s.ln);
+        }
+        ir.state[s.name] = { type: 'enum', init: s.init.v, options };
+        break;
+      }
+
       case 'curve': {
         const id = evalId(s.id, cScope, s.ln);
         const obj: any = { id, type: 'curve' };
@@ -594,19 +651,32 @@ export function emit(stmts: Stmt[]): SceneIR {
         const drag = s.props.get('drag');
         if (drag && drag !== true) {
           if (drag.k !== 'arrow') throw new CompileError('drag must be axis -> bind', s.ln);
-          const axis = drag.from.k === 'id' ? drag.from.name : ser(drag.from, cScope);
-          if (drag.to.k === 'id') {
-            obj.draggable = { axis, bind: bindTo(drag.to.name, 'drag', s.ln) };
-          } else if (drag.to.k === 'tuple' && drag.to.items.length === 2) {
-            const bindX =
-              drag.to.items[0].k === 'id' ? drag.to.items[0].name : ser(drag.to.items[0], cScope);
-            const bindY =
-              drag.to.items[1].k === 'id' ? drag.to.items[1].name : ser(drag.to.items[1], cScope);
+          if (drag.from.k === 'call' && drag.from.fn === 'along') {
+            if (drag.from.args.length !== 1 || drag.from.args[0].k !== 'id') {
+              throw new CompileError('along(...) takes one object id', s.ln);
+            }
+            if (drag.to.k !== 'id') throw new CompileError('along(...) -> binds one param', s.ln);
             obj.draggable = {
-              axis,
-              bind: bindTo(bindX, 'drag', s.ln),
-              bindY: bindTo(bindY, 'drag', s.ln),
+              bind: bindTo(drag.to.name, 'drag', s.ln),
+              along: { ref: drag.from.args[0].name },
             };
+          } else {
+            const axis = drag.from.k === 'id' ? drag.from.name : ser(drag.from, cScope);
+            if (drag.to.k === 'id') {
+              obj.draggable = { axis, bind: bindTo(drag.to.name, 'drag', s.ln) };
+            } else if (drag.to.k === 'tuple' && drag.to.items.length === 2) {
+              const bindX =
+                drag.to.items[0].k === 'id' ? drag.to.items[0].name : ser(drag.to.items[0], cScope);
+              const bindY =
+                drag.to.items[1].k === 'id' ? drag.to.items[1].name : ser(drag.to.items[1], cScope);
+              obj.draggable = {
+                axis,
+                bind: bindTo(bindX, 'drag', s.ln),
+                bindY: bindTo(bindY, 'drag', s.ln),
+              };
+            }
+            const snap = s.props.get('snap');
+            if (snap && snap !== true) obj.draggable.snap = parseSnap(snap, s.ln);
           }
         }
         applyCommon(obj, s.props, cScope, s.ln);
@@ -768,6 +838,18 @@ export function emit(stmts: Stmt[]): SceneIR {
         const step = propNum(s.props, 'step', s.ln, cScope);
         if (label) ctrl.label = label;
         if (step != null) ctrl.step = step;
+        ir.controls.push(ctrl);
+        break;
+      }
+
+      case 'picker': {
+        const bind = bindTo(s.bind, 'picker', s.ln);
+        if (ir.state[bind].type !== 'enum') {
+          throw new CompileError(`picker binds "${bind}" but it isn't a choice state`, s.ln);
+        }
+        const ctrl: any = { as: 'picker', bind };
+        const label = propStr(s.props, 'label', cScope);
+        if (label) ctrl.label = label;
         ir.controls.push(ctrl);
         break;
       }

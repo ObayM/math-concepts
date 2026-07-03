@@ -2,6 +2,7 @@
 import React, { useRef } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool, interpolate } from '@/engine/runtime/eval';
+import { expandObjects } from '@/engine/runtime/expand';
 import { resolveColor } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
@@ -86,7 +87,7 @@ export default function NumberlineRenderer({ ir }: { ir: SceneIR }) {
         <line x1={0} y1={Y_MID} x2={W} y2={Y_MID} stroke="#cbd5e1" strokeWidth={2} />
         {ticks}
 
-        {ir.objects.map((obj, i) => {
+        {expandObjects(ir.objects, scope).map((obj, i) => {
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
           if (obj.type === 'point') {
             const x = evalNumber(obj.x, scope);

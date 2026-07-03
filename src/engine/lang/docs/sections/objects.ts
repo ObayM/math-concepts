@@ -40,15 +40,20 @@ export const objectsSection: DocSection = {
     {
       keyword: 'point',
       syntax:
-        'point <id> = (x, y) { [drag: <axis> -> <bind>], [r: <number>], [label: "text"], [props] }',
+        'point <id> = (x, y) { [drag: <axis> -> <bind>], [snap: <n>|(nx,ny)|grid], [r: <number>], [label: "text"], [props] }',
       description:
-        'A point at scene coordinates (x, y). Both coords can be expressions. `drag` makes it draggable — axis is `x`, `y`, or `xy`; bind is the state key updated by the drag.',
+        "A point at scene coordinates (x, y). Both coords can be expressions. `drag` makes it draggable — axis is `x`, `y`, or `xy`; bind is the state key updated by the drag. `snap` rounds the dragged value to the nearest step (`grid` = nearest 1). `drag: along(<objId>) -> <bind>` constrains the drag to a `circle` or two-point `line` object — bind receives an angle (radians) for a circle, or 0..1 for a line segment; the point's own position should already be an expression of that param.",
       props: [
         { name: 'drag', type: 'axis -> bind', description: 'make it draggable, writes state' },
+        {
+          name: 'snap',
+          type: 'number | (number, number) | grid',
+          description: 'round the dragged value(s) to a step',
+        },
         { name: 'r', type: 'number', description: 'radius in pixels (default 6)' },
         { name: 'label', type: 'string', description: 'text label next to the point' },
       ],
-      example: `point p = (t, t^2) { drag: x -> t, color: accent }\npoint v = (vx, vy) { drag: xy -> (vx, vy), label: "vertex" }`,
+      example: `point p = (t, t^2) { drag: x -> t, color: accent }\npoint v = (vx, vy) { drag: xy -> (vx, vy), label: "vertex" }\npoint g = (t, t^2) { drag: x -> t, snap: 0.5 }\ncircle c = (0, 0) { r: 3 }\npoint onC = (3*cos(theta), 3*sin(theta)) { drag: along(c) -> theta }`,
     },
     {
       keyword: 'line',

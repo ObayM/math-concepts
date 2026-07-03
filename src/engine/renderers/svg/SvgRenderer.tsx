@@ -2,6 +2,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool } from '@/engine/runtime/eval';
+import { applyDrag, type Draggable } from '@/engine/runtime/drag';
+import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
@@ -44,35 +46,34 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
     yDomain: ir.space.yDomain,
   };
 
+  const objects = expandObjects(ir.objects, scope);
+
   // grab point positions so a "line through: <id>" can latch onto them
   const points: Record<string, { x: number; y: number }> = {};
-  for (const o of ir.objects) {
+  for (const o of objects) {
     if (o.type === 'point') points[o.id] = { x: evalNumber(o.x, scope), y: evalNumber(o.y, scope) };
   }
 
-  const startDrag =
-    (obj: { draggable?: { axis: string; bind: string; bindY?: string } }) =>
-    (e: React.PointerEvent) => {
-      if (!obj.draggable) return;
-      e.preventDefault();
-      const { axis, bind, bindY } = obj.draggable;
-      const move = (ev: PointerEvent) => {
-        const svg = svgRef.current;
-        if (!svg) return;
-        const rect = svg.getBoundingClientRect();
-        const dataX = xMin + ((ev.clientX - rect.left) / rect.width) * (xMax - xMin);
-        const dataY = yMax - ((ev.clientY - rect.top) / rect.height) * (yMax - yMin);
-        if (axis === 'x' || axis === 'xy') set(bind, dataX);
-        if (axis === 'y') set(bind, dataY);
-        if (axis === 'xy' && bindY) set(bindY, dataY);
-      };
-      const up = () => {
-        window.removeEventListener('pointermove', move);
-        window.removeEventListener('pointerup', up);
-      };
-      window.addEventListener('pointermove', move);
-      window.addEventListener('pointerup', up);
+  const startDrag = (obj: { draggable?: Draggable }) => (e: React.PointerEvent) => {
+    if (!obj.draggable) return;
+    e.preventDefault();
+    const draggable = obj.draggable;
+    const move = (ev: PointerEvent) => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      const rect = svg.getBoundingClientRect();
+      const dataX = xMin + ((ev.clientX - rect.left) / rect.width) * (xMax - xMin);
+      const dataY = yMax - ((ev.clientY - rect.top) / rect.height) * (yMax - yMin);
+      const patch = applyDrag(draggable, dataX, dataY, ir, scope);
+      for (const key in patch) set(key, patch[key]);
     };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
 
   // pick a "nice" tick spacing (1/2/5 × 10^k) so grid + numbers aren't cramped
   const niceStep = (range: number, target: number) => {
@@ -176,7 +177,7 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
         {grid}
         {axes}
         {ticks}
-        {ir.objects.map((obj, i) => {
+        {objects.map((obj, i) => {
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
           const Prim = svgPrimitives[obj.type];
           if (!Prim) return null;

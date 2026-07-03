@@ -17,6 +17,7 @@ const GRAMMAR_KEYWORDS = [
   'scene',
   'param',
   'bool',
+  'choice',
   // objects
   'curve',
   'area',
@@ -32,11 +33,13 @@ const GRAMMAR_KEYWORDS = [
   'slider',
   'toggle',
   'stepper',
+  'picker',
   'button',
   // timeline
   'step',
   // logic
   'for',
+  'repeat',
   'if',
   'let',
   'def',

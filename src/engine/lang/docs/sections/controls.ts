@@ -26,6 +26,12 @@ export const controlsSection: DocSection = {
       example: 'stepper n { label: "rectangles", step: 1 }',
     },
     {
+      keyword: 'picker',
+      syntax: 'picker <bind> { [label: "text"] }',
+      description: 'A row of pill buttons bound to a `choice` state variable, one per option.',
+      example: 'picker shape { label: "pick a shape" }',
+    },
+    {
       keyword: 'button',
       syntax:
         'button "label" { [set: {k: v}], [step: {k: v}], [animate: {k: v}], [toggle: "key"], [dur: <ms>], [ease: <curve>] }',

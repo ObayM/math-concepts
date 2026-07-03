@@ -21,6 +21,13 @@ export const logicSection: DocSection = {
       example: `for i in range(-4, 5) {\n  if i >= 0 {\n    rect f"pos{i}" = (i, 0) { w: 0.8, h: i, color: primary }\n  } else {\n    rect f"neg{i}" = (i, i) { w: 0.8, h: 0-i, color: neutral }\n  }\n}`,
     },
     {
+      keyword: 'repeat',
+      syntax: 'repeat <var> in range(0, <count>) {\n  ...\n}',
+      description:
+        "Expands at render time, not compile time — `<count>` can be a state expression (e.g. a slider), so the number of instances updates live as the learner drags it. The range must start at 0. Inside the body, `<var>` is a live runtime value (0..count-1), usable in any expression alongside real state. Each body object's id gets `#<i>` appended automatically, so plain ids are fine (no f-string needed). Capped at 500 instances.",
+      example: `param n = 4 { range: [1, 40], step: 1 }\nrepeat i in range(0, n) {\n  rect r = (i*4/n, 0) { w: 4/n, h: (i*4/n)^2, color: accent, opacity: 0.3 }\n}\nslider n { label: "rectangles" }`,
+    },
+    {
       keyword: 'let',
       syntax: 'let <name> = <expr>',
       description:

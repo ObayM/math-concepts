@@ -80,8 +80,15 @@ const pointObj = z.object({
   r: z.number().optional(),
   label: liveText.optional(),
   // bind = x-axis state key; bindY = y-axis state key (for axis 'xy' free drag)
+  // along = constrain the drag to a circle/segment, writing an angle/t param to bind instead
   draggable: z
-    .object({ axis: z.enum(['x', 'y', 'xy']), bind: z.string(), bindY: z.string().optional() })
+    .object({
+      axis: z.enum(['x', 'y', 'xy']).optional(),
+      bind: z.string(),
+      bindY: z.string().optional(),
+      snap: z.union([z.number(), z.tuple([z.number(), z.number()]), z.literal('grid')]).optional(),
+      along: z.object({ ref: z.string() }).optional(),
+    })
     .optional(),
   ...objBase,
 });
@@ -154,6 +161,18 @@ const arcObj = z.object({
   ...objBase,
 });
 
+// count is a NumExpr so it can bind to state (e.g. a slider); the renderer
+// expands this into `count` copies of body at render time — see runtime/expand.ts.
+// body items are plain scene objects, keyed `${id}#${i}` once expanded. shares
+// objBase (id/visibleIf/...) so it needs no special-casing where other objects go.
+const repeatObj = z.object({
+  type: z.literal('repeat'),
+  var: z.string(),
+  count: expr,
+  body: z.array(z.lazy((): z.ZodTypeAny => sceneObject)),
+  ...objBase,
+});
+
 const sceneObject = z.discriminatedUnion('type', [
   curveObj,
   areaObj,
@@ -165,6 +184,7 @@ const sceneObject = z.discriminatedUnion('type', [
   polygonObj,
   vectorObj,
   arcObj,
+  repeatObj,
 ]);
 
 // controls = the widgets, wired both ways to state
@@ -187,6 +207,12 @@ const stepperControl = z.object({
   label: z.string().optional(),
   step: z.number().optional(),
 });
+// bind must point at an enum state var; buttons render its options
+const pickerControl = z.object({
+  as: z.literal('picker'),
+  bind: z.string(),
+  label: z.string().optional(),
+});
 // a button fires one or more actions on click
 const buttonControl = z.object({
   as: z.literal('button'),
@@ -202,6 +228,7 @@ const control = z.discriminatedUnion('as', [
   sliderControl,
   toggleControl,
   stepperControl,
+  pickerControl,
   buttonControl,
 ]);
 

@@ -4,8 +4,8 @@ import type { SceneIR, Scope } from '@/engine/ir/types';
 
 type SceneCtx = {
   scope: Scope;
-  set: (key: string, value: number | boolean) => void;
-  setMany: (values: Record<string, number | boolean>) => void;
+  set: (key: string, value: number | boolean | string) => void;
+  setMany: (values: Record<string, number | boolean | string>) => void;
   animate: (targets: Record<string, number>, duration?: number, ease?: string) => void;
   ir: SceneIR;
 };
@@ -23,14 +23,17 @@ const EASES: Record<string, (t: number) => number> = {
 function initScope(ir: SceneIR): Scope {
   const scope: Scope = {};
   for (const [key, def] of Object.entries(ir.state)) {
-    if (def.type === 'number' || def.type === 'boolean') scope[key] = def.init;
-    // enum vars get parsed but i haven't wired them into scope yet
+    scope[key] = def.init;
   }
   return scope;
 }
 
 // keep numbers inside their declared min/max
-function clampVal(ir: SceneIR, key: string, value: number | boolean): number | boolean {
+function clampVal(
+  ir: SceneIR,
+  key: string,
+  value: number | boolean | string
+): number | boolean | string {
   const def = ir.state[key];
   if (def?.type === 'number' && typeof value === 'number') {
     let v = value;
@@ -61,7 +64,7 @@ export function SceneProvider({ ir, children }: { ir: SceneIR; children: React.R
 
   // a manual set (drag/slider), kill any running tween so the user wins
   const set = useCallback(
-    (key: string, value: number | boolean) => {
+    (key: string, value: number | boolean | string) => {
       cancelRaf();
       setScope((prev) => ({ ...prev, [key]: clampVal(ir, key, value) }));
     },
@@ -69,7 +72,7 @@ export function SceneProvider({ ir, children }: { ir: SceneIR; children: React.R
   );
 
   const setMany = useCallback(
-    (values: Record<string, number | boolean>) => {
+    (values: Record<string, number | boolean | string>) => {
       setScope((prev) => {
         const next = { ...prev };
         for (const k in values) next[k] = clampVal(ir, k, values[k]);

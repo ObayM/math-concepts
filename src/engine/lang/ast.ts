@@ -19,9 +19,11 @@ export type Stmt =
   | { k: 'scene'; spaceType: string; props: PropMap; children: Stmt[]; ln: number }
   | { k: 'param'; name: string; init: Expr; props: PropMap; ln: number }
   | { k: 'bool_d'; name: string; init: Expr; ln: number }
+  | { k: 'choice_d'; name: string; init: Expr; props: PropMap; ln: number }
   | { k: 'let'; name: string; value: Expr; ln: number }
   | { k: 'def'; name: string; params: string[]; body: Stmt[]; ln: number }
   | { k: 'for_s'; var: string; start: Expr; end: Expr; step: Expr | null; body: Stmt[]; ln: number }
+  | { k: 'repeat_s'; var: string; start: Expr; count: Expr; body: Stmt[]; ln: number }
   | { k: 'if_s'; cases: IfCase[]; elseBody: Stmt[] | null; ln: number }
   | { k: 'call_s'; fn: string; args: Expr[]; ln: number }
   | { k: 'curve'; id: Expr; expr: Expr; props: PropMap; ln: number }
@@ -37,6 +39,7 @@ export type Stmt =
   | { k: 'slider'; bind: string; props: PropMap; ln: number }
   | { k: 'toggle'; bind: string; props: PropMap; ln: number }
   | { k: 'stepper'; bind: string; props: PropMap; ln: number }
+  | { k: 'picker'; bind: string; props: PropMap; ln: number }
   | { k: 'button'; label: string; props: PropMap; ln: number }
   | { k: 'step'; narrate: string | null; props: PropMap; ln: number }
   // lesson-level nodes
