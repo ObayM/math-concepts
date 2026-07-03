@@ -18,6 +18,30 @@ describe('exercises.quiz', () => {
   });
 });
 
+describe('exercises.numeric', () => {
+  const slide = { exercise: { kind: 'numeric', answers: [64 / 3], tolerance: 0.05 } };
+
+  it('starts empty, completes once a parseable number is typed', () => {
+    expect(exercises.numeric.initial()).toBe('');
+    expect(exercises.numeric.isComplete(slide, '')).toBe(false);
+    expect(exercises.numeric.isComplete(slide, 'abc')).toBe(false);
+    expect(exercises.numeric.isComplete(slide, '21')).toBe(true);
+  });
+
+  it('accepts anything within tolerance of a listed answer', () => {
+    expect(exercises.numeric.check(slide, '21.33')).toBe(true);
+    expect(exercises.numeric.check(slide, '21.2')).toBe(false); // 0.13 off, outside 0.05
+    expect(exercises.numeric.check(slide, 'nope')).toBe(false);
+  });
+
+  it('accepts any of several listed answers', () => {
+    const multi = { exercise: { kind: 'numeric', answers: [2, -2], tolerance: 0 } };
+    expect(exercises.numeric.check(multi, '2')).toBe(true);
+    expect(exercises.numeric.check(multi, '-2')).toBe(true);
+    expect(exercises.numeric.check(multi, '3')).toBe(false);
+  });
+});
+
 describe('exercises.build', () => {
   const slide = {
     exercise: {

@@ -8,6 +8,10 @@ exports[`formatCompileError caret frame > points at the offending column with a 
 
 exports[`lesson compile errors > build without a bank 1`] = `"line 3: build needs a bank: [...]"`;
 
+exports[`lesson compile errors > numeric with a string answer 1`] = `"line 3: expected a number, got a string"`;
+
+exports[`lesson compile errors > numeric without an answer 1`] = `"line 3: numeric needs an answer: <number>"`;
+
 exports[`lesson compile errors > quiz without a correct option 1`] = `"line 3: quiz needs a * correct option"`;
 
 exports[`lesson compile errors > quiz without an ask 1`] = `"line 3: quiz needs an ask "...""`;

@@ -201,13 +201,10 @@ function lexLine(line: string, ln: number, startCol: number): Token[] {
 }
 
 function unescapeChar(c: string): string {
+  // only quotes and the backslash itself are escapes. every other "\x" keeps its
+  // backslash so LaTeX commands (\frac, \tan, \right, \n...) survive intact —
+  // strings carry math, and \n/\t collide with \neq/\tan anyway.
   switch (c) {
-    case 'n':
-      return '\n';
-    case 't':
-      return '\t';
-    case 'r':
-      return '\r';
     case '\\':
       return '\\';
     case '"':
@@ -215,6 +212,6 @@ function unescapeChar(c: string): string {
     case "'":
       return "'";
     default:
-      return c;
+      return '\\' + c;
   }
 }

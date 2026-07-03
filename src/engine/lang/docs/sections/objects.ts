@@ -8,10 +8,34 @@ export const objectsSection: DocSection = {
   entries: [
     {
       keyword: 'curve',
-      syntax: 'curve <id> = <expr> { [props] }',
+      syntax:
+        'curve <id> = <expr> { [props] }  OR  curve <id> = (x(t), y(t)) { t: [start, end], [steps: <n>] }',
       description:
-        'Plots f(x). The expression is evaluated for each x in the domain. State variables can appear in the expression.',
-      example: `curve f = x^2 { color: primary }\ncurve g = sin(x)*t { color: accent, show: showSin }`,
+        'Plots f(x) across the domain. Give it a `(x, y)` pair instead to trace a parametric curve over the parameter `t` — supply `t: [start, end]`. State variables can appear in either form.',
+      props: [
+        { name: 't', type: '[start, end]', description: 'parameter range (parametric form only)' },
+        { name: 'steps', type: 'number', description: 'sample count for parametric curves' },
+        {
+          name: 'where',
+          type: 'expr',
+          description: 'boolean in x — draw the curve only where it holds (piecewise)',
+        },
+      ],
+      example: `curve f = x^2 { color: primary }\ncurve g = sin(x)*t { color: accent, show: showSin }\ncurve circle = (cos(t), sin(t)) { t: [0, 2*PI], color: accent }\ncurve left = x + 2 { where: x < k }  // a piecewise branch`,
+    },
+    {
+      keyword: 'area',
+      syntax:
+        'area <id> = <upper expr> { [from: <n>], [to: <n>], [lower: <expr>], [opacity: <n>] }',
+      description:
+        'Shades the region under a curve. Fills between y = <upper expr> and y = 0 (or `lower:` for a second curve), clipped to x in `[from, to]` (defaults to the scene domain). `from`/`to` can bind to state, so a slider can sweep the shaded width.',
+      props: [
+        { name: 'from', type: 'expr', description: 'left x bound (default xMin)' },
+        { name: 'to', type: 'expr', description: 'right x bound (default xMax)' },
+        { name: 'lower', type: 'expr', description: 'lower boundary curve (default y = 0)' },
+        { name: 'opacity', type: 'number', description: 'fill opacity (default 0.15)' },
+      ],
+      example: `area a = x^2 { from: 0, to: 4, color: accent, opacity: 0.1 }\narea band = f(x) { lower: g(x), color: primary }`,
     },
     {
       keyword: 'point',

@@ -11,6 +11,15 @@ export const exercises = {
     isComplete: (_slide, v) => v !== null,
     check: (slide, v) => v === slide.exercise.correct,
   },
+  numeric: {
+    initial: () => '',
+    isComplete: (_slide, v) => v !== '' && v != null && !Number.isNaN(Number(v)),
+    check: (slide, v) => {
+      const n = Number(v);
+      if (Number.isNaN(n)) return false;
+      return slide.exercise.answers.some((a) => Math.abs(n - a) <= slide.exercise.tolerance);
+    },
+  },
   build: {
     initial: () => [],
     isComplete: (slide, v) => v && v.length === slide.exercise.slots,

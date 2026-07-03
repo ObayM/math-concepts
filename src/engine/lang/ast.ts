@@ -25,6 +25,7 @@ export type Stmt =
   | { k: 'if_s'; cases: IfCase[]; elseBody: Stmt[] | null; ln: number }
   | { k: 'call_s'; fn: string; args: Expr[]; ln: number }
   | { k: 'curve'; id: Expr; expr: Expr; props: PropMap; ln: number }
+  | { k: 'area'; id: Expr; expr: Expr; props: PropMap; ln: number }
   | { k: 'point'; id: Expr; pos: Expr | null; props: PropMap; ln: number }
   | { k: 'line'; id: Expr; seg: [Expr, Expr] | null; props: PropMap; ln: number }
   | { k: 'label'; id: Expr | null; at: Expr; text: Expr; props: PropMap; ln: number }
@@ -43,6 +44,14 @@ export type Stmt =
   | { k: 'prose'; text: string; ln: number }
   | { k: 'goal'; prompt: string; props: PropMap; ln: number }
   | { k: 'quiz'; options: QuizOption[]; common: ExerciseCommon; ln: number }
+  | {
+      k: 'numeric';
+      answers: Expr[];
+      tolerance: Expr | null;
+      unit: string | null;
+      common: ExerciseCommon;
+      ln: number;
+    }
   | {
       k: 'build';
       bank: string[];

@@ -2,12 +2,14 @@
 import { Scene } from '@/engine';
 import RichText from './RichText';
 import QuizExercise from './exercises/QuizExercise';
+import NumericExercise from './exercises/NumericExercise';
 import BuildExercise from './exercises/BuildExercise';
 
 // renders a v2 slide as a composition: prose + scene + exercise.
 // a slide is no longer one "type" — it stacks whatever parts it declares.
 const exerciseRegistry = {
   quiz: QuizExercise,
+  numeric: NumericExercise,
   build: BuildExercise,
 };
 

@@ -5,7 +5,8 @@ import RichText from '../RichText';
 // v2 build — reads slide.exercise (prompt, bank[{id,label,kind}], slots, reusable, answers, explanation)
 export default function BuildExercise({ slide, value = [], checked, correct, onChange }) {
   const ex = slide.exercise;
-  const placed = value || [];
+  // value can briefly be a non-array (null / prior slide's answer) during slide swaps
+  const placed = Array.isArray(value) ? value : [];
   const labelOf = (id) => ex.bank.find((t) => t.id === id)?.label ?? id;
   const usedCount = (id) => placed.filter((p) => p === id).length;
 
@@ -18,6 +19,12 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
 
   return (
     <div className="flex flex-col items-center gap-6">
+      {ex.prompt && (
+        <RichText className="text-xl text-neutral-600 leading-relaxed font-medium text-center block">
+          {ex.prompt}
+        </RichText>
+      )}
+
       {/* answer slots */}
       <div className="flex flex-wrap justify-center gap-2 bg-neutral-50 border border-neutral-200 rounded-2xl p-4 min-w-[200px]">
         {Array.from({ length: ex.slots }).map((_, i) => {

@@ -537,7 +537,40 @@ export function emit(stmts: Stmt[]): SceneIR {
 
       case 'curve': {
         const id = evalId(s.id, cScope, s.ln);
-        const obj: any = { id, type: 'curve', expr: lowerR(s.expr, cScope, s.ln, ['x']) };
+        const obj: any = { id, type: 'curve' };
+        if (s.expr.k === 'tuple') {
+          // parametric: (x(t), y(t)) traced over t in [start, end]
+          if (s.expr.items.length !== 2)
+            throw new CompileError('a parametric curve is (x, y) — two components', s.ln);
+          obj.xExpr = lowerR(s.expr.items[0], cScope, s.ln, ['t']);
+          obj.yExpr = lowerR(s.expr.items[1], cScope, s.ln, ['t']);
+          const t = s.props.get('t');
+          if (!t || t === true || t.k !== 'list' || t.items.length < 2)
+            throw new CompileError('a parametric curve needs t: [start, end]', s.ln);
+          obj.tDomain = [cNum(t.items[0], cScope, s.ln), cNum(t.items[1], cScope, s.ln)];
+          const steps = propNum(s.props, 'steps', s.ln, cScope);
+          if (steps != null) obj.tSteps = steps;
+        } else {
+          obj.expr = lowerR(s.expr, cScope, s.ln, ['x']);
+        }
+        const where = s.props.get('where');
+        if (where && where !== true) obj.where = asIR(lowerR(where, cScope, s.ln, ['x']));
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'area': {
+        const id = evalId(s.id, cScope, s.ln);
+        const obj: any = { id, type: 'area', expr: lowerR(s.expr, cScope, s.ln, ['x']) };
+        const lowerB = s.props.get('lower');
+        if (lowerB && lowerB !== true) obj.lower = lowerR(lowerB, cScope, s.ln, ['x']);
+        const from = propLowerR(s.props, 'from', cScope, s.ln);
+        const to = propLowerR(s.props, 'to', cScope, s.ln);
+        if (from != null) obj.from = from;
+        if (to != null) obj.to = to;
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
+        if (opacity != null) obj.opacity = opacity;
         applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;
@@ -832,6 +865,25 @@ function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
   };
 }
 
+function emitNumeric(s: Extract<Stmt, { k: 'numeric' }>) {
+  if (!s.common.ask) throw new CompileError('numeric needs an ask "..."', s.ln);
+  if (!s.answers.length) throw new CompileError('numeric needs an answer: <number>', s.ln);
+  // answers/tolerance fold to constants at compile time (e.g. 64/3, sqrt(2))
+  const answers = s.answers.map((a) => cNum(a, {}, s.ln));
+  const tolerance = s.tolerance ? cNum(s.tolerance, {}, s.ln) : 1e-6;
+  if (tolerance < 0) throw new CompileError('tolerance must not be negative', s.ln);
+  return {
+    kind: 'numeric' as const,
+    prompt: s.common.ask,
+    answers,
+    tolerance,
+    ...(s.unit && { unit: s.unit }),
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
 function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
   if (!s.common.ask) throw new CompileError('build needs an ask "..."', s.ln);
   if (!s.bank.length) throw new CompileError('build needs a bank: [...]', s.ln);
@@ -866,7 +918,11 @@ function emitSlide(s: SlideStmt, i: number) {
   const id = pStr(s.props, 'id') || slug(s.title) || `slide-${i + 1}`;
   const prose: string[] = [];
   let scene: SceneIR | undefined;
-  let exercise: ReturnType<typeof emitQuiz> | ReturnType<typeof emitBuild> | undefined;
+  let exercise:
+    | ReturnType<typeof emitQuiz>
+    | ReturnType<typeof emitNumeric>
+    | ReturnType<typeof emitBuild>
+    | undefined;
   const goals: ReturnType<typeof emitGoal>[] = [];
 
   for (const item of s.items) {
@@ -878,6 +934,9 @@ function emitSlide(s: SlideStmt, i: number) {
     } else if (item.k === 'quiz') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitQuiz(item);
+    } else if (item.k === 'numeric') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitNumeric(item);
     } else if (item.k === 'build') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitBuild(item);

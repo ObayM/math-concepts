@@ -16,6 +16,24 @@ export const exercisesSection: DocSection = {
         'quiz {\n  ask "If a < 0, the parabola..."\n  - "opens upward" { why: "Check the sign — a negative flips it." }\n  * "opens downward"\n  hint "Picture y = -x²."\n  ! "A negative a flips the U so it opens downward."\n}',
     },
     {
+      keyword: 'numeric',
+      syntax:
+        'numeric {\n  ask "..."\n  answer: <number>\n  [answer: <another accepted value>]\n  [tolerance: <n>]\n  [unit: "..."]\n}',
+      description:
+        'A free-entry numeric answer. The learner types a number and it counts as correct if it lands within `tolerance` of any listed `answer`. Answers fold from expressions, so `64/3` or `sqrt(2)` are fine. `tolerance` defaults to a tiny epsilon (so type an exact expected value, or widen it for estimates). `unit` is shown as a suffix in the input.',
+      props: [
+        { name: 'answer', type: 'number', description: 'an accepted value (repeatable)' },
+        {
+          name: 'tolerance',
+          type: 'number',
+          description: 'how far off is still correct (default ~0)',
+        },
+        { name: 'unit', type: 'string', description: 'label shown next to the input' },
+      ],
+      example:
+        'numeric {\n  ask "As $n \\to \\infty$, the area under x² on [0,4]?"\n  answer: 64/3\n  tolerance: 0.05\n  hint "The antiderivative of x² is x³/3."\n  ! "x³/3 evaluated from 0 to 4 is 64/3."\n}',
+    },
+    {
       keyword: 'build',
       syntax:
         'build {\n  ask "..."\n  bank: ["tok", "tok", ...]\n  answer: ["tok", ...]\n  [answer: ["...alt ordering..."]]\n  [slots: <n>]\n  [reusable]\n}',

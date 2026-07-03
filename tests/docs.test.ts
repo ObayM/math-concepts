@@ -11,6 +11,7 @@ const GRAMMAR_KEYWORDS = [
   '>',
   'goal',
   'quiz',
+  'numeric',
   'build',
   // scene + state
   'scene',
@@ -18,6 +19,7 @@ const GRAMMAR_KEYWORDS = [
   'bool',
   // objects
   'curve',
+  'area',
   'point',
   'line',
   'label',

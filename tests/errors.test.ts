@@ -42,6 +42,10 @@ const lessonCases: Record<string, string> = {
     'lesson "L" {\n  slide "s" {\n    quiz {\n      ask "?"\n      - "a"\n      - "b"\n    }\n  }\n}',
   'quiz without an ask':
     'lesson "L" {\n  slide "s" {\n    quiz {\n      - "a"\n      * "b"\n    }\n  }\n}',
+  'numeric without an answer':
+    'lesson "L" {\n  slide "s" {\n    numeric {\n      ask "?"\n    }\n  }\n}',
+  'numeric with a string answer':
+    'lesson "L" {\n  slide "s" {\n    numeric {\n      ask "?"\n      answer: "two"\n    }\n  }\n}',
   'build without a bank':
     'lesson "L" {\n  slide "s" {\n    build {\n      ask "?"\n      answer: ["x"]\n    }\n  }\n}',
   'two exercises on one slide':

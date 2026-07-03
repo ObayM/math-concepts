@@ -48,7 +48,31 @@ const objBase = {
   visibleIf: z.union([z.string(), exprIRSchema]).optional(),
 };
 
-const curveObj = z.object({ type: z.literal('curve'), expr, ...objBase });
+// a curve is either y = f(x) (expr) or parametric (xExpr/yExpr over t in tDomain).
+// the emitter guarantees exactly one form is present.
+const curveObj = z.object({
+  type: z.literal('curve'),
+  expr: expr.optional(),
+  xExpr: expr.optional(),
+  yExpr: expr.optional(),
+  tDomain: z.tuple([z.number(), z.number()]).optional(),
+  tSteps: z.number().optional(),
+  // a boolean predicate in x — the curve is drawn only where it holds (piecewise)
+  where: z.union([z.string(), exprIRSchema]).optional(),
+  ...objBase,
+});
+
+// a shaded region between y = expr (upper) and y = lower (default 0), bounded to
+// x in [from, to] (default the scene's xDomain). from/to/lower may bind to state.
+const areaObj = z.object({
+  type: z.literal('area'),
+  expr,
+  lower: expr.optional(),
+  from: expr.optional(),
+  to: expr.optional(),
+  opacity: z.number().optional(),
+  ...objBase,
+});
 const pointObj = z.object({
   type: z.literal('point'),
   x: expr,
@@ -132,6 +156,7 @@ const arcObj = z.object({
 
 const sceneObject = z.discriminatedUnion('type', [
   curveObj,
+  areaObj,
   pointObj,
   lineObj,
   labelObj,

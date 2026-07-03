@@ -299,6 +299,8 @@ function makeParser(tokens: Token[]) {
         return parseIf(ln);
       case 'curve':
         return parseCurve(ln);
+      case 'area':
+        return parseArea(ln);
       case 'point':
         return parsePoint(ln);
       case 'line':
@@ -414,6 +416,8 @@ function makeParser(tokens: Token[]) {
         items.push(parseGoal(peek().line));
       } else if (at('quiz')) {
         items.push(parseQuiz(peek().line));
+      } else if (at('numeric')) {
+        items.push(parseNumeric(peek().line));
       } else if (at('build')) {
         items.push(parseBuild(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
@@ -521,6 +525,45 @@ function makeParser(tokens: Token[]) {
     }
     eat('RC');
     return { k: 'quiz', options, common, ln };
+  }
+
+  function parseNumeric(ln: number): Stmt {
+    eat('IDENT', 'numeric');
+    eat('LC');
+    skipNL();
+    const answers: Expr[] = [];
+    let tolerance: Expr | null = null;
+    let unit: string | null = null;
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('answer')) {
+        pos++;
+        eat('COLON');
+        answers.push(parseExpr()); // any listed value is accepted
+        endStmt();
+      } else if (at('tolerance')) {
+        pos++;
+        eat('COLON');
+        tolerance = parseExpr();
+        endStmt();
+      } else if (at('unit')) {
+        pos++;
+        eat('COLON');
+        unit = eatStr();
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in numeric — use ask/answer/tolerance/unit/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'numeric', answers, tolerance, unit, common, ln };
   }
 
   function parseBuild(ln: number): Stmt {
@@ -676,6 +719,17 @@ function makeParser(tokens: Token[]) {
     const props = parsePropsBlock();
     endStmt();
     return { k: 'curve', id, expr, props, ln };
+  }
+
+  // same shape as curve: area <id> = <upper expr> { from, to, lower, opacity, ... }
+  function parseArea(ln: number): Stmt {
+    eat('IDENT', 'area');
+    const id = parseId();
+    eat('ASSIGN');
+    const expr = parseExpr();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'area', id, expr, props, ln };
   }
 
   function parsePoint(ln: number): Stmt {

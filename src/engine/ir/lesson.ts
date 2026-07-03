@@ -21,6 +21,14 @@ const quizExercise = z.object({
   ...exerciseBase,
 });
 
+const numericExercise = z.object({
+  kind: z.literal('numeric'),
+  answers: z.array(z.number()).min(1), // any listed value within tolerance is correct
+  tolerance: z.number().nonnegative(),
+  unit: z.string().optional(),
+  ...exerciseBase,
+});
+
 const buildToken = z.object({
   id: z.string(),
   label: z.string(),
@@ -36,7 +44,11 @@ const buildExercise = z.object({
   ...exerciseBase,
 });
 
-export const exercise = z.discriminatedUnion('kind', [quizExercise, buildExercise]);
+export const exercise = z.discriminatedUnion('kind', [
+  quizExercise,
+  numericExercise,
+  buildExercise,
+]);
 
 // a goal gates the slide's Continue until `when` has been true (latches)
 const goal = z.object({
