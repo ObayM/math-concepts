@@ -1,17 +1,35 @@
 'use client';
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { svgPrimitives } from './registry';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 
-const W = 640;
-const H = 420;
+const DEFAULT_W = 640; // used until the container is measured (also SSR)
+const ASPECT = 0.6; // height / width — comfortable landscape default
 
 export default function SvgRenderer({ ir }: { ir: SceneIR }) {
   const { scope, set } = useScene();
   const svgRef = useRef<SVGSVGElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // measure the container so W/H are real pixels — text and touch targets stay
+  // physically sized on any screen instead of scaling with a fixed viewBox
+  const [measuredW, setMeasuredW] = useState<number | null>(null);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setMeasuredW(w);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const W = Math.max(240, Math.round(measuredW ?? DEFAULT_W));
+  const H = Math.round(W * ASPECT);
 
   if (!ir.space.yDomain) return null; // plane scenes must have yDomain
   const [xMin, xMax] = ir.space.xDomain;
@@ -69,8 +87,9 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
   const grid: React.ReactNode[] = [];
   const ticks: React.ReactNode[] = [];
   if (ir.space.grid) {
-    const sx = niceStep(xMax - xMin, 10);
-    const sy = niceStep(yMax - yMin, 10);
+    // fewer ticks on narrow screens so labels never crowd
+    const sx = niceStep(xMax - xMin, clamp(Math.floor(W / 70), 4, 12));
+    const sy = niceStep(yMax - yMin, clamp(Math.floor(H / 50), 3, 10));
     const axisXpx = cx.toX(clamp(0, xMin, xMax));
     const axisYpx = cx.toY(clamp(0, yMin, yMax));
     for (let t = Math.ceil(xMin / sx) * sx, k = 0; t <= xMax + 1e-9; t += sx, k++) {
@@ -144,7 +163,10 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-neutral-100 overflow-hidden">
+    <div
+      ref={wrapRef}
+      className="w-full bg-white rounded-2xl border border-neutral-100 overflow-hidden"
+    >
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
