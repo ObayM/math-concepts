@@ -1,3 +1,5 @@
+import { lessonSection } from './sections/lesson';
+import { exercisesSection } from './sections/exercises';
 import { sceneSection } from './sections/scene';
 import { objectsSection } from './sections/objects';
 import { controlsSection } from './sections/controls';
@@ -8,15 +10,20 @@ import { expressionsSection } from './sections/expressions';
 export type { DocProp, DocEntry, DocSection } from './types';
 
 export const PRISM_DOCS = {
-  tagline: 'A language for interactive math scenes.',
-  intro: `Prism compiles to the Scene IR that powers Mathly's interactive lesson engine.
-Write a Prism scene and the runtime renders it as a live, manipulable visualization.
-The compiler runs at seed-time or on the server — never in the browser.
+  tagline: 'A language for interactive math lessons.',
+  intro: `Prism compiles to the IR that powers Mathly's interactive lesson engine.
+The compiler runs at seed-time or on the server, and its output is validated data —
+it never executes code, so it is safe to compile AI-generated source.
 
-A Prism file is exactly one "scene <type> { ... }" block — everything else nests inside it.
-Object/control properties go in a trailing "{ key: value }" block; the opening "{" must be
-on the same line as the statement it belongs to.`,
+A Prism file is one of two things:
+  • a bare "scene <type> { ... }" block — a single interactive visualization, or
+  • a "lesson \\"Title\\" { ... }" block — a full lesson of composed slides.
+
+Block structure is brace-delimited. Object/control properties go in a trailing
+"{ key: value }" block whose opening "{" is on the same line as the statement.`,
   sections: [
+    lessonSection,
+    exercisesSection,
     sceneSection,
     objectsSection,
     controlsSection,
