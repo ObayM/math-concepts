@@ -10,7 +10,6 @@ import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor } from '@/utils/aiService';
 
 import TextBlock from './blocks/TextBlock';
-import GraphBlock from './blocks/GraphBlock';
 import QuizBlock from './blocks/QuizBlock';
 import SceneBlock from './blocks/SceneBlock';
 import BuildBlock from './blocks/BuildBlock';
@@ -20,7 +19,6 @@ import { exercises } from './exercises';
 
 const blockRegistry = {
   text: TextBlock,
-  graph: GraphBlock,
   quiz: QuizBlock,
   scene: SceneBlock,
   build: BuildBlock,

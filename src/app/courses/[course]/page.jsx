@@ -1,10 +1,19 @@
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 import LessonCard from '@/components/lessonCard';
 import Badge from '@/components/ui/Badge';
 
-export default async function GeometryCourse() {
+// one page for every course — matches the course by name (the index links to
+// /courses/<name lowercased>) and lists its lessons from the DB.
+export default async function CoursePage({ params }) {
+  const { course: courseSlug } = await params;
+
+  const courses = await prisma.course.findMany();
+  const course = courses.find((c) => c.name.toLowerCase() === courseSlug.toLowerCase());
+  if (!course) notFound();
+
   const session = await auth.api.getSession({ headers: await headers() });
 
   let progressMap = new Map();
@@ -26,7 +35,7 @@ export default async function GeometryCourse() {
   }
 
   const lessons = await prisma.lesson.findMany({
-    where: { category: 'Geometry' },
+    where: { courseId: course.id },
     orderBy: { sortOrder: 'asc' },
   });
 
@@ -50,20 +59,20 @@ export default async function GeometryCourse() {
   });
 
   const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;
-
+  // Integrate a flash cards system here, wehre you can memorize, revise everything you learned in a very short time
+  // We need a practice thingie where you can practice for infinity
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface">
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <Badge variant="accent" className="mb-4 text-sm px-4 py-1.5">
-            Geometry
+          <Badge variant="primary" className="mb-4 text-sm px-4 py-1.5">
+            {course.name}
           </Badge>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900 mb-4">
-            Explore the <span className="text-accent-600">Shape of Space</span>
+            {course.name}
           </h1>
           <p className="text-xl text-neutral-500 leading-relaxed mb-4">
-            Dive into points, lines, and shapes. Master the coordinate plane and see geometry come
-            alive.
+            {course.description || 'Complete each lesson to unlock the next.'}
           </p>
           <p className="text-sm font-bold text-neutral-400">
             {completedCount} / {lessons.length} lessons completed
@@ -79,7 +88,9 @@ export default async function GeometryCourse() {
               isLast={i === lessonsWithProgress.length - 1}
             />
           ))}
-          <p className="text-center text-sm text-neutral-400 mt-6">More lessons coming soon</p>
+          {lessons.length === 0 && (
+            <p className="text-center text-neutral-400">No lessons in this course yet.</p>
+          )}
         </div>
       </main>
     </div>
