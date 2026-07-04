@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { Zap } from 'lucide-react';
 import LessonCard from '@/components/lessonCard';
 import Badge from '@/components/ui/Badge';
 
@@ -60,7 +62,6 @@ export default async function CoursePage({ params }) {
 
   const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;
   // Integrate a flash cards system here, wehre you can memorize, revise everything you learned in a very short time
-  // We need a practice thingie where you can practice for infinity
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface">
       <main className="container mx-auto px-4 py-16 md:py-24">
@@ -74,9 +75,18 @@ export default async function CoursePage({ params }) {
           <p className="text-xl text-neutral-500 leading-relaxed mb-4">
             {course.description || 'Complete each lesson to unlock the next.'}
           </p>
-          <p className="text-sm font-bold text-neutral-400">
+          <p className="text-sm font-bold text-neutral-400 mb-6">
             {completedCount} / {lessons.length} lessons completed
           </p>
+          {lessons.length > 0 && (
+            <Link
+              href={`/courses/${courseSlug}/practice`}
+              className="inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl border-b-[3px] border-accent-800 active:border-b-0 active:translate-y-[3px] transition-all"
+            >
+              <Zap className="w-4 h-4" />
+              Practice
+            </Link>
+          )}
         </div>
 
         <div className="max-w-2xl mx-auto">
