@@ -13,6 +13,8 @@ import {
 
 const sameSequence = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 
+const flatBlanks = (ex) => ex.rows.flat().filter((cell) => cell.blank);
+
 export const exercises = {
   quiz: {
     initial: () => null,
@@ -78,6 +80,25 @@ export const exercises = {
         v.map((i) => bank[i]),
         slide.exercise.items
       );
+    },
+  },
+  table: {
+    initial: (slide) => new Array(flatBlanks(slide.exercise).length).fill(''),
+    isComplete: (slide, v) => {
+      const blanks = flatBlanks(slide.exercise);
+      return (
+        Array.isArray(v) &&
+        v.length === blanks.length &&
+        v.every((s) => s !== '' && s != null && !Number.isNaN(Number(s)))
+      );
+    },
+    // full correctness (all blanks right); the component surfaces per-blank
+    // partial credit for display, but Continue is gated by `checked` alone,
+    // same as every other exercise kind — a partial score never blocks it
+    check: (slide, v) => {
+      const blanks = flatBlanks(slide.exercise);
+      if (!Array.isArray(v) || v.length !== blanks.length) return false;
+      return blanks.every((b, i) => Math.abs(Number(v[i]) - b.answer) <= slide.exercise.tolerance);
     },
   },
 };

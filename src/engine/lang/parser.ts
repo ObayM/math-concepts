@@ -445,6 +445,8 @@ function makeParser(tokens: Token[]) {
         items.push(parseMatch(peek().line));
       } else if (at('order')) {
         items.push(parseOrder(peek().line));
+      } else if (at('table')) {
+        items.push(parseTable(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
         const key = eatIdent();
         eat('COLON');
@@ -790,6 +792,50 @@ function makeParser(tokens: Token[]) {
     }
     eat('RC');
     return { k: 'order', items: orderItems, decoys, common, ln };
+  }
+
+  function parseTable(ln: number): Stmt {
+    eat('IDENT', 'table');
+    eat('LC');
+    skipNL();
+    let header: string[] | null = null;
+    const rows: Expr[][] = [];
+    let tolerance: Expr | null = null;
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('header')) {
+        pos++;
+        eat('COLON');
+        header = parseStrList();
+        endStmt();
+      } else if (at('row')) {
+        pos++;
+        eat('COLON');
+        const cells: Expr[] = [parseExpr()];
+        while (check('COMMA')) {
+          pos++;
+          cells.push(parseExpr());
+        }
+        rows.push(cells);
+        endStmt();
+      } else if (at('tolerance')) {
+        pos++;
+        eat('COLON');
+        tolerance = parseExpr();
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in table — use ask/header/row/tolerance/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'table', header, rows, tolerance, common, ln };
   }
 
   function parseParam(ln: number): Stmt {

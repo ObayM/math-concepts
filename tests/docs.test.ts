@@ -17,6 +17,7 @@ const GRAMMAR_KEYWORDS = [
   'sketch',
   'match',
   'order',
+  'table',
   // scene + state
   'scene',
   'param',

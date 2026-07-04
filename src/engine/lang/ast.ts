@@ -96,6 +96,14 @@ export type Stmt =
       decoys: string[];
       common: ExerciseCommon;
       ln: number;
+    }
+  | {
+      k: 'table';
+      header: string[] | null;
+      rows: Expr[][];
+      tolerance: Expr | null;
+      common: ExerciseCommon;
+      ln: number;
     };
 
 export type HotspotTarget =

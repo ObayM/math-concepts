@@ -1118,6 +1118,44 @@ function emitOrder(s: Extract<Stmt, { k: 'order' }>) {
   };
 }
 
+function emitTable(s: Extract<Stmt, { k: 'table' }>) {
+  if (!s.common.ask) throw new CompileError('table needs an ask "..."', s.ln);
+  if (!s.rows.length) throw new CompileError('table needs at least one row: ...', s.ln);
+  const width = s.rows[0].length;
+  if (s.header && s.header.length !== width) {
+    throw new CompileError('table header length must match row length', s.ln);
+  }
+  let hasBlank = false;
+  const rows = s.rows.map((row) => {
+    if (row.length !== width) {
+      throw new CompileError('every table row must have the same number of cells', s.ln);
+    }
+    return row.map((cellExpr) => {
+      if (cellExpr.k === 'call' && cellExpr.fn === 'blank') {
+        if (cellExpr.args.length !== 1) {
+          throw new CompileError('blank(...) takes exactly one expected answer', s.ln);
+        }
+        hasBlank = true;
+        return { blank: true as const, answer: cNum(cellExpr.args[0], {}, s.ln) };
+      }
+      return { value: cNum(cellExpr, {}, s.ln) };
+    });
+  });
+  if (!hasBlank) throw new CompileError('table needs at least one blank(...) cell', s.ln);
+  const tolerance = s.tolerance ? cNum(s.tolerance, {}, s.ln) : 1e-6;
+  if (tolerance < 0) throw new CompileError('tolerance must not be negative', s.ln);
+  return {
+    kind: 'table' as const,
+    prompt: s.common.ask,
+    ...(s.header && { header: s.header }),
+    rows,
+    tolerance,
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
 function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
   const whenExpr = s.props.get('when');
   if (!whenExpr || whenExpr === true) throw new CompileError('goal needs a when: condition', s.ln);
@@ -1138,6 +1176,7 @@ function emitSlide(s: SlideStmt, i: number) {
     | ReturnType<typeof emitSketch>
     | ReturnType<typeof emitMatch>
     | ReturnType<typeof emitOrder>
+    | ReturnType<typeof emitTable>
     | undefined;
   const goals: ReturnType<typeof emitGoal>[] = [];
 
@@ -1168,6 +1207,9 @@ function emitSlide(s: SlideStmt, i: number) {
     } else if (item.k === 'order') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitOrder(item);
+    } else if (item.k === 'table') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitTable(item);
     } else if (item.k === 'goal') {
       goals.push(emitGoal(item));
     }

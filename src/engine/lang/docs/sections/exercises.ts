@@ -141,5 +141,28 @@ export const exercisesSection: DocSection = {
       example:
         'order {\n  ask "Order these steps of order of operations."\n  item "Parentheses"\n  item "Exponents"\n  item "Multiply / Divide"\n  item "Add / Subtract"\n  ! "PEMDAS, left to right within each tier."\n}',
     },
+    {
+      keyword: 'table',
+      syntax:
+        'table {\n  ask "..."\n  [header: ["col", "col", ...]]\n  row: <value|blank(answer)>, <value|blank(answer)>, ...\n  [row: ...]\n  [tolerance: <n>]\n}',
+      description:
+        'Fill in the blanks of a function table. Each `row:` line lists one value per column — plain numbers are given, `blank(<answer>)` marks a cell the learner fills in (the argument is the expected value, and folds from an expression like any other answer). Every row needs the same number of cells; at least one cell across the whole table must be a `blank(...)`. `tolerance` applies to every blank. Correctness is shown per-blank plus an overall "X / N correct" count — partial credit is surfaced but never blocks Continue, same as every other exercise.',
+      props: [
+        { name: 'header', type: 'string[]', description: 'column headings (optional)' },
+        {
+          name: 'row',
+          type: 'value, value, ...',
+          description: 'one row — mix plain numbers and blank(answer) cells (repeatable)',
+          required: true,
+        },
+        {
+          name: 'tolerance',
+          type: 'number',
+          description: 'how far off a blank can be (default ~0)',
+        },
+      ],
+      example:
+        'table {\n  ask "Complete the table for f(x) = x² - 1."\n  header: ["x", "f(x)"]\n  row: -2, blank(3)\n  row: -1, blank(0)\n  row: 0, blank(-1)\n  row: 1, blank(0)\n  row: 2, blank(3)\n  ! "Square x, then subtract 1."\n}',
+    },
   ],
 };
