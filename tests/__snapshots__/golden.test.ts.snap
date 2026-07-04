@@ -456,6 +456,16 @@ exports[`scene compiler goldens > compiles shapes.prism to stable IR 1`] = `
       "x": 1,
       "y": -2,
     },
+    {
+      "alt": "a small placeholder square",
+      "h": 1,
+      "id": "logo",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "type": "image",
+      "w": 1,
+      "x": -2.5,
+      "y": 1.5,
+    },
   ],
   "space": {
     "type": "plane",

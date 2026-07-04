@@ -822,6 +822,30 @@ export function emit(stmts: Stmt[]): SceneIR {
         break;
       }
 
+      case 'image': {
+        const id = evalId(s.id, cScope, s.ln);
+        const [x, y] = lowerPairR(s.pos, cScope, s.ln);
+        const w = propLowerR(s.props, 'w', cScope, s.ln);
+        const h = propLowerR(s.props, 'h', cScope, s.ln);
+        if (w == null || h == null) throw new CompileError('image needs w: and h: props', s.ln);
+        const src = propStr(s.props, 'src', cScope);
+        if (!src) throw new CompileError('image needs a src: prop', s.ln);
+        if (!/^(https?:\/\/|data:image\/|\/)/i.test(src)) {
+          throw new CompileError(
+            'image src must be an http(s) URL, a data:image/ URI, or a root-relative path',
+            s.ln
+          );
+        }
+        const alt = propStr(s.props, 'alt', cScope);
+        if (!alt) throw new CompileError('image needs an alt: prop — describe what it shows', s.ln);
+        const obj: any = { id, type: 'image', x, y, w, h, src, alt };
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
+        if (opacity != null) obj.opacity = opacity;
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
       case 'slider': {
         const ctrl: any = { as: 'slider', bind: bindTo(s.bind, 'slider', s.ln) };
         const label = propStr(s.props, 'label', cScope);

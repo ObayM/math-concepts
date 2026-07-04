@@ -163,6 +163,21 @@ const arcObj = z.object({
   ...objBase,
 });
 
+// (x, y) is the bottom-left corner in scene coords; w/h in scene units.
+// src is a URL, data:image/ URI, or root-relative path (checked at compile time);
+// alt is required — it's the scene's accessibility description for this image.
+const imageObj = z.object({
+  type: z.literal('image'),
+  x: expr,
+  y: expr,
+  w: expr,
+  h: expr,
+  src: z.string(),
+  alt: z.string().min(1),
+  opacity: z.number().optional(),
+  ...objBase,
+});
+
 // count is a NumExpr so it can bind to state (e.g. a slider); the renderer
 // expands this into `count` copies of body at render time — see runtime/expand.ts.
 // body items are plain scene objects, keyed `${id}#${i}` once expanded. shares
@@ -186,6 +201,7 @@ const sceneObject = z.discriminatedUnion('type', [
   polygonObj,
   vectorObj,
   arcObj,
+  imageObj,
   repeatObj,
 ]);
 

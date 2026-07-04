@@ -4,7 +4,7 @@ export const objectsSection: DocSection = {
   id: 'objects',
   title: 'Objects',
   description:
-    'Objects are the visual elements of a scene. Properties go in a trailing `{ key: value }` block — omit it entirely if the object needs no configuration. All objects accept: `color`, `style` (solid/dashed/dotted), `show:<expr>`, `width:<number>`. **Note:** `curve`, `line`, `rect`, `circle`, `polygon`, `vector`, `arc` require `plane` scenes; only `point` and `label` work on `numberline` scenes.',
+    'Objects are the visual elements of a scene. Properties go in a trailing `{ key: value }` block — omit it entirely if the object needs no configuration. All objects accept: `color`, `style` (solid/dashed/dotted), `show:<expr>`, `width:<number>`. **Note:** `curve`, `line`, `rect`, `circle`, `polygon`, `vector`, `arc`, `image` require `plane` scenes; only `point` and `label` work on `numberline` scenes.',
   entries: [
     {
       keyword: 'curve',
@@ -103,6 +103,20 @@ export const objectsSection: DocSection = {
       description:
         'An arc centered at (x, y), from `from` degrees to `to` degrees (counter-clockwise). Useful for angle markers.',
       example: 'param t = 90 { range: [0, 360] }\narc angle = (0,0) { r: 0.5, from: 0, to: t }',
+    },
+    {
+      keyword: 'image',
+      syntax:
+        'image <id> = (x, y) { w: <expr>, h: <expr>, src: "<url>", alt: "<description>", [opacity: <number>] }',
+      description:
+        "(x, y) is the bottom-left corner in scene coords; width/height are expressions. `src` must be an http(s) URL, a `data:image/` URI, or a root-relative path — nothing else compiles. `alt` is required: it becomes the image's accessible description, so write what it shows, not just its filename.",
+      props: [
+        { name: 'src', type: 'string', description: 'http(s) URL, data:image/ URI, or /path' },
+        { name: 'alt', type: 'string', description: 'required accessible description' },
+        { name: 'opacity', type: 'number', description: 'fill opacity (default 1)' },
+      ],
+      example:
+        'image logo = (-1, -1) { w: 2, h: 2, src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", alt: "a small placeholder square" }',
     },
   ],
 };

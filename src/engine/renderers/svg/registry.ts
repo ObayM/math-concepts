@@ -10,6 +10,7 @@ import Circle from './primitives/Circle';
 import Polygon from './primitives/Polygon';
 import Vector from './primitives/Vector';
 import Arc from './primitives/Arc';
+import Image from './primitives/Image';
 
 // type -> renderer. adding a primitive is just dropping one in here (like blockRegistry)
 export const svgPrimitives: Record<string, ComponentType<PrimProps>> = {
@@ -23,4 +24,5 @@ export const svgPrimitives: Record<string, ComponentType<PrimProps>> = {
   polygon: Polygon,
   vector: Vector,
   arc: Arc,
+  image: Image,
 };

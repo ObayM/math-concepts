@@ -332,6 +332,8 @@ function makeParser(tokens: Token[]) {
         return parseVector(ln);
       case 'arc':
         return parseArc(ln);
+      case 'image':
+        return parseImage(ln);
       case 'slider':
         return parseSlider(ln);
       case 'toggle':
@@ -1085,6 +1087,16 @@ function makeParser(tokens: Token[]) {
     const props = parsePropsBlock();
     endStmt();
     return { k: 'arc', id, center, props, ln };
+  }
+
+  function parseImage(ln: number): Stmt {
+    eat('IDENT', 'image');
+    const id = parseId();
+    eat('ASSIGN');
+    const pos_ = parseExpr();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'image', id, pos: pos_, props, ln };
   }
 
   function parseSlider(ln: number): Stmt {

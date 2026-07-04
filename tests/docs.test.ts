@@ -34,6 +34,7 @@ const GRAMMAR_KEYWORDS = [
   'polygon',
   'vector',
   'arc',
+  'image',
   // controls
   'slider',
   'toggle',

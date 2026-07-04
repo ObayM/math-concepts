@@ -179,3 +179,18 @@ describe('P2.17 primitives render to clean SVG', () => {
     });
   }
 });
+
+describe('P5.37 image object renders to clean SVG', () => {
+  const imgSrc =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  const ir = compile(
+    `scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  image logo = (-1, -1) { w: 2, h: 2, src: "${imgSrc}", alt: "a small placeholder square" }\n}`
+  );
+
+  it('renders an <image> with the accessible alt text and no NaN coords', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir }));
+    expect(html).toContain('<image');
+    expect(html).toContain('aria-label="a small placeholder square"');
+    expect(html).not.toContain('NaN');
+  });
+});
