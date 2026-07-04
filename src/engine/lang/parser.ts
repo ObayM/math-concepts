@@ -1,5 +1,14 @@
 import type { Token, TT } from './tokens';
-import type { Expr, PropMap, Stmt, IfCase, SlideStmt, QuizOption, ExerciseCommon } from './ast';
+import type {
+  Expr,
+  PropMap,
+  Stmt,
+  IfCase,
+  SlideStmt,
+  QuizOption,
+  ExerciseCommon,
+  HotspotTarget,
+} from './ast';
 import { CompileError } from './errors';
 
 const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes']);
@@ -301,6 +310,8 @@ function makeParser(tokens: Token[]) {
         return parseRepeat(ln);
       case 'if':
         return parseIf(ln);
+      case 'reveal':
+        return parseReveal(ln);
       case 'curve':
         return parseCurve(ln);
       case 'area':
@@ -426,6 +437,10 @@ function makeParser(tokens: Token[]) {
         items.push(parseNumeric(peek().line));
       } else if (at('build')) {
         items.push(parseBuild(peek().line));
+      } else if (at('hotspot')) {
+        items.push(parseHotspot(peek().line));
+      } else if (at('sketch')) {
+        items.push(parseSketch(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
         const key = eatIdent();
         eat('COLON');
@@ -616,6 +631,99 @@ function makeParser(tokens: Token[]) {
     return { k: 'build', bank, answers, slots, reusable, common, ln };
   }
 
+  function parseHotspot(ln: number): Stmt {
+    eat('IDENT', 'hotspot');
+    eat('LC');
+    skipNL();
+    let target: HotspotTarget | null = null;
+    let miss: string | null = null;
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('target')) {
+        pos++;
+        if (target) throw new CompileError('hotspot can have only one target', peek().line);
+        if (!at('rect') && !at('circle')) {
+          const t = peek();
+          throw new CompileError('target needs a shape — "rect" or "circle"', t.line, t.col);
+        }
+        const kind = eatIdent() as 'rect' | 'circle';
+        const shapePos = parseExpr();
+        const props = parsePropsBlock();
+        target = { kind, pos: shapePos, props };
+        endStmt();
+      } else if (at('miss')) {
+        pos++;
+        miss = eatStr();
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in hotspot — use ask/target/miss/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'hotspot', target, miss, common, ln };
+  }
+
+  function parseSketch(ln: number): Stmt {
+    eat('IDENT', 'sketch');
+    if (!at('curve') && !at('points') && !at('line')) {
+      const t = peek();
+      throw new CompileError('sketch needs a mode — "curve", "points", or "line"', t.line, t.col);
+    }
+    const mode = eatIdent() as 'curve' | 'points' | 'line';
+    eat('LC');
+    skipNL();
+    const near: Expr[] = [];
+    let through: Expr | null = null;
+    let slope: Expr | null = null;
+    let tol: Expr | null = null;
+    let slopeTol: Expr | null = null;
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('near')) {
+        pos++;
+        near.push(parseExpr());
+        endStmt();
+      } else if (at('through')) {
+        pos++;
+        through = parseExpr();
+        endStmt();
+      } else if (at('slope')) {
+        pos++;
+        eat('COLON');
+        slope = parseExpr();
+        endStmt();
+      } else if (at('tol')) {
+        pos++;
+        eat('COLON');
+        tol = parseExpr();
+        endStmt();
+      } else if (at('slopeTol')) {
+        pos++;
+        eat('COLON');
+        slopeTol = parseExpr();
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in sketch — use ask/near/through/slope/tol/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'sketch', mode, near, through, slope, tol, slopeTol, common, ln };
+  }
+
   function parseParam(ln: number): Stmt {
     eat('IDENT', 'param');
     const name = eatIdent();
@@ -722,6 +830,12 @@ function makeParser(tokens: Token[]) {
       } else break;
     }
     return { k: 'if_s', cases, elseBody, ln };
+  }
+
+  function parseReveal(ln: number): Stmt {
+    eat('IDENT', 'reveal');
+    const body = parseBraceBlock();
+    return { k: 'reveal', body, ln };
   }
 
   function parseId(): Expr {

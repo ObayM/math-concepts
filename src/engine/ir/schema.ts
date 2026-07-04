@@ -46,6 +46,8 @@ const objBase = {
   strokeWidth: z.number().optional(),
   style: z.enum(['solid', 'dashed', 'dotted']).optional(),
   visibleIf: z.union([z.string(), exprIRSchema]).optional(),
+
+  phase: z.enum(['reveal']).optional(),
 };
 
 // a curve is either y = f(x) (expr) or parametric (xExpr/yExpr over t in tDomain).

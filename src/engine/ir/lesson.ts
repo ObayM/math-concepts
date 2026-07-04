@@ -44,14 +44,38 @@ const buildExercise = z.object({
   ...exerciseBase,
 });
 
+const hotspotTarget = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('rect'), x: z.number(), y: z.number(), w: z.number(), h: z.number() }),
+  z.object({ kind: z.literal('circle'), x: z.number(), y: z.number(), r: z.number() }),
+]);
+
+const hotspotExercise = z.object({
+  kind: z.literal('hotspot'),
+  target: hotspotTarget,
+  miss: z.string().optional(),
+  ...exerciseBase,
+});
+
+const sketchExercise = z.object({
+  kind: z.literal('sketch'),
+  mode: z.enum(['curve', 'points', 'line']),
+  targets: z.array(z.tuple([z.number(), z.number()])).optional(),
+  through: z.tuple([z.number(), z.number()]).optional(),
+  slope: z.number().optional(),
+  slopeTol: z.number().nonnegative().optional(),
+  tol: z.number().nonnegative(),
+  ...exerciseBase,
+});
+
 export const exercise = z.discriminatedUnion('kind', [
   quizExercise,
   numericExercise,
   buildExercise,
+  hotspotExercise,
+  sketchExercise,
 ]);
 
-// a goal gates the slide's Continue until `when` has been true (latches)
-const goal = z.object({
+export const goal = z.object({
   prompt: z.string(),
   when: exprIRSchema,
   hint: z.string().optional(),
@@ -79,3 +103,4 @@ export const lessonSchema = z.object({
 export type LessonIR = z.infer<typeof lessonSchema>;
 export type SlideIR = z.infer<typeof slide>;
 export type ExerciseIR = z.infer<typeof exercise>;
+export type GoalIR = z.infer<typeof goal>;

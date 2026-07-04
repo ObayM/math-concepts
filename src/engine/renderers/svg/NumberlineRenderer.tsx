@@ -6,12 +6,22 @@ import { expandObjects } from '@/engine/runtime/expand';
 import { resolveColor } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
+import type { InputLayerConfig } from './InputLayer';
 
 const W = 640;
 const H = 120;
 const Y_MID = H / 2;
 
-export default function NumberlineRenderer({ ir }: { ir: SceneIR }) {
+export default function NumberlineRenderer({
+  ir,
+  revealed,
+}: {
+  ir: SceneIR;
+  onTap?: (x: number, y: number) => void;
+  marker?: { x: number; y: number; correct?: boolean };
+  revealed?: boolean;
+  inputLayer?: InputLayerConfig;
+}) {
   const { scope, set } = useScene();
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -88,6 +98,7 @@ export default function NumberlineRenderer({ ir }: { ir: SceneIR }) {
         {ticks}
 
         {expandObjects(ir.objects, scope).map((obj, i) => {
+          if (obj.phase === 'reveal' && !revealed) return null;
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
           if (obj.type === 'point') {
             const x = evalNumber(obj.x, scope);

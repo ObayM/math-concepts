@@ -4,6 +4,7 @@ export interface Example {
   description: string;
   tags: string[];
   code: string;
+  hasReveal?: boolean;
 }
 
 export const EXAMPLES: Example[] = [
@@ -142,6 +143,27 @@ export const EXAMPLES: Example[] = [
   label at (cx/2, 0-cx/2) = "a² = \${cx*cx}"
   label at (cx+0.3, cy/2) = "b² = \${cy*cy}"
   label at (cx/2-1, cy/2+0.5) = "c² = \${cx*cx+cy*cy}"
+}`,
+  },
+  {
+    id: 'predict-then-reveal',
+    title: 'Predict, then Reveal',
+    description:
+      'Objects inside `reveal { ... }` stay hidden until the learner checks their answer — the predict-then-reveal pattern used by sketch/hotspot exercises. Hit "Reveal" to see the real curve appear.',
+    tags: ['reveal', 'guided-flow', 'phase-3'],
+    hasReveal: true,
+    code: `scene plane {
+  x: [-5, 6]
+  y: [-5, 6]
+  grid
+  axes
+
+  label at (-4.5, 5) = "predict: y = (x-1)² - 3"
+
+  reveal {
+    curve f = (x-1)^2 - 3 { color: primary, width: 3 }
+    point vertex = (1, -3) { color: accent, r: 6, label: "vertex" }
+  }
 }`,
   },
   {

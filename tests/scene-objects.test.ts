@@ -65,3 +65,22 @@ describe('area', () => {
     if (a.type === 'area') expect(typeof a.to).toBe('object'); // an expr tree, not a constant
   });
 });
+
+describe('reveal', () => {
+  it('tags every object inside with phase: reveal', () => {
+    const objects = objectsOf(
+      wrap('reveal {\n    curve f = x^2\n    point p = (1, 1) { color: danger }\n  }')
+    );
+    expect(objects).toHaveLength(2);
+    for (const o of objects) expect(o.phase).toBe('reveal');
+  });
+
+  it('objects outside reveal have no phase', () => {
+    const [c] = objectsOf(wrap('curve f = x^2'));
+    expect(c.phase).toBeUndefined();
+  });
+
+  it('rejects an empty reveal block', () => {
+    expect(() => compile(wrap('reveal {\n  }'))).toThrow(/no objects/);
+  });
+});

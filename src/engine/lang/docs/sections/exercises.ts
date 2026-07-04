@@ -52,5 +52,52 @@ export const exercisesSection: DocSection = {
       example:
         'build {\n  ask "Factor x² + 5x + 6."\n  reusable\n  bank: ["(", ")", "x", "+", "2", "3"]\n  answer: ["(", "x", "+", "2", ")", "(", "x", "+", "3", ")"]\n  ! "2 × 3 = 6 and 2 + 3 = 5, so (x + 2)(x + 3)."\n}',
     },
+    {
+      keyword: 'hotspot',
+      syntax:
+        'hotspot {\n  ask "..."\n  target rect (x, y) { w: <n>, h: <n> }\n  [target circle (x, y) { r: <n> }]\n  [miss "..."]\n}',
+      description:
+        "Tap the right spot directly on the slide's scene, rather than picking from a list or typing a value. `target` is a rect or circle region in scene (data) coordinates — a tap inside it is correct. The tapped point is marked on the scene; `miss` is shown instead of the usual explanation when the tap lands outside the target.",
+      props: [
+        {
+          name: 'target',
+          type: 'rect | circle',
+          description: 'the hit region, in scene coordinates',
+          required: true,
+        },
+        { name: 'miss', type: 'string', description: 'feedback shown when the tap misses' },
+      ],
+      example:
+        'hotspot {\n  ask "Tap where the parabola crosses y = 4."\n  target circle (2, 4) { r: 0.6 }\n  miss "Try solving x² = 4."\n  ! "x² = 4 at x = 2 (and x = -2, off to the left)."\n}',
+    },
+    {
+      keyword: 'sketch',
+      syntax:
+        'sketch curve {\n  ask "..."\n  near (x, y)\n  [near (x, y) ...]\n  [tol: <n>]\n}\nsketch points {\n  ask "..."\n  near (x, y)\n  [near (x, y) ...]\n  [tol: <n>]\n}\nsketch line {\n  ask "..."\n  through (x, y)\n  slope: <n>\n  [tol: <n>]\n  [slopeTol: <n>]\n}',
+      description:
+        "Draw directly on the slide's scene — a freehand curve, a handful of tapped points, or a dragged straight line. `curve` and `points` check against `near` landmark points (the drawn shape must pass within `tol` of each); `curve` is checked as a connected stroke, `points` as independent taps. `line` checks the drawn segment's slope against `slope` (within `slopeTol`) and that it passes within `tol` of `through`. Pairs naturally with a `reveal { ... }` block for predict-then-reveal.",
+      props: [
+        { name: 'near', type: '(number, number)', description: 'a landmark point (repeatable)' },
+        {
+          name: 'through',
+          type: '(number, number)',
+          description: 'point the line must pass near (line mode)',
+        },
+        {
+          name: 'slope',
+          type: 'number',
+          description: 'expected slope (line mode)',
+          required: true,
+        },
+        { name: 'tol', type: 'number', description: 'position tolerance, in scene units' },
+        {
+          name: 'slopeTol',
+          type: 'number',
+          description: 'slope tolerance (line mode, default 0.5)',
+        },
+      ],
+      example:
+        'sketch curve {\n  ask "Draw $y = (x-1)^2 - 3$ — vertex and both crossings roughly right."\n  near (1, -3)\n  near (1-sqrt(3), 0)\n  near (1+sqrt(3), 0)\n  tol: 0.6\n  hint "Vertex form puts the vertex at (h, k)."\n}',
+    },
   ],
 };

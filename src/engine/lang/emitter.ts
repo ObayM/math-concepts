@@ -514,6 +514,18 @@ export function emit(stmts: Stmt[]): SceneIR {
         break;
       }
 
+      case 'reveal': {
+        const savedObjects = ir.objects;
+        ir.objects = [];
+        run(s.body, cScope);
+        const revealed = ir.objects;
+        ir.objects = savedObjects;
+        if (!revealed.length) throw new CompileError('reveal body has no objects', s.ln);
+        for (const obj of revealed) obj.phase = 'reveal';
+        ir.objects.push(...revealed);
+        break;
+      }
+
       case 'call_s': {
         const macro = macros.get(s.fn);
         if (!macro) throw new CompileError(`undefined macro "${s.fn}"`, s.ln);
@@ -988,6 +1000,91 @@ function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
   };
 }
 
+function emitHotspot(s: Extract<Stmt, { k: 'hotspot' }>) {
+  if (!s.common.ask) throw new CompileError('hotspot needs an ask "..."', s.ln);
+  if (!s.target) throw new CompileError('hotspot needs a target rect/circle', s.ln);
+  const t = s.target;
+  if (t.pos.k !== 'tuple' || t.pos.items.length < 2) {
+    throw new CompileError('target needs a (x, y) position', s.ln);
+  }
+  const x = cNum(t.pos.items[0], {}, s.ln);
+  const y = cNum(t.pos.items[1], {}, s.ln);
+
+  let target:
+    | { kind: 'rect'; x: number; y: number; w: number; h: number }
+    | { kind: 'circle'; x: number; y: number; r: number };
+  if (t.kind === 'rect') {
+    const w = t.props.get('w');
+    const h = t.props.get('h');
+    if (!w || w === true || !h || h === true) {
+      throw new CompileError('target rect needs w: and h: props', s.ln);
+    }
+    target = { kind: 'rect', x, y, w: cNum(w, {}, s.ln), h: cNum(h, {}, s.ln) };
+  } else {
+    const r = t.props.get('r');
+    if (!r || r === true) throw new CompileError('target circle needs an r: prop', s.ln);
+    target = { kind: 'circle', x, y, r: cNum(r, {}, s.ln) };
+  }
+
+  return {
+    kind: 'hotspot' as const,
+    prompt: s.common.ask,
+    target,
+    ...(s.miss && { miss: s.miss }),
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
+function tuplePair(e: Expr, ln: number, what: string): [number, number] {
+  if (e.k !== 'tuple' || e.items.length < 2) throw new CompileError(`${what} needs a (x, y)`, ln);
+  return [cNum(e.items[0], {}, ln), cNum(e.items[1], {}, ln)];
+}
+
+function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
+  if (!s.common.ask) throw new CompileError('sketch needs an ask "..."', s.ln);
+
+  if (s.mode === 'line') {
+    if (!s.through) throw new CompileError('sketch line needs a through (x, y) point', s.ln);
+    if (!s.slope) throw new CompileError('sketch line needs a slope: <n>', s.ln);
+    const through = tuplePair(s.through, s.ln, 'through');
+    const slope = cNum(s.slope, {}, s.ln);
+    const tol = s.tol ? cNum(s.tol, {}, s.ln) : 0.4;
+    const slopeTol = s.slopeTol ? cNum(s.slopeTol, {}, s.ln) : 0.5;
+    if (tol < 0 || slopeTol < 0) throw new CompileError('tolerance must not be negative', s.ln);
+    return {
+      kind: 'sketch' as const,
+      mode: 'line' as const,
+      prompt: s.common.ask,
+      through,
+      slope,
+      tol,
+      slopeTol,
+      hints: s.common.hints,
+      ...(s.common.explanation && { explanation: s.common.explanation }),
+      ...(s.common.skill && { skill: s.common.skill }),
+    };
+  }
+
+  if (!s.near.length) {
+    throw new CompileError(`sketch ${s.mode} needs at least one near (x, y)`, s.ln);
+  }
+  const targets = s.near.map((t) => tuplePair(t, s.ln, 'near'));
+  const tol = s.tol ? cNum(s.tol, {}, s.ln) : s.mode === 'curve' ? 0.5 : 0.4;
+  if (tol < 0) throw new CompileError('tolerance must not be negative', s.ln);
+  return {
+    kind: 'sketch' as const,
+    mode: s.mode,
+    prompt: s.common.ask,
+    targets,
+    tol,
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
 function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
   const whenExpr = s.props.get('when');
   if (!whenExpr || whenExpr === true) throw new CompileError('goal needs a when: condition', s.ln);
@@ -1004,6 +1101,8 @@ function emitSlide(s: SlideStmt, i: number) {
     | ReturnType<typeof emitQuiz>
     | ReturnType<typeof emitNumeric>
     | ReturnType<typeof emitBuild>
+    | ReturnType<typeof emitHotspot>
+    | ReturnType<typeof emitSketch>
     | undefined;
   const goals: ReturnType<typeof emitGoal>[] = [];
 
@@ -1022,6 +1121,12 @@ function emitSlide(s: SlideStmt, i: number) {
     } else if (item.k === 'build') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitBuild(item);
+    } else if (item.k === 'hotspot') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitHotspot(item);
+    } else if (item.k === 'sketch') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitSketch(item);
     } else if (item.k === 'goal') {
       goals.push(emitGoal(item));
     }

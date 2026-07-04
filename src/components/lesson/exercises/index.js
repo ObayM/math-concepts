@@ -3,6 +3,14 @@
 // drives its Check button off, so a new exercise kind is just a new entry here
 // plus its component in SlideView.
 
+import {
+  pointInRegion,
+  curveNearPoints,
+  pointsNearTargets,
+  distToPolyline,
+  slope as slopeOf,
+} from '@/engine/checks/geometry';
+
 const sameSequence = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 
 export const exercises = {
@@ -24,5 +32,33 @@ export const exercises = {
     initial: () => [],
     isComplete: (slide, v) => v && v.length === slide.exercise.slots,
     check: (slide, v) => v && slide.exercise.answers.some((ans) => sameSequence(ans, v)),
+  },
+  hotspot: {
+    initial: () => null,
+    isComplete: (_slide, v) => Array.isArray(v),
+    check: (slide, v) => Array.isArray(v) && pointInRegion(v, slide.exercise.target),
+  },
+  sketch: {
+    initial: () => null,
+    isComplete: (slide, v) => {
+      if (!Array.isArray(v)) return false;
+      const ex = slide.exercise;
+      return ex.mode === 'points' ? v.length >= ex.targets.length : v.length >= 2;
+    },
+    check: (slide, v) => {
+      if (!Array.isArray(v) || v.length < 2) return false;
+      const ex = slide.exercise;
+      if (ex.mode === 'points') return pointsNearTargets(v, ex.targets, ex.tol);
+      if (ex.mode === 'line') {
+        const a = v[0];
+        const b = v[v.length - 1];
+        const drawnSlope = slopeOf(a, b);
+        if (!Number.isFinite(drawnSlope) || Math.abs(drawnSlope - ex.slope) > ex.slopeTol) {
+          return false;
+        }
+        return distToPolyline(ex.through, [a, b]) <= ex.tol;
+      }
+      return curveNearPoints(v, ex.targets, ex.tol);
+    },
   },
 };

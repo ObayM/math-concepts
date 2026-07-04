@@ -36,6 +36,131 @@ describe('v2 scene render (SSR smoke)', () => {
   }
 });
 
+describe('hotspot tap layer + marker render to clean SVG (P3 step 24)', () => {
+  const ir = compile(
+    'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n  curve f = x^2\n}'
+  );
+
+  it('renders the tap-catcher rect when onTap is passed', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir, onTap: () => {} }));
+    expect(html).toContain('crosshair');
+    expect(html).not.toContain('NaN');
+  });
+
+  it('renders a marker circle at the tapped point', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(Scene, { ir, marker: { x: 2, y: 4, correct: true } })
+    );
+    expect(html).toContain('<circle');
+    expect(html).not.toContain('NaN');
+  });
+
+  it('renders neither when onTap/marker are absent (no regression)', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir }));
+    expect(html).not.toContain('crosshair');
+  });
+});
+
+describe('reveal phase gates object visibility (P3 step 25)', () => {
+  const ir = compile(
+    'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  curve guess = 0 { color: neutral }\n  reveal {\n    curve f = (x-1)^2 - 3 { color: primary, width: 3 }\n  }\n}'
+  );
+
+  it('hides the revealed curve until revealed=true', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir, revealed: false }));
+    expect((html.match(/<path/g) ?? []).length).toBe(1);
+  });
+
+  it('shows both curves once revealed', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir, revealed: true }));
+    expect((html.match(/<path/g) ?? []).length).toBe(2);
+  });
+
+  it('defaults to hidden when revealed is omitted', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir }));
+    expect((html.match(/<path/g) ?? []).length).toBe(1);
+  });
+});
+
+describe('InputLayer draw capture renders to clean SVG (P3 step 26)', () => {
+  const ir = compile(
+    'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n  curve f = x^2\n}'
+  );
+
+  it('renders the capture rect for curve mode when not disabled', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(Scene, {
+        ir,
+        inputLayer: { mode: 'curve', value: null, onChange: () => {} },
+      })
+    );
+    expect(html).toContain('crosshair');
+    expect(html).not.toContain('NaN');
+  });
+
+  it('renders a committed curve as a polyline', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(Scene, {
+        ir,
+        inputLayer: {
+          mode: 'curve',
+          value: [
+            [-2, 4],
+            [0, 0],
+            [2, 4],
+          ],
+          onChange: () => {},
+        },
+      })
+    );
+    expect(html).toContain('<polyline');
+    expect(html).not.toContain('NaN');
+  });
+
+  it('renders committed points as circles, not a polyline', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(Scene, {
+        ir,
+        inputLayer: {
+          mode: 'points',
+          value: [
+            [-1, 1],
+            [1, 1],
+          ],
+          onChange: () => {},
+        },
+      })
+    );
+    expect(html).toContain('<circle');
+    expect(html).not.toContain('<polyline');
+  });
+
+  it('suppresses the capture rect once disabled, but keeps the drawn value visible', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(Scene, {
+        ir,
+        inputLayer: {
+          mode: 'curve',
+          value: [
+            [-2, 4],
+            [2, 4],
+          ],
+          onChange: () => {},
+          disabled: true,
+        },
+      })
+    );
+    expect(html).not.toContain('crosshair');
+    expect(html).toContain('<polyline');
+  });
+
+  it('renders nothing extra when inputLayer is absent (no regression)', () => {
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir }));
+    expect(html).not.toContain('crosshair');
+    expect(html).not.toContain('<polyline');
+  });
+});
+
 describe('P2.17 primitives render to clean SVG', () => {
   const cases: Record<string, string> = {
     'parametric curve':

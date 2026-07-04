@@ -178,6 +178,33 @@
   border-bottom-color: #4f46e5;
 }
 
+.ex-reveal-btn {
+  margin: 6px 0 6px auto;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #4f46e5;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.1s,
+    color 0.1s,
+    border-color 0.1s;
+}
+
+.ex-reveal-btn:hover {
+  background: #e0e7ff;
+}
+
+.ex-reveal-btn.active {
+  color: #16a34a;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
 .ex-pane {
   display: none;
 }

@@ -44,13 +44,26 @@ function clampVal(
   return value;
 }
 
-export function SceneProvider({ ir, children }: { ir: SceneIR; children: React.ReactNode }) {
+export function SceneProvider({
+  ir,
+  children,
+  onScopeChange,
+}: {
+  ir: SceneIR;
+  children: React.ReactNode;
+  onScopeChange?: (scope: Scope) => void;
+}) {
   const [scope, setScope] = useState<Scope>(() => initScope(ir));
   const scopeRef = useRef(scope);
   const rafRef = useRef<number | null>(null);
+  const onScopeChangeRef = useRef(onScopeChange);
+  useEffect(() => {
+    onScopeChangeRef.current = onScopeChange;
+  }, [onScopeChange]);
 
   useEffect(() => {
     scopeRef.current = scope;
+    onScopeChangeRef.current?.(scope);
   }, [scope]);
 
   const cancelRaf = useCallback(() => {

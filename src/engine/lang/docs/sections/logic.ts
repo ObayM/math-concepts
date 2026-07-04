@@ -28,6 +28,13 @@ export const logicSection: DocSection = {
       example: `param n = 4 { range: [1, 40], step: 1 }\nrepeat i in range(0, n) {\n  rect r = (i*4/n, 0) { w: 4/n, h: (i*4/n)^2, color: accent, opacity: 0.3 }\n}\nslider n { label: "rectangles" }`,
     },
     {
+      keyword: 'reveal',
+      syntax: 'reveal {\n  ...objects...\n}',
+      description:
+        "Objects inside stay hidden until the slide's exercise has been checked, then appear — the predict-then-reveal pattern (sketch/guess first, see the real answer after). Any normal object statement is allowed inside; a slide needs an exercise for the reveal to ever trigger.",
+      example: `curve guess = 0 { color: neutral, style: dashed }\nreveal {\n  curve f = (x-1)^2 - 3 { color: primary, width: 3 }\n}`,
+    },
+    {
       keyword: 'let',
       syntax: 'let <name> = <expr>',
       description:

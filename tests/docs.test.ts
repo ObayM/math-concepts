@@ -13,6 +13,8 @@ const GRAMMAR_KEYWORDS = [
   'quiz',
   'numeric',
   'build',
+  'hotspot',
+  'sketch',
   // scene + state
   'scene',
   'param',
@@ -41,6 +43,7 @@ const GRAMMAR_KEYWORDS = [
   'for',
   'repeat',
   'if',
+  'reveal',
   'let',
   'def',
 ];

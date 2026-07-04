@@ -5,13 +5,28 @@ import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
+import { resolveColor } from '@/engine/colors';
+import { toDataCoords } from './coords';
+import InputLayer, { type InputLayerConfig } from './InputLayer';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 
 const DEFAULT_W = 640; // used until the container is measured (also SSR)
 const ASPECT = 0.6; // height / width — comfortable landscape default
 
-export default function SvgRenderer({ ir }: { ir: SceneIR }) {
+export default function SvgRenderer({
+  ir,
+  onTap,
+  marker,
+  revealed,
+  inputLayer,
+}: {
+  ir: SceneIR;
+  onTap?: (x: number, y: number) => void;
+  marker?: { x: number; y: number; correct?: boolean };
+  revealed?: boolean;
+  inputLayer?: InputLayerConfig;
+}) {
   const { scope, set } = useScene();
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -61,9 +76,7 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
     const move = (ev: PointerEvent) => {
       const svg = svgRef.current;
       if (!svg) return;
-      const rect = svg.getBoundingClientRect();
-      const dataX = xMin + ((ev.clientX - rect.left) / rect.width) * (xMax - xMin);
-      const dataY = yMax - ((ev.clientY - rect.top) / rect.height) * (yMax - yMin);
+      const [dataX, dataY] = toDataCoords(svg, ev.clientX, ev.clientY, [xMin, xMax], [yMin, yMax]);
       const patch = applyDrag(draggable, dataX, dataY, ir, scope);
       for (const key in patch) set(key, patch[key]);
     };
@@ -73,6 +86,13 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+  };
+
+  const handleTap = (e: React.PointerEvent<SVGRectElement>) => {
+    const svg = svgRef.current;
+    if (!svg || !onTap) return;
+    const [dataX, dataY] = toDataCoords(svg, e.clientX, e.clientY, [xMin, xMax], [yMin, yMax]);
+    onTap(dataX, dataY);
   };
 
   // pick a "nice" tick spacing (1/2/5 × 10^k) so grid + numbers aren't cramped
@@ -177,7 +197,19 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
         {grid}
         {axes}
         {ticks}
+        {onTap && (
+          <rect
+            x={0}
+            y={0}
+            width={W}
+            height={H}
+            fill="transparent"
+            style={{ cursor: 'crosshair' }}
+            onPointerDown={handleTap}
+          />
+        )}
         {objects.map((obj, i) => {
+          if (obj.phase === 'reveal' && !revealed) return null;
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
           const Prim = svgPrimitives[obj.type];
           if (!Prim) return null;
@@ -192,6 +224,20 @@ export default function SvgRenderer({ ir }: { ir: SceneIR }) {
             />
           );
         })}
+        {marker && (
+          <circle
+            cx={cx.toX(marker.x)}
+            cy={cx.toY(marker.y)}
+            r={7}
+            fill={resolveColor(
+              marker.correct == null ? 'primary' : marker.correct ? 'success' : 'danger'
+            )}
+            stroke="white"
+            strokeWidth={2}
+            pointerEvents="none"
+          />
+        )}
+        {inputLayer && <InputLayer cx={cx} svgRef={svgRef} {...inputLayer} />}
       </svg>
     </div>
   );

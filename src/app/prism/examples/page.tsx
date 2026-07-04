@@ -36,6 +36,7 @@ const KEYWORDS = new Set([
   'through',
   'show',
   'drag',
+  'reveal',
   'grid',
   'axes',
   'tex',
@@ -109,6 +110,7 @@ function highlight(code: string): string {
 
 function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
   const [tab, setTab] = useState<'preview' | 'code'>('preview');
+  const [revealed, setRevealed] = useState(false);
   const { ir, err } = useMemo(() => {
     try {
       return { ir: compile(example.code), err: null };
@@ -150,6 +152,14 @@ function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
           >
             Code
           </button>
+          {example.hasReveal && tab === 'preview' && (
+            <button
+              className={`ex-reveal-btn ${revealed ? 'active' : ''}`}
+              onClick={() => setRevealed((r) => !r)}
+            >
+              {revealed ? '✓ Revealed' : 'Reveal'}
+            </button>
+          )}
         </div>
 
         <div className={`ex-pane ${tab === 'preview' ? 'active' : ''}`}>
@@ -157,7 +167,7 @@ function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
             {err ? (
               <p className="text-xs font-mono text-red-500 p-4">{err}</p>
             ) : ir ? (
-              <Scene ir={ir} />
+              <Scene ir={ir} revealed={revealed} />
             ) : (
               <p className="text-sm text-neutral-400 text-center py-8">Loading…</p>
             )}

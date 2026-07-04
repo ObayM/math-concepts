@@ -8,6 +8,7 @@ import Spinner from '@/components/ui/Spinner';
 import Card from '@/components/ui/Card';
 import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor } from '@/utils/aiService';
+import { evalGoals } from '@/engine/runtime/goals';
 
 import TextBlock from './blocks/TextBlock';
 import QuizBlock from './blocks/QuizBlock';
@@ -42,6 +43,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
   const [interactiveValue, setInteractiveValue] = useState(50);
   const [answer, setAnswer] = useState(null);
   const [checked, setChecked] = useState(false);
+  const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
   const [quizHistory, setQuizHistory] = useState([]);
   const [isComplete, setIsComplete] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -155,6 +157,15 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     setChecked(false);
   };
 
+  const handleScopeChange = (scope) => {
+    const goals = slide?.goals;
+    if (!goals?.length) return;
+    setGoalsState((prev) => {
+      const prevMet = prev.slideId === slide.id ? prev.met : [];
+      return { slideId: slide.id, met: evalGoals(goals, prevMet, scope) };
+    });
+  };
+
   const handleTutorAsk = async () => {
     if (!tutorQuery.trim()) return;
     setTutorLoading(true);
@@ -209,7 +220,10 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     );
   }
 
-  const canAdvance = !checker || checked;
+  const goalsMet =
+    goalsState.slideId === slide?.id ? goalsState.met : (slide?.goals ?? []).map(() => false);
+  const goalsSatisfied = !slide?.goals?.length || goalsMet.every(Boolean);
+  const canAdvance = (!checker || checked) && goalsSatisfied;
   const correct = checked && checker ? checker.check(slide, answer) : null;
   const BlockRenderer = slide && slide.type ? (blockRegistry[slide.type] ?? TextBlock) : null;
 
@@ -266,6 +280,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
                   checked={checked}
                   correct={correct}
                   onChange={handleAnswerChange}
+                  goalsMet={goalsMet}
+                  onScopeChange={handleScopeChange}
                 />
               ) : (
                 BlockRenderer && (

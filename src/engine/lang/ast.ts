@@ -25,6 +25,7 @@ export type Stmt =
   | { k: 'for_s'; var: string; start: Expr; end: Expr; step: Expr | null; body: Stmt[]; ln: number }
   | { k: 'repeat_s'; var: string; start: Expr; count: Expr; body: Stmt[]; ln: number }
   | { k: 'if_s'; cases: IfCase[]; elseBody: Stmt[] | null; ln: number }
+  | { k: 'reveal'; body: Stmt[]; ln: number }
   | { k: 'call_s'; fn: string; args: Expr[]; ln: number }
   | { k: 'curve'; id: Expr; expr: Expr; props: PropMap; ln: number }
   | { k: 'area'; id: Expr; expr: Expr; props: PropMap; ln: number }
@@ -63,7 +64,29 @@ export type Stmt =
       reusable: boolean;
       common: ExerciseCommon;
       ln: number;
+    }
+  | {
+      k: 'hotspot';
+      target: HotspotTarget | null;
+      miss: string | null;
+      common: ExerciseCommon;
+      ln: number;
+    }
+  | {
+      k: 'sketch';
+      mode: 'curve' | 'points' | 'line';
+      near: Expr[];
+      through: Expr | null;
+      slope: Expr | null;
+      tol: Expr | null;
+      slopeTol: Expr | null;
+      common: ExerciseCommon;
+      ln: number;
     };
+
+export type HotspotTarget =
+  | { kind: 'rect'; pos: Expr; props: PropMap }
+  | { kind: 'circle'; pos: Expr; props: PropMap };
 
 export type SlideStmt = {
   k: 'slide';

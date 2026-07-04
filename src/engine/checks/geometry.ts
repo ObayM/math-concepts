@@ -45,6 +45,10 @@ export function curveNearPoints(line: Pt[], targets: Pt[], tol: number): boolean
   return targets.every((t) => distToPolyline(t, line) <= tol);
 }
 
+export function pointsNearTargets(points: Pt[], targets: Pt[], tol: number): boolean {
+  return targets.every((t) => points.some((p) => Math.hypot(p[0] - t[0], p[1] - t[1]) <= tol));
+}
+
 // --- curve vs expression ----------------------------------------------------
 
 // does the drawn polyline approximate y = f(x) over [a,b]? resample the curve
