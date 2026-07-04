@@ -17,8 +17,7 @@ export const sceneSection: DocSection = {
         { name: 'grid', type: 'flag', description: 'draw a background grid (plane only)' },
         { name: 'axes', type: 'flag', description: 'draw axes' },
       ],
-      example:
-        'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n}\n\nscene numberline {\n  x: [-10, 10]\n  axes\n}',
+      example: 'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n}',
     },
     {
       keyword: 'param',

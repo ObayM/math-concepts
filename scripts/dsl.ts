@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { compile, compileLesson, CompileError, formatCompileError } from '@/engine/lang';
+import { PRISM_DOCS } from '@/engine/lang/docs';
+import { PRISM_COOKBOOK } from '@/engine/lang/docs/cookbook';
+import { PRISM_ERRORS } from '@/engine/lang/docs/errors';
+import { compileAny } from '@/components/prism/compileAny';
+import { EXAMPLES } from '@/app/prism/examples/examples-data';
 
 const G = '\x1b[32m';
 const R = '\x1b[31m';
@@ -46,7 +51,53 @@ function checkFile(filePath: string): boolean {
   }
 }
 
-if (cmd === 'check') {
+function checkSource(label: string, src: string): boolean {
+  const { error } = compileAny(src);
+  if (error) {
+    console.log(`${R}✗${X} ${label}`);
+    console.log(
+      error
+        .split('\n')
+        .map((l) => `  ${R}${l}${X}`)
+        .join('\n')
+    );
+    return false;
+  }
+  console.log(`${G}✓${X} ${label}`);
+  return true;
+}
+
+if (cmd === 'docs-check') {
+  let anyFail = false;
+
+  for (const section of PRISM_DOCS.sections) {
+    for (const entry of section.entries) {
+      if (!entry.example) continue;
+      if (!checkSource(`docs/${section.id}/${entry.keyword}`, entry.example)) anyFail = true;
+    }
+  }
+
+  for (const ex of EXAMPLES) {
+    if (!checkSource(`gallery/${ex.id}`, ex.code)) anyFail = true;
+  }
+
+  for (const entry of PRISM_COOKBOOK) {
+    if (!checkSource(`cookbook/${entry.id}`, entry.source)) anyFail = true;
+  }
+
+  for (const err of PRISM_ERRORS) {
+    const { error: badError } = compileAny(err.bad);
+    if (!badError) {
+      console.log(`${R}✗${X} errors/${err.code} (bad) ${Y}— expected to fail but compiled${X}`);
+      anyFail = true;
+    } else {
+      console.log(`${G}✓${X} errors/${err.code} (bad, fails as expected)`);
+    }
+    if (!checkSource(`errors/${err.code} (good)`, err.good)) anyFail = true;
+  }
+
+  process.exit(anyFail ? 1 : 0);
+} else if (cmd === 'check') {
   const file = argv[1];
   if (!file) {
     console.error('usage: dsl check <file>');
@@ -83,6 +134,7 @@ ${B}commands:${X}
   check <file>       validate a .prism lesson or scene file
   check-all [dir]    validate every .prism file (default: prisma/lessons)
   compile <file>     compile and print the IR as JSON
+  docs-check         compile every /prism doc example, gallery entry, and cookbook source
 
 ${B}examples:${X}
   make dsl-check f=prisma/lessons/quadratics-1.prism

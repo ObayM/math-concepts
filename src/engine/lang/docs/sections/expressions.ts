@@ -11,7 +11,7 @@ export const expressionsSection: DocSection = {
       syntax: '+ - * / ^ %',
       description:
         '`^` is exponentiation (e.g. `x^2`). All standard arithmetic. Standard precedence.',
-      example: '(x^2 + 2*x + 1) / (x + 1)',
+      example: 'curve f = (x^2 + 2*x + 1) / (x + 1) { color: primary }',
     },
     {
       keyword: 'math functions',
@@ -24,14 +24,14 @@ export const expressionsSection: DocSection = {
       keyword: 'constants',
       syntax: 'PI  E',
       description: 'Mathematical constants (uppercase).',
-      example: `circle unit = (0,0) { r: 1 }\narc a = (0,0) { r: 0.3, from: 0, to: t*180/PI }`,
+      example: `param t = 1.57 { range: [0, 6.28] }\ncircle unit = (0,0) { r: 1 }\narc a = (0,0) { r: 0.3, from: 0, to: t*180/PI }`,
     },
     {
       keyword: 'interpolation',
       syntax: '"text ${expr} more text"',
       description:
         'In label text, `${expr}` is evaluated at runtime and shown rounded to 2 decimal places.',
-      example: 'label at (t, t^2+0.5) = "f(${t}) = ${t^2}"',
+      example: 'param t = 1 { range: [-3, 3] }\nlabel at (t, t^2+0.5) = "f(${t}) = ${t^2}"',
     },
     {
       keyword: 'f-strings',

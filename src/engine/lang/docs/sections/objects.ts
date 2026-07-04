@@ -21,7 +21,7 @@ export const objectsSection: DocSection = {
           description: 'boolean in x — draw the curve only where it holds (piecewise)',
         },
       ],
-      example: `curve f = x^2 { color: primary }\ncurve g = sin(x)*t { color: accent, show: showSin }\ncurve circle = (cos(t), sin(t)) { t: [0, 2*PI], color: accent }\ncurve left = x + 2 { where: x < k }  // a piecewise branch`,
+      example: `param t = 0 { range: [-3, 3] }\nbool showSin = false\ncurve f = x^2 { color: primary }\ncurve g = sin(x)*t { color: accent, show: showSin }\ncurve trace = (cos(t), sin(t)) { t: [0, 2*PI], color: accent }\ncurve left = x + 2 { where: x < 0 }  # a piecewise branch`,
     },
     {
       keyword: 'area',
@@ -35,7 +35,7 @@ export const objectsSection: DocSection = {
         { name: 'lower', type: 'expr', description: 'lower boundary curve (default y = 0)' },
         { name: 'opacity', type: 'number', description: 'fill opacity (default 0.15)' },
       ],
-      example: `area a = x^2 { from: 0, to: 4, color: accent, opacity: 0.1 }\narea band = f(x) { lower: g(x), color: primary }`,
+      example: `area a = x^2 { from: 0, to: 4, color: accent, opacity: 0.1 }\narea band = 6 { lower: x^2, color: primary, opacity: 0.15 }`,
     },
     {
       keyword: 'point',
@@ -53,7 +53,7 @@ export const objectsSection: DocSection = {
         { name: 'r', type: 'number', description: 'radius in pixels (default 6)' },
         { name: 'label', type: 'string', description: 'text label next to the point' },
       ],
-      example: `point p = (t, t^2) { drag: x -> t, color: accent }\npoint v = (vx, vy) { drag: xy -> (vx, vy), label: "vertex" }\npoint g = (t, t^2) { drag: x -> t, snap: 0.5 }\ncircle c = (0, 0) { r: 3 }\npoint onC = (3*cos(theta), 3*sin(theta)) { drag: along(c) -> theta }`,
+      example: `param t = 0 { range: [-3, 3] }\nparam vx = 2 { range: [-4, 4] }\nparam vy = 1 { range: [-4, 4] }\nparam theta = 0 { range: [0, 6.28] }\npoint p = (t, t^2) { drag: x -> t, color: accent, snap: 0.5 }\npoint v = (vx, vy) { drag: xy -> (vx, vy), label: "vertex" }\ncircle c = (0, 0) { r: 3 }\npoint onC = (3*cos(theta), 3*sin(theta)) { drag: along(c) -> theta }`,
     },
     {
       keyword: 'line',
@@ -61,21 +61,22 @@ export const objectsSection: DocSection = {
         'line <id> = (x1,y1) -> (x2,y2) { [props] }  OR  line <id> { through: <obj_id>, slope: <expr>, [props] }',
       description:
         'A line segment uses `->` arrow syntax. For an infinite line through a point, omit `=` and put `through:` and `slope:` in the props block instead.',
-      example: `line seg = (-2,0) -> (2,4) { color: neutral }\nline tangent { through: p, slope: 2*t, style: dashed, show: showTangent }`,
+      example: `param t = 0 { range: [-3, 3] }\nbool showTangent = false\npoint p = (t, t^2) { drag: x -> t, color: accent }\nline seg = (-2,0) -> (2,4) { color: neutral }\nline tangent { through: p, slope: 2*t, style: dashed, show: showTangent }`,
     },
     {
       keyword: 'label',
       syntax: 'label [id] at (x, y) = <text> { [size: <number>], [tex], [props] }',
       description:
         'Text positioned in scene coordinates. Use `${expr}` in the text for live-updating values (rounded to 2 dp). Add `tex` flag to render as LaTeX via KaTeX.',
-      example: `label at (t, t^2+0.5) = "slope = \${2*t}"\nlabel eq at (0, 4) = "x^2 + 1" { tex }`,
+      example: `param t = 0 { range: [-3, 3] }\nlabel at (t, t^2+0.5) = "slope = \${2*t}"\nlabel eq at (0, 4) = "x^2 + 1" { tex }`,
     },
     {
       keyword: 'rect',
       syntax: 'rect <id> = (x, y) { w: <expr>, h: <expr>, [opacity: <number>], [props] }',
       description:
         '(x, y) is the bottom-left corner in scene coords. Width and height are expressions.',
-      example: 'rect bar = (0, 0) { w: 0.5, h: t^2, color: primary, opacity: 0.4 }',
+      example:
+        'param t = 1 { range: [0, 3] }\nrect bar = (0, 0) { w: 0.5, h: t^2, color: primary, opacity: 0.4 }',
     },
     {
       keyword: 'circle',
@@ -93,14 +94,15 @@ export const objectsSection: DocSection = {
       keyword: 'vector',
       syntax: 'vector <id> = (x1,y1) -> (x2,y2) { [props] }',
       description: 'An arrow from (x1,y1) to (x2,y2). All coords can be expressions.',
-      example: 'vector v = (0,0) -> (vx, vy) { color: accent }',
+      example:
+        'param vx = 2 { range: [-4, 4] }\nparam vy = 1 { range: [-4, 4] }\nvector v = (0,0) -> (vx, vy) { color: accent }',
     },
     {
       keyword: 'arc',
       syntax: 'arc <id> = (x, y) { r: <expr>, from: <degrees>, to: <degrees>, [props] }',
       description:
         'An arc centered at (x, y), from `from` degrees to `to` degrees (counter-clockwise). Useful for angle markers.',
-      example: 'arc angle = (0,0) { r: 0.5, from: 0, to: t }',
+      example: 'param t = 90 { range: [0, 360] }\narc angle = (0,0) { r: 0.5, from: 0, to: t }',
     },
   ],
 };

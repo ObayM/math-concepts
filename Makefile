@@ -1,4 +1,4 @@
-.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-compile dsl-preview
+.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-compile dsl-preview dsl-docs-check
 
 
 dev: install
@@ -54,3 +54,6 @@ dsl-compile:
 dsl-preview:
 	@echo "open http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.prism)"
 	@xdg-open "http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.prism)" 2>/dev/null || open "http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.prism)" 2>/dev/null || true
+
+dsl-docs-check:
+	npx tsx scripts/dsl.ts docs-check

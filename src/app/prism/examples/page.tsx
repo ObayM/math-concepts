@@ -3,110 +3,10 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { compile, Scene } from '@/engine';
 import type { SceneIR } from '@/engine/ir/types';
+import { highlight } from '@/components/prism/SyntaxPre';
 import { EXAMPLES } from './examples-data';
 import '../prism.css';
 import './examples.css';
-
-const KEYWORDS = new Set([
-  'scene',
-  'param',
-  'bool',
-  'curve',
-  'point',
-  'line',
-  'label',
-  'rect',
-  'circle',
-  'polygon',
-  'vector',
-  'arc',
-  'slider',
-  'toggle',
-  'stepper',
-  'button',
-  'step',
-  'for',
-  'in',
-  'range',
-  'if',
-  'elif',
-  'else',
-  'let',
-  'def',
-  'through',
-  'show',
-  'drag',
-  'reveal',
-  'grid',
-  'axes',
-  'tex',
-  'set',
-  'animate',
-  'ease',
-  'dur',
-  'opacity',
-  'style',
-  'color',
-  'width',
-  'min',
-  'max',
-  'true',
-  'false',
-]);
-const MATH_FNS = new Set([
-  'sin',
-  'cos',
-  'tan',
-  'asin',
-  'acos',
-  'atan',
-  'atan2',
-  'sinh',
-  'cosh',
-  'tanh',
-  'sqrt',
-  'cbrt',
-  'abs',
-  'log',
-  'log2',
-  'log10',
-  'exp',
-  'floor',
-  'ceil',
-  'round',
-  'sign',
-  'pow',
-  'hypot',
-  'PI',
-  'E',
-]);
-
-function highlight(code: string): string {
-  return code
-    .split('\n')
-    .map((line) => {
-      const ci = line.indexOf('#');
-      const main = ci === -1 ? line : line.slice(0, ci);
-      const cmt = ci === -1 ? '' : line.slice(ci);
-      const h = main.replace(
-        /("(?:[^"\\]|\\.)*")|(\b\d+(?:\.\d+)?\b)|([+\-*/^%]|->|>=|<=|==|!=|[=><!])|([()[\]{},])|(\b[a-zA-Z_][a-zA-Z0-9_]*\b)/g,
-        (_, str, num, op, punc, word) => {
-          if (str) return `<span class="tok-str">${str}</span>`;
-          if (num) return `<span class="tok-num">${num}</span>`;
-          if (op) return `<span class="tok-op">${op}</span>`;
-          if (punc) return `<span class="tok-punc">${punc}</span>`;
-          if (word) {
-            if (KEYWORDS.has(word)) return `<span class="tok-kw">${word}</span>`;
-            if (MATH_FNS.has(word)) return `<span class="tok-fn">${word}</span>`;
-            return `<span class="tok-id">${word}</span>`;
-          }
-          return _;
-        }
-      );
-      return cmt ? `${h}<span class="tok-cmt">${cmt}</span>` : h;
-    })
-    .join('\n');
-}
 
 function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
   const [tab, setTab] = useState<'preview' | 'code'>('preview');
@@ -118,6 +18,7 @@ function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
       return { ir: null, err: e instanceof Error ? e.message : String(e) };
     }
   }, [example.code]);
+  const playHref = `/prism/play#${btoa(encodeURIComponent(example.code))}`;
 
   return (
     <article className="ex-card">
@@ -133,7 +34,7 @@ function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
             ))}
           </div>
         </div>
-        <Link href="/dsl-preview" className="ex-open-btn">
+        <Link href={playHref} className="ex-open-btn">
           Open in playground →
         </Link>
       </div>
@@ -195,7 +96,7 @@ export default function ExamplesPage() {
             <Link href="/prism" className="ex-back-link">
               ← Docs
             </Link>
-            <Link href="/dsl-preview" className="ex-back-link">
+            <Link href="/prism/play" className="ex-back-link">
               Playground
             </Link>
           </div>

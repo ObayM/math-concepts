@@ -1,170 +1,11 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PRISM_DOCS } from '@/engine/lang/docs';
 import type { DocEntry, DocSection } from '@/engine/lang/docs';
-import { compile, Scene } from '@/engine';
-import type { SceneIR } from '@/engine/ir/types';
+import LiveSnippet from '@/components/prism/LiveSnippet';
+import SyntaxPre from '@/components/prism/SyntaxPre';
 import './prism.css';
-
-const KEYWORDS = new Set([
-  'scene',
-  'param',
-  'bool',
-  'curve',
-  'point',
-  'line',
-  'label',
-  'rect',
-  'circle',
-  'polygon',
-  'vector',
-  'arc',
-  'slider',
-  'toggle',
-  'stepper',
-  'button',
-  'step',
-  'for',
-  'in',
-  'range',
-  'if',
-  'elif',
-  'else',
-  'let',
-  'def',
-  'through',
-  'show',
-  'drag',
-  'grid',
-  'axes',
-  'tex',
-  'set',
-  'animate',
-  'ease',
-  'dur',
-  'opacity',
-  'style',
-  'color',
-  'width',
-  'min',
-  'max',
-  'step',
-  'true',
-  'false',
-]);
-
-const MATH_FNS = new Set([
-  'sin',
-  'cos',
-  'tan',
-  'asin',
-  'acos',
-  'atan',
-  'atan2',
-  'sinh',
-  'cosh',
-  'tanh',
-  'sqrt',
-  'cbrt',
-  'abs',
-  'log',
-  'log2',
-  'log10',
-  'exp',
-  'floor',
-  'ceil',
-  'round',
-  'sign',
-  'pow',
-  'hypot',
-  'PI',
-  'E',
-]);
-
-function highlight(code: string): string {
-  return code
-    .split('\n')
-    .map((line) => {
-      const commentIdx = line.indexOf('#');
-      const main = commentIdx === -1 ? line : line.slice(0, commentIdx);
-      const comment = commentIdx === -1 ? '' : line.slice(commentIdx);
-
-      const highlighted = main.replace(
-        /("(?:[^"\\]|\\.)*")|(\b\d+(?:\.\d+)?\b)|([+\-*/^%]|->|>=|<=|==|!=|[=><!])|([()[\]{},])|(\b[a-zA-Z_][a-zA-Z0-9_]*\b)/g,
-        (_, str, num, op, punc, word) => {
-          if (str) return `<span class="tok-str">${str}</span>`;
-          if (num) return `<span class="tok-num">${num}</span>`;
-          if (op) return `<span class="tok-op">${op}</span>`;
-          if (punc) return `<span class="tok-punc">${punc}</span>`;
-          if (word) {
-            if (KEYWORDS.has(word)) return `<span class="tok-kw">${word}</span>`;
-            if (MATH_FNS.has(word)) return `<span class="tok-fn">${word}</span>`;
-            return `<span class="tok-id">${word}</span>`;
-          }
-          return _;
-        }
-      );
-
-      return comment ? `${highlighted}<span class="tok-cmt">${comment}</span>` : highlighted;
-    })
-    .join('\n');
-}
-
-function SyntaxPre({ code, className = '' }: { code: string; className?: string }) {
-  return (
-    <pre
-      className={`prism-pre syntax ${className}`}
-      dangerouslySetInnerHTML={{ __html: highlight(code) }}
-    />
-  );
-}
-
-function CodePreview({ code }: { code: string }) {
-  const [tab, setTab] = useState<'code' | 'preview'>('code');
-  const { ir, err } = useMemo(() => {
-    try {
-      return { ir: compile(code), err: null };
-    } catch (e: unknown) {
-      return { ir: null, err: e instanceof Error ? e.message : String(e) };
-    }
-  }, [code]);
-
-  return (
-    <div className="code-preview">
-      <div className="code-preview-tabs">
-        <button
-          className={`code-preview-tab ${tab === 'code' ? 'active' : ''}`}
-          onClick={() => setTab('code')}
-        >
-          Code
-        </button>
-        <button
-          className={`code-preview-tab ${tab === 'preview' ? 'active' : ''}`}
-          onClick={() => setTab('preview')}
-        >
-          Preview ↗
-        </button>
-      </div>
-
-      <div className={`code-preview-pane ${tab === 'code' ? 'active' : ''}`}>
-        <SyntaxPre code={code} />
-      </div>
-
-      <div className={`code-preview-pane ${tab === 'preview' ? 'active' : ''}`}>
-        <div className="code-preview-scene">
-          {err ? (
-            <p className="text-xs font-mono text-red-500 py-2">{err}</p>
-          ) : ir ? (
-            <Scene ir={ir} />
-          ) : (
-            <p className="text-xs text-neutral-400 py-4 text-center">compiling…</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function PropTable({ props }: { props: NonNullable<DocEntry['props']> }) {
   return (
@@ -197,8 +38,6 @@ function PropTable({ props }: { props: NonNullable<DocEntry['props']> }) {
 }
 
 function Entry({ entry }: { entry: DocEntry }) {
-  const hasFullScene = entry.example?.trimStart().startsWith('scene') ?? false;
-
   return (
     <div id={`entry-${entry.keyword}`} className="prism-entry">
       <div className="entry-header">
@@ -225,13 +64,7 @@ function Entry({ entry }: { entry: DocEntry }) {
           >
             example
           </p>
-          {hasFullScene ? (
-            <CodePreview code={entry.example} />
-          ) : (
-            <div className="code-preview">
-              <SyntaxPre code={entry.example} />
-            </div>
-          )}
+          <LiveSnippet code={entry.example} />
         </div>
       )}
     </div>
@@ -310,7 +143,7 @@ export default function PrismPage() {
         </nav>
 
         <div className="sidebar-footer">
-          <Link href="/dsl-preview" className="sidebar-footer-link">
+          <Link href="/prism/play" className="sidebar-footer-link">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
               <rect
                 x="1"
@@ -349,7 +182,7 @@ export default function PrismPage() {
                 strokeWidth="1.5"
               />
             </svg>
-            Live playground
+            Playground
           </Link>
           <Link href="/prism/examples" className="sidebar-footer-link">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -361,6 +194,25 @@ export default function PrismPage() {
               />
             </svg>
             Examples
+          </Link>
+          <Link href="/prism/cookbook" className="sidebar-footer-link">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path
+                d="M2 1.5h9v10l-4.5-2-4.5 2v-10z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Cookbook
+          </Link>
+          <Link href="/prism/errors" className="sidebar-footer-link">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M6.5 4v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="6.5" cy="9" r="0.6" fill="currentColor" />
+            </svg>
+            Errors
           </Link>
         </div>
       </aside>
@@ -375,11 +227,14 @@ export default function PrismPage() {
               {PRISM_DOCS.intro.split('\n').filter(Boolean).join(' ')}
             </p>
             <div className="hero-cta-row">
-              <Link href="/dsl-preview" className="hero-cta-primary">
+              <Link href="/prism/play" className="hero-cta-primary">
                 Open playground →
               </Link>
               <Link href="/prism/examples" className="hero-cta-secondary">
                 View examples
+              </Link>
+              <Link href="/prism/cookbook" className="hero-cta-secondary">
+                Cookbook
               </Link>
             </div>
           </div>

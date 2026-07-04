@@ -59,7 +59,7 @@ export const lessonSection: DocSection = {
         { name: 'hint', type: 'string', description: 'nudge shown if the learner is stuck' },
       ],
       example:
-        'goal "Make both roots negative" { when: r1 < 0 and r2 < 0, hint: "Drag both points left." }',
+        'scene plane {\n  x: [-6, 6]\n  y: [-6, 6]\n  grid\n  axes\n  param r1 = -3 { range: [-6, 6] }\n  param r2 = 2 { range: [-6, 6] }\n  point p1 = (r1, 0) { drag: x -> r1, color: danger }\n  point p2 = (r2, 0) { drag: x -> r2, color: danger }\n}\ngoal "Make both roots negative" { when: r1 < 0 and r2 < 0, hint: "Drag both points left." }',
     },
   ],
 };

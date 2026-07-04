@@ -6,6 +6,8 @@ import { controlsSection } from './sections/controls';
 import { timelineSection } from './sections/timeline';
 import { logicSection } from './sections/logic';
 import { expressionsSection } from './sections/expressions';
+import { PRISM_COOKBOOK } from './cookbook';
+import { PRISM_ERRORS } from './errors';
 
 export type { DocProp, DocEntry, DocSection } from './types';
 
@@ -100,6 +102,28 @@ export function toAIContext(): string {
   lines.push('# COMPLETE EXAMPLE');
   lines.push('');
   lines.push(COMPLETE_EXAMPLE);
+  lines.push('');
+
+  lines.push('# COOKBOOK — reach for these patterns, not just raw syntax');
+  lines.push('');
+  for (const entry of PRISM_COOKBOOK) {
+    lines.push(`## ${entry.title}`);
+    lines.push(entry.description);
+    lines.push(entry.source);
+    lines.push('');
+  }
+
+  lines.push('# COMMON ERRORS — if you get one of these, here is the fix');
+  lines.push('');
+  for (const err of PRISM_ERRORS) {
+    lines.push(`## ${err.code}: ${err.title}`);
+    lines.push(err.explanation);
+    lines.push('bad:');
+    lines.push(err.bad);
+    lines.push('good:');
+    lines.push(err.good);
+    lines.push('');
+  }
 
   return lines.join('\n');
 }

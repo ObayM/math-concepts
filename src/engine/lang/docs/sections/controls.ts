@@ -11,25 +11,28 @@ export const controlsSection: DocSection = {
       syntax: 'slider <bind> { [label: "text"], [min: <n>], [max: <n>], [step: <n>] }',
       description:
         "A horizontal slider bound to a numeric state variable. `min`/`max` override the param's range.",
-      example: 'slider t { label: "move the point", min: -3, max: 3 }',
+      example:
+        'param t = 0 { range: [-3, 3] }\nslider t { label: "move the point", min: -3, max: 3 }',
     },
     {
       keyword: 'toggle',
       syntax: 'toggle <bind> { [label: "text"] }',
       description: 'An on/off switch bound to a boolean state variable.',
-      example: 'toggle showTangent { label: "show tangent line" }',
+      example: 'bool showTangent = false\ntoggle showTangent { label: "show tangent line" }',
     },
     {
       keyword: 'stepper',
       syntax: 'stepper <bind> { [label: "text"], [step: <n>] }',
       description: 'A − / + stepper bound to a numeric state variable.',
-      example: 'stepper n { label: "rectangles", step: 1 }',
+      example:
+        'param n = 4 { range: [1, 40], step: 1 }\nstepper n { label: "rectangles", step: 1 }',
     },
     {
       keyword: 'picker',
       syntax: 'picker <bind> { [label: "text"] }',
       description: 'A row of pill buttons bound to a `choice` state variable, one per option.',
-      example: 'picker shape { label: "pick a shape" }',
+      example:
+        'choice shape = "circle" { options: ["circle", "square", "triangle"] }\npicker shape { label: "pick a shape" }',
     },
     {
       keyword: 'button',
@@ -49,7 +52,7 @@ export const controlsSection: DocSection = {
         { name: 'dur', type: 'ms', description: 'animation duration (default 600ms)' },
         { name: 'ease', type: 'string', description: 'easing curve for animate' },
       ],
-      example: `button "reset" { set: { t: 0 } }\nbutton "play" { animate: { t: 3 }, dur: 2000, ease: easeInOut }`,
+      example: `param t = 0 { range: [-3, 3] }\nbutton "reset" { set: { t: 0 } }\nbutton "play" { animate: { t: 3 }, dur: 2000, ease: easeInOut }`,
     },
   ],
 };

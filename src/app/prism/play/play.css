@@ -1,0 +1,84 @@
+.play-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #fff;
+}
+
+.play-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.play-back-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.play-back-link:hover {
+  color: #4f46e5;
+}
+
+.play-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f0f0f;
+  flex: 1;
+}
+
+.play-share-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.play-share-btn:hover {
+  background: #f9fafb;
+}
+
+.play-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 800px) {
+  .play-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
+.play-editor {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 20px;
+  border: none;
+  border-right: 1px solid #e5e7eb;
+  resize: none;
+  background: #0f1117;
+  color: #e2e8f0;
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  tab-size: 2;
+  outline: none;
+}
+
+.play-preview {
+  overflow-y: auto;
+  padding: 24px;
+}

@@ -12,7 +12,7 @@ export const timelineSection: DocSection = {
         'step ["narrate text"] { [set: {k: v}], [animate: {k: v}], [dur: <ms>], [ease: <curve>] }',
       description:
         'One beat in the timeline. The learner presses play to advance. Narrate text appears as a caption. Steps accumulate — state set in step 1 stays in step 2.',
-      example: `step "here's f(x) = x²"\nstep "the tangent at x=t has slope 2t" { set: { showTangent: true } }\nstep "watch the slope change" { animate: { t: 3 }, dur: 2000, ease: easeInOut }`,
+      example: `param t = 0 { range: [-3, 3] }\nbool showTangent = false\nstep "here's f(x) = x²"\nstep "the tangent at x=t has slope 2t" { set: { showTangent: true } }\nstep "watch the slope change" { animate: { t: 3 }, dur: 2000, ease: easeInOut }`,
     },
   ],
 };
