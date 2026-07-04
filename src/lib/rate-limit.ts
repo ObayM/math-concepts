@@ -4,6 +4,7 @@ const store = new Map<string, Bucket>();
 const LIMITS = {
   chat: { max: 20, perMin: 20 },
   generate: { max: 5, perMin: 5 },
+  'generate-lesson': { max: 2, perMin: 2 },
 } as const;
 
 export function consume(key: string, tier: keyof typeof LIMITS): boolean {

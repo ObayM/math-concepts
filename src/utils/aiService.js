@@ -26,3 +26,18 @@ export const generateScene = async (concept, difficulty = 'intermediate', contex
 
   return res.json();
 };
+
+export const generateLesson = async (topic, course = '', difficulty = 'intermediate') => {
+  const res = await fetch('/api/ai/generate-lesson', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ topic, course, difficulty }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Lesson generation failed');
+  }
+
+  return res.json();
+};
