@@ -74,6 +74,13 @@ const matchExercise = z.object({
   ...exerciseBase,
 });
 
+const orderExercise = z.object({
+  kind: z.literal('order'),
+  items: z.array(z.string()).min(2), // the correct sequence, in the declared order
+  decoys: z.array(z.string()).optional(),
+  ...exerciseBase,
+});
+
 export const exercise = z.discriminatedUnion('kind', [
   quizExercise,
   numericExercise,
@@ -81,6 +88,7 @@ export const exercise = z.discriminatedUnion('kind', [
   hotspotExercise,
   sketchExercise,
   matchExercise,
+  orderExercise,
 ]);
 
 export const goal = z.object({

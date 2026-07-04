@@ -89,6 +89,13 @@ export type Stmt =
       decoys: string[];
       common: ExerciseCommon;
       ln: number;
+    }
+  | {
+      k: 'order';
+      items: string[];
+      decoys: string[];
+      common: ExerciseCommon;
+      ln: number;
     };
 
 export type HotspotTarget =

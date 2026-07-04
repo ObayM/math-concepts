@@ -67,4 +67,17 @@ export const exercises = {
       Array.isArray(v) && v.length === slide.exercise.pairs.length && v.every((x) => x != null),
     check: (slide, v) => Array.isArray(v) && slide.exercise.pairs.every((p, i) => v[i] === p.right),
   },
+  order: {
+    initial: () => [],
+
+    isComplete: (slide, v) => Array.isArray(v) && v.length === slide.exercise.items.length,
+    check: (slide, v) => {
+      if (!Array.isArray(v)) return false;
+      const bank = [...slide.exercise.items, ...(slide.exercise.decoys ?? [])];
+      return sameSequence(
+        v.map((i) => bank[i]),
+        slide.exercise.items
+      );
+    },
+  },
 };

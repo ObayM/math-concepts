@@ -443,6 +443,8 @@ function makeParser(tokens: Token[]) {
         items.push(parseSketch(peek().line));
       } else if (at('match')) {
         items.push(parseMatch(peek().line));
+      } else if (at('order')) {
+        items.push(parseOrder(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
         const key = eatIdent();
         eat('COLON');
@@ -757,6 +759,37 @@ function makeParser(tokens: Token[]) {
     }
     eat('RC');
     return { k: 'match', pairs, decoys, common, ln };
+  }
+
+  function parseOrder(ln: number): Stmt {
+    eat('IDENT', 'order');
+    eat('LC');
+    skipNL();
+    const orderItems: string[] = [];
+    const decoys: string[] = [];
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('item')) {
+        pos++;
+        orderItems.push(eatStr());
+        endStmt();
+      } else if (at('decoy')) {
+        pos++;
+        decoys.push(eatStr());
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in order - use ask/item/decoy/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'order', items: orderItems, decoys, common, ln };
   }
 
   function parseParam(ln: number): Stmt {

@@ -16,6 +16,7 @@ const GRAMMAR_KEYWORDS = [
   'hotspot',
   'sketch',
   'match',
+  'order',
   // scene + state
   'scene',
   'param',

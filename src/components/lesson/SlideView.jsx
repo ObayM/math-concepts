@@ -8,6 +8,7 @@ import BuildExercise from './exercises/BuildExercise';
 import HotspotExercise from './exercises/HotspotExercise';
 import SketchExercise from './exercises/SketchExercise';
 import MatchExercise from './exercises/MatchExercise';
+import OrderExercise from './exercises/OrderExercise';
 
 // renders a v2 slide as a composition: prose + scene + exercise.
 // a slide is no longer one "type" — it stacks whatever parts it declares.
@@ -18,6 +19,7 @@ const exerciseRegistry = {
   hotspot: HotspotExercise,
   sketch: SketchExercise,
   match: MatchExercise,
+  order: OrderExercise,
 };
 
 export default function SlideView({

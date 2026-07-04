@@ -1104,6 +1104,20 @@ function emitMatch(s: Extract<Stmt, { k: 'match' }>) {
   };
 }
 
+function emitOrder(s: Extract<Stmt, { k: 'order' }>) {
+  if (!s.common.ask) throw new CompileError('order needs an ask "..."', s.ln);
+  if (s.items.length < 2) throw new CompileError('order needs at least 2 item lines', s.ln);
+  return {
+    kind: 'order' as const,
+    prompt: s.common.ask,
+    items: s.items,
+    ...(s.decoys.length && { decoys: s.decoys }),
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
 function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
   const whenExpr = s.props.get('when');
   if (!whenExpr || whenExpr === true) throw new CompileError('goal needs a when: condition', s.ln);
@@ -1123,6 +1137,7 @@ function emitSlide(s: SlideStmt, i: number) {
     | ReturnType<typeof emitHotspot>
     | ReturnType<typeof emitSketch>
     | ReturnType<typeof emitMatch>
+    | ReturnType<typeof emitOrder>
     | undefined;
   const goals: ReturnType<typeof emitGoal>[] = [];
 
@@ -1150,6 +1165,9 @@ function emitSlide(s: SlideStmt, i: number) {
     } else if (item.k === 'match') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitMatch(item);
+    } else if (item.k === 'order') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitOrder(item);
     } else if (item.k === 'goal') {
       goals.push(emitGoal(item));
     }

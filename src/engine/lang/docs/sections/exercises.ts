@@ -120,5 +120,26 @@ export const exercisesSection: DocSection = {
       example:
         'match {\n  ask "Match each derivative rule to its result."\n  pair "d/dx(x^n)" -> "n·x^(n-1)"\n  pair "d/dx(sin x)" -> "cos x"\n  pair "d/dx(cos x)" -> "-sin x"\n  decoy "n·x^n"\n  ! "Power rule brings the exponent down and drops it by one."\n}',
     },
+    {
+      keyword: 'order',
+      syntax:
+        'order {\n  ask "..."\n  item "..."\n  [item "..." ...]\n  [decoy "..."]\n  [hint "..."]\n  [! "explanation"]\n}',
+      description:
+        "Put a shuffled list of items back into the right order. The `item` lines are declared in their correct sequence — that's both the answer and the source of the tokens shown (shuffled) to the learner. `decoy` adds extra tokens that don't belong in the sequence at all. Like `build`, but without the operator/operand token styling and without separate `bank:`/`answer:` arrays — there is exactly one correct order.",
+      props: [
+        {
+          name: 'item',
+          type: 'string',
+          description: 'a step in the correct sequence (repeatable, min 2)',
+        },
+        {
+          name: 'decoy',
+          type: 'string',
+          description: "an extra token that isn't part of the sequence (repeatable)",
+        },
+      ],
+      example:
+        'order {\n  ask "Order these steps of order of operations."\n  item "Parentheses"\n  item "Exponents"\n  item "Multiply / Divide"\n  item "Add / Subtract"\n  ! "PEMDAS, left to right within each tier."\n}',
+    },
   ],
 };
