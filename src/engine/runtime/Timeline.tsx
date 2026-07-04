@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, RotateCcw, ChevronLeft } from 'lucide-react';
+import { Play, RotateCcw, ChevronLeft, Lightbulb } from 'lucide-react';
 import { useScene } from './SceneProvider';
 import type { SceneIR } from '@/engine/ir/types';
 
@@ -21,6 +21,23 @@ function foldTo(ir: SceneIR, i: number): Record<string, number | boolean> {
     if (st.animate) Object.assign(s, st.animate);
   }
   return s;
+}
+
+// keyed by step index in the parent, so switching steps remounts this with
+// fresh (hidden) state instead of needing an effect to reset it
+function StepHint({ hint }: { hint: string }) {
+  const [shown, setShown] = useState(false);
+  if (shown) return <p className="text-neutral-400 text-xs leading-relaxed">{hint}</p>;
+  return (
+    <button
+      type="button"
+      onClick={() => setShown(true)}
+      className="flex items-center gap-1 self-start text-xs font-semibold text-primary-500 hover:text-primary-600 transition-colors"
+    >
+      <Lightbulb className="w-3.5 h-3.5" />
+      Hint
+    </button>
+  );
 }
 
 export default function Timeline({ ir }: { ir: SceneIR }) {
@@ -72,6 +89,8 @@ export default function Timeline({ ir }: { ir: SceneIR }) {
           {current.narrate}
         </p>
       )}
+
+      {current?.hint && <StepHint key={idx} hint={current.hint} />}
 
       <div className="flex items-center gap-3">
         <button

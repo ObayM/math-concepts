@@ -921,10 +921,12 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         }
         const dur = propNum(s.props, 'dur', s.ln, cScope);
         const ease = propStr(s.props, 'ease', cScope);
+        const hint = propStr(s.props, 'hint', cScope);
         if (set) obj.set = set;
         if (animate) obj.animate = animate;
         if (dur != null) obj.duration = dur;
         if (ease) obj.ease = ease;
+        if (hint) obj.hint = hint;
         ir.timeline.push(obj);
         break;
       }

@@ -563,6 +563,7 @@ exports[`scene compiler goldens > compiles timeline.prism to stable IR 1`] = `
       },
       "duration": 1000,
       "ease": "easeInOut",
+      "hint": "bigger |a| stretches the parabola vertically",
       "narrate": "a = 3 makes it tall and narrow",
     },
     {

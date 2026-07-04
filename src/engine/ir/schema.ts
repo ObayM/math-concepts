@@ -258,6 +258,7 @@ const timelineStep = z.object({
   duration: z.number().optional(),
   ease: z.enum(['linear', 'easeIn', 'easeOut', 'easeInOut']).optional(),
   narrate: z.string().optional(),
+  hint: z.string().optional(),
 });
 
 export const sceneSchema = z.object({
