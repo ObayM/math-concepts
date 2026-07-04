@@ -67,12 +67,20 @@ const sketchExercise = z.object({
   ...exerciseBase,
 });
 
+const matchExercise = z.object({
+  kind: z.literal('match'),
+  pairs: z.array(z.object({ left: z.string(), right: z.string() })).min(2),
+  decoys: z.array(z.string()).optional(),
+  ...exerciseBase,
+});
+
 export const exercise = z.discriminatedUnion('kind', [
   quizExercise,
   numericExercise,
   buildExercise,
   hotspotExercise,
   sketchExercise,
+  matchExercise,
 ]);
 
 export const goal = z.object({

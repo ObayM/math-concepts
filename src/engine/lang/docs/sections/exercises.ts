@@ -99,5 +99,26 @@ export const exercisesSection: DocSection = {
       example:
         'sketch curve {\n  ask "Draw $y = (x-1)^2 - 3$ — vertex and both crossings roughly right."\n  near (1, -3)\n  near (1-sqrt(3), 0)\n  near (1+sqrt(3), 0)\n  tol: 0.6\n  hint "Vertex form puts the vertex at (h, k)."\n}',
     },
+    {
+      keyword: 'match',
+      syntax:
+        'match {\n  ask "..."\n  pair "left" -> "right"\n  [pair "left2" -> "right2" ...]\n  [decoy "extra wrong right"]\n  [hint "..."]\n  [! "explanation"]\n}',
+      description:
+        'Tap-left-then-tap-right pairing. Tap a left item, then tap the right item it belongs with — at least two `pair` lines are required. `decoy` adds extra right-side entries that never pair with anything, making the match harder to guess. The right column is shuffled (seeded off the left texts, so it stays put across re-renders of the same exercise).',
+      props: [
+        {
+          name: 'pair',
+          type: '"left" -> "right"',
+          description: 'a correct pairing (repeatable, min 2)',
+        },
+        {
+          name: 'decoy',
+          type: 'string',
+          description: 'an extra unpaired right-side option (repeatable)',
+        },
+      ],
+      example:
+        'match {\n  ask "Match each derivative rule to its result."\n  pair "d/dx(x^n)" -> "n·x^(n-1)"\n  pair "d/dx(sin x)" -> "cos x"\n  pair "d/dx(cos x)" -> "-sin x"\n  decoy "n·x^n"\n  ! "Power rule brings the exponent down and drops it by one."\n}',
+    },
   ],
 };

@@ -1085,6 +1085,25 @@ function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
   };
 }
 
+function emitMatch(s: Extract<Stmt, { k: 'match' }>) {
+  if (!s.common.ask) throw new CompileError('match needs an ask "..."', s.ln);
+  if (s.pairs.length < 2) throw new CompileError('match needs at least 2 pair lines', s.ln);
+  const pairs = s.pairs.map(([l, r]) => {
+    if (l.k !== 'str') throw new CompileError('pair left side must be a string', s.ln);
+    if (r.k !== 'str') throw new CompileError('pair right side must be a string', s.ln);
+    return { left: l.v, right: r.v };
+  });
+  return {
+    kind: 'match' as const,
+    prompt: s.common.ask,
+    pairs,
+    ...(s.decoys.length && { decoys: s.decoys }),
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+  };
+}
+
 function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
   const whenExpr = s.props.get('when');
   if (!whenExpr || whenExpr === true) throw new CompileError('goal needs a when: condition', s.ln);
@@ -1103,6 +1122,7 @@ function emitSlide(s: SlideStmt, i: number) {
     | ReturnType<typeof emitBuild>
     | ReturnType<typeof emitHotspot>
     | ReturnType<typeof emitSketch>
+    | ReturnType<typeof emitMatch>
     | undefined;
   const goals: ReturnType<typeof emitGoal>[] = [];
 
@@ -1127,6 +1147,9 @@ function emitSlide(s: SlideStmt, i: number) {
     } else if (item.k === 'sketch') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitSketch(item);
+    } else if (item.k === 'match') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitMatch(item);
     } else if (item.k === 'goal') {
       goals.push(emitGoal(item));
     }

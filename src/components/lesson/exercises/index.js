@@ -61,4 +61,10 @@ export const exercises = {
       return curveNearPoints(v, ex.targets, ex.tol);
     },
   },
+  match: {
+    initial: (slide) => new Array(slide.exercise.pairs.length).fill(null),
+    isComplete: (slide, v) =>
+      Array.isArray(v) && v.length === slide.exercise.pairs.length && v.every((x) => x != null),
+    check: (slide, v) => Array.isArray(v) && slide.exercise.pairs.every((p, i) => v[i] === p.right),
+  },
 };

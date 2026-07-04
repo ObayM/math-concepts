@@ -82,6 +82,13 @@ export type Stmt =
       slopeTol: Expr | null;
       common: ExerciseCommon;
       ln: number;
+    }
+  | {
+      k: 'match';
+      pairs: [Expr, Expr][];
+      decoys: string[];
+      common: ExerciseCommon;
+      ln: number;
     };
 
 export type HotspotTarget =

@@ -441,6 +441,8 @@ function makeParser(tokens: Token[]) {
         items.push(parseHotspot(peek().line));
       } else if (at('sketch')) {
         items.push(parseSketch(peek().line));
+      } else if (at('match')) {
+        items.push(parseMatch(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
         const key = eatIdent();
         eat('COLON');
@@ -722,6 +724,39 @@ function makeParser(tokens: Token[]) {
     }
     eat('RC');
     return { k: 'sketch', mode, near, through, slope, tol, slopeTol, common, ln };
+  }
+
+  function parseMatch(ln: number): Stmt {
+    eat('IDENT', 'match');
+    eat('LC');
+    skipNL();
+    const pairs: [Expr, Expr][] = [];
+    const decoys: string[] = [];
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('pair')) {
+        pos++;
+        const e = parseExpr();
+        if (e.k !== 'arrow') throw new CompileError('pair must be "left" -> "right"', ln);
+        pairs.push([e.from, e.to]);
+        endStmt();
+      } else if (at('decoy')) {
+        pos++;
+        decoys.push(eatStr());
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in match — use ask/pair/decoy/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'match', pairs, decoys, common, ln };
   }
 
   function parseParam(ln: number): Stmt {
