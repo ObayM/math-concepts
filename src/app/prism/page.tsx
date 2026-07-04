@@ -58,7 +58,7 @@ function Entry({ entry }: { entry: DocEntry }) {
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: '#9ca3af',
+              color: 'var(--color-neutral-400)',
               marginBottom: 8,
             }}
           >
@@ -262,7 +262,7 @@ export default function PrismPage() {
 
         <footer className="prism-footer">
           Part of the{' '}
-          <Link href="/" style={{ color: '#6366f1' }}>
+          <Link href="/" style={{ color: 'var(--color-primary-600)' }}>
             Mathly
           </Link>{' '}
           engine. Compiler lives at{' '}
@@ -270,7 +270,7 @@ export default function PrismPage() {
             style={{
               fontSize: 12,
               fontFamily: 'ui-monospace, monospace',
-              background: '#f3f4f6',
+              background: 'var(--color-neutral-100)',
               padding: '1px 5px',
               borderRadius: 4,
             }}
