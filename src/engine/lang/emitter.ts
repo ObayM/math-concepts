@@ -314,9 +314,9 @@ function niceNum(v: number): string {
   return String(Math.round(v * 1e9) / 1e9);
 }
 
-export function emit(stmts: Stmt[]): SceneIR {
+export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
   const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
-  const macros: Macros = new Map();
+  const macros: Macros = seedMacros ? new Map(seedMacros) : new Map();
   let autoLabelId = 0;
   // vars bound by an enclosing `repeat` — valid runtime ids inside its body,
   // resolved by the renderer at expand time, not here
@@ -1188,7 +1188,7 @@ function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
   return { prompt: s.prompt, when, ...(hint && { hint }) };
 }
 
-function emitSlide(s: SlideStmt, i: number) {
+function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   const id = pStr(s.props, 'id') || slug(s.title) || `slide-${i + 1}`;
   const prose: string[] = [];
   let scene: SceneIR | undefined;
@@ -1209,7 +1209,7 @@ function emitSlide(s: SlideStmt, i: number) {
       prose.push(item.text);
     } else if (item.k === 'scene') {
       if (scene) throw new CompileError('a slide can have at most one scene', item.ln);
-      scene = emit([item]);
+      scene = emit([item], lessonMacros);
     } else if (item.k === 'quiz') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitQuiz(item);
@@ -1257,6 +1257,9 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
   const root = stmts[0];
   if (!root || root.k !== 'lesson') throw new CompileError('expected a lesson block');
 
+  const lessonMacros: Macros = new Map();
+  for (const d of root.defs) lessonMacros.set(d.name, { params: d.params, body: d.body });
+
   const course = pStr(root.props, 'course');
   const skills = pStrList(root.props, 'skills');
   const ir = {
@@ -1264,7 +1267,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
     title: root.title,
     ...(course && { course }),
     ...(skills && { skills }),
-    slides: root.slides.map(emitSlide),
+    slides: root.slides.map((s, i) => emitSlide(s, i, lessonMacros)),
   };
 
   const result = lessonSchema.safeParse(ir);

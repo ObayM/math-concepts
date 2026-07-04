@@ -45,7 +45,14 @@ export type Stmt =
   | { k: 'button'; label: string; props: PropMap; ln: number }
   | { k: 'step'; narrate: string | null; props: PropMap; ln: number }
   // lesson-level nodes
-  | { k: 'lesson'; title: string; props: PropMap; slides: SlideStmt[]; ln: number }
+  | {
+      k: 'lesson';
+      title: string;
+      props: PropMap;
+      slides: SlideStmt[];
+      defs: Extract<Stmt, { k: 'def' }>[];
+      ln: number;
+    }
   | { k: 'prose'; text: string; ln: number }
   | { k: 'goal'; prompt: string; props: PropMap; ln: number }
   | { k: 'quiz'; options: QuizOption[]; common: ExerciseCommon; ln: number }

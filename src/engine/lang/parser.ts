@@ -387,6 +387,7 @@ function makeParser(tokens: Token[]) {
     skipNL();
     const props: PropMap = new Map();
     const slides: SlideStmt[] = [];
+    const defs: Extract<Stmt, { k: 'def' }>[] = [];
     while (!check('RC') && !check('EOF')) {
       skipNL();
       if (check('RC') || check('EOF')) break;
@@ -394,12 +395,8 @@ function makeParser(tokens: Token[]) {
         slides.push(parseSlide(peek().line));
         skipNL();
       } else if (at('def')) {
-        const t = peek();
-        throw new CompileError(
-          'lesson-level macros are not supported yet — define `def` inside a scene',
-          t.line,
-          t.col
-        );
+        defs.push(parseDef(peek().line) as Extract<Stmt, { k: 'def' }>);
+        skipNL();
       } else if (check('IDENT')) {
         const key = eatIdent();
         eat('COLON');
@@ -411,7 +408,7 @@ function makeParser(tokens: Token[]) {
       }
     }
     eat('RC');
-    return { k: 'lesson', title, props, slides, ln };
+    return { k: 'lesson', title, props, slides, defs, ln };
   }
 
   const SLIDE_PROPS = new Set(['cat', 'id', 'skill']);

@@ -45,7 +45,7 @@ export const logicSection: DocSection = {
       keyword: 'def',
       syntax: 'def <name>(param1, param2, ...) {\n  ...\n}',
       description:
-        'Defines a reusable macro. Call it like a function — arguments are substituted as compile-time values.',
+        "Defines a reusable macro. Call it like a function — arguments are substituted as compile-time values. Declared inside a `scene`, it's callable only in that scene. Declared at the top of a `lesson` (alongside its `slide`s), it's callable from every slide's scene in that lesson.",
       example: `def tick(x, len) {\n  line f"t{x}" = (x, 0) -> (x, len) { color: neutral }\n}\n\ntick(1, 0.2)\ntick(2, 0.2)\ntick(5, 0.4)`,
     },
   ],
