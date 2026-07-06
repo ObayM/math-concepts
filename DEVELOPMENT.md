@@ -80,11 +80,19 @@ make migrate
 
 **Want to add a new lesson?**
 
-Lessons are stored in the database. You can add them visually using Prisma Studio (`make studio`), or edit the source array in `src/app/api/create-lessons/route.js` and re-run:
+Lessons are written in Prism (our lesson language) as `.prism` files in `prisma/lessons/`. Add your file, register it in `prisma/seed.js`, then:
 
 ```bash
 make seed
 ```
+
+While writing, get a live preview that reloads on every save:
+
+```bash
+make dsl-preview
+```
+
+The full language reference lives in the app at `/prism` (with a playground at `/prism/play`), and heads up: `make seed` prunes any lesson that isn't in `seed.js`'s list.
 
 **Testing email verification in dev**
 

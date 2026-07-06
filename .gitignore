@@ -42,11 +42,5 @@ next-env.d.ts
 
 .vercel
 
-plan.md
-CLAUDE.md
-branding.md
 # generated from prisma/lessons/*.dsl by scripts/build-lessons.mjs
 prisma/lessons/*.json
-
-ONBOARDING.md
-draft.txt
