@@ -79,7 +79,7 @@ export default function LessonPlayer({
   }, [currentIndex, quizHistory, lessonId, progressLoaded]);
 
   useEffect(() => {
-    fetch('/api/streak')
+    fetch('/api/activity')
       .then((r) => r.json())
       .then((d) => {
         if (d.streak !== undefined) setStreak(d.streak);
@@ -99,10 +99,9 @@ export default function LessonPlayer({
   }
 
   const markComplete = () => {
-    fetch('/api/update-activity', { method: 'POST' })
-      .then((r) => r.json())
+    fetch('/api/activity', { method: 'POST' })
       .then(() =>
-        fetch('/api/streak')
+        fetch('/api/activity')
           .then((r) => r.json())
           .then((d) => {
             if (d.streak !== undefined) setStreak(d.streak);

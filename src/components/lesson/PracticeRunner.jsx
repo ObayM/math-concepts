@@ -72,7 +72,7 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
     setStats((s) => ({ attempted: s.attempted + 1, correct: s.correct + (isCorrect ? 1 : 0) }));
     if (!activityTouched.current) {
       activityTouched.current = true;
-      fetch('/api/update-activity', { method: 'POST' }).catch(() => {});
+      fetch('/api/activity', { method: 'POST' }).catch(() => {});
     }
   };
 
