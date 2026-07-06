@@ -8,9 +8,6 @@ export default function OnboardingPage() {
         <p className="mt-4 text-lg text-neutral-900">
           This will be your username and you can&apos;t change it!
         </p>
-        <p className="mt-2 text-sm text-neutral-900">
-          Your profile will be at: <code>/u/your-name</code>
-        </p>
         <div className="mt-8">
           <OnboardingForm />
         </div>

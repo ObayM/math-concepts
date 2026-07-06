@@ -47,7 +47,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Courses', href: '/courses' },
-    { name: 'Sandbox', href: '/sandbox' },
+    { name: 'Sandbox', href: '/prism/play' },
   ];
 
   return (
@@ -107,13 +107,6 @@ export default function Navbar() {
                           {user.email || 'No email found'}
                         </p>
                       </div>
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="text-neutral-700 block px-4 py-2 text-sm hover:bg-neutral-100"
-                      >
-                        My Profile
-                      </Link>
                       <button
                         onClick={handleLogout}
                         className="text-danger-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-100"
@@ -185,13 +178,6 @@ export default function Navbar() {
                 <div className="py-6">
                   {user ? (
                     <div className="space-y-4">
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="-mx-3 flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-neutral-900 hover:bg-neutral-100"
-                      >
-                        <User className="w-5 h-5" /> My Profile
-                      </Link>
                       <button
                         onClick={handleLogout}
                         className="w-full rounded-md bg-danger-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-danger-500"

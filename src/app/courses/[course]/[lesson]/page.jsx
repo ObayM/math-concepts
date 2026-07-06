@@ -2,13 +2,14 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { lessonSchema } from '@/engine/ir/lesson';
 import LessonPlayer from '@/components/lesson/LessonPlayer';
+import { getNextLessonKey } from '@/lib/db/lessonService';
 
 export default async function LessonPage({ params }) {
   const { course, lesson: lessonSlug } = await params;
 
   const lessonRow = await prisma.lesson.findUnique({
     where: { lessonKey: lessonSlug },
-    select: { data: true },
+    select: { data: true, courseId: true, sortOrder: true },
   });
 
   if (!lessonRow) notFound();
@@ -20,5 +21,14 @@ export default async function LessonPage({ params }) {
     notFound();
   }
 
-  return <LessonPlayer slides={parsed.data.slides} lessonId={lessonSlug} coursePath={course} />;
+  const nextLessonId = await getNextLessonKey(lessonRow.courseId, lessonRow.sortOrder);
+
+  return (
+    <LessonPlayer
+      slides={parsed.data.slides}
+      lessonId={lessonSlug}
+      coursePath={course}
+      nextLessonId={nextLessonId}
+    />
+  );
 }

@@ -9,6 +9,16 @@ export async function getLessonById(id) {
   return prisma.lesson.findUnique({ where: { id } });
 }
 
+export async function getNextLessonKey(courseId, sortOrder) {
+  if (!courseId) return null;
+  const next = await prisma.lesson.findFirst({
+    where: { courseId, sortOrder: { gt: sortOrder } },
+    orderBy: { sortOrder: 'asc' },
+    select: { lessonKey: true },
+  });
+  return next?.lessonKey ?? null;
+}
+
 // flattens every exercise-bearing slide across a course's lessons into one
 // pool — the source for infinite practice mode. exercises live inside each
 // lesson's compiled `data` JSON, not a separate table, so this has to pull

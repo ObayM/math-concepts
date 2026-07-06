@@ -35,7 +35,12 @@ const getChecker = (s) => {
   return null;
 };
 
-export default function LessonPlayer({ slides = [], lessonId, coursePath = 'algebra' }) {
+export default function LessonPlayer({
+  slides = [],
+  lessonId,
+  coursePath = 'algebra',
+  nextLessonId,
+}) {
   const router = useRouter();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -175,7 +180,8 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
     setTutorLoading(false);
   };
 
-  const handleContinue = () => router.push(`/courses/${coursePath}`);
+  const handleContinue = () =>
+    router.push(nextLessonId ? `/courses/${coursePath}/${nextLessonId}` : `/courses/${coursePath}`);
   const handleBackToCourse = () => router.push(`/courses/${coursePath}`);
 
   const handleReset = () => {
@@ -212,6 +218,7 @@ export default function LessonPlayer({ slides = [], lessonId, coursePath = 'alge
             onContinue={handleContinue}
             onBack={handleBackToCourse}
             onRetake={handleReset}
+            nextLessonId={nextLessonId}
             streak={streak}
             quizHistory={quizHistory}
           />
