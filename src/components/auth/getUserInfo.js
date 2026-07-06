@@ -7,6 +7,7 @@ export async function getUserInfo() {
 
   const user = session.user;
   const profile = user.username ? { username: user.username, id: user.id } : null;
+  const isImpersonating = !!session.session?.impersonatedBy;
 
-  return { user, profile };
+  return { user, profile, isImpersonating };
 }

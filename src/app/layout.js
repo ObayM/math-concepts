@@ -4,6 +4,7 @@ import 'katex/dist/katex.min.css';
 import Navbar from '@/components/layout/navbar';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { getUserInfo } from '@/components/auth/getUserInfo';
+import ImpersonationBanner from '@/components/admin/ImpersonationBanner';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -22,7 +23,12 @@ export default async function RootLayout({ children }) {
   const userInfo = await getUserInfo();
   const pathname = (await headers()).get('x-pathname') ?? '';
 
-  if (userInfo?.user && !userInfo.profile && !pathname.startsWith('/onboarding')) {
+  if (
+    userInfo?.user &&
+    !userInfo.profile &&
+    !userInfo.isImpersonating &&
+    !pathname.startsWith('/onboarding')
+  ) {
     redirect('/onboarding');
   }
 
@@ -30,6 +36,7 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`${nunito.variable} font-[family-name:var(--font-nunito)] antialiased`}>
         <AuthProvider initialUser={userInfo}>
+          <ImpersonationBanner />
           {!pathname.startsWith('/dsl-preview') && !pathname.startsWith('/prism') && <Navbar />}
           {children}
         </AuthProvider>

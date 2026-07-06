@@ -7,6 +7,7 @@ const AuthContext = createContext({
   user: null,
   profile: null,
   isLoading: true,
+  isImpersonating: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -21,7 +22,13 @@ export function AuthProvider({ children, initialUser }) {
     ? { username: user.username, id: user.id }
     : (initialUser?.profile ?? null);
 
+  const isImpersonating = session
+    ? !!session.session?.impersonatedBy
+    : (initialUser?.isImpersonating ?? false);
+
   return (
-    <AuthContext.Provider value={{ user, profile, isLoading }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, profile, isLoading, isImpersonating }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
