@@ -159,6 +159,7 @@ model LessonAttempt {
   lessonId     String   @map("lesson_id")
   slideId      String?  @map("slide_id")
   exerciseKind String?  @map("exercise_kind")
+  skill        String?  @map("skill")
   question     String
   correct      Boolean
   createdAt    DateTime @default(now()) @map("created_at")

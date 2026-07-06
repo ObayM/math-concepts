@@ -1,4 +1,16 @@
 import { prisma } from '@/lib/prisma';
+import { lessonSchema } from '@/engine/ir/lesson';
+
+function buildSkillMap(publishedData) {
+  const parsed = lessonSchema.safeParse(publishedData);
+  const map = new Map();
+  if (!parsed.success) return map;
+  for (const slide of parsed.data.slides) {
+    const skill = slide.exercise?.skill ?? slide.skill ?? null;
+    if (skill) map.set(slide.id, skill);
+  }
+  return map;
+}
 
 export async function getLessonProgress(userId, lessonKey) {
   const lesson = await prisma.lesson.findUnique({
@@ -25,7 +37,7 @@ export async function upsertLessonProgress(
 ) {
   const lesson = await prisma.lesson.findUnique({
     where: { lessonKey },
-    select: { id: true },
+    select: { id: true, publishedData: true },
   });
   if (!lesson) return null;
 
@@ -39,12 +51,14 @@ export async function upsertLessonProgress(
     const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
     const newAttempts = quizHistory.slice(priorLength);
     if (newAttempts.length) {
+      const skillMap = buildSkillMap(lesson.publishedData);
       await prisma.lessonAttempt.createMany({
         data: newAttempts.map((a) => ({
           userId,
           lessonId: lesson.id,
           slideId: a.slideId ?? null,
           exerciseKind: a.kind ?? null,
+          skill: a.slideId ? (skillMap.get(a.slideId) ?? null) : null,
           question: a.question,
           correct: a.correct,
         })),
