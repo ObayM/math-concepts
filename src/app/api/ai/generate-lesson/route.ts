@@ -1,5 +1,6 @@
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { requireUser } from '@/lib/session';
 import { consume } from '@/lib/rate-limit';
 import { LESSON_GEN_MODEL } from '@/lib/ai';
@@ -8,6 +9,12 @@ import { toAIContext } from '@/engine/lang/docs';
 
 const INSTRUCTIONS = toAIContext();
 
+const bodySchema = z.object({
+  topic: z.string().min(1),
+  course: z.string().optional().default(''),
+  difficulty: z.string().optional().default('intermediate'),
+});
+
 export async function POST(req: Request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,7 +22,11 @@ export async function POST(req: Request) {
   if (!consume(user.id, 'generate-lesson'))
     return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
 
-  const { topic, course = '', difficulty = 'intermediate' } = await req.json();
+  const parsed = bodySchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+  const { topic, course, difficulty } = parsed.data;
 
   const { text: prism } = await generateText({
     model: LESSON_GEN_MODEL,
