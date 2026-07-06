@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { Check, Lock, ChevronRight } from 'lucide-react';
-import { iconMap } from './lib/IconMap';
+import { iconMap } from '@/components/lib/IconMap';
 import Badge from '@/components/ui/Badge';
 
 const statusConfig = {
@@ -32,8 +32,8 @@ const statusConfig = {
 };
 
 export default function LessonCard({ lesson, index, isLast = false }) {
-  const { id, title, description, category, difficulty, status, icon_name } = lesson;
-  const Icon = iconMap[icon_name] || iconMap['FunctionSquare'];
+  const { id, title, description, category, difficulty, status, iconName } = lesson;
+  const Icon = iconMap[iconName] || iconMap['FunctionSquare'];
   const config = statusConfig[status] || statusConfig.locked;
   const isLocked = status === 'locked';
 

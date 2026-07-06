@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Zap } from 'lucide-react';
-import LessonCard from '@/components/lessonCard';
+import LessonCard from '@/components/lesson/LessonCard';
 import Badge from '@/components/ui/Badge';
 
 // one page for every course — matches the course by name (the index links to
