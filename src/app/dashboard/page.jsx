@@ -1,47 +1,85 @@
-'use client';
 import React from 'react';
-import { useAuth } from '@/components/auth/AuthProvider';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle } from 'lucide-react';
 
-import { lessonsData } from '@/components/lib/data';
+import { requireUser } from '@/lib/session';
+import { prisma } from '@/lib/prisma';
+import { getStreak, getActivityHeatmap } from '@/lib/db/activityService';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
-const DashboardPage = () => {
-  const { profile } = useAuth();
-  const [streak, setStreak] = React.useState(null);
-  const [activityData, setActivityData] = React.useState([]);
+function withLessonStatus(lessons, progressByLessonKey) {
+  return lessons.map((lesson, index) => {
+    const progress = progressByLessonKey.get(lesson.lessonKey);
+    const isCompleted = progress?.completed ?? false;
+    const isStarted = (progress?.currentStep ?? 0) > 0;
 
-  React.useEffect(() => {
-    fetch('/api/streak')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.streak !== undefined) setStreak(data.streak);
-      })
-      .catch(console.error);
+    let status = 'locked';
+    if (isCompleted) {
+      status = 'completed';
+    } else if (index === 0) {
+      status = 'unlocked';
+    } else if (progressByLessonKey.get(lessons[index - 1].lessonKey)?.completed) {
+      status = 'unlocked';
+    }
+    if (status === 'locked' && isStarted) status = 'unlocked';
 
-    fetch('/api/activity')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.activity) setActivityData(data.activity);
-      })
-      .catch(console.error);
-  }, []);
+    return { id: lesson.lessonKey, title: lesson.title, difficulty: lesson.difficulty, status };
+  });
+}
+
+const DashboardPage = async () => {
+  const user = await requireUser();
+  if (!user) redirect('/login');
+
+  const [streak, activityData, courses, progressRows] = await Promise.all([
+    getStreak(user.id),
+    getActivityHeatmap(user.id),
+    prisma.course.findMany({ orderBy: { createdAt: 'asc' } }),
+    prisma.userLessonProgress.findMany({
+      where: { userId: user.id },
+      select: {
+        completed: true,
+        currentStep: true,
+        lastPlayedAt: true,
+        lesson: { select: { lessonKey: true, courseId: true } },
+      },
+    }),
+  ]);
+
+  const progressByLessonKey = new Map(progressRows.map((p) => [p.lesson.lessonKey, p]));
+
+  const coursesWithLessons = await Promise.all(
+    courses.map(async (course) => {
+      const lessons = await prisma.lesson.findMany({
+        where: { courseId: course.id },
+        orderBy: { sortOrder: 'asc' },
+      });
+      return { ...course, lessons: withLessonStatus(lessons, progressByLessonKey) };
+    })
+  );
+
+  let currentCourse = coursesWithLessons[0] ?? null;
+  if (progressRows.length > 0) {
+    const mostRecent = progressRows.reduce((a, b) => (a.lastPlayedAt > b.lastPlayedAt ? a : b));
+    const match = coursesWithLessons.find((c) => c.id === mostRecent.lesson.courseId);
+    if (match) currentCourse = match;
+  }
 
   return (
     <div className="bg-surface min-h-[calc(100vh-var(--nav-h))]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
-          <WelcomeHeader name={profile?.username} streak={streak} />
+          <WelcomeHeader name={user.username} streak={streak} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <ContinueLearningCard />
+              <ContinueLearningCard course={currentCourse} />
               <ActivitySection activityData={activityData} />
             </div>
             <div>
-              <UpNextPanel lessons={lessonsData.slice(0, 5)} />
+              <UpNextPanel course={currentCourse} />
             </div>
           </div>
         </div>
@@ -64,19 +102,21 @@ const WelcomeHeader = ({ name, streak }) => (
   </div>
 );
 
-const ContinueLearningCard = () => {
-  const algebraLessons = lessonsData.filter((l) => l.category === 'Algebra');
-  const completed = algebraLessons.filter((l) => l.status === 'completed').length;
-  const total = algebraLessons.length;
+const ContinueLearningCard = ({ course }) => {
+  if (!course) return null;
+
+  const completed = course.lessons.filter((l) => l.status === 'completed').length;
+  const total = course.lessons.length;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-  // Flagging that this card is still static, we need to change this later
+  const coursePath = course.name.toLowerCase();
+
   return (
     <Card className="animate-fade-in-up [animation-delay:100ms] opacity-0 p-6">
       <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
         Currently Learning
       </p>
-      <h2 className="mt-2 text-2xl font-bold text-neutral-900">Algebra</h2>
-      <p className="mt-1 text-sm text-neutral-500">Real functions, domain, range and beyond.</p>
+      <h2 className="mt-2 text-2xl font-bold text-neutral-900">{course.name}</h2>
+      <p className="mt-1 text-sm text-neutral-500">{course.description}</p>
 
       <div className="mt-5">
         <div className="flex items-center justify-between text-sm mb-2">
@@ -95,7 +135,7 @@ const ContinueLearningCard = () => {
 
       <Button
         as={Link}
-        href="/courses/algebra"
+        href={`/courses/${coursePath}`}
         variant="primary"
         size="md"
         icon={<PlayCircle size={18} />}
@@ -113,18 +153,28 @@ const ActivitySection = ({ activityData }) => (
   </Card>
 );
 
-const UpNextPanel = ({ lessons }) => (
-  <div className="animate-fade-in-up [animation-delay:150ms] opacity-0">
-    <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">Up Next</p>
-    <div className="flex flex-col gap-2">
-      {lessons.map((lesson) => (
-        <LessonRow key={lesson.id} lesson={lesson} />
-      ))}
-    </div>
-  </div>
-);
+const UpNextPanel = ({ course }) => {
+  if (!course) return null;
+  const coursePath = course.name.toLowerCase();
 
-const LessonRow = ({ lesson }) => {
+  return (
+    <div className="animate-fade-in-up [animation-delay:150ms] opacity-0">
+      <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">
+        Up Next
+      </p>
+      <div className="flex flex-col gap-2">
+        {course.lessons.slice(0, 5).map((lesson) => (
+          <LessonRow key={lesson.id} lesson={lesson} coursePath={coursePath} />
+        ))}
+        {course.lessons.length === 0 && (
+          <p className="text-sm text-neutral-400">No lessons in this course yet.</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const LessonRow = ({ lesson, coursePath }) => {
   const isLocked = lesson.status === 'locked';
   const isCompleted = lesson.status === 'completed';
 
@@ -157,7 +207,7 @@ const LessonRow = ({ lesson }) => {
   );
 
   if (isLocked) return content;
-  return <Link href={`/courses/algebra/${lesson.id}`}>{content}</Link>;
+  return <Link href={`/courses/${coursePath}/${lesson.id}`}>{content}</Link>;
 };
 
 export default DashboardPage;
