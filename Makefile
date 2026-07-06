@@ -1,4 +1,4 @@
-.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-compile dsl-preview dsl-docs-check
+.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-compile dsl-preview dsl-docs-check promote
 
 
 dev: install
@@ -34,6 +34,9 @@ seed:
 
 studio:
 	npm run db:studio
+
+promote:
+	EMAIL=$(EMAIL) ROLE=$(ROLE) node --env-file=.env scripts/set-role.mjs
 
 
 clean:

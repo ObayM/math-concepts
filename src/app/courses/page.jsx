@@ -6,6 +6,7 @@ import Badge from '@/components/ui/Badge';
 
 export default async function CoursesPage() {
   const courses = await prisma.course.findMany({
+    where: { status: 'published' },
     orderBy: { createdAt: 'asc' },
   });
 
@@ -27,7 +28,7 @@ export default async function CoursesPage() {
             return (
               <Link
                 key={course.id}
-                href={`/courses/${course.name.toLowerCase()}`}
+                href={`/courses/${course.slug ?? course.name.toLowerCase()}`}
                 className="group block animate-fade-in-up"
                 style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
               >

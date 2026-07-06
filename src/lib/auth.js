@@ -1,9 +1,15 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { username } from 'better-auth/plugins';
+import { username, admin } from 'better-auth/plugins';
 import { nextCookies } from 'better-auth/next-js';
 import { prisma } from './prisma';
 import { sendEmail } from './email';
+import { ac, roles, ROLES, ADMIN_ROLES } from './permissions';
+
+const adminUserIds = (process.env.ADMIN_USER_IDS ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
@@ -41,6 +47,13 @@ export const auth = betterAuth({
     username({
       minUsernameLength: 3,
       maxUsernameLength: 39,
+    }),
+    admin({
+      ac,
+      roles,
+      defaultRole: ROLES.STUDENT,
+      adminRoles: ADMIN_ROLES,
+      adminUserIds,
     }),
     nextCookies(),
   ],

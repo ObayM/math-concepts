@@ -1,14 +1,22 @@
 const { PrismaClient } = require('@prisma/client');
+const fs = require('node:fs');
+const path = require('node:path');
 const prisma = new PrismaClient();
 
-// every lesson is now compiled Prism (Lesson IR v2) loaded from ./lessons/*.json.
+// bootstrap-only seed for a fresh DB. the admin CMS is the source of truth from
+// here on: this never overwrites or deletes content that already exists in the DB.
+// every lesson is compiled Prism (Lesson IR v2) loaded from ./lessons/*.json.
 // build them first with `npm run build:lessons` (db:seed does this automatically).
 
 async function main() {
   const algebraCourse = await prisma.course.upsert({
     where: { name: 'Algebra' },
     update: {},
-    create: { name: 'Algebra', description: 'Master the fundamentals of Algebra.' },
+    create: {
+      name: 'Algebra',
+      slug: 'algebra',
+      description: 'Master the fundamentals of Algebra.',
+    },
   });
 
   const calculusCourse = await prisma.course.upsert({
@@ -16,6 +24,7 @@ async function main() {
     update: {},
     create: {
       name: 'Calculus',
+      slug: 'calculus',
       description: 'From the tangent line to the full toolkit of derivatives.',
     },
   });
@@ -131,22 +140,24 @@ async function main() {
   ];
 
   for (const lesson of lessons) {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'lessons', `${lesson.lessonKey}.prism`),
+      'utf8'
+    );
     await prisma.lesson.upsert({
       where: { lessonKey: lesson.lessonKey },
-      update: lesson,
-      create: lesson,
+      update: {},
+      create: {
+        ...lesson,
+        source,
+        publishedSource: source,
+        publishedData: lesson.data,
+        status: 'published',
+        publishedAt: new Date(),
+      },
     });
     console.log('seeded:', lesson.lessonKey);
   }
-
-  // prune anything left over from the old v1 seed (progress cascades on delete)
-  const keys = lessons.map((l) => l.lessonKey);
-  const prunedLessons = await prisma.lesson.deleteMany({ where: { lessonKey: { notIn: keys } } });
-  const prunedCourses = await prisma.course.deleteMany({
-    where: { name: { notIn: ['Algebra', 'Calculus'] } },
-  });
-  if (prunedLessons.count) console.log('pruned lessons:', prunedLessons.count);
-  if (prunedCourses.count) console.log('pruned courses:', prunedCourses.count);
 }
 
 main()

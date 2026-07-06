@@ -1,0 +1,17 @@
+import { notFound } from 'next/navigation';
+import { getLessonById } from '@/lib/db/lessonService';
+import LessonSourceEditor from '@/components/admin/editor/LessonSourceEditor';
+
+export default async function LessonEditPage({ params }) {
+  const { id } = await params;
+  const lesson = await getLessonById(id);
+  if (!lesson) notFound();
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-neutral-900">{lesson.title ?? lesson.lessonKey}</h1>
+      <p className="text-sm text-neutral-500">{lesson.lessonKey}</p>
+      <LessonSourceEditor lessonId={lesson.id} initialSource={lesson.source} />
+    </div>
+  );
+}

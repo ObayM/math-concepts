@@ -44,10 +44,13 @@ export default function Navbar() {
   const profileRef = useRef(null);
   useOutsideClick(profileRef, () => setIsProfileOpen(false));
 
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Courses', href: '/courses' },
     { name: 'Sandbox', href: '/prism/play' },
+    ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
 
   return (

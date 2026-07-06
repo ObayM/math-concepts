@@ -7,37 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean
-  image         String?
-  username      String?   @unique
+  id              String    @id
+  name            String
+  email           String    @unique
+  emailVerified   Boolean
+  image           String?
+  username        String?   @unique
   displayUsername String?
-  createdAt     DateTime
-  updatedAt     DateTime
+  role            String    @default("student")
+  banned          Boolean   @default(false)
+  banReason       String?
+  banExpires      DateTime?
+  createdAt       DateTime
+  updatedAt       DateTime
 
-  sessions   Session[]
-  accounts   Account[]
-  activities UserDailyActivity[]
-  progress   UserLessonProgress[]
-  attempts   LessonAttempt[]
+  sessions        Session[]
+  accounts        Account[]
+  activities      UserDailyActivity[]
+  progress        UserLessonProgress[]
+  attempts        LessonAttempt[]
+  authoredLessons Lesson[]
 
   @@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
@@ -72,12 +77,20 @@ model Verification {
   @@map("verification")
 }
 
+enum ContentStatus {
+  draft
+  published
+}
 
 model Course {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String        @id @default(uuid())
+  name        String        @unique
+  slug        String?
   description String?
-  createdAt   DateTime @default(now()) @map("created_at")
+  status      ContentStatus @default(published)
+  sortOrder   Int           @default(0) @map("sort_order")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at")
 
   lessons Lesson[]
 
@@ -85,19 +98,27 @@ model Course {
 }
 
 model Lesson {
-  id          String   @id @default(uuid())
-  courseId    String?  @map("course_id")
-  lessonKey   String   @unique @map("lesson_key")
-  data        Json
-  title       String?
-  description String?
-  category    String?
-  difficulty  String?
-  iconName    String?  @map("icon_name")
-  sortOrder   Int      @default(0) @map("sort_order")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id              String        @id @default(uuid())
+  courseId        String?       @map("course_id")
+  lessonKey       String        @unique @map("lesson_key")
+  source          String        @default("")
+  data            Json
+  publishedSource String?       @map("published_source")
+  publishedData   Json?         @map("published_data")
+  status          ContentStatus @default(draft)
+  authorId        String?       @map("author_id")
+  title           String?
+  description     String?
+  category        String?
+  difficulty      String?
+  iconName        String?       @map("icon_name")
+  sortOrder       Int           @default(0) @map("sort_order")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")
+  publishedAt     DateTime?     @map("published_at")
 
   course   Course?              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  author   User?                @relation(fields: [authorId], references: [id], onDelete: SetNull)
   progress UserLessonProgress[]
   attempts LessonAttempt[]
 

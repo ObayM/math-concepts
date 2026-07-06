@@ -1,22 +1,26 @@
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Zap } from 'lucide-react';
 import LessonCard from '@/components/lesson/LessonCard';
 import Badge from '@/components/ui/Badge';
+import { getCourseBySlug } from '@/lib/db/courseService';
+import { getFullSession, isAdmin } from '@/lib/authz';
 
-// one page for every course — matches the course by name (the index links to
-// /courses/<name lowercased>) and lists its lessons from the DB.
+// one page for every course — matches the course by slug, falling back to a
+// lowercased name match for any course that predates the slug column.
 export default async function CoursePage({ params }) {
   const { course: courseSlug } = await params;
 
-  const courses = await prisma.course.findMany();
-  const course = courses.find((c) => c.name.toLowerCase() === courseSlug.toLowerCase());
+  let course = await getCourseBySlug(courseSlug);
+  if (!course) {
+    const courses = await prisma.course.findMany();
+    course = courses.find((c) => c.name.toLowerCase() === courseSlug.toLowerCase()) ?? null;
+  }
   if (!course) notFound();
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getFullSession();
+  const viewerIsAdmin = isAdmin(session?.user ?? null);
 
   let progressMap = new Map();
   if (session?.user) {
@@ -37,7 +41,7 @@ export default async function CoursePage({ params }) {
   }
 
   const lessons = await prisma.lesson.findMany({
-    where: { courseId: course.id },
+    where: viewerIsAdmin ? { courseId: course.id } : { courseId: course.id, status: 'published' },
     orderBy: { sortOrder: 'asc' },
   });
 

@@ -25,13 +25,13 @@ export async function getNextLessonKey(courseId, sortOrder) {
 // every lesson row and scan its slides.
 export async function getExercisePoolByCourse(courseId) {
   const lessons = await prisma.lesson.findMany({
-    where: { courseId },
-    select: { lessonKey: true, title: true, data: true },
+    where: { courseId, status: 'published' },
+    select: { lessonKey: true, title: true, publishedData: true },
   });
 
   const pool = [];
   for (const lesson of lessons) {
-    const parsed = lessonSchema.safeParse(lesson.data);
+    const parsed = lessonSchema.safeParse(lesson.publishedData);
     if (!parsed.success) continue;
     for (const slide of parsed.data.slides) {
       if (slide.exercise) pool.push({ ...slide, lessonKey: lesson.lessonKey });
