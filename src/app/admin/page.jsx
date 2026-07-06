@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { ADMIN_ROLES } from '@/lib/permissions';
-import Card from '@/components/ui/Card';
+import Card from '@/components/admin/ui/Card';
 
 async function getCounts() {
   const [totalUsers, admins, banned, recentSignups] = await Promise.all([

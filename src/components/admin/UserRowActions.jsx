@@ -1,6 +1,6 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+import Button from '@/components/admin/ui/Button';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import {
   setRoleAction,
@@ -30,7 +30,7 @@ export default function UserRowActions({ user, viewerId, canManage, canImpersona
           <select
             name="role"
             defaultValue={user.role ?? 'student'}
-            className="rounded-lg border border-neutral-200 px-2 py-1.5 text-xs"
+            className="border border-neutral-300 px-2 py-1.5 text-xs"
           >
             {ROLE_OPTIONS.map((r) => (
               <option key={r} value={r}>

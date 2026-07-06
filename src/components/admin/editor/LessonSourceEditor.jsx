@@ -3,7 +3,8 @@
 import { useState, useMemo, useRef } from 'react';
 import { compileAny } from '@/components/prism/compileAny';
 import MiniPlayer from '@/components/prism/MiniPlayer';
-import Button from '@/components/ui/Button';
+import Button from '@/components/admin/ui/Button';
+import './mini-player-admin.css';
 
 export default function LessonSourceEditor({ lessonId, initialSource }) {
   const [source, setSource] = useState(initialSource);
@@ -44,7 +45,7 @@ export default function LessonSourceEditor({ lessonId, initialSource }) {
     <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
       <div>
         <textarea
-          className="h-[560px] w-full rounded-2xl border border-neutral-200 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="h-[560px] w-full border border-neutral-300 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           value={source}
           spellCheck={false}
           onChange={(e) => setSource(e.target.value)}
@@ -61,12 +62,12 @@ export default function LessonSourceEditor({ lessonId, initialSource }) {
           )}
         </div>
         {saveError && (
-          <pre className="mt-2 whitespace-pre-wrap rounded-xl bg-danger-50 p-3 text-xs text-danger-700">
+          <pre className="mt-2 whitespace-pre-wrap border border-danger-100 bg-danger-50 p-3 text-xs text-danger-700">
             {saveError}
           </pre>
         )}
       </div>
-      <div className="rounded-2xl border border-neutral-200 p-4">
+      <div className="border border-neutral-200 p-4">
         {previewError ? (
           <pre className="whitespace-pre-wrap text-xs text-danger-600">{previewError}</pre>
         ) : lesson ? (

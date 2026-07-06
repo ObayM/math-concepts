@@ -1,0 +1,41 @@
+.mini-player-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.mini-player-tab {
+  border: 1px solid var(--color-neutral-300);
+  background: white;
+  color: var(--color-neutral-600);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.mini-player-tab.active {
+  border-color: var(--color-primary-600);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.mini-player-actions {
+  margin-top: 12px;
+}
+
+.mini-player-check {
+  border: 1px solid var(--color-primary-600);
+  background: var(--color-primary-600);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.mini-player-check:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

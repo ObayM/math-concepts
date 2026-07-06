@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireAdmin, isSuperAdmin } from '@/lib/authz';
-import Badge from '@/components/ui/Badge';
+import Badge from '@/components/admin/ui/Badge';
 
 const navLinks = [
   { name: 'Overview', href: '/admin' },
@@ -14,17 +14,17 @@ export default async function AdminLayout({ children }) {
 
   return (
     <div className="mx-auto flex max-w-7xl gap-8 px-4 py-8 lg:px-8">
-      <aside className="hidden w-56 flex-shrink-0 lg:block">
+      <aside className="hidden w-56 flex-shrink-0 border-r border-neutral-200 pr-6 lg:block">
         <div className="mb-6">
           <p className="text-xs font-bold uppercase tracking-wide text-neutral-500">Mathly</p>
           <p className="text-lg font-bold text-primary-900">Admin</p>
         </div>
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
+              className="border-l-2 border-transparent px-3 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary-600 hover:bg-neutral-50 hover:text-primary-700"
             >
               {link.name}
             </Link>

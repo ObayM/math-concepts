@@ -21,7 +21,7 @@ export default function ImpersonationBanner() {
       <span>Viewing Mathly as {user?.username ?? user?.email ?? 'this user'}</span>
       <button
         onClick={handleExit}
-        className="rounded-lg border-b-[2px] border-warning-600 bg-white px-2.5 py-1 text-xs font-bold text-warning-600 transition-all active:border-b-0 active:translate-y-[2px]"
+        className="border border-warning-600 bg-white px-2.5 py-1 text-xs font-bold text-warning-600 transition-colors hover:bg-warning-100"
       >
         Exit impersonation
       </button>

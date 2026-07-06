@@ -2,8 +2,9 @@ import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { getFullSession, isAdmin, isSuperAdmin } from '@/lib/authz';
 import { getUsersCompletedCounts } from '@/lib/db/userService';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
+import Card from '@/components/admin/ui/Card';
+import Badge from '@/components/admin/ui/Badge';
+import Input from '@/components/admin/ui/Input';
 import UserRowActions from '@/components/admin/UserRowActions';
 
 const roleBadgeVariant = (role) => {
@@ -37,12 +38,12 @@ export default async function AdminUsersPage({ searchParams }) {
       <h1 className="text-2xl font-bold text-neutral-900">Users</h1>
 
       <form className="mt-4">
-        <input
+        <Input
           type="search"
           name="q"
           defaultValue={q ?? ''}
           placeholder="Search by email"
-          className="w-full max-w-sm rounded-xl border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full max-w-sm"
         />
       </form>
 

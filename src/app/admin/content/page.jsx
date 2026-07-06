@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
+import Card from '@/components/admin/ui/Card';
+import Badge from '@/components/admin/ui/Badge';
+import Button from '@/components/admin/ui/Button';
+import Input from '@/components/admin/ui/Input';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import {
   createCourseAction,
@@ -12,9 +13,6 @@ import {
   deleteLessonAction,
   deleteCourseAction,
 } from './actions';
-
-const inputClass =
-  'rounded-xl border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500';
 
 export default async function AdminContentPage() {
   const courses = await prisma.course.findMany({
@@ -29,11 +27,11 @@ export default async function AdminContentPage() {
       <Card className="mt-6 p-5">
         <h2 className="text-sm font-bold text-neutral-700">New course</h2>
         <form action={createCourseAction} className="mt-3 flex flex-wrap gap-2">
-          <input name="name" placeholder="Course name" required className={inputClass} />
-          <input
+          <Input name="name" placeholder="Course name" required />
+          <Input
             name="description"
             placeholder="Description (optional)"
-            className={`min-w-[220px] flex-1 ${inputClass}`}
+            className="min-w-[220px] flex-1"
           />
           <Button type="submit" size="sm">
             Create course
@@ -115,12 +113,7 @@ export default async function AdminContentPage() {
 
             <form action={createLessonAction} className="mt-4 flex gap-2">
               <input type="hidden" name="courseId" value={course.id} />
-              <input
-                name="title"
-                placeholder="New lesson title"
-                required
-                className={`flex-1 ${inputClass}`}
-              />
+              <Input name="title" placeholder="New lesson title" required className="flex-1" />
               <Button type="submit" size="sm">
                 New lesson
               </Button>
