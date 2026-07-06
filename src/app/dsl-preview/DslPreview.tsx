@@ -75,7 +75,7 @@ export default function DslPreview() {
     const f = input.trim();
     if (!f) return;
     inputRef.current?.blur();
-    const name = f.endsWith('.dsl') ? f : `${f}.dsl`;
+    const name = f.endsWith('.prism') ? f : `${f}.prism`;
     router.push(`/dsl-preview?file=${name}&scene=1`);
   };
 
@@ -95,7 +95,7 @@ export default function DslPreview() {
             className={s.fileInput}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="filename.dsl"
+            placeholder="filename.prism"
             spellCheck={false}
           />
         </form>

@@ -26,11 +26,15 @@ function extractScenes(text: string) {
 }
 
 export async function GET(req: NextRequest) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'not found' }, { status: 404 });
+  }
+
   const { searchParams } = req.nextUrl;
   const file = searchParams.get('file') ?? '';
   const sceneN = parseInt(searchParams.get('scene') ?? '1', 10);
 
-  if (!file.endsWith('.dsl') || file.includes('/') || file.includes('..')) {
+  if (!file.endsWith('.prism') || file.includes('/') || file.includes('..')) {
     return NextResponse.json({ error: 'invalid filename' }, { status: 400 });
   }
 
