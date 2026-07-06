@@ -1,39 +1,18 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, RotateCcw, BrainCircuit } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
-import Spinner from '@/components/ui/Spinner';
 import Card from '@/components/ui/Card';
 import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor } from '@/utils/aiService';
 import { evalGoals } from '@/engine/runtime/goals';
 
-import TextBlock from './blocks/TextBlock';
-import QuizBlock from './blocks/QuizBlock';
-import SceneBlock from './blocks/SceneBlock';
-import BuildBlock from './blocks/BuildBlock';
 import SlideView from './SlideView';
-import { checkable } from './checkable';
 import { exercises } from './exercises';
 
-const blockRegistry = {
-  text: TextBlock,
-  quiz: QuizBlock,
-  scene: SceneBlock,
-  build: BuildBlock,
-};
-
-// v2 slides are compositions (no `type`); v1 slides carry a `type`. one player,
-// both shapes, until the legacy lessons are ported.
-const isV2 = (s) => s && !s.type;
-const getChecker = (s) => {
-  if (!s) return null;
-  if (s.type) return checkable[s.type] ?? null;
-  if (s.exercise) return exercises[s.exercise.kind] ?? null;
-  return null;
-};
+const getChecker = (s) => (s?.exercise ? (exercises[s.exercise.kind] ?? null) : null);
 
 export default function LessonPlayer({
   slides = [],
@@ -45,7 +24,6 @@ export default function LessonPlayer({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDir, setSlideDir] = useState('right');
-  const [interactiveValue, setInteractiveValue] = useState(50);
   const [answer, setAnswer] = useState(null);
   const [checked, setChecked] = useState(false);
   const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
@@ -53,6 +31,7 @@ export default function LessonPlayer({
   const [isComplete, setIsComplete] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [streak, setStreak] = useState(null);
+  const [saveError, setSaveError] = useState(false);
 
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorQuery, setTutorQuery] = useState('');
@@ -78,14 +57,26 @@ export default function LessonPlayer({
       .catch(() => setProgressLoaded(true));
   }, [lessonId, slides.length]);
 
+  const skipNextSaveRef = useRef(true);
   useEffect(() => {
     if (!progressLoaded || !lessonId) return;
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
+      return;
+    }
     fetch('/api/progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lessonKey: lessonId, currentStep: currentIndex, isCompleted: false }),
-    }).catch(console.error);
-  }, [currentIndex, lessonId, progressLoaded]);
+      body: JSON.stringify({
+        lessonKey: lessonId,
+        currentStep: currentIndex,
+        isCompleted: false,
+        quizHistory,
+      }),
+    })
+      .then(() => setSaveError(false))
+      .catch(() => setSaveError(true));
+  }, [currentIndex, quizHistory, lessonId, progressLoaded]);
 
   useEffect(() => {
     fetch('/api/streak')
@@ -96,17 +87,16 @@ export default function LessonPlayer({
       .catch(console.error);
   }, []);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
+  const [resetForIndex, setResetForIndex] = useState(-1);
+  if (resetForIndex !== currentIndex) {
+    setResetForIndex(currentIndex);
     const next = slides[currentIndex];
     const c = getChecker(next);
-    setInteractiveValue(50);
     setAnswer(c ? c.initial(next) : null);
     setChecked(false);
     setTutorOpen(false);
     setTutorResponse('');
-  }, [currentIndex, slides]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }
 
   const markComplete = () => {
     fetch('/api/update-activity', { method: 'POST' })
@@ -129,7 +119,24 @@ export default function LessonPlayer({
         isCompleted: true,
         quizHistory,
       }),
-    }).catch(console.error);
+    })
+      .then(() => setSaveError(false))
+      .catch(() => setSaveError(true));
+  };
+
+  const handleRetrySave = () => {
+    fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lessonKey: lessonId,
+        currentStep: currentIndex,
+        isCompleted: isComplete,
+        quizHistory,
+      }),
+    })
+      .then(() => setSaveError(false))
+      .catch(() => setSaveError(true));
   };
 
   const handleNext = () => {
@@ -175,8 +182,8 @@ export default function LessonPlayer({
     if (!tutorQuery.trim()) return;
     setTutorLoading(true);
     const context = slide.content ?? slide.prose ?? slide.exercise?.prompt ?? slide.title;
-    const answer = await askTutor(context, tutorQuery);
-    setTutorResponse(answer);
+    const reply = await askTutor(context, tutorQuery);
+    setTutorResponse(reply);
     setTutorLoading(false);
   };
 
@@ -192,7 +199,6 @@ export default function LessonPlayer({
     setIsComplete(false);
     setChecked(false);
     setAnswer(null);
-    setInteractiveValue(50);
     setSlideDir('right');
   };
 
@@ -232,10 +238,17 @@ export default function LessonPlayer({
   const goalsSatisfied = !slide?.goals?.length || goalsMet.every(Boolean);
   const canAdvance = (!checker || checked) && goalsSatisfied;
   const correct = checked && checker ? checker.check(slide, answer) : null;
-  const BlockRenderer = slide && slide.type ? (blockRegistry[slide.type] ?? TextBlock) : null;
 
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface text-neutral-900 p-4 md:p-6 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
+      {saveError && (
+        <div className="absolute top-4 left-4 flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10">
+          Couldn&apos;t save your progress.
+          <button onClick={handleRetrySave} className="underline hover:no-underline">
+            Retry
+          </button>
+        </div>
+      )}
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         {streak !== null && (
           <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2">
@@ -280,29 +293,15 @@ export default function LessonPlayer({
             </div>
 
             <div className="flex-1 w-full">
-              {isV2(slide) ? (
-                <SlideView
-                  slide={slide}
-                  value={answer}
-                  checked={checked}
-                  correct={correct}
-                  onChange={handleAnswerChange}
-                  goalsMet={goalsMet}
-                  onScopeChange={handleScopeChange}
-                />
-              ) : (
-                BlockRenderer && (
-                  <BlockRenderer
-                    slide={slide}
-                    interactiveValue={interactiveValue}
-                    onInteractiveChange={setInteractiveValue}
-                    value={answer}
-                    checked={checked}
-                    correct={correct}
-                    onChange={handleAnswerChange}
-                  />
-                )
-              )}
+              <SlideView
+                slide={slide}
+                value={answer}
+                checked={checked}
+                correct={correct}
+                onChange={handleAnswerChange}
+                goalsMet={goalsMet}
+                onScopeChange={handleScopeChange}
+              />
             </div>
           </div>
         </div>
