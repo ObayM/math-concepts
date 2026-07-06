@@ -1,5 +1,6 @@
 'use client';
 import type { DocEntry, DocSection } from '@/engine/lang/docs';
+import InlineMd from '@/components/prism/InlineMd';
 import LiveSnippet from '@/components/prism/LiveSnippet';
 import SyntaxPre from '@/components/prism/SyntaxPre';
 
@@ -24,7 +25,9 @@ function PropTable({ props }: { props: NonNullable<DocEntry['props']> }) {
               <td>
                 <span className="prop-type">{p.type}</span>
               </td>
-              <td>{p.description}</td>
+              <td>
+                <InlineMd text={p.description} />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -36,30 +39,28 @@ function PropTable({ props }: { props: NonNullable<DocEntry['props']> }) {
 function Entry({ entry }: { entry: DocEntry }) {
   return (
     <div id={`entry-${entry.keyword}`} className="prism-entry">
-      <div className="entry-header">
-        <h3 className="entry-keyword">{entry.keyword}</h3>
-      </div>
+      <h3 className="entry-keyword">
+        {entry.keyword}
+        <a
+          href={`#entry-${entry.keyword}`}
+          className="entry-anchor"
+          aria-label={`Link to ${entry.keyword}`}
+        >
+          #
+        </a>
+      </h3>
+
+      <p className="entry-description">
+        <InlineMd text={entry.description} />
+      </p>
 
       <SyntaxPre code={entry.syntax} />
-
-      <p className="entry-description">{entry.description}</p>
 
       {entry.props && entry.props.length > 0 && <PropTable props={entry.props} />}
 
       {entry.example && (
-        <div style={{ marginTop: 16 }}>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--color-neutral-400)',
-              marginBottom: 8,
-            }}
-          >
-            example
-          </p>
+        <div className="entry-example">
+          <p className="entry-example-label">Example</p>
           <LiveSnippet code={entry.example} />
         </div>
       )}
@@ -67,11 +68,27 @@ function Entry({ entry }: { entry: DocEntry }) {
   );
 }
 
-export default function PrismSectionView({ section }: { section: DocSection }) {
+export default function PrismSectionView({
+  section,
+  chapter,
+  chapterCount,
+}: {
+  section: DocSection;
+  chapter?: number;
+  chapterCount?: number;
+}) {
   return (
     <section id={section.id} className="prism-section">
+      {chapter != null && (
+        <p className="section-eyebrow">
+          Guide · {String(chapter).padStart(2, '0')}
+          {chapterCount ? ` of ${String(chapterCount).padStart(2, '0')}` : ''}
+        </p>
+      )}
       <h1 className="section-title">{section.title}</h1>
-      <p className="section-description">{section.description}</p>
+      <p className="section-description">
+        <InlineMd text={section.description} />
+      </p>
       <div>
         {section.entries.map((e) => (
           <Entry key={e.keyword} entry={e} />
