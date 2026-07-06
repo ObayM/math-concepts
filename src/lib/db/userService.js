@@ -16,3 +16,17 @@ export async function setUsername(userId, username) {
     data: { username },
   });
 }
+
+export async function countUsersWithRole(role) {
+  return prisma.user.count({ where: { role } });
+}
+
+export async function getUsersCompletedCounts(userIds) {
+  if (!userIds.length) return new Map();
+  const rows = await prisma.userLessonProgress.groupBy({
+    by: ['userId'],
+    where: { userId: { in: userIds }, completed: true },
+    _count: { _all: true },
+  });
+  return new Map(rows.map((r) => [r.userId, r._count._all]));
+}
