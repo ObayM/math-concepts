@@ -28,10 +28,12 @@ export async function POST(req: Request) {
   }
   const { topic, course, difficulty } = parsed.data;
 
-  const { text: prism } = await generateText({
-    model: LESSON_GEN_MODEL,
-    instructions: INSTRUCTIONS,
-    prompt: `Write a full Prism lesson that teaches: "${topic}".
+  let prism: string;
+  try {
+    const result = await generateText({
+      model: LESSON_GEN_MODEL,
+      instructions: INSTRUCTIONS,
+      prompt: `Write a full Prism lesson that teaches: "${topic}".
 Difficulty: ${difficulty}.${course ? `\nCourse: ${course}` : ''}
 
 Compose several slides (prose, an interactive scene, and at least one exercise)
@@ -40,7 +42,12 @@ slide with a scene should be genuinely interactive — the learner manipulates
 something and sees math respond, not a static picture.
 
 Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markdown, no explanation.`,
-  });
+    });
+    prism = result.text;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: 'AI generation failed', detail: message }, { status: 502 });
+  }
 
   try {
     const lesson = compileLesson(prism);

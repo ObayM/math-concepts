@@ -59,6 +59,17 @@ scene plane {
   step "drag the point and watch the slope update" { animate: { t: 3 }, dur: 2000, ease: easeInOut }
 }`;
 
+export function docsToCompletions() {
+  return PRISM_DOCS.sections.flatMap((section) =>
+    section.entries.map((entry) => ({
+      label: entry.keyword,
+      type: 'keyword',
+      detail: entry.syntax,
+      info: entry.description,
+    }))
+  );
+}
+
 export function toAIContext(): string {
   const lines: string[] = [
     `Prism — ${PRISM_DOCS.tagline}`,
