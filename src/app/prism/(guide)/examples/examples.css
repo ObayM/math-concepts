@@ -35,25 +35,6 @@
   );
 }
 
-.ex-header-nav {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.ex-back-link {
-  font-size: 13px;
-  font-weight: 600;
-  color: #6b7280;
-  text-decoration: none;
-  transition: color 0.1s;
-}
-
-.ex-back-link:hover {
-  color: #111827;
-}
-
 .ex-page-title {
   font-size: 40px;
   font-weight: 800;

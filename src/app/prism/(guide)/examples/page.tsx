@@ -5,7 +5,6 @@ import { compile, Scene } from '@/engine';
 import type { SceneIR } from '@/engine/ir/types';
 import { highlight } from '@/components/prism/SyntaxPre';
 import { EXAMPLES } from './examples-data';
-import '../prism.css';
 import './examples.css';
 
 function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
@@ -92,14 +91,6 @@ export default function ExamplesPage() {
     <div style={{ minHeight: '100vh', background: '#fff' }}>
       <div className="ex-page">
         <header className="ex-header">
-          <div className="ex-header-nav">
-            <Link href="/prism" className="ex-back-link">
-              ← Docs
-            </Link>
-            <Link href="/prism/play" className="ex-back-link">
-              Playground
-            </Link>
-          </div>
           <h1 className="ex-page-title">Examples</h1>
           <p className="ex-page-sub">
             Real Prism scenes — source + live output side by side. Click any card to open it in the

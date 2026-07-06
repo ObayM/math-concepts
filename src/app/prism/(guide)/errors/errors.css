@@ -10,23 +10,6 @@
   margin-bottom: 32px;
 }
 
-.err-header-nav {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.err-back-link {
-  font-size: 13px;
-  font-weight: 600;
-  color: #6b7280;
-  text-decoration: none;
-}
-
-.err-back-link:hover {
-  color: #4f46e5;
-}
-
 .err-page-title {
   font-size: 32px;
   font-weight: 800;

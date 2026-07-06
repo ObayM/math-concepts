@@ -1,7 +1,5 @@
-import Link from 'next/link';
 import { PRISM_ERRORS } from '@/engine/lang/docs/errors';
 import SyntaxPre from '@/components/prism/SyntaxPre';
-import '../prism.css';
 import './errors.css';
 
 export default function ErrorsPage() {
@@ -9,14 +7,6 @@ export default function ErrorsPage() {
     <div style={{ minHeight: '100vh', background: '#fff' }}>
       <div className="err-page">
         <header className="err-header">
-          <div className="err-header-nav">
-            <Link href="/prism" className="err-back-link">
-              ← Docs
-            </Link>
-            <Link href="/prism/play" className="err-back-link">
-              Playground
-            </Link>
-          </div>
           <h1 className="err-page-title">Error index</h1>
           <p className="err-page-sub">
             The compiler catches these at compile time — no partial lessons, no silent zeros. Each

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { PRISM_DOCS } from '@/engine/lang/docs';
 import { PRISM_COOKBOOK } from '@/engine/lang/docs/cookbook';
 import { PRISM_ERRORS } from '@/engine/lang/docs/errors';
-import { EXAMPLES } from '../src/app/prism/examples/examples-data';
+import { EXAMPLES } from '../src/app/prism/(guide)/examples/examples-data';
 import { compileAny } from '@/components/prism/compileAny';
 
 // every docs example, gallery entry, and cookbook source must actually
