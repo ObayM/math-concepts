@@ -1,5 +1,6 @@
 lesson "Differentiation II — Product & Quotient Rules" {
   course: "calculus"
+  skills: ["deriv-product-rule", "deriv-quotient-rule"]
 
   slide "The Tempting Trap" {
     id: "d2-trap"

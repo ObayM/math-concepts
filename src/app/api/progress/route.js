@@ -12,7 +12,15 @@ const bodySchema = z.object({
   currentStep: z.number().int().min(0),
   isCompleted: z.boolean().optional().default(false),
   quizHistory: z
-    .array(z.object({ title: z.string().optional(), question: z.string(), correct: z.boolean() }))
+    .array(
+      z.object({
+        title: z.string().optional(),
+        question: z.string(),
+        correct: z.boolean(),
+        slideId: z.string().optional(),
+        kind: z.string().optional(),
+      })
+    )
     .optional(),
 });
 

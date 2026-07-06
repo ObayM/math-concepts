@@ -1,5 +1,6 @@
 lesson "Differentiation IV — Trigonometric Functions" {
   course: "calculus"
+  skills: ["deriv-trig-sin-cos", "deriv-trig-other"]
 
   slide "The Star Result" {
     id: "d4-intro"

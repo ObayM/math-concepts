@@ -160,7 +160,10 @@ export default function LessonPlayer({
     setChecked(true);
     const correct = checker.check(slide, answer);
     const question = slide.exercise?.prompt ?? slide.content ?? '';
-    setQuizHistory((h) => [...h, { title: slide.title, question, correct }]);
+    setQuizHistory((h) => [
+      ...h,
+      { title: slide.title, question, correct, slideId: slide.id, kind: slide.exercise?.kind },
+    ]);
   };
 
   const handleAnswerChange = (val) => {

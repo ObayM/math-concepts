@@ -1,5 +1,6 @@
 lesson "Monotonicity of Functions" {
   course: "algebra"
+  skills: ["func-monotonicity"]
 
   slide "Understanding Monotonicity" {
     id: "l2-intro"

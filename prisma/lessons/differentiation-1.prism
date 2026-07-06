@@ -1,5 +1,6 @@
 lesson "Differentiation I — The Derivative & the Power Rule" {
   course: "calculus"
+  skills: ["deriv-definition", "deriv-power-rule", "deriv-sum-rule"]
 
   slide "What Is a Derivative?" {
     id: "d1-intro"

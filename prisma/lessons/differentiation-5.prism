@@ -1,5 +1,6 @@
 lesson "Differentiation V — Mixed Drill" {
   course: "calculus"
+  skills: ["deriv-power-rule", "deriv-product-rule", "deriv-quotient-rule", "deriv-chain-rule", "deriv-trig-sin-cos"]
 
   slide "Read the Structure First" {
     id: "d5-intro"

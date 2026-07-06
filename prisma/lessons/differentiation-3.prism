@@ -1,5 +1,6 @@
 lesson "Differentiation III — The Chain Rule" {
   course: "calculus"
+  skills: ["deriv-chain-rule"]
 
   slide "Functions Inside Functions" {
     id: "d3-intro"

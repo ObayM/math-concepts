@@ -23,6 +23,7 @@ model User {
   accounts   Account[]
   activities UserDailyActivity[]
   progress   UserLessonProgress[]
+  attempts   LessonAttempt[]
 
   @@map("user")
 }
@@ -98,6 +99,7 @@ model Lesson {
 
   course   Course?              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   progress UserLessonProgress[]
+  attempts LessonAttempt[]
 
   @@map("lessons")
 }
@@ -128,4 +130,22 @@ model UserLessonProgress {
 
   @@id([userId, lessonId])
   @@map("user_lesson_progress")
+}
+
+model LessonAttempt {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  lessonId     String   @map("lesson_id")
+  slideId      String?  @map("slide_id")
+  exerciseKind String?  @map("exercise_kind")
+  question     String
+  correct      Boolean
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([lessonId])
+  @@map("lesson_attempts")
 }

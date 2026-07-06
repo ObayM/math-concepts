@@ -30,6 +30,28 @@ export async function upsertLessonProgress(
   if (!lesson) return null;
 
   const now = new Date();
+
+  if (quizHistory !== undefined) {
+    const existing = await prisma.userLessonProgress.findUnique({
+      where: { userId_lessonId: { userId, lessonId: lesson.id } },
+      select: { quizHistory: true },
+    });
+    const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
+    const newAttempts = quizHistory.slice(priorLength);
+    if (newAttempts.length) {
+      await prisma.lessonAttempt.createMany({
+        data: newAttempts.map((a) => ({
+          userId,
+          lessonId: lesson.id,
+          slideId: a.slideId ?? null,
+          exerciseKind: a.kind ?? null,
+          question: a.question,
+          correct: a.correct,
+        })),
+      });
+    }
+  }
+
   await prisma.userLessonProgress.upsert({
     where: { userId_lessonId: { userId, lessonId: lesson.id } },
     update: {

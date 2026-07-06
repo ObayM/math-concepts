@@ -1,5 +1,6 @@
 lesson "Operations on Functions" {
   course: "algebra"
+  skills: ["func-operations", "func-composition"]
 
   slide "Operations on Functions" {
     id: "l3-intro"

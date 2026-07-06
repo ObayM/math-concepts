@@ -1,5 +1,6 @@
 lesson "Intro to Real Functions" {
   course: "algebra"
+  skills: ["func-domain", "func-range", "func-domain-restrictions"]
 
   slide "Welcome to Functions!" {
     id: "l1-intro"
