@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool, interpolate } from '@/engine/runtime/eval';
 import { expandObjects } from '@/engine/runtime/expand';
-import { resolveColor } from '@/engine/colors';
+import { resolveColor, AXIS_LINE, AXIS_LABEL } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 import type { InputLayerConfig } from './InputLayer';
@@ -52,13 +52,13 @@ export default function NumberlineRenderer({
     const X = cx.toX(t);
     ticks.push(
       <g key={`tick${k}`}>
-        <line x1={X} y1={Y_MID - 6} x2={X} y2={Y_MID + 6} stroke="#cbd5e1" strokeWidth={1.5} />
+        <line x1={X} y1={Y_MID - 6} x2={X} y2={Y_MID + 6} stroke={AXIS_LINE} strokeWidth={1.5} />
         <text
           x={X}
           y={Y_MID + 20}
           textAnchor="middle"
           fontSize={11}
-          fill="#94a3b8"
+          fill={AXIS_LABEL}
           stroke="white"
           strokeWidth={3}
           paintOrder="stroke"
@@ -94,7 +94,7 @@ export default function NumberlineRenderer({
         className="w-full select-none"
         style={{ touchAction: 'none' }}
       >
-        <line x1={0} y1={Y_MID} x2={W} y2={Y_MID} stroke="#cbd5e1" strokeWidth={2} />
+        <line x1={0} y1={Y_MID} x2={W} y2={Y_MID} stroke={AXIS_LINE} strokeWidth={2} />
         {ticks}
 
         {expandObjects(ir.objects, scope).map((obj, i) => {

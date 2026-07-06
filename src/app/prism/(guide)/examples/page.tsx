@@ -88,7 +88,7 @@ function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
 
 export default function ExamplesPage() {
   return (
-    <div style={{ minHeight: '100vh', background: '#fff' }}>
+    <div className="min-h-screen bg-white">
       <div className="ex-page">
         <header className="ex-header">
           <h1 className="ex-page-title">Examples</h1>

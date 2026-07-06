@@ -4,7 +4,7 @@ import './errors.css';
 
 export default function ErrorsPage() {
   return (
-    <div style={{ minHeight: '100vh', background: '#fff' }}>
+    <div className="min-h-screen bg-white">
       <div className="err-page">
         <header className="err-header">
           <h1 className="err-page-title">Error index</h1>

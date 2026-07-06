@@ -13,6 +13,10 @@ export function resolveColor(c?: string): string {
   return TOKENS[c] ?? c;
 }
 
+export const GRID_LINE = 'var(--color-neutral-200)';
+export const AXIS_LINE = 'var(--color-neutral-300)';
+export const AXIS_LABEL = 'var(--color-neutral-400)';
+
 export function dash(style?: string): string | undefined {
   if (style === 'dashed') return '8 6';
   if (style === 'dotted') return '2 5';

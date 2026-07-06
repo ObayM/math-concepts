@@ -5,7 +5,7 @@ import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
-import { resolveColor } from '@/engine/colors';
+import { resolveColor, GRID_LINE, AXIS_LINE, AXIS_LABEL } from '@/engine/colors';
 import { toDataCoords } from './coords';
 import InputLayer, { type InputLayerConfig } from './InputLayer';
 import type { SceneIR } from '@/engine/ir/types';
@@ -115,7 +115,7 @@ export default function SvgRenderer({
     const axisYpx = cx.toY(clamp(0, yMin, yMax));
     for (let t = Math.ceil(xMin / sx) * sx, k = 0; t <= xMax + 1e-9; t += sx, k++) {
       const X = cx.toX(t);
-      grid.push(<line key={`gx${k}`} x1={X} y1={0} x2={X} y2={H} stroke="#eef2f7" />);
+      grid.push(<line key={`gx${k}`} x1={X} y1={0} x2={X} y2={H} stroke={GRID_LINE} />);
       if (Math.abs(t) > 1e-9)
         ticks.push(
           <text
@@ -124,7 +124,7 @@ export default function SvgRenderer({
             y={axisYpx + 14}
             textAnchor="middle"
             fontSize={11}
-            fill="#94a3b8"
+            fill={AXIS_LABEL}
             stroke="white"
             strokeWidth={3}
             paintOrder="stroke"
@@ -135,7 +135,7 @@ export default function SvgRenderer({
     }
     for (let t = Math.ceil(yMin / sy) * sy, k = 0; t <= yMax + 1e-9; t += sy, k++) {
       const Y = cx.toY(t);
-      grid.push(<line key={`gy${k}`} x1={0} y1={Y} x2={W} y2={Y} stroke="#eef2f7" />);
+      grid.push(<line key={`gy${k}`} x1={0} y1={Y} x2={W} y2={Y} stroke={GRID_LINE} />);
       if (Math.abs(t) > 1e-9)
         ticks.push(
           <text
@@ -144,7 +144,7 @@ export default function SvgRenderer({
             y={Y + 4}
             textAnchor="end"
             fontSize={11}
-            fill="#94a3b8"
+            fill={AXIS_LABEL}
             stroke="white"
             strokeWidth={3}
             paintOrder="stroke"
@@ -165,7 +165,7 @@ export default function SvgRenderer({
           y1={0}
           x2={cx.toX(0)}
           y2={H}
-          stroke="#cbd5e1"
+          stroke={AXIS_LINE}
           strokeWidth={1.5}
         />
       );
@@ -177,7 +177,7 @@ export default function SvgRenderer({
           y1={cx.toY(0)}
           x2={W}
           y2={cx.toY(0)}
-          stroke="#cbd5e1"
+          stroke={AXIS_LINE}
           strokeWidth={1.5}
         />
       );
