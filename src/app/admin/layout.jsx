@@ -6,6 +6,7 @@ const navLinks = [
   { name: 'Overview', href: '/admin' },
   { name: 'Users', href: '/admin/users' },
   { name: 'Content', href: '/admin/content' },
+  { name: 'Measurement', href: '/admin/measurement' },
 ];
 
 export default async function AdminLayout({ children }) {

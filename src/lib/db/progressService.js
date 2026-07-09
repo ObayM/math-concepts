@@ -12,6 +12,28 @@ function buildSkillMap(publishedData) {
   return map;
 }
 
+const MASTERY_ALPHA = 0.3;
+
+async function recordSkillMastery(userId, skill, correct) {
+  const correctInc = correct ? 1 : 0;
+  const existing = await prisma.userSkillMastery.findUnique({
+    where: { userId_skill: { userId, skill } },
+  });
+
+  if (!existing) {
+    await prisma.userSkillMastery.create({
+      data: { userId, skill, score: correctInc, attempts: 1, correct: correctInc },
+    });
+    return;
+  }
+
+  const score = existing.score * (1 - MASTERY_ALPHA) + correctInc * MASTERY_ALPHA;
+  await prisma.userSkillMastery.update({
+    where: { userId_skill: { userId, skill } },
+    data: { score, attempts: existing.attempts + 1, correct: existing.correct + correctInc },
+  });
+}
+
 export async function getLessonProgress(userId, lessonKey) {
   const lesson = await prisma.lesson.findUnique({
     where: { lessonKey },
@@ -52,17 +74,19 @@ export async function upsertLessonProgress(
     const newAttempts = quizHistory.slice(priorLength);
     if (newAttempts.length) {
       const skillMap = buildSkillMap(lesson.publishedData);
-      await prisma.lessonAttempt.createMany({
-        data: newAttempts.map((a) => ({
-          userId,
-          lessonId: lesson.id,
-          slideId: a.slideId ?? null,
-          exerciseKind: a.kind ?? null,
-          skill: a.slideId ? (skillMap.get(a.slideId) ?? null) : null,
-          question: a.question,
-          correct: a.correct,
-        })),
-      });
+      const resolved = newAttempts.map((a) => ({
+        userId,
+        lessonId: lesson.id,
+        slideId: a.slideId ?? null,
+        exerciseKind: a.kind ?? null,
+        skill: a.slideId ? (skillMap.get(a.slideId) ?? null) : null,
+        question: a.question,
+        correct: a.correct,
+      }));
+      await prisma.lessonAttempt.createMany({ data: resolved });
+      for (const a of resolved) {
+        if (a.skill) await recordSkillMastery(userId, a.skill, a.correct);
+      }
     }
   }
 

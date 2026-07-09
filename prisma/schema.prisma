@@ -28,6 +28,7 @@ model User {
   progress        UserLessonProgress[]
   attempts        LessonAttempt[]
   authoredLessons Lesson[]
+  skillMastery    UserSkillMastery[]
 
   @@map("user")
 }
@@ -170,4 +171,18 @@ model LessonAttempt {
   @@index([userId])
   @@index([lessonId])
   @@map("lesson_attempts")
+}
+
+model UserSkillMastery {
+  userId    String   @map("user_id")
+  skill     String
+  score     Float    @default(0)
+  attempts  Int      @default(0)
+  correct   Int      @default(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skill])
+  @@map("user_skill_mastery")
 }
