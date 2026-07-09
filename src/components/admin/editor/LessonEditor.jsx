@@ -1,12 +1,19 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import { compileAny } from '@/components/prism/compileAny';
 import MiniPlayer from '@/components/prism/MiniPlayer';
 import Button from '@/components/admin/ui/Button';
 import MonacoPrismEditor from './MonacoPrismEditor';
+import ProblemsPanel from './ProblemsPanel';
 import AiPanel from './AiPanel';
 import './mini-player-admin.css';
+
+const vSeparator =
+  'w-1.5 shrink-0 cursor-col-resize bg-neutral-200 transition-colors hover:bg-primary-300 active:bg-primary-400';
+const hSeparator =
+  'h-1.5 shrink-0 cursor-row-resize bg-neutral-200 transition-colors hover:bg-primary-300 active:bg-primary-400';
 
 export default function LessonEditor({ lessonId, initialSource }) {
   const [source, setSource] = useState(initialSource);
@@ -15,8 +22,21 @@ export default function LessonEditor({ lessonId, initialSource }) {
   const [showAi, setShowAi] = useState(true);
   const [diagnostics, setDiagnostics] = useState([]);
   const abortRef = useRef(null);
+  const editorApiRef = useRef(null);
 
   const { lesson, error: previewError } = useMemo(() => compileAny(source), [source]);
+
+  const handleEditorReady = useCallback((editor, monaco) => {
+    editorApiRef.current = { editor, monaco };
+  }, []);
+
+  function jumpToLine(line, col) {
+    const api = editorApiRef.current;
+    if (!api) return;
+    api.editor.revealLineInCenter(line);
+    api.editor.setPosition({ lineNumber: line, column: col });
+    api.editor.focus();
+  }
 
   async function handleSave() {
     abortRef.current?.abort();
@@ -52,16 +72,12 @@ export default function LessonEditor({ lessonId, initialSource }) {
           <Button onClick={handleSave} isLoading={saveState === 'saving'}>
             Save draft
           </Button>
+          <span className="text-xs text-neutral-400">Ctrl/Cmd+S</span>
           {saveState === 'saved' && (
             <span className="text-sm font-semibold text-success-600">Saved</span>
           )}
           {saveState === 'error' && (
             <span className="text-sm font-semibold text-danger-600">Save failed</span>
-          )}
-          {diagnostics.length > 0 && (
-            <span className="text-sm font-semibold text-danger-600">
-              {diagnostics.length} problem{diagnostics.length > 1 ? 's' : ''}
-            </span>
           )}
         </div>
         <Button variant="outline" size="sm" onClick={() => setShowAi((v) => !v)}>
@@ -75,27 +91,47 @@ export default function LessonEditor({ lessonId, initialSource }) {
         </pre>
       )}
 
-      <div
-        className={`grid grid-cols-1 gap-4 ${showAi ? 'lg:grid-cols-[1fr_1fr_320px]' : 'lg:grid-cols-2'}`}
-      >
-        <MonacoPrismEditor
-          value={source}
-          onChange={setSource}
-          onDiagnostics={setDiagnostics}
-          onSave={handleSave}
-        />
-        <div className="min-w-0 border border-neutral-200 p-4">
-          {previewError ? (
-            <pre className="whitespace-pre-wrap text-xs text-danger-600">{previewError}</pre>
-          ) : lesson ? (
-            <MiniPlayer lesson={lesson} />
-          ) : null}
-        </div>
-        {showAi && (
-          <div className="min-w-0">
-            <AiPanel source={source} onApply={setSource} />
-          </div>
-        )}
+      <div className="h-[78vh]">
+        <Group orientation="horizontal" className="h-full">
+          <Panel defaultSize={showAi ? 55 : 65} minSize={30}>
+            <Group orientation="vertical" className="h-full">
+              <Panel defaultSize={75} minSize={30}>
+                <MonacoPrismEditor
+                  value={source}
+                  onChange={setSource}
+                  onDiagnostics={setDiagnostics}
+                  onSave={handleSave}
+                  onEditorReady={handleEditorReady}
+                  className="h-full"
+                />
+              </Panel>
+              <Separator className={hSeparator} />
+              <Panel defaultSize={25} minSize={10} collapsible collapsedSize={0}>
+                <ProblemsPanel diagnostics={diagnostics} onJump={jumpToLine} />
+              </Panel>
+            </Group>
+          </Panel>
+          <Separator className={vSeparator} />
+          <Panel defaultSize={showAi ? 25 : 35} minSize={15} collapsible collapsedSize={0}>
+            <div className="h-full min-w-0 overflow-auto border border-neutral-200 p-4">
+              {previewError ? (
+                <pre className="whitespace-pre-wrap text-xs text-danger-600">{previewError}</pre>
+              ) : lesson ? (
+                <MiniPlayer lesson={lesson} />
+              ) : null}
+            </div>
+          </Panel>
+          {showAi && (
+            <>
+              <Separator className={vSeparator} />
+              <Panel defaultSize={20} minSize={12} collapsible collapsedSize={0}>
+                <div className="h-full min-w-0 overflow-auto">
+                  <AiPanel source={source} onApply={setSource} />
+                </div>
+              </Panel>
+            </>
+          )}
+        </Group>
       </div>
     </div>
   );

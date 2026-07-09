@@ -10,6 +10,7 @@ export default function MonacoPrismEditor({
   onChange,
   onDiagnostics,
   onSave,
+  onEditorReady,
   className = '',
 }) {
   const monacoRef = useRef(null);
@@ -18,12 +19,14 @@ export default function MonacoPrismEditor({
   const onChangeRef = useRef(onChange);
   const onDiagnosticsRef = useRef(onDiagnostics);
   const onSaveRef = useRef(onSave);
+  const onEditorReadyRef = useRef(onEditorReady);
 
   useEffect(() => {
     onChangeRef.current = onChange;
     onDiagnosticsRef.current = onDiagnostics;
     onSaveRef.current = onSave;
-  }, [onChange, onDiagnostics, onSave]);
+    onEditorReadyRef.current = onEditorReady;
+  }, [onChange, onDiagnostics, onSave, onEditorReady]);
 
   const runMarkers = useCallback((source) => {
     const monaco = monacoRef.current;
@@ -46,6 +49,7 @@ export default function MonacoPrismEditor({
       onSaveRef.current?.();
     });
     runMarkers(editor.getValue());
+    onEditorReadyRef.current?.(editor, monaco);
   }
 
   function handleChange(newValue) {
@@ -60,7 +64,7 @@ export default function MonacoPrismEditor({
   }
 
   return (
-    <div className={`min-w-0 h-[560px] border border-neutral-300 ${className}`}>
+    <div className={`min-w-0 h-full border border-neutral-300 ${className}`}>
       <Editor
         height="100%"
         defaultLanguage="prism"
