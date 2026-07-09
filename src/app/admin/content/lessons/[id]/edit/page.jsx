@@ -11,7 +11,11 @@ export default async function LessonEditPage({ params }) {
     <div>
       <h1 className="text-2xl font-bold text-neutral-900">{lesson.title ?? lesson.lessonKey}</h1>
       <p className="text-sm text-neutral-500">{lesson.lessonKey}</p>
-      <LessonEditor lessonId={lesson.id} initialSource={lesson.source} />
+      <LessonEditor
+        lessonId={lesson.id}
+        title={lesson.title ?? lesson.lessonKey}
+        initialSource={lesson.source}
+      />
     </div>
   );
 }

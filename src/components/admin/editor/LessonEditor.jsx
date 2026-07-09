@@ -8,6 +8,8 @@ import Button from '@/components/admin/ui/Button';
 import MonacoPrismEditor from './MonacoPrismEditor';
 import ProblemsPanel from './ProblemsPanel';
 import AiPanel from './AiPanel';
+import RecentLessonTabs from './RecentLessonTabs';
+import LessonSwitcher from './LessonSwitcher';
 import './mini-player-admin.css';
 
 const vSeparator =
@@ -15,7 +17,7 @@ const vSeparator =
 const hSeparator =
   'h-1.5 shrink-0 cursor-row-resize bg-neutral-200 transition-colors hover:bg-primary-300 active:bg-primary-400';
 
-export default function LessonEditor({ lessonId, initialSource }) {
+export default function LessonEditor({ lessonId, title, initialSource }) {
   const [source, setSource] = useState(initialSource);
   const [saveState, setSaveState] = useState('idle');
   const [saveError, setSaveError] = useState(null);
@@ -67,12 +69,16 @@ export default function LessonEditor({ lessonId, initialSource }) {
 
   return (
     <div className="mt-6">
+      <RecentLessonTabs lessonId={lessonId} title={title} />
+      <LessonSwitcher currentLessonId={lessonId} />
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button onClick={handleSave} isLoading={saveState === 'saving'}>
             Save draft
           </Button>
-          <span className="text-xs text-neutral-400">Ctrl/Cmd+S</span>
+          <span className="text-xs text-neutral-400">
+            Ctrl/Cmd+S · Ctrl/Cmd+K to switch lessons
+          </span>
           {saveState === 'saved' && (
             <span className="text-sm font-semibold text-success-600">Saved</span>
           )}
