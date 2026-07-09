@@ -4,7 +4,7 @@ import { useState, useRef, useMemo } from 'react';
 import { compileAny } from '@/components/prism/compileAny';
 import MiniPlayer from '@/components/prism/MiniPlayer';
 import Button from '@/components/admin/ui/Button';
-import CodeMirrorEditor from './CodeMirrorEditor';
+import MonacoPrismEditor from './MonacoPrismEditor';
 import AiPanel from './AiPanel';
 import './mini-player-admin.css';
 
@@ -13,6 +13,7 @@ export default function LessonEditor({ lessonId, initialSource }) {
   const [saveState, setSaveState] = useState('idle');
   const [saveError, setSaveError] = useState(null);
   const [showAi, setShowAi] = useState(true);
+  const [diagnostics, setDiagnostics] = useState([]);
   const abortRef = useRef(null);
 
   const { lesson, error: previewError } = useMemo(() => compileAny(source), [source]);
@@ -57,6 +58,11 @@ export default function LessonEditor({ lessonId, initialSource }) {
           {saveState === 'error' && (
             <span className="text-sm font-semibold text-danger-600">Save failed</span>
           )}
+          {diagnostics.length > 0 && (
+            <span className="text-sm font-semibold text-danger-600">
+              {diagnostics.length} problem{diagnostics.length > 1 ? 's' : ''}
+            </span>
+          )}
         </div>
         <Button variant="outline" size="sm" onClick={() => setShowAi((v) => !v)}>
           {showAi ? 'Just write Prism' : 'Show AI panel'}
@@ -72,7 +78,12 @@ export default function LessonEditor({ lessonId, initialSource }) {
       <div
         className={`grid grid-cols-1 gap-4 ${showAi ? 'lg:grid-cols-[1fr_1fr_320px]' : 'lg:grid-cols-2'}`}
       >
-        <CodeMirrorEditor value={source} onChange={setSource} />
+        <MonacoPrismEditor
+          value={source}
+          onChange={setSource}
+          onDiagnostics={setDiagnostics}
+          onSave={handleSave}
+        />
         <div className="min-w-0 border border-neutral-200 p-4">
           {previewError ? (
             <pre className="whitespace-pre-wrap text-xs text-danger-600">{previewError}</pre>
