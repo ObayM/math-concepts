@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { requireUser } from '@/lib/session';
 import { isUsernameAvailable, setUsername, USERNAME_REGEX } from '@/lib/db/userService';
 import { NextResponse } from 'next/server';
@@ -20,6 +21,13 @@ export async function POST(request) {
   const available = await isUsernameAvailable(username);
   if (!available) return NextResponse.json({ error: 'Username already taken' }, { status: 409 });
 
-  await setUsername(user.id, username);
+  try {
+    await setUsername(user.id, username);
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      return NextResponse.json({ error: 'Username already taken' }, { status: 409 });
+    }
+    throw err;
+  }
   return NextResponse.json({ success: true });
 }

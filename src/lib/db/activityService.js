@@ -1,8 +1,15 @@
 import { prisma } from '@/lib/prisma';
 
+// UTC-normalized "today" — reads (getStreak/getActivityHeatmap) compare dates
+// via toISOString(), which is UTC. Using local midnight here would drift by a
+// day whenever the server's timezone isn't UTC.
+function todayUTC() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
 export async function touchActivity(userId) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = todayUTC();
   await prisma.userDailyActivity.upsert({
     where: { userId_activityDate: { userId, activityDate: today } },
     update: {},

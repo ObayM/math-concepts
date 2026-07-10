@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { BookOpen, Shapes } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
+import { courseUrlSlug } from '@/lib/db/courseService';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 
@@ -28,7 +29,7 @@ export default async function CoursesPage() {
             return (
               <Link
                 key={course.id}
-                href={`/courses/${course.slug ?? course.name.toLowerCase()}`}
+                href={`/courses/${courseUrlSlug(course)}`}
                 className="group block animate-fade-in-up"
                 style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
               >

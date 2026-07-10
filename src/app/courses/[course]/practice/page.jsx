@@ -1,14 +1,13 @@
-import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { getExercisePoolByCourse } from '@/lib/db/lessonService';
+import { resolveCourseBySlug } from '@/lib/db/courseService';
 import PracticeRunner from '@/components/lesson/PracticeRunner';
 import Button from '@/components/ui/Button';
 
 export default async function PracticePage({ params }) {
   const { course: courseSlug } = await params;
 
-  const courses = await prisma.course.findMany();
-  const course = courses.find((c) => c.name.toLowerCase() === courseSlug.toLowerCase());
+  const course = await resolveCourseBySlug(courseSlug);
   if (!course) notFound();
 
   const pool = await getExercisePoolByCourse(course.id);

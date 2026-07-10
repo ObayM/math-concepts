@@ -4,19 +4,13 @@ import Link from 'next/link';
 import { Zap } from 'lucide-react';
 import LessonCard from '@/components/lesson/LessonCard';
 import Badge from '@/components/ui/Badge';
-import { getCourseBySlug } from '@/lib/db/courseService';
+import { resolveCourseBySlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
-// one page for every course — matches the course by slug, falling back to a
-// lowercased name match for any course that predates the slug column.
 export default async function CoursePage({ params }) {
   const { course: courseSlug } = await params;
 
-  let course = await getCourseBySlug(courseSlug);
-  if (!course) {
-    const courses = await prisma.course.findMany();
-    course = courses.find((c) => c.name.toLowerCase() === courseSlug.toLowerCase()) ?? null;
-  }
+  const course = await resolveCourseBySlug(courseSlug);
   if (!course) notFound();
 
   const session = await getFullSession();

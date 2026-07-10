@@ -6,6 +6,7 @@ import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle } from 'lucide-react';
 import { requireUser } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { getStreak, getActivityHeatmap } from '@/lib/db/activityService';
+import { courseUrlSlug } from '@/lib/db/courseService';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -108,7 +109,7 @@ const ContinueLearningCard = ({ course }) => {
   const completed = course.lessons.filter((l) => l.status === 'completed').length;
   const total = course.lessons.length;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-  const coursePath = course.name.toLowerCase();
+  const coursePath = courseUrlSlug(course);
 
   return (
     <Card className="animate-fade-in-up [animation-delay:100ms] opacity-0 p-6">
@@ -155,7 +156,7 @@ const ActivitySection = ({ activityData }) => (
 
 const UpNextPanel = ({ course }) => {
   if (!course) return null;
-  const coursePath = course.name.toLowerCase();
+  const coursePath = courseUrlSlug(course);
 
   return (
     <div className="animate-fade-in-up [animation-delay:150ms] opacity-0">
