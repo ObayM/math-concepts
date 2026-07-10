@@ -18,6 +18,25 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     minPasswordLength: 6,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your Mathly password',
+        html: `
+          <div style="font-family:sans-serif;max-width:480px;margin:auto">
+            <h2>Reset your password</h2>
+            <p>Click the button below to choose a new password for your Mathly account.</p>
+            <a href="${url}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">
+              Reset Password
+            </a>
+            <p style="margin-top:16px;color:#6b7280;font-size:13px">
+              If you didn't request this, you can safely ignore this email — your password won't change.
+            </p>
+          </div>
+        `,
+      });
+    },
   },
 
   emailVerification: {
