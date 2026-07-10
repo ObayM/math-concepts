@@ -23,7 +23,7 @@ logs:
 
 
 migrate:
-	npm run db:push
+	npm run db:migrate:dev
 
 migrate-prod:
 	npm run db:migrate

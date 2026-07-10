@@ -5,9 +5,30 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  DATABASE_URL: postgresql://mathly:mathly@localhost:5432/mathly
+  BETTER_AUTH_SECRET: ci-only-secret-not-for-real-use
+  BETTER_AUTH_URL: http://localhost:3000
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+  GEMINI_API_KEY: ci-placeholder-key
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: mathly
+          POSTGRES_PASSWORD: mathly
+          POSTGRES_DB: mathly
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -32,3 +53,9 @@ jobs:
 
       - name: Docs examples, gallery, and cookbook all compile
         run: npm run dsl docs-check
+
+      - name: Migrations apply cleanly to a fresh database
+        run: npm run db:migrate
+
+      - name: App builds
+        run: npm run build

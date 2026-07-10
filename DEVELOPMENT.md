@@ -33,7 +33,7 @@ make dev
 
 This will boot up a Postgres container and get Next.js running. Give it a second until you see the nice `✓ Ready` in your terminal!
 
-**4. Push that database schema!**
+**4. Run the database migrations!**
 
 ```bash
 make migrate
