@@ -162,7 +162,14 @@ export default function LessonPlayer({
     const question = slide.exercise?.prompt ?? slide.content ?? '';
     setQuizHistory((h) => [
       ...h,
-      { title: slide.title, question, correct, slideId: slide.id, kind: slide.exercise?.kind },
+      {
+        title: slide.title,
+        question,
+        correct,
+        slideId: slide.id,
+        kind: slide.exercise?.kind,
+        answer,
+      },
     ]);
   };
 

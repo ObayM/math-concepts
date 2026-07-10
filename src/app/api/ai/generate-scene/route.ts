@@ -10,9 +10,9 @@ import { toAIContext } from '@/engine/lang/docs';
 const INSTRUCTIONS = toAIContext();
 
 const bodySchema = z.object({
-  concept: z.string().min(1),
-  difficulty: z.string().optional().default('intermediate'),
-  context: z.string().optional().default(''),
+  concept: z.string().min(1).max(300),
+  difficulty: z.string().max(50).optional().default('intermediate'),
+  context: z.string().max(4000).optional().default(''),
 });
 
 export async function POST(req: Request) {

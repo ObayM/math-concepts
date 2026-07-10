@@ -1,15 +1,31 @@
 import { prisma } from '@/lib/prisma';
 import { lessonSchema } from '@/engine/ir/lesson';
+import { exercises } from '@/components/lesson/exercises';
 
-function buildSkillMap(publishedData) {
+export function buildSlideMap(publishedData) {
   const parsed = lessonSchema.safeParse(publishedData);
   const map = new Map();
   if (!parsed.success) return map;
-  for (const slide of parsed.data.slides) {
-    const skill = slide.exercise?.skill ?? slide.skill ?? null;
-    if (skill) map.set(slide.id, skill);
-  }
+  for (const slide of parsed.data.slides) map.set(slide.id, slide);
   return map;
+}
+
+// never trust the client's `correct` — re-derive it from the published
+// exercise and the answer the client claims it submitted. this is the
+// server-side trust boundary for mastery/attempts.
+export function verifyAttempts(slideMap, attempts) {
+  return attempts.map((a) => {
+    const slide = a.slideId ? slideMap.get(a.slideId) : null;
+    const checker = slide?.exercise ? exercises[slide.exercise.kind] : null;
+    return {
+      title: a.title,
+      question: a.question,
+      slideId: a.slideId ?? null,
+      kind: a.kind ?? null,
+      skill: slide?.exercise?.skill ?? slide?.skill ?? null,
+      correct: checker ? Boolean(checker.check(slide, a.answer)) : false,
+    };
+  });
 }
 
 const MASTERY_ALPHA = 0.3;
@@ -64,6 +80,7 @@ export async function upsertLessonProgress(
   if (!lesson) return null;
 
   const now = new Date();
+  let verifiedQuizHistory = quizHistory;
 
   if (quizHistory !== undefined) {
     const existing = await prisma.userLessonProgress.findUnique({
@@ -72,21 +89,36 @@ export async function upsertLessonProgress(
     });
     const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
     const newAttempts = quizHistory.slice(priorLength);
+
     if (newAttempts.length) {
-      const skillMap = buildSkillMap(lesson.publishedData);
-      const resolved = newAttempts.map((a) => ({
-        userId,
-        lessonId: lesson.id,
-        slideId: a.slideId ?? null,
-        exerciseKind: a.kind ?? null,
-        skill: a.slideId ? (skillMap.get(a.slideId) ?? null) : null,
-        question: a.question,
-        correct: a.correct,
-      }));
-      await prisma.lessonAttempt.createMany({ data: resolved });
-      for (const a of resolved) {
-        if (a.skill) await recordSkillMastery(userId, a.skill, a.correct);
+      const slideMap = buildSlideMap(lesson.publishedData);
+      const verified = verifyAttempts(slideMap, newAttempts);
+
+      await prisma.lessonAttempt.createMany({
+        data: verified.map((v) => ({
+          userId,
+          lessonId: lesson.id,
+          slideId: v.slideId,
+          exerciseKind: v.kind,
+          skill: v.skill,
+          question: v.question,
+          correct: v.correct,
+        })),
+      });
+      for (const v of verified) {
+        if (v.skill) await recordSkillMastery(userId, v.skill, v.correct);
       }
+
+      verifiedQuizHistory = [
+        ...quizHistory.slice(0, priorLength),
+        ...verified.map(({ title, question, slideId, kind, correct }) => ({
+          title,
+          question,
+          slideId,
+          kind,
+          correct,
+        })),
+      ];
     }
   }
 
@@ -96,7 +128,7 @@ export async function upsertLessonProgress(
       currentStep,
       lastPlayedAt: now,
       ...(isCompleted && { completed: true, completedAt: now }),
-      ...(quizHistory !== undefined && { quizHistory }),
+      ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
     },
     create: {
       userId,
@@ -104,7 +136,7 @@ export async function upsertLessonProgress(
       currentStep,
       lastPlayedAt: now,
       ...(isCompleted && { completed: true, completedAt: now }),
-      ...(quizHistory !== undefined && { quizHistory }),
+      ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
     },
   });
   return lesson.id;

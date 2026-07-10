@@ -6,8 +6,8 @@ import { consume } from '@/lib/rate-limit';
 import { TUTOR_MODEL } from '@/lib/ai';
 
 const bodySchema = z.object({
-  context: z.string(),
-  question: z.string().min(1),
+  context: z.string().max(4000),
+  question: z.string().min(1).max(500),
 });
 
 export async function POST(req: Request) {

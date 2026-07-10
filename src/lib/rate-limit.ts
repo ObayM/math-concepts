@@ -10,10 +10,11 @@ const LIMITS = {
 
 export function consume(key: string, tier: keyof typeof LIMITS): boolean {
   const { max, perMin } = LIMITS[tier];
+  const bucketKey = `${tier}:${key}`;
   const now = Date.now();
-  const b = store.get(key) ?? { tokens: max, last: now };
+  const b = store.get(bucketKey) ?? { tokens: max, last: now };
   const refilled = Math.min(max, b.tokens + ((now - b.last) / 60_000) * perMin);
   if (refilled < 1) return false;
-  store.set(key, { tokens: refilled - 1, last: now });
+  store.set(bucketKey, { tokens: refilled - 1, last: now });
   return true;
 }

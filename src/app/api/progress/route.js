@@ -8,19 +8,21 @@ import {
 import { NextResponse } from 'next/server';
 
 const bodySchema = z.object({
-  lessonKey: z.string().min(1),
-  currentStep: z.number().int().min(0),
+  lessonKey: z.string().min(1).max(200),
+  currentStep: z.number().int().min(0).max(1000),
   isCompleted: z.boolean().optional().default(false),
   quizHistory: z
     .array(
       z.object({
-        title: z.string().optional(),
-        question: z.string(),
+        title: z.string().max(300).optional(),
+        question: z.string().max(2000),
         correct: z.boolean(),
-        slideId: z.string().optional(),
-        kind: z.string().optional(),
+        slideId: z.string().max(200).optional(),
+        kind: z.string().max(50).optional(),
+        answer: z.unknown().optional(),
       })
     )
+    .max(500)
     .optional(),
 });
 
