@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { Avatar } from '@/components/profile/ProfileHeaderCard';
 
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
@@ -96,23 +97,40 @@ export default function Navbar() {
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full transition-colors hover:bg-neutral-200"
+                  className="flex items-center justify-center w-9 h-9 rounded-full transition-opacity hover:opacity-80"
                 >
-                  <User className="w-6 h-6 text-neutral-600" />
+                  <Avatar
+                    name={user.name || user.displayUsername || user.username}
+                    image={user.image}
+                    size="sm"
+                  />
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
                     <div className="py-1">
-                      <div className="px-4 py-2 text-sm text-neutral-700 border-b">
-                        <p className="font-semibold">Welcome!</p>
-                        <p className="truncate text-neutral-500">
-                          {user.email || 'No email found'}
+                      <div className="px-4 py-3 border-b border-neutral-100">
+                        <p className="text-sm font-semibold text-neutral-900 truncate">
+                          {user.name || user.displayUsername}
                         </p>
+                        {user.username && (
+                          <p className="text-xs text-neutral-400">
+                            @{user.displayUsername || user.username}
+                          </p>
+                        )}
                       </div>
+                      {user.username && (
+                        <Link
+                          href={`/@${user.username}`}
+                          onClick={() => setIsProfileOpen(false)}
+                          className="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50"
+                        >
+                          Your Profile
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
-                        className="text-danger-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-100"
+                        className="text-danger-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-50"
                       >
                         Log Out
                       </button>
@@ -180,7 +198,16 @@ export default function Navbar() {
 
                 <div className="py-6">
                   {user ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
+                      {user.username && (
+                        <Link
+                          href={`/@${user.username}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-neutral-900 hover:bg-neutral-100"
+                        >
+                          Your Profile
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full rounded-md bg-danger-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-danger-500"
