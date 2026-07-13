@@ -118,6 +118,18 @@ async function main() {
     },
     {
       courseId: calculusCourse.id,
+      lessonKey: 'differentiation-7',
+      data: require('./lessons/differentiation-7.json'),
+      title: 'Implicit Differentiation',
+      description:
+        'Find dy/dx for curves that were never solved for y, from circles to the product rule in disguise.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'Circle',
+      sortOrder: 9,
+    },
+    {
+      courseId: calculusCourse.id,
       lessonKey: 'differentiation-4',
       data: require('./lessons/differentiation-4.json'),
       title: 'Trigonometric Derivatives',
@@ -130,11 +142,23 @@ async function main() {
     },
     {
       courseId: calculusCourse.id,
+      lessonKey: 'differentiation-6',
+      data: require('./lessons/differentiation-6.json'),
+      title: 'Exponential & Logarithmic Derivatives',
+      description:
+        'The function that is its own derivative, the clean 1/x that falls out of ln(x), and every chain rule built on top of them.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'TrendingUp',
+      sortOrder: 11,
+    },
+    {
+      courseId: calculusCourse.id,
       lessonKey: 'differentiation-5',
       data: require('./lessons/differentiation-5.json'),
       title: 'Mixed Differentiation Drill',
       description:
-        'Choose the right rule under pressure — a mixed workout combining power, product, quotient, chain, and trig derivatives.',
+        'Choose the right rule under pressure, a mixed workout spanning power, product, quotient, chain, trig, implicit, exponential, and log derivatives.',
       category: 'Calculus',
       difficulty: 'Advanced',
       iconName: 'Dumbbell',

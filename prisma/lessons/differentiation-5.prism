@@ -1,12 +1,13 @@
-lesson "Differentiation V — Mixed Drill" {
+lesson "Differentiation V: Mixed Drill" {
   course: "calculus"
-  skills: ["deriv-power-rule", "deriv-product-rule", "deriv-quotient-rule", "deriv-chain-rule", "deriv-trig-sin-cos"]
+  skills: ["deriv-power-rule", "deriv-product-rule", "deriv-quotient-rule", "deriv-chain-rule", "deriv-trig-sin-cos", "deriv-implicit", "deriv-exp", "deriv-log"]
 
   slide "Read the Structure First" {
     id: "d5-intro"
     cat: "Strategy"
     > You now have every core rule: **power, sum/difference, product, quotient,
-    > chain**, and the **trig** derivatives. The skill now is choosing the right one.
+    > chain, trig, implicit, exponential**, and **logarithmic** derivatives. The
+    > skill now is choosing the right one.
     >
     > Before differentiating, ask: *what is the outermost operation?* A sum? Handle
     > each term. A product or quotient? Reach for that rule. Something raised to a
@@ -26,7 +27,7 @@ lesson "Differentiation V — Mixed Drill" {
       pair "d/dx[f(g(x))]" -> "f'(g(x))·g'(x)"
       pair "d/dx[sin x]" -> "cos x"
       decoy "u'v'"
-      ! "That last one — u'v' — is the trap: the derivative of a product is never just the product of the derivatives."
+      ! "That last one, u'v', is the trap: the derivative of a product is never just the product of the derivatives."
     }
   }
 
@@ -37,7 +38,7 @@ lesson "Differentiation V — Mixed Drill" {
       ask "Which rule do you apply **first** to differentiate $f(x) = x^{2}\sin x$?"
       skill: "deriv-product-rule"
       - "Chain rule" { why: "There's no function-inside-a-function here." }
-      * "Product rule" { why: "Correct — it's x² times sin x, a product." }
+      * "Product rule" { why: "Correct: it's x² times sin x, a product." }
       - "Quotient rule" { why: "Nothing is being divided." }
       - "Power rule alone" { why: "Power rule handles x², but not the product with sin x." }
       hint "It's one thing multiplied by another."
@@ -119,6 +120,58 @@ lesson "Differentiation V — Mixed Drill" {
       answer: ["sin x", "+", "x", "·", "cos x"]
       hint "Product rule: (derivative of x)·sin x + x·(derivative of sin x)."
       ! "$\frac{d}{dx}[x\sin x] = \sin x + x\cos x$."
+    }
+  }
+
+  slide "Implicit Drill" {
+    id: "d5-num-implicit"
+    cat: "Drills"
+    numeric {
+      ask "For $x^{2} + y^{2} = 169$, find $\dfrac{dy}{dx}$ at the point (5, 12)."
+      skill: "deriv-implicit"
+      answer: -5 / 12
+      tolerance: 0.001
+      hint "Differentiate both sides: 2x + 2y·dy/dx = 0."
+      ! "2x + 2y·dy/dx = 0 gives dy/dx = -x/y. At (5, 12), that's -5/12 ≈ -0.417."
+    }
+  }
+
+  slide "Exponential Drill" {
+    id: "d5-num-exp"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = e^{x} + x^{3}$. Find $f'(0)$."
+      skill: "deriv-exp"
+      answer: 1
+      hint "f'(x) = e^x + 3x²."
+      ! "f'(x) = e^x + 3x², so f'(0) = 1 + 0 = 1."
+    }
+  }
+
+  slide "Logarithm Drill" {
+    id: "d5-num-log"
+    cat: "Drills"
+    numeric {
+      ask "Let $f(x) = \ln(x) + x^{2}$. Find $f'(1)$."
+      skill: "deriv-log"
+      answer: 3
+      hint "f'(x) = 1/x + 2x."
+      ! "f'(x) = 1/x + 2x, so f'(1) = 1 + 2 = 3."
+    }
+  }
+
+  slide "Which Rule, Reprise" {
+    id: "d5-quiz-mixed"
+    cat: "Drills"
+    quiz {
+      ask "Which rule handles $\dfrac{d}{dx}\left[\ln(x)\cdot e^{x}\right]$?"
+      skill: "deriv-product-rule"
+      - "Chain rule" { why: "Neither factor is a function stuffed inside another here." }
+      * "Product rule"
+      - "Quotient rule" { why: "Nothing is being divided; ln(x) and e^x are multiplied." }
+      - "Just the exponential rule alone" { why: "That handles e^x by itself, but ln(x) is multiplying it, so the product rule has to come first." }
+      hint "Two functions of x, multiplied together."
+      ! "ln(x) and e^x are multiplied, so this needs the product rule: (1/x)·e^x + ln(x)·e^x."
     }
   }
 

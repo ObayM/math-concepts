@@ -1,0 +1,140 @@
+lesson "Differentiation VII: Implicit Differentiation" {
+  course: "calculus"
+  skills: ["deriv-implicit"]
+
+  slide "When y Isn't Alone" {
+    id: "d7-intro"
+    cat: "The Idea"
+    > Every derivative so far has started with $y = f(x)$, some formula with $x$
+    > on one side and $y$ on the other. But a circle, $x^{2} + y^{2} = 25$, isn't
+    > written that way, and it isn't even a function (it fails the vertical line
+    > test). Yet every point on it still has a perfectly good tangent line.
+    > **Implicit differentiation** finds that slope without ever solving for $y$.
+  }
+
+  slide "The Recipe" {
+    id: "d7-recipe"
+    cat: "The Idea"
+    > Differentiate *both sides* of the equation with respect to $x$, treating
+    > $y$ as a hidden function of $x$. Whenever you differentiate a term with
+    > $y$ in it, the chain rule tacks on a $\frac{dy}{dx}$:
+    >
+    > $$\frac{d}{dx}\left[y^{2}\right] = 2y\,\frac{dy}{dx}$$
+    >
+    > Compare that to $\frac{d}{dx}[x^2] = 2x$: same power rule, plus one extra
+    > factor because $y$ secretly depends on $x$.
+  }
+
+  slide "Don't Forget the Chain Rule" {
+    id: "d7-quiz-recipe"
+    cat: "The Idea"
+    quiz {
+      ask "If y is a function of x, what is $\frac{d}{dx}\left[y^{3}\right]$?"
+      skill: "deriv-implicit"
+      - "$y^{3}$" { why: "That's not differentiating at all." }
+      - "$3y^{2}$" { why: "Close, but this is the ordinary power rule. y depends on x, so the chain rule needs one more factor." }
+      * "$3y^{2}\,\dfrac{dy}{dx}$"
+      - "$3y\,\dfrac{dy}{dx}$" { why: "The power rule drops the exponent by one first: y³ becomes 3y², not 3y." }
+      hint "Treat y like an inner function and apply the chain rule, same as d/dx[sin(y)] would need cos(y)·dy/dx."
+      ! "The power rule brings the 3 down and drops the exponent to 2, then the chain rule adds dy/dx since y depends on x."
+    }
+  }
+
+  slide "The Tangent to a Circle" {
+    id: "d7-circle"
+    cat: "Chain Rule on y"
+    > Differentiate $x^{2} + y^{2} = 25$ term by term: $2x + 2y\,\frac{dy}{dx} = 0$.
+    > Solve for the slope: $\frac{dy}{dx} = -\frac{x}{y}$. Drag the point around
+    > the circle and watch the tangent line update, always perpendicular to the
+    > radius at that point.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-6, 6]
+      grid
+      axes
+      circle c = (0, 0) { r: 5, color: neutral, style: dashed }
+      param theta = 0.9 { range: [0, 6.28], step: 0.02 }
+      point P = (5 * cos(theta), 5 * sin(theta)) { drag: along(c) -> theta, color: primary, r: 7, label: "(x, y)" }
+      line tangent { through: P, slope: 0 - (5 * cos(theta)) / (5 * sin(theta)), color: accent, width: 2 }
+      slider theta { label: "angle" }
+    }
+  }
+
+  slide "Evaluate the Slope" {
+    id: "d7-numeric-circle"
+    cat: "Chain Rule on y"
+    numeric {
+      ask "For $x^{2} + y^{2} = 25$, find $\dfrac{dy}{dx}$ at the point (3, 4)."
+      skill: "deriv-implicit"
+      answer: -0.75
+      hint "Differentiate to get 2x + 2y·dy/dx = 0, then solve for dy/dx and plug in."
+      ! "2x + 2y·dy/dx = 0 gives dy/dx = -x/y. At (3, 4), that's -3/4 = -0.75."
+    }
+  }
+
+  slide "When x and y Multiply" {
+    id: "d7-product"
+    cat: "Product Rule Meets Implicit"
+    > Some implicit equations mix $x$ and $y$ in the same term, like $xy = 6$.
+    > Differentiating $xy$ needs the **product rule** from Lesson II, since both
+    > factors depend on $x$:
+    >
+    > $$\frac{d}{dx}[xy] = x\,\frac{dy}{dx} + y$$
+    >
+    > Setting that equal to $\frac{d}{dx}[6] = 0$ gives $x\,\frac{dy}{dx} + y = 0$,
+    > so $\frac{dy}{dx} = -\frac{y}{x}$.
+  }
+
+  slide "Evaluate the Product Case" {
+    id: "d7-numeric-product"
+    cat: "Product Rule Meets Implicit"
+    numeric {
+      ask "For $xy = 6$, find $\dfrac{dy}{dx}$ at the point (2, 3)."
+      skill: "deriv-implicit"
+      answer: -1.5
+      hint "Product rule on xy gives x·dy/dx + y = 0."
+      ! "x·dy/dx + y = 0 gives dy/dx = -y/x. At (2, 3), that's -3/2 = -1.5."
+    }
+  }
+
+  slide "Spot the Product Rule" {
+    id: "d7-quiz-spot"
+    cat: "Product Rule Meets Implicit"
+    quiz {
+      ask "Implicitly differentiating $x^{2} + xy = 10$, which term needs the product rule?"
+      skill: "deriv-implicit"
+      - "$x^{2}$" { why: "That's an ordinary power rule term, no y involved." }
+      * "$xy$"
+      - "10" { why: "A constant just differentiates to 0." }
+      - "None of them" { why: "xy has two factors that both depend on x, so it needs the product rule." }
+      hint "Look for the term where x and y are multiplied together."
+      ! "xy is a product of two x-dependent factors, so differentiating it needs the product rule: x·dy/dx + y."
+    }
+  }
+
+  slide "Build the Derivative" {
+    id: "d7-build"
+    cat: "Product Rule Meets Implicit"
+    build {
+      ask "Assemble d/dx[y²], assuming y is a function of x."
+      skill: "deriv-implicit"
+      bank: ["2y", "dy/dx", "·", "y", "2"]
+      answer: ["2y", "·", "dy/dx"]
+      hint "Power rule first, then the chain rule tacks on dy/dx."
+      ! "d/dx[y²] = 2y · dy/dx: the power rule brings down the 2, the chain rule adds dy/dx."
+    }
+  }
+
+  slide "Put It All Together" {
+    id: "d7-capstone"
+    cat: "Product Rule Meets Implicit"
+    numeric {
+      ask "For $x^{2} + xy = 10$, find $\dfrac{dy}{dx}$ at the point (2, 3)."
+      skill: "deriv-implicit"
+      answer: -3.5
+      hint "Differentiate term by term: 2x + (x·dy/dx + y) = 0, then solve and plug in."
+      ! "2x + x·dy/dx + y = 0 gives dy/dx = -(2x + y)/x. At (2, 3), that's -(4 + 3)/2 = -3.5."
+    }
+  }
+}

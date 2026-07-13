@@ -7,15 +7,17 @@ import { compileLesson } from '@/engine/lang';
 import { lessonSchema } from '@/engine/ir/lesson';
 import { Scene } from '@/engine';
 
-// the differentiation flagship course — five lessons authored in Prism. each must
-// be a schema-valid v2 lesson, and every scene must server-render to clean SVG
-// (no NaN coords, no unresolved ${} in the live labels/tangents).
+// the differentiation unit, authored in Prism. each must be a schema-valid v2
+// lesson, and every scene must server-render to clean SVG (no NaN coords, no
+// unresolved ${} in the live labels/tangents).
 
 const LESSONS = [
   'differentiation-1',
   'differentiation-2',
   'differentiation-3',
+  'differentiation-7',
   'differentiation-4',
+  'differentiation-6',
   'differentiation-5',
 ];
 
@@ -73,6 +75,9 @@ describe('differentiation course', () => {
         'deriv-chain-rule',
         'deriv-trig-sin-cos',
         'deriv-trig-other',
+        'deriv-implicit',
+        'deriv-exp',
+        'deriv-log',
       ])
     );
   });

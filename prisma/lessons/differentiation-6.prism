@@ -1,0 +1,178 @@
+lesson "Differentiation VI: Exponential & Logarithmic Derivatives" {
+  course: "calculus"
+  skills: ["deriv-exp", "deriv-log"]
+
+  slide "A Function Equal to Its Own Derivative" {
+    id: "d6-intro"
+    cat: "The Exponential"
+    > There's exactly one family of functions where the height *is* the slope:
+    > $f(x) = e^{x}$. At every point, how far up the curve sits equals how
+    > steep it's climbing there.
+    >
+    > $$\frac{d}{dx}\,e^{x} = e^{x}$$
+  }
+
+  slide "Height Equals Slope" {
+    id: "d6-scene"
+    cat: "The Exponential"
+    > Drag the point along $e^{x}$ and watch the label: the tangent's slope
+    > always matches the point's height, exactly.
+
+    scene plane {
+      x: [-2, 3]
+      y: [-1, 15]
+      grid
+      axes
+      param a = 1 { range: [-2, 3], step: 0.1 }
+      curve f = exp(x) { color: primary, width: 3 }
+      point P = (a, exp(a)) { drag: x -> a, color: accent, r: 7, label: "height = ${exp(a)}" }
+      line tangent { through: P, slope: exp(a), color: success, width: 2 }
+      label at (a + 0.2, exp(a) + 1.5) = "slope = ${exp(a)}" { color: success }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "Differentiate the Exponential" {
+    id: "d6-quiz-exp"
+    cat: "The Exponential"
+    quiz {
+      ask "What is $\dfrac{d}{dx}\,e^{x}$?"
+      skill: "deriv-exp"
+      - "$x\,e^{x-1}$" { why: "That's the power rule pattern, which doesn't apply here: the variable is in the exponent, not the base." }
+      * "$e^{x}$"
+      - "$0$" { why: "e^x is never constant, it keeps growing." }
+      - "$e$" { why: "The derivative is a whole function of x, not a single number." }
+      hint "This is the one function that's its own derivative."
+      ! "e^x differentiates to itself: that's the defining property of e."
+    }
+  }
+
+  slide "Chain Rule Meets the Exponential" {
+    id: "d6-chain-exp"
+    cat: "The Exponential"
+    > Stack a function inside the exponent and the chain rule kicks in as
+    > usual: keep the exponential, then multiply by the derivative of what's
+    > inside.
+    >
+    > $$\frac{d}{dx}\,e^{g(x)} = e^{g(x)}\cdot g'(x)$$
+    >
+    > So $\frac{d}{dx}\,e^{3x} = 3e^{3x}$: the exponential stays, and the inside's
+    > derivative (3) tags along as a constant multiplier.
+  }
+
+  slide "Evaluate the Chain Rule" {
+    id: "d6-numeric-chain-exp"
+    cat: "The Exponential"
+    numeric {
+      ask "Let $h(x) = e^{2x}$. Find $h'(0)$."
+      skill: "deriv-exp"
+      answer: 2
+      hint "h'(x) = e^{2x} · 2, the exponential times the derivative of 2x."
+      ! "h'(x) = 2e^{2x}, so h'(0) = 2e^0 = 2 · 1 = 2."
+    }
+  }
+
+  slide "The Natural Log's Slope" {
+    id: "d6-log-scene"
+    cat: "The Logarithm"
+    > $\ln(x)$, the inverse of $e^{x}$, has its own clean derivative:
+    >
+    > $$\frac{d}{dx}\,\ln(x) = \frac{1}{x}$$
+    >
+    > Drag the point and watch the slope shrink as $x$ grows, always matching
+    > $\frac{1}{x}$.
+
+    scene plane {
+      x: [0.1, 6]
+      y: [-3, 3]
+      grid
+      axes
+      param a = 1 { range: [0.2, 5.8], step: 0.1 }
+      curve f = log(x) { color: primary, width: 3 }
+      point P = (a, log(a)) { drag: x -> a, color: accent, r: 7, label: "ln(a) = ${log(a)}" }
+      line tangent { through: P, slope: 1 / a, color: success, width: 2 }
+      label at (a + 0.3, log(a) + 1) = "slope = ${1 / a}" { color: success }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "Differentiate the Logarithm" {
+    id: "d6-quiz-log"
+    cat: "The Logarithm"
+    quiz {
+      ask "What is $\dfrac{d}{dx}\,\ln(x)$?"
+      skill: "deriv-log"
+      - "$\ln(x)$" { why: "Unlike e^x, ln(x) isn't its own derivative." }
+      * "$\dfrac{1}{x}$"
+      - "$x$" { why: "That's not what falls out of differentiating a logarithm." }
+      - "$\dfrac{1}{x^{2}}$" { why: "Close in shape, but the derivative of ln(x) only has x to the first power in the denominator." }
+      hint "This is one of the cleanest derivatives in calculus: a whole logarithm collapses to a simple reciprocal."
+      ! "d/dx[ln(x)] = 1/x, one of the tidiest results in calculus."
+    }
+  }
+
+  slide "Chain Rule Meets the Logarithm" {
+    id: "d6-chain-log"
+    cat: "The Logarithm"
+    > Same idea as before: keep the reciprocal structure, then multiply by the
+    > derivative of what's inside.
+    >
+    > $$\frac{d}{dx}\,\ln\!\left(g(x)\right) = \frac{g'(x)}{g(x)}$$
+    >
+    > So $\frac{d}{dx}\,\ln\!\left(x^{2}+1\right) = \dfrac{2x}{x^{2}+1}$.
+  }
+
+  slide "Evaluate the Log Chain Rule" {
+    id: "d6-numeric-chain-log"
+    cat: "The Logarithm"
+    numeric {
+      ask "Let $h(x) = \ln\!\left(x^{2}+1\right)$. Find $h'(1)$."
+      skill: "deriv-log"
+      answer: 1
+      hint "h'(x) = (2x)/(x²+1), the derivative of the inside over the inside."
+      ! "h'(x) = 2x/(x²+1), so h'(1) = 2/2 = 1."
+    }
+  }
+
+  slide "Other Bases" {
+    id: "d6-quiz-base"
+    cat: "Other Bases"
+    quiz {
+      ask "What is $\dfrac{d}{dx}\,2^{x}$?"
+      skill: "deriv-exp"
+      - "$2^{x}$" { why: "That's only true for base e. Every other base carries an extra constant factor." }
+      * "$2^{x}\ln(2)$"
+      - "$x\cdot 2^{x-1}$" { why: "That's the power-rule pattern for x raised to a fixed power, not a fixed base raised to x." }
+      - "$\ln(2)$" { why: "The derivative is a whole function of x, not a single number." }
+      hint "Only base e avoids picking up an extra constant. Every other base tags on ln(base)."
+      ! "d/dx[a^x] = a^x·ln(a), so d/dx[2^x] = 2^x·ln(2)."
+    }
+  }
+
+  slide "Match Each Rule" {
+    id: "d6-match"
+    cat: "Other Bases"
+    match {
+      ask "Match each derivative rule to its result."
+      skill: "deriv-exp"
+      pair "d/dx[e^x]" -> "e^x"
+      pair "d/dx[ln(x)]" -> "1/x"
+      pair "d/dx[e^{g(x)}]" -> "g'(x)·e^{g(x)}"
+      pair "d/dx[ln(g(x))]" -> "g'(x)/g(x)"
+      decoy "x·e^{x-1}"
+      ! "Every exponential/log rule follows the same shape: keep the outer function, multiply by the inside's derivative."
+    }
+  }
+
+  slide "Put It All Together" {
+    id: "d6-capstone"
+    cat: "Other Bases"
+    numeric {
+      ask "Let $f(x) = x\,e^{x}$. Find $f'(0)$."
+      skill: "deriv-exp"
+      answer: 1
+      hint "This needs the product rule: f'(x) = (1)e^x + x·e^x."
+      ! "By the product rule, f'(x) = e^x + x·e^x = e^x(1+x). At x = 0, that's 1·(1+0) = 1."
+    }
+  }
+}
