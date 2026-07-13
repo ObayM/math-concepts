@@ -15,7 +15,8 @@ async function main() {
     create: {
       name: 'Calculus',
       slug: 'calculus',
-      description: 'From the tangent line to the full toolkit of derivatives.',
+      description:
+        'A complete single-variable course: limits and continuity, derivatives and their applications, then integration and what it builds.',
     },
   });
 
@@ -295,6 +296,30 @@ async function main() {
       difficulty: 'Advanced',
       iconName: 'Ruler',
       sortOrder: 23,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'intapp-1',
+      data: require('./lessons/intapp-1.json'),
+      title: 'Volumes of Revolution',
+      description:
+        'Spin a flat region around an axis and slice the resulting solid into disks or washers to find its volume.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'Circle',
+      sortOrder: 24,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'intapp-2',
+      data: require('./lessons/intapp-2.json'),
+      title: 'Average Value & Accumulation',
+      description:
+        'Average infinitely many values with one integral, then meet the accumulation functions that tie the whole course together.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'ChevronRight',
+      sortOrder: 25,
     },
   ];
 

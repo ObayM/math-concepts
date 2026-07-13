@@ -1,0 +1,132 @@
+lesson "Applications of Integration II: Average Value & Accumulation" {
+  course: "calculus"
+  skills: ["intapp-average-value", "intapp-accumulation"]
+
+  slide "Averaging Infinitely Many Values" {
+    id: "ia2-intro"
+    cat: "Average Value"
+    > Averaging a handful of numbers means adding them up and dividing by
+    > how many there are. The **average value** of a function over $[a, b]$
+    > does the same thing for infinitely many values, using an integral in
+    > place of a sum:
+    >
+    > $$f_{\text{avg}} = \frac{1}{b-a} \int_{a}^{b} f(x)\,dx$$
+  }
+
+  slide "The Rectangle With the Same Area" {
+    id: "ia2-scene"
+    cat: "Average Value"
+    > The average value of $f(x) = x^{2}$ on $[0, 4]$ is $\dfrac{16}{3}
+    > \approx 5.33$: the dashed rectangle at that height, spanning the same
+    > width, holds exactly as much area as the shaded region under the curve.
+
+    scene plane {
+      x: [-0.5, 4.5]
+      y: [-1, 17]
+      grid
+      axes
+      curve f = x^2 { color: primary, width: 3 }
+      curve avgLine = 16 / 3 { color: accent, style: dashed, width: 2 }
+      area under = x^2 { from: 0, to: 4, color: primary, opacity: 0.12 }
+      label at (2.6, 15) = "average = 16/3 ≈ 5.33" { color: accent }
+    }
+  }
+
+  slide "Compute the Average Value" {
+    id: "ia2-numeric-avg"
+    cat: "Average Value"
+    numeric {
+      ask "Find the average value of $f(x) = x^{2}$ on $[0, 4]$."
+      skill: "intapp-average-value"
+      answer: 5.33
+      tolerance: 0.01
+      hint "Divide ∫₀⁴ x² dx by the width of the interval, 4."
+      ! "(1/4)∫₀⁴ x² dx = (1/4)(64/3) = 16/3 ≈ 5.33."
+    }
+  }
+
+  slide "One More Average" {
+    id: "ia2-numeric-avg2"
+    cat: "Average Value"
+    numeric {
+      ask "Find the average value of $f(x) = 3x^{2}$ on $[1, 2]$."
+      skill: "intapp-average-value"
+      answer: 7
+      hint "Divide ∫₁² 3x² dx by the width of the interval, 1."
+      ! "∫₁² 3x² dx = [x³] from 1 to 2 = 8 - 1 = 7, and dividing by width 1 leaves 7."
+    }
+  }
+
+  slide "Accumulating Over Time" {
+    id: "ia2-accumulation-scene"
+    cat: "Accumulation Functions"
+    > An **accumulation function** $A(x) = \int_{a}^{x} f(t)\,dt$ totals up a
+    > rate as it plays out over time. If water flows in at rate $r(t) = 2t$,
+    > the shaded area is the total volume accumulated by time $t$. Drag $t$
+    > and watch the total grow.
+
+    scene plane {
+      x: [-0.5, 5]
+      y: [-1, 12]
+      grid
+      axes
+      param tv = 2 { range: [0.1, 4.9], step: 0.1 }
+      curve rate = 2 * x { color: primary, width: 3 }
+      area accumulated = 2 * x { from: 0, to: tv, color: accent, opacity: 0.25 }
+      label at (0.2, 11) = "accumulated = ${tv^2}" { color: accent }
+      slider tv { label: "t" }
+    }
+  }
+
+  slide "Total the Accumulation" {
+    id: "ia2-numeric-accumulation"
+    cat: "Accumulation Functions"
+    numeric {
+      ask "Water flows in at rate $r(t) = 2t$. Find the total volume accumulated from t = 0 to t = 3."
+      skill: "intapp-accumulation"
+      answer: 9
+      hint "Total accumulated = ∫₀³ 2t dt."
+      ! "∫₀³ 2t dt = [t²] from 0 to 3 = 9."
+    }
+  }
+
+  slide "Differentiating the Accumulation" {
+    id: "ia2-quiz-derivative"
+    cat: "Accumulation Functions"
+    quiz {
+      ask "For $A(x) = \int_{a}^{x} f(t)\,dt$, what is $A'(x)$?"
+      skill: "intapp-accumulation"
+      - "$A(x)$" { why: "Differentiating an accumulation function doesn't return itself; it returns the original rate." }
+      * "$f(x)$"
+      - "$f(a)$" { why: "The result depends on x, the variable upper bound, not the fixed lower bound a." }
+      - "$0$" { why: "A(x) is genuinely changing as x increases, so its derivative isn't zero." }
+      hint "This is the Fundamental Theorem of Calculus, part two, from Lesson III of the integration unit."
+      ! "A'(x) = f(x): differentiating an accumulation function just hands back the rate that was being accumulated."
+    }
+  }
+
+  slide "Match Each Idea" {
+    id: "ia2-match"
+    cat: "Accumulation Functions"
+    match {
+      ask "Match each idea to its formula."
+      skill: "intapp-average-value"
+      pair "average value on [a, b]" -> "(1/(b-a)) ∫[a,b] f(x) dx"
+      pair "accumulation function" -> "A(x) = ∫[a,x] f(t) dt"
+      pair "A'(x)" -> "f(x)"
+      decoy "average value always equals f(b)"
+      ! "Average value, accumulation, and the Fundamental Theorem are all the same integral idea, just pointed at different questions."
+    }
+  }
+
+  slide "The Whole Toolkit" {
+    id: "ia2-closing"
+    cat: "Looking Back"
+    > That's the full arc: **limits** gave calculus a solid foundation,
+    > **derivatives** measured instantaneous change, their **applications**
+    > put that measurement to work, **integration** reversed the process to
+    > total things up, and this unit put totals to work too. Every piece
+    > built on the one before it, and every piece is still there whenever you
+    > need it again.
+  }
+}

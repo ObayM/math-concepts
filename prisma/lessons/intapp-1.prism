@@ -1,0 +1,100 @@
+lesson "Applications of Integration I: Volumes of Revolution" {
+  course: "calculus"
+  skills: ["intapp-volumes"]
+
+  slide "Spinning a Region Into a Solid" {
+    id: "ia1-intro"
+    cat: "The Disk Method"
+    > Spin a flat region around an axis and it sweeps out a solid. Slice that
+    > solid into thin circular disks, each one the cross-section at some $x$,
+    > and add up their volumes: that's the **disk method**.
+    >
+    > $$V = \pi \int_{a}^{b} \left[f(x)\right]^{2} dx$$
+  }
+
+  slide "The Radius, Live" {
+    id: "ia1-scene"
+    cat: "The Disk Method"
+    > Rotating $y = \sqrt{x}$ around the x-axis sweeps out a solid whose
+    > cross-section at each $x$ is a disk of radius $\sqrt{x}$ (the dashed
+    > mirror below shows the solid's silhouette). Drag the point and watch
+    > the radius change.
+
+    scene plane {
+      x: [-1, 5]
+      y: [-3, 3]
+      grid
+      axes
+      curve f = sqrt(x) { color: primary, width: 3 }
+      curve fneg = 0 - sqrt(x) { color: primary, style: dashed, width: 2 }
+      param xv = 2 { range: [0.1, 4.9], step: 0.1 }
+      line radius = (xv, 0) -> (xv, sqrt(xv)) { color: accent, width: 3 }
+      point P = (xv, sqrt(xv)) { drag: x -> xv, color: accent, r: 6, label: "radius = ${sqrt(xv)}" }
+      slider xv { label: "x" }
+    }
+  }
+
+  slide "Compute the Volume" {
+    id: "ia1-numeric-disk"
+    cat: "The Disk Method"
+    numeric {
+      ask "Find the volume from rotating $y = \sqrt{x}$ around the x-axis from x = 0 to x = 4."
+      skill: "intapp-volumes"
+      answer: 25.13
+      tolerance: 0.05
+      hint "V = π∫₀⁴ (√x)² dx = π∫₀⁴ x dx."
+      ! "V = π∫₀⁴ x dx = π[x²/2] from 0 to 4 = π(8) ≈ 25.13."
+    }
+  }
+
+  slide "When There's a Hole in the Middle" {
+    id: "ia1-washer"
+    cat: "The Washer Method"
+    > If the region being spun doesn't touch the axis, the solid has a hole
+    > straight through it: each cross-section is a **washer**, not a solid
+    > disk. Subtract the inner circle's area from the outer one:
+    >
+    > $$V = \pi \int_{a}^{b} \left(\left[\text{outer}(x)\right]^{2} - \left[\text{inner}(x)\right]^{2}\right) dx$$
+  }
+
+  slide "A Washer Example" {
+    id: "ia1-numeric-washer"
+    cat: "The Washer Method"
+    numeric {
+      ask "Rotate the region between $y = x$ (outer) and $y = x^{2}$ (inner) around the x-axis from x = 0 to x = 1. Find the volume."
+      skill: "intapp-volumes"
+      answer: 0.42
+      tolerance: 0.01
+      hint "V = π∫₀¹ (x² - x⁴) dx."
+      ! "V = π∫₀¹ (x² - x⁴) dx = π[x³/3 - x⁵/5] from 0 to 1 = π(1/3 - 1/5) = 2π/15 ≈ 0.42."
+    }
+  }
+
+  slide "Disk or Washer?" {
+    id: "ia1-quiz-which"
+    cat: "The Washer Method"
+    quiz {
+      ask "When do you need the washer method instead of the disk method?"
+      skill: "intapp-volumes"
+      - "Whenever the function is negative somewhere" { why: "Squaring the radius erases any sign issue; that's not what triggers a washer." }
+      * "When the rotated region doesn't touch the axis of rotation"
+      - "Whenever the bounds are not 0 and a positive number" { why: "The bounds themselves don't determine disk versus washer, the gap from the axis does." }
+      - "Never, the disk method always works" { why: "The disk method assumes the region reaches all the way to the axis; a gap needs the washer method's inner radius." }
+      hint "Picture the cross-section: does it have a hole in the middle or not?"
+      ! "A gap between the region and the axis becomes a hole straight through the solid, a washer, so you need an inner radius to subtract."
+    }
+  }
+
+  slide "Match the Method" {
+    id: "ia1-match"
+    cat: "The Washer Method"
+    match {
+      ask "Match each method to its formula."
+      skill: "intapp-volumes"
+      pair "disk method" -> "V = π∫[a,b] [f(x)]² dx"
+      pair "washer method" -> "V = π∫[a,b] ([outer]² - [inner]²) dx"
+      decoy "V = ∫[a,b] f(x) dx"
+      ! "Both methods slice the solid into thin cross-sections and add up their areas, a disk's area or a washer's area."
+    }
+  }
+}
