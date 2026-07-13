@@ -24,6 +24,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'limits-1',
+      unit: 'Limits & Continuity',
       data: require('./lessons/limits-1.json'),
       title: 'What a Limit Is',
       description:
@@ -36,6 +37,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'limits-2',
+      unit: 'Limits & Continuity',
       data: require('./lessons/limits-2.json'),
       title: 'Computing Limits',
       description:
@@ -48,6 +50,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'limits-3',
+      unit: 'Limits & Continuity',
       data: require('./lessons/limits-3.json'),
       title: 'One-Sided & Infinite Limits',
       description:
@@ -60,6 +63,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'limits-4',
+      unit: 'Limits & Continuity',
       data: require('./lessons/limits-4.json'),
       title: 'Limits at Infinity',
       description:
@@ -72,6 +76,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'limits-5',
+      unit: 'Limits & Continuity',
       data: require('./lessons/limits-5.json'),
       title: 'Continuity & the Intermediate Value Theorem',
       description:
@@ -84,6 +89,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-1',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-1.json'),
       title: 'The Derivative & the Power Rule',
       description:
@@ -96,6 +102,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-2',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-2.json'),
       title: 'Product & Quotient Rules',
       description:
@@ -108,6 +115,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-3',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-3.json'),
       title: 'The Chain Rule',
       description:
@@ -120,6 +128,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-7',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-7.json'),
       title: 'Implicit Differentiation',
       description:
@@ -132,6 +141,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-4',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-4.json'),
       title: 'Trigonometric Derivatives',
       description:
@@ -144,6 +154,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-6',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-6.json'),
       title: 'Exponential & Logarithmic Derivatives',
       description:
@@ -156,6 +167,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-5',
+      unit: 'Derivatives & Rules',
       data: require('./lessons/differentiation-5.json'),
       title: 'Mixed Differentiation Drill',
       description:
@@ -168,6 +180,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'appderiv-1',
+      unit: 'Applications of the Derivative',
       data: require('./lessons/appderiv-1.json'),
       title: 'Linear Approximation & Differentials',
       description:
@@ -180,6 +193,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'appderiv-2',
+      unit: 'Applications of the Derivative',
       data: require('./lessons/appderiv-2.json'),
       title: 'Related Rates',
       description:
@@ -192,6 +206,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'appderiv-3',
+      unit: 'Applications of the Derivative',
       data: require('./lessons/appderiv-3.json'),
       title: 'Increasing, Decreasing & the First Derivative Test',
       description:
@@ -204,6 +219,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'appderiv-4',
+      unit: 'Applications of the Derivative',
       data: require('./lessons/appderiv-4.json'),
       title: 'Concavity & the Second Derivative Test',
       description:
@@ -216,6 +232,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'appderiv-5',
+      unit: 'Applications of the Derivative',
       data: require('./lessons/appderiv-5.json'),
       title: 'Curve Sketching',
       description:
@@ -228,6 +245,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'appderiv-6',
+      unit: 'Applications of the Derivative',
       data: require('./lessons/appderiv-6.json'),
       title: 'Optimization',
       description:
@@ -240,6 +258,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'integration-1',
+      unit: 'Integration',
       data: require('./lessons/integration-1.json'),
       title: 'Antiderivatives',
       description:
@@ -252,6 +271,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'integration-2',
+      unit: 'Integration',
       data: require('./lessons/integration-2.json'),
       title: 'Riemann Sums',
       description:
@@ -264,6 +284,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'integration-3',
+      unit: 'Integration',
       data: require('./lessons/integration-3.json'),
       title: 'The Fundamental Theorem of Calculus',
       description:
@@ -276,6 +297,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'integration-4',
+      unit: 'Integration',
       data: require('./lessons/integration-4.json'),
       title: 'u-Substitution',
       description:
@@ -288,6 +310,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'integration-5',
+      unit: 'Integration',
       data: require('./lessons/integration-5.json'),
       title: 'Area Between Curves',
       description:
@@ -300,6 +323,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'intapp-1',
+      unit: 'Applications of Integration',
       data: require('./lessons/intapp-1.json'),
       title: 'Volumes of Revolution',
       description:
@@ -312,6 +336,7 @@ async function main() {
     {
       courseId: calculusCourse.id,
       lessonKey: 'intapp-2',
+      unit: 'Applications of Integration',
       data: require('./lessons/intapp-2.json'),
       title: 'Average Value & Accumulation',
       description:

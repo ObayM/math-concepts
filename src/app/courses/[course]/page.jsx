@@ -59,6 +59,19 @@ export default async function CoursePage({ params }) {
   });
 
   const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;
+
+  // group consecutive lessons sharing a `unit` under one header; lessons with
+  // no unit (e.g. a course that hasn't adopted units yet) fall into a single
+  // ungrouped run, so this degrades to the old flat list.
+  const groups = [];
+  for (const lesson of lessonsWithProgress) {
+    const last = groups[groups.length - 1];
+    if (last && last.unit === lesson.unit) {
+      last.lessons.push(lesson);
+    } else {
+      groups.push({ unit: lesson.unit, lessons: [lesson] });
+    }
+  }
   // Integrate a flash cards system here, wehre you can memorize, revise everything you learned in a very short time
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface">
@@ -88,14 +101,38 @@ export default async function CoursePage({ params }) {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          {lessonsWithProgress.map((lesson, i) => (
-            <LessonCard
-              key={lesson.id}
-              lesson={lesson}
-              index={i}
-              isLast={i === lessonsWithProgress.length - 1}
-            />
-          ))}
+          {groups.map((group, gi) => {
+            const groupCompleted = group.lessons.filter((l) => l.status === 'completed').length;
+            return (
+              <div key={group.unit ?? `ungrouped-${gi}`}>
+                {group.unit && (
+                  <div
+                    className={`flex items-baseline justify-between ${gi === 0 ? 'mb-4' : 'mt-10 mb-4 pt-6 border-t border-neutral-100'}`}
+                  >
+                    <div>
+                      <p className="text-primary-600 font-bold text-xs tracking-wider uppercase">
+                        Unit {gi + 1}
+                      </p>
+                      <h2 className="text-xl font-extrabold text-neutral-900 mt-0.5">
+                        {group.unit}
+                      </h2>
+                    </div>
+                    <p className="text-xs font-bold text-neutral-400 shrink-0">
+                      {groupCompleted} / {group.lessons.length}
+                    </p>
+                  </div>
+                )}
+                {group.lessons.map((lesson, i) => (
+                  <LessonCard
+                    key={lesson.id}
+                    lesson={lesson}
+                    index={i}
+                    isLast={i === group.lessons.length - 1}
+                  />
+                ))}
+              </div>
+            );
+          })}
           {lessons.length === 0 && (
             <p className="text-center text-neutral-400">No lessons in this course yet.</p>
           )}

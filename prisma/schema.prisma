@@ -111,6 +111,7 @@ model Lesson {
   title           String?
   description     String?
   category        String?
+  unit            String?
   difficulty      String?
   iconName        String?       @map("icon_name")
   sortOrder       Int           @default(0) @map("sort_order")
