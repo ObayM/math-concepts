@@ -1,0 +1,113 @@
+lesson "Integration II: Riemann Sums" {
+  course: "calculus"
+  skills: ["int-riemann-sum", "int-definite-integral"]
+
+  slide "Area, Approximated" {
+    id: "i2-intro"
+    cat: "The Idea"
+    > The **definite integral** $\int_{a}^{b} f(x)\,dx$ is the exact area
+    > between a curve and the x-axis from $a$ to $b$. Before there's a clean
+    > formula for it, there's a simple idea: chop the region into thin
+    > rectangles, add up their areas, and let the rectangles get thinner.
+  }
+
+  slide "Watch the Rectangles Multiply" {
+    id: "i2-scene"
+    cat: "Riemann Sums"
+    > Each rectangle's height matches $f(x) = x^{2}$ at its left edge. More,
+    > thinner rectangles hug the true area (shaded) more closely. Push the
+    > stepper up and watch the sum close in on the real area.
+
+    scene plane {
+      x: [-0.5, 4.5]
+      y: [-0.5, 10]
+      grid
+      axes
+      param n = 4 { range: [1, 40], step: 1 }
+      curve f = x^2 { color: primary, width: 3 }
+      area exact = x^2 { from: 0, to: 4, color: primary, opacity: 0.08 }
+      repeat i in range(0, n) {
+        rect r = (i * 4 / n, 0) { w: 4 / n, h: (i * 4 / n)^2, color: accent, opacity: 0.35 }
+      }
+      label at (2.5, 9) = "n = ${n} rectangles"
+      stepper n { label: "rectangles" }
+    }
+  }
+
+  slide "The Left Sum" {
+    id: "i2-numeric-left"
+    cat: "Riemann Sums"
+    numeric {
+      ask "For $f(x) = x^{2}$ on $[0, 4]$ with 4 rectangles, compute the left Riemann sum (heights at x = 0, 1, 2, 3, width 1 each)."
+      skill: "int-riemann-sum"
+      answer: 14
+      hint "Heights: f(0), f(1), f(2), f(3) = 0, 1, 4, 9."
+      ! "0 + 1 + 4 + 9 = 14, each rectangle 1 unit wide."
+    }
+  }
+
+  slide "The Right Sum" {
+    id: "i2-numeric-right"
+    cat: "Riemann Sums"
+    numeric {
+      ask "Same setup, but use the right edge of each rectangle instead (heights at x = 1, 2, 3, 4)."
+      skill: "int-riemann-sum"
+      answer: 30
+      hint "Heights: f(1), f(2), f(3), f(4) = 1, 4, 9, 16."
+      ! "1 + 4 + 9 + 16 = 30."
+    }
+  }
+
+  slide "Which Way Does the Left Sum Lean?" {
+    id: "i2-quiz-left"
+    cat: "Riemann Sums"
+    quiz {
+      ask "For an increasing function, does the left Riemann sum overestimate or underestimate the true area?"
+      skill: "int-riemann-sum"
+      - "Overestimate" { why: "The left edge is the shortest height on each rectangle, since the function is increasing." }
+      * "Underestimate"
+      - "It's always exact" { why: "Riemann sums are approximations; they only become exact in the limit as rectangles shrink to zero width." }
+      - "There's no way to tell" { why: "For a strictly increasing function, the left edge is always the lowest point on each rectangle." }
+      hint "On an increasing function, is the left edge of each rectangle the shortest or tallest point?"
+      ! "For an increasing function, the left edge is always the lowest point, so every rectangle sits under the curve: the left sum underestimates."
+    }
+  }
+
+  slide "Which Way Does the Right Sum Lean?" {
+    id: "i2-quiz-right"
+    cat: "Riemann Sums"
+    quiz {
+      ask "For an increasing function, does the right Riemann sum overestimate or underestimate the true area?"
+      skill: "int-riemann-sum"
+      * "Overestimate"
+      - "Underestimate" { why: "That's the left sum's behavior on an increasing function, not the right sum's." }
+      - "It's always exact" { why: "Riemann sums are approximations; they only become exact in the limit as rectangles shrink to zero width." }
+      - "There's no way to tell" { why: "For a strictly increasing function, the right edge is always the tallest point on each rectangle." }
+      hint "On an increasing function, is the right edge of each rectangle the shortest or tallest point?"
+      ! "For an increasing function, the right edge is always the highest point, so every rectangle pokes above the curve: the right sum overestimates."
+    }
+  }
+
+  slide "The Limit Defines the Integral" {
+    id: "i2-definition"
+    cat: "The Definite Integral"
+    > As the number of rectangles $n \to \infty$, both the left and right
+    > sums squeeze toward the same number, the true area. That limit is what
+    > the definite integral notation means:
+    >
+    > $$\int_{a}^{b} f(x)\,dx = \lim_{n \to \infty} \left(\text{Riemann sum with } n \text{ rectangles}\right)$$
+  }
+
+  slide "Estimate the True Area" {
+    id: "i2-capstone"
+    cat: "The Definite Integral"
+    numeric {
+      ask "The true value of $\int_{0}^{4} x^{2}\,dx$ is $\dfrac{64}{3}$. Enter its decimal value."
+      skill: "int-definite-integral"
+      answer: 21.33
+      tolerance: 0.05
+      hint "64 divided by 3."
+      ! "64/3 ≈ 21.33, squarely between the left sum (14) and right sum (30) from earlier, and much closer once n is large. The next lesson shows how to get this exactly."
+    }
+  }
+}

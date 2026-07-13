@@ -1,0 +1,97 @@
+lesson "Integration V: Area Between Curves" {
+  course: "calculus"
+  skills: ["int-area-between-curves"]
+
+  slide "Stacking Two Regions" {
+    id: "i5-intro"
+    cat: "The Idea"
+    > When one curve sits above another across an interval, the area trapped
+    > between them is just the integral of the gap:
+    >
+    > $$\text{Area} = \int_{a}^{b} \left[\,\text{top}(x) - \text{bottom}(x)\,\right] dx$$
+  }
+
+  slide "Line Meets Parabola" {
+    id: "i5-scene"
+    cat: "A Worked Example"
+    > $y = x + 2$ (the line) sits above $y = x^{2}$ (the parabola) between
+    > their two crossing points. The shaded band is the area between them.
+
+    scene plane {
+      x: [-2, 3]
+      y: [-1, 5]
+      grid
+      axes
+      curve upper = x + 2 { color: primary, width: 3 }
+      curve lower = x^2 { color: accent, width: 3 }
+      area band = x + 2 { lower: x^2, from: -1, to: 2, color: success, opacity: 0.25 }
+    }
+  }
+
+  slide "Find Where They Cross" {
+    id: "i5-numeric-intersect"
+    cat: "A Worked Example"
+    numeric {
+      ask "Find the positive x-value where $y = x + 2$ and $y = x^{2}$ intersect."
+      skill: "int-area-between-curves"
+      answer: 2
+      hint "Set x + 2 = x² and solve: x² - x - 2 = 0 factors as (x-2)(x+1)."
+      ! "(x-2)(x+1) = 0 gives x = 2 or x = -1. The positive one is x = 2."
+    }
+  }
+
+  slide "Compute the Area" {
+    id: "i5-numeric-area"
+    cat: "A Worked Example"
+    numeric {
+      ask "Find the area between $y = x + 2$ and $y = x^{2}$ from x = -1 to x = 2."
+      skill: "int-area-between-curves"
+      answer: 4.5
+      tolerance: 0.01
+      hint "Integrate (x + 2 - x²) from -1 to 2."
+      ! "∫₋₁² (x + 2 - x²) dx = [x²/2 + 2x - x³/3] from -1 to 2 = 3.333 - (-1.167) = 4.5."
+    }
+  }
+
+  slide "Pick the Right Setup" {
+    id: "i5-quiz-setup"
+    cat: "Strategy"
+    quiz {
+      ask "To find the area between two curves on [a, b], you should integrate..."
+      skill: "int-area-between-curves"
+      - "top(x) + bottom(x)" { why: "Adding the curves doesn't measure the gap between them." }
+      * "top(x) - bottom(x)"
+      - "bottom(x) - top(x)" { why: "That gives a negative area, since the bottom curve is smaller." }
+      - "top(x) · bottom(x)" { why: "Area between curves is never a product of the two functions." }
+      hint "Subtract to measure the gap, top minus bottom."
+      ! "Area = ∫[a,b] (top - bottom) dx: the taller curve minus the shorter one gives the height of the gap at each x."
+    }
+  }
+
+  slide "When Curves Cross Midway" {
+    id: "i5-quiz-cross"
+    cat: "Strategy"
+    quiz {
+      ask "If two curves cross each other in the middle of [a, b], swapping which one is on top, what should you do?"
+      skill: "int-area-between-curves"
+      - "Nothing, integrate top - bottom across the whole interval as usual" { why: "That would let the two regions cancel each other out instead of adding." }
+      * "Split the integral at the crossing point and handle each piece separately"
+      - "Only integrate the first half of the interval" { why: "That throws away real area past the crossing point." }
+      - "Double the final answer" { why: "There's no reason the two regions would have equal area, so doubling one piece is not reliable." }
+      hint "Which curve is on top changes at the crossing point, so top - bottom flips sign there too."
+      ! "Split the integral at every crossing point, so each piece always subtracts the correct top curve from the correct bottom curve."
+    }
+  }
+
+  slide "One More Region" {
+    id: "i5-capstone"
+    cat: "A Worked Example"
+    numeric {
+      ask "Find the area between $y = x$ and $y = x^{3}$ from x = 0 to x = 1."
+      skill: "int-area-between-curves"
+      answer: 0.25
+      hint "For 0 ≤ x ≤ 1, x ≥ x³, so integrate (x - x³)."
+      ! "∫₀¹ (x - x³) dx = [x²/2 - x⁴/4] from 0 to 1 = 0.5 - 0.25 = 0.25."
+    }
+  }
+}

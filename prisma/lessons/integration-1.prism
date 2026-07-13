@@ -1,0 +1,124 @@
+lesson "Integration I: Antiderivatives" {
+  course: "calculus"
+  skills: ["int-antiderivative", "int-power-rule"]
+
+  slide "Running Differentiation Backward" {
+    id: "i1-intro"
+    cat: "The Idea"
+    > An **antiderivative** of $f$ is any function $F$ whose derivative is
+    > $f$: $F'(x) = f(x)$. It's differentiation in reverse, and it's the
+    > foundation everything in integral calculus is built on.
+  }
+
+  slide "The Power Rule, Reversed" {
+    id: "i1-power-rule"
+    cat: "The Idea"
+    > Reversing the power rule for derivatives gives the power rule for
+    > antiderivatives:
+    >
+    > $$\int x^{n}\,dx = \frac{x^{n+1}}{n+1} + C \qquad (n \ne -1)$$
+    >
+    > Bump the exponent up by one, then divide by the new exponent. The
+    > mystery constant $C$ shows up because constants vanish when you
+    > differentiate, so integrating can never recover them.
+  }
+
+  slide "A Whole Family of Answers" {
+    id: "i1-scene"
+    cat: "The Idea"
+    > $F(x) = x^{2} + C$ is an antiderivative of $f(x) = 2x$ for *every* value
+    > of $C$. Drag the slider: the blue curve slides up and down, but its
+    > slope (matching the dashed $f$) never changes.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-2, 10]
+      grid
+      axes
+      param C = 0 { range: [-3, 3], step: 0.5 }
+      curve F = x^2 + C { color: primary, width: 3 }
+      curve f = 2 * x { color: accent, style: dashed, width: 2 }
+      label at (-2.8, 9) = "F(x) = x² + C, C = ${C}" { color: neutral }
+      slider C { label: "C" }
+    }
+  }
+
+  slide "Reverse the Power Rule" {
+    id: "i1-quiz-power"
+    cat: "The Idea"
+    quiz {
+      ask "What is $\int x^{3}\,dx$?"
+      skill: "int-power-rule"
+      - "$3x^{2} + C$" { why: "That's the derivative of x³, not its antiderivative." }
+      - "$x^{4} + C$" { why: "Don't forget to divide by the new exponent." }
+      * "$\dfrac{x^{4}}{4} + C$"
+      - "$4x^{4} + C$"
+      hint "Bump the exponent up by one, then divide by that new exponent."
+      ! "Bump 3 up to 4, then divide by 4: x⁴/4 + C."
+    }
+  }
+
+  slide "Use an Initial Condition" {
+    id: "i1-numeric-initial"
+    cat: "Finding C"
+    numeric {
+      ask "F'(x) = 3x² and F(1) = 5. Find F(2)."
+      skill: "int-antiderivative"
+      answer: 12
+      hint "F(x) = x³ + C. Use F(1) = 5 to find C first."
+      ! "F(x) = x³ + C, and F(1) = 1 + C = 5 gives C = 4. So F(2) = 8 + 4 = 12."
+    }
+  }
+
+  slide "Antiderivatives Split Across Sums" {
+    id: "i1-sum-rule"
+    cat: "Combining Terms"
+    > Just like derivatives, antiderivatives split neatly across $+$ and $-$,
+    > and constants ride along for free:
+    >
+    > $$\int \left[f(x) \pm g(x)\right] dx = \int f(x)\,dx \pm \int g(x)\,dx$$
+    >
+    > So a polynomial can be integrated term by term, same as it's
+    > differentiated term by term.
+  }
+
+  slide "Build the Antiderivative" {
+    id: "i1-build"
+    cat: "Combining Terms"
+    build {
+      ask "Assemble the antiderivative of $4x^{3}$."
+      skill: "int-power-rule"
+      bank: ["x^4", "+", "C", "4x^2", "x^3"]
+      answer: ["x^4", "+", "C"]
+      hint "Bump the exponent up by one, divide by the new exponent, then add C."
+      ! "The antiderivative of 4x³ is x⁴ + C: the 4 and the new exponent's reciprocal cancel exactly."
+    }
+  }
+
+  slide "Match Each Rule" {
+    id: "i1-match"
+    cat: "Combining Terms"
+    match {
+      ask "Match each function to its antiderivative."
+      skill: "int-antiderivative"
+      pair "x^n" -> "x^(n+1)/(n+1) + C"
+      pair "cos(x)" -> "sin(x) + C"
+      pair "sin(x)" -> "-cos(x) + C"
+      pair "e^x" -> "e^x + C"
+      decoy "1/x gives x + C"
+      ! "Every antiderivative rule here just reverses a derivative rule you already know."
+    }
+  }
+
+  slide "Put It Together" {
+    id: "i1-capstone"
+    cat: "Combining Terms"
+    numeric {
+      ask "F'(x) = 6x² - 4x + 1 and F(0) = 2. Find F(1)."
+      skill: "int-antiderivative"
+      answer: 3
+      hint "F(x) = 2x³ - 2x² + x + C. Use F(0) = 2 to find C."
+      ! "F(x) = 2x³ - 2x² + x + C, and F(0) = C = 2. So F(1) = 2 - 2 + 1 + 2 = 3."
+    }
+  }
+}

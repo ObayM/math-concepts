@@ -1,0 +1,103 @@
+lesson "Integration IV: u-Substitution" {
+  course: "calculus"
+  skills: ["int-u-sub"]
+
+  slide "Undoing the Chain Rule" {
+    id: "i4-intro"
+    cat: "The Idea"
+    > **u-substitution** reverses the chain rule. If an integral contains a
+    > function and its derivative multiplied together, rename the inner
+    > function $u$, and the messy integral simplifies dramatically.
+  }
+
+  slide "A Worked Example" {
+    id: "i4-worked"
+    cat: "The Idea"
+    > For $\int 2x(x^{2}+1)^{3}\,dx$: let $u = x^{2}+1$, so $du = 2x\,dx$,
+    > exactly the leftover piece. The integral becomes
+    >
+    > $$\int u^{3}\,du = \frac{u^{4}}{4} + C = \frac{(x^{2}+1)^{4}}{4} + C$$
+  }
+
+  slide "Spot the Substitution" {
+    id: "i4-quiz-spot"
+    cat: "Recognizing the Pattern"
+    quiz {
+      ask "What's the right substitution for $\int 2x\cos\left(x^{2}\right) dx$?"
+      skill: "int-u-sub"
+      * "u = x²"
+      - "u = 2x" { why: "That leaves cos(x²) with no clean way to rewrite it in terms of u." }
+      - "u = cos(x)" { why: "The 2x outside doesn't match d/dx[cos(x)] = -sin(x)." }
+      - "u = x" { why: "That doesn't absorb the squared term inside the cosine at all." }
+      hint "Look for the inner function whose derivative is sitting right outside it."
+      ! "u = x² makes du = 2x dx, exactly the factor multiplying cos(x²)."
+    }
+  }
+
+  slide "Substitute and Evaluate" {
+    id: "i4-numeric-first"
+    cat: "Definite Integrals via u-sub"
+    numeric {
+      ask "Evaluate $\int_{0}^{1} 2x(x^{2}+1)^{3}\,dx$."
+      skill: "int-u-sub"
+      answer: 3.75
+      tolerance: 0.01
+      hint "Let u = x²+1. When x = 0, u = 1; when x = 1, u = 2. Then integrate u³ du."
+      ! "∫₁² u³ du = [u⁴/4] from 1 to 2 = 4 - 0.25 = 3.75."
+    }
+  }
+
+  slide "Another Substitution" {
+    id: "i4-numeric-second"
+    cat: "Definite Integrals via u-sub"
+    numeric {
+      ask "Evaluate $\int_{0}^{\pi/2} \cos(x)\sin(x)\,dx$."
+      skill: "int-u-sub"
+      answer: 0.5
+      hint "Let u = sin(x), so du = cos(x) dx. When x = 0, u = 0; when x = π/2, u = 1."
+      ! "∫₀¹ u du = [u²/2] from 0 to 1 = 0.5."
+    }
+  }
+
+  slide "Why the Bounds Change" {
+    id: "i4-quiz-bounds"
+    cat: "Definite Integrals via u-sub"
+    quiz {
+      ask "When you substitute u = g(x) in a definite integral, what happens to the bounds?"
+      skill: "int-u-sub"
+      - "They stay the same, since x is still the variable" { why: "Once you switch to u, the bounds have to switch to matching u-values too." }
+      * "They convert to the corresponding u-values"
+      - "They get dropped entirely" { why: "The bounds are still needed, just recomputed in terms of u." }
+      - "They get swapped, upper for lower" { why: "The bounds convert to u-values in the same order, not reversed." }
+      hint "If u = g(x), plug the old x-bounds into g to get the new u-bounds."
+      ! "Each x-bound converts through u = g(x): plug the lower and upper x-values in to get the new u-bounds."
+    }
+  }
+
+  slide "Match Integral to Substitution" {
+    id: "i4-match"
+    cat: "Recognizing the Pattern"
+    match {
+      ask "Match each integral to the substitution that simplifies it."
+      skill: "int-u-sub"
+      pair "∫2x·cos(x²) dx" -> "u = x²"
+      pair "∫3x²·e^(x³) dx" -> "u = x³"
+      pair "∫(1/x)·ln(x) dx" -> "u = ln(x)"
+      decoy "u = dx"
+      ! "In each case, u is the inner function whose derivative is the leftover factor."
+    }
+  }
+
+  slide "Put It Together" {
+    id: "i4-capstone"
+    cat: "Definite Integrals via u-sub"
+    numeric {
+      ask "Evaluate $\int_{1}^{2} \dfrac{2x}{x^{2}+3}\,dx$."
+      skill: "int-u-sub"
+      answer: 0.56
+      tolerance: 0.01
+      hint "Let u = x²+3, du = 2x dx. When x = 1, u = 4; when x = 2, u = 7."
+      ! "∫₄⁷ (1/u) du = [ln(u)] from 4 to 7 = ln(7) - ln(4) ≈ 0.56."
+    }
+  }
+}

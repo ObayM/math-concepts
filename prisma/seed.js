@@ -236,6 +236,66 @@ async function main() {
       iconName: 'Star',
       sortOrder: 18,
     },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'integration-1',
+      data: require('./lessons/integration-1.json'),
+      title: 'Antiderivatives',
+      description:
+        'Run differentiation backward: the power rule in reverse, the mystery constant C, and finding it from an initial condition.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'Undo2',
+      sortOrder: 19,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'integration-2',
+      data: require('./lessons/integration-2.json'),
+      title: 'Riemann Sums',
+      description:
+        'Approximate the area under a curve with rectangles, live, and watch the estimate close in as they multiply and thin out.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'Sigma',
+      sortOrder: 20,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'integration-3',
+      data: require('./lessons/integration-3.json'),
+      title: 'The Fundamental Theorem of Calculus',
+      description:
+        'The result that ties the whole course together: exact area under a curve from nothing more than an antiderivative.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'MapPin',
+      sortOrder: 21,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'integration-4',
+      data: require('./lessons/integration-4.json'),
+      title: 'u-Substitution',
+      description:
+        'Reverse the chain rule to simplify integrals that would otherwise be unmanageable, bounds and all.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'Play',
+      sortOrder: 22,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'integration-5',
+      data: require('./lessons/integration-5.json'),
+      title: 'Area Between Curves',
+      description:
+        'Stack two regions and integrate the gap between them, from a line and a parabola to curves that cross midway.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'Ruler',
+      sortOrder: 23,
+    },
   ];
 
   for (const lesson of lessons) {

@@ -1,0 +1,111 @@
+lesson "Integration III: The Fundamental Theorem of Calculus" {
+  course: "calculus"
+  skills: ["int-ftc"]
+
+  slide "Derivatives and Integrals Are Opposites" {
+    id: "i3-intro"
+    cat: "The Theorem"
+    > The **Fundamental Theorem of Calculus** is the payoff for everything so
+    > far: it says the exact area under a curve doesn't need an infinite sum
+    > of rectangles at all, just any antiderivative.
+    >
+    > $$\int_{a}^{b} f(x)\,dx = F(b) - F(a), \quad \text{where } F'(x) = f(x)$$
+  }
+
+  slide "The Shaded Region" {
+    id: "i3-scene"
+    cat: "The Theorem"
+    > The area shaded below is $\int_{0}^{4} x^{2}\,dx$. Using $F(x) =
+    > \dfrac{x^{3}}{3}$ as an antiderivative, the theorem says that area is
+    > exactly $F(4) - F(0)$, no rectangles required.
+
+    scene plane {
+      x: [-0.5, 4.5]
+      y: [-1, 10]
+      grid
+      axes
+      curve f = x^2 { color: primary, width: 3 }
+      area under = x^2 { from: 0, to: 4, color: accent, opacity: 0.2 }
+      label at (1.5, 9) = "area = F(4) - F(0)" { color: accent }
+    }
+  }
+
+  slide "Evaluate It Exactly" {
+    id: "i3-numeric-exact"
+    cat: "The Theorem"
+    numeric {
+      ask "Using $F(x) = \dfrac{x^{3}}{3}$, evaluate $\int_{0}^{4} x^{2}\,dx$ exactly."
+      skill: "int-ftc"
+      answer: 21.333
+      tolerance: 0.01
+      hint "F(4) - F(0) = 64/3 - 0."
+      ! "F(4) - F(0) = 64/3 - 0 = 64/3 ≈ 21.33, matching the Riemann sum estimate from Lesson II, but exact this time."
+    }
+  }
+
+  slide "A Simple Definite Integral" {
+    id: "i3-numeric-simple"
+    cat: "Applying FTC"
+    numeric {
+      ask "Evaluate $\int_{1}^{3} 2x\,dx$."
+      skill: "int-ftc"
+      answer: 8
+      hint "An antiderivative of 2x is x². Evaluate at 3 and at 1."
+      ! "[x²] from 1 to 3 is 9 - 1 = 8."
+    }
+  }
+
+  slide "A Trig Definite Integral" {
+    id: "i3-numeric-trig"
+    cat: "Applying FTC"
+    numeric {
+      ask "Evaluate $\int_{0}^{\pi} \sin(x)\,dx$."
+      skill: "int-ftc"
+      answer: 2
+      hint "An antiderivative of sin(x) is -cos(x)."
+      ! "[-cos(x)] from 0 to π is -cos(π) - (-cos(0)) = 1 + 1 = 2."
+    }
+  }
+
+  slide "The Other Half of the Theorem" {
+    id: "i3-quiz-other-half"
+    cat: "The Theorem"
+    quiz {
+      ask "The Fundamental Theorem also says $\dfrac{d}{dx}\left[\int_{a}^{x} f(t)\,dt\right] = ?$"
+      skill: "int-ftc"
+      - "$f(a)$" { why: "The result depends on x, the variable upper bound, not on the fixed lower bound a." }
+      * "$f(x)$"
+      - "$0$" { why: "Differentiating an accumulation function doesn't erase it, it just returns the original rate." }
+      - "$F(x) - F(a)$" { why: "That's the value of the integral itself, not its derivative." }
+      hint "Integrating and then differentiating should undo each other, just like differentiating then integrating."
+      ! "Differentiating an accumulation function just returns the original function back: d/dx[∫ₐˣ f(t)dt] = f(x)."
+    }
+  }
+
+  slide "Pick the Right Evaluation" {
+    id: "i3-quiz-notation"
+    cat: "The Theorem"
+    quiz {
+      ask "Which expression correctly evaluates $\int_{a}^{b} f(x)\,dx$ using an antiderivative F?"
+      skill: "int-ftc"
+      - "$F(a) - F(b)$" { why: "The bounds are swapped: it should be the upper bound minus the lower bound." }
+      * "$F(b) - F(a)$"
+      - "$F(a) + F(b)$" { why: "The two values are subtracted, not added." }
+      - "$F(b) \cdot F(a)$" { why: "The Fundamental Theorem is a subtraction, not a product." }
+      hint "Upper bound value minus lower bound value."
+      ! "∫ₐᵇ f(x)dx = F(b) - F(a): plug in the upper bound, plug in the lower bound, subtract."
+    }
+  }
+
+  slide "Put It Together" {
+    id: "i3-capstone"
+    cat: "Applying FTC"
+    numeric {
+      ask "Evaluate $\int_{0}^{2} \left(3x^{2} - 1\right) dx$."
+      skill: "int-ftc"
+      answer: 6
+      hint "An antiderivative of 3x² - 1 is x³ - x."
+      ! "[x³ - x] from 0 to 2 is (8 - 2) - (0 - 0) = 6."
+    }
+  }
+}
