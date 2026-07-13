@@ -1,0 +1,122 @@
+lesson "Applications II: Related Rates" {
+  course: "calculus"
+  skills: ["appderiv-related-rates"]
+
+  slide "When Two Rates Are Linked" {
+    id: "ad2-intro"
+    cat: "The Idea"
+    > A **related rates** problem gives you two quantities tied together by an
+    > equation, tells you how fast one is changing, and asks for the rate of
+    > the other. The recipe: write the equation relating them, then
+    > differentiate *both sides with respect to time* using implicit
+    > differentiation, since every quantity is secretly a function of $t$.
+  }
+
+  slide "A Growing Circle" {
+    id: "ad2-circle-scene"
+    cat: "Circles"
+    > A circle's radius grows at a steady rate. Its area, $A = \pi r^{2}$,
+    > grows too, but not at a steady rate: differentiating with respect to
+    > time gives $\dfrac{dA}{dt} = 2\pi r\,\dfrac{dr}{dt}$. Drag $r$ and watch
+    > the growth rate change even though $\dfrac{dr}{dt}$ stays fixed at 2.
+
+    scene plane {
+      x: [-8, 8]
+      y: [-8, 8]
+      grid
+      axes
+      param r = 4 { range: [1, 7], step: 0.1 }
+      circle c = (0, 0) { r: r, color: primary }
+      label at (-7, 7) = "r = ${r},  dA/dt = ${2 * PI * r * 2}" { color: accent }
+      slider r { label: "radius r" }
+    }
+  }
+
+  slide "Evaluate the Growth Rate" {
+    id: "ad2-numeric-circle"
+    cat: "Circles"
+    numeric {
+      ask "If $\dfrac{dr}{dt} = 2$ cm/s, find $\dfrac{dA}{dt}$ when $r = 5$ cm."
+      skill: "appderiv-related-rates"
+      answer: 62.83
+      tolerance: 0.05
+      hint "dA/dt = 2πr · dr/dt."
+      ! "dA/dt = 2π(5)(2) = 20π ≈ 62.83 cm²/s."
+    }
+  }
+
+  slide "The Sliding Ladder" {
+    id: "ad2-ladder"
+    cat: "The Ladder Problem"
+    > A 10-foot ladder leans against a wall. Its base and its height above the
+    > ground satisfy $x^{2} + y^{2} = 100$ at all times. As the base slides
+    > away from the wall, the top slides down: differentiate both sides with
+    > respect to $t$ to get $2x\,\dfrac{dx}{dt} + 2y\,\dfrac{dy}{dt} = 0$.
+
+    scene plane {
+      x: [-1, 11]
+      y: [-1, 11]
+      grid
+      axes
+      param bx = 6 { range: [1, 9.5], step: 0.1 }
+      line ladder = (0, sqrt(100 - bx^2)) -> (bx, 0) { color: primary, width: 3 }
+      point base = (bx, 0) { drag: x -> bx, color: accent, r: 6, label: "x = ${bx}" }
+      point top = (0, sqrt(100 - bx^2)) { color: accent, r: 6, label: "y = ${sqrt(100 - bx^2)}" }
+      slider bx { label: "base distance x" }
+    }
+  }
+
+  slide "Evaluate the Sliding Rate" {
+    id: "ad2-numeric-ladder"
+    cat: "The Ladder Problem"
+    numeric {
+      ask "The base slides away at $\dfrac{dx}{dt} = 1$ ft/s. Find $\dfrac{dy}{dt}$ when $x = 6$ ft (so $y = 8$ ft)."
+      skill: "appderiv-related-rates"
+      answer: -0.75
+      hint "2x·dx/dt + 2y·dy/dt = 0, so dy/dt = -(x·dx/dt)/y."
+      ! "dy/dt = -(6)(1)/8 = -0.75 ft/s: the top slides down at 0.75 ft/s."
+    }
+  }
+
+  slide "The First Move" {
+    id: "ad2-quiz-strategy"
+    cat: "Strategy"
+    quiz {
+      ask "What's the first step in a related rates problem?"
+      skill: "appderiv-related-rates"
+      - "Immediately differentiate whatever quantity is being asked for" { why: "You need an equation connecting the quantities before you can differentiate anything." }
+      * "Write an equation relating the changing quantities"
+      - "Plug in the given numbers right away" { why: "Plugging in numbers before differentiating loses the variables you need to differentiate." }
+      - "Find the second derivative" { why: "Related rates only ever needs one derivative with respect to time." }
+      hint "You can't differentiate what you haven't written down yet."
+      ! "Write the equation linking the quantities first, then differentiate both sides with respect to t, and only then plug in the known values."
+    }
+  }
+
+  slide "A Growing Sphere" {
+    id: "ad2-numeric-sphere"
+    cat: "One More Shape"
+    numeric {
+      ask "A sphere's volume is $V = \dfrac{4}{3}\pi r^{3}$. If $\dfrac{dr}{dt} = 3$ cm/s, find $\dfrac{dV}{dt}$ when $r = 2$ cm."
+      skill: "appderiv-related-rates"
+      answer: 150.8
+      tolerance: 0.1
+      hint "dV/dt = 4πr² · dr/dt."
+      ! "dV/dt = 4π(2)²(3) = 48π ≈ 150.8 cm³/s."
+    }
+  }
+
+  slide "Match the Scenario to Its Equation" {
+    id: "ad2-match"
+    cat: "One More Shape"
+    match {
+      ask "Match each scenario to its related-rates equation."
+      skill: "appderiv-related-rates"
+      pair "circle's area growing" -> "dA/dt = 2πr · dr/dt"
+      pair "sphere's volume growing" -> "dV/dt = 4πr² · dr/dt"
+      pair "ladder sliding down a wall" -> "x·dx/dt + y·dy/dt = 0"
+      decoy "dA/dt = πr²"
+      ! "Every related rates equation comes from differentiating the shape's own formula with respect to time."
+    }
+  }
+}

@@ -1,0 +1,139 @@
+lesson "Applications III: Increasing, Decreasing & the First Derivative Test" {
+  course: "calculus"
+  skills: ["appderiv-monotonicity", "appderiv-first-deriv-test"]
+
+  slide "What the Sign of f' Tells You" {
+    id: "ad3-intro"
+    cat: "Sign of the Derivative"
+    > The derivative's sign is a direct readout of a function's behavior:
+    >
+    > $$f'(x) > 0 \implies f \text{ is increasing} \qquad f'(x) < 0 \implies f \text{ is decreasing}$$
+    >
+    > No graph required, just the sign of one formula.
+  }
+
+  slide "Watch the Slope Flip" {
+    id: "ad3-scene"
+    cat: "Sign of the Derivative"
+    > For $f(x) = x^{3} - 3x$, drag the point and watch the tangent switch
+    > color: green where the slope is positive (climbing), red where it's
+    > negative (falling).
+
+    scene plane {
+      x: [-3, 3]
+      y: [-4, 4]
+      grid
+      axes
+      param a = -2 { range: [-2.5, 2.5], step: 0.05 }
+      curve f = x^3 - 3 * x { color: primary, width: 3 }
+      point P = (a, a^3 - 3 * a) { drag: x -> a, color: accent, r: 6 }
+      line tangentPos { through: P, slope: 3 * a^2 - 3, color: success, width: 2, show: 3 * a^2 - 3 > 0 }
+      line tangentNeg { through: P, slope: 3 * a^2 - 3, color: danger, width: 2, show: 3 * a^2 - 3 < 0 }
+      label at (a + 0.3, a^3 - 3 * a + 1) = "f'(a) = ${3 * a^2 - 3}" { color: neutral }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "Read the Sign" {
+    id: "ad3-quiz-sign"
+    cat: "Sign of the Derivative"
+    quiz {
+      ask "If $f'(x) > 0$ on an interval, f is..."
+      skill: "appderiv-monotonicity"
+      * "increasing on that interval"
+      - "decreasing on that interval" { why: "That's what a negative derivative means, not a positive one." }
+      - "constant on that interval" { why: "A constant function has f'(x) = 0, not f'(x) > 0." }
+      - "concave up on that interval" { why: "Concavity comes from the second derivative, not the first." }
+      hint "Positive slope means the graph is climbing as x increases."
+      ! "f'(x) > 0 means the tangent slope is positive everywhere on that interval, so f is climbing: it's increasing."
+    }
+  }
+
+  slide "Where the Slope Vanishes" {
+    id: "ad3-critical"
+    cat: "Critical Points"
+    > A **critical point** is where $f'(x) = 0$ or $f'(x)$ is undefined. These
+    > are the only candidates for a local max or min, the spots where climbing
+    > can turn into falling (or vice versa).
+    >
+    > For $f(x) = x^{3} - 3x$: $f'(x) = 3x^{2} - 3 = 0$ gives $x = \pm 1$.
+  }
+
+  slide "Find a Critical Point" {
+    id: "ad3-numeric-critical"
+    cat: "Critical Points"
+    numeric {
+      ask "Find the positive critical point of $f(x) = x^{3} - 3x$."
+      skill: "appderiv-monotonicity"
+      answer: 1
+      hint "Set f'(x) = 3x² - 3 equal to 0 and solve."
+      ! "3x² - 3 = 0 gives x² = 1, so x = 1 or x = -1. The positive one is x = 1."
+    }
+  }
+
+  slide "The First Derivative Test" {
+    id: "ad3-fdt"
+    cat: "Classifying Critical Points"
+    > Check the sign of $f'$ on either side of a critical point:
+    >
+    > - Sign goes **+ to −** → local **maximum**
+    > - Sign goes **− to +** → local **minimum**
+    > - Sign doesn't change → neither
+  }
+
+  slide "Classify x = -1" {
+    id: "ad3-quiz-classify-max"
+    cat: "Classifying Critical Points"
+    quiz {
+      ask "For $f(x) = x^{3} - 3x$: f'(-2) = 9 and f'(0) = -3. What is x = -1?"
+      skill: "appderiv-first-deriv-test"
+      * "A local maximum"
+      - "A local minimum" { why: "The sign goes from positive to negative here, which is the local max pattern." }
+      - "Neither" { why: "The sign does change here, from + to -, so it is a local extremum." }
+      - "Impossible to tell" { why: "The sign change on either side is exactly what the first derivative test needs." }
+      hint "f' goes from positive (before -1) to negative (after -1)."
+      ! "f' switches from + to - at x = -1, so by the first derivative test, it's a local maximum."
+    }
+  }
+
+  slide "Classify x = 1" {
+    id: "ad3-quiz-classify-min"
+    cat: "Classifying Critical Points"
+    quiz {
+      ask "For $f(x) = x^{3} - 3x$: f'(0) = -3 and f'(2) = 9. What is x = 1?"
+      skill: "appderiv-first-deriv-test"
+      - "A local maximum" { why: "That's the + to - pattern, but here the sign goes the other way." }
+      * "A local minimum"
+      - "Neither" { why: "The sign does change here, from - to +, so it is a local extremum." }
+      - "Impossible to tell" { why: "The sign change on either side is exactly what the first derivative test needs." }
+      hint "f' goes from negative (before 1) to positive (after 1)."
+      ! "f' switches from - to + at x = 1, so by the first derivative test, it's a local minimum."
+    }
+  }
+
+  slide "Match the Pattern" {
+    id: "ad3-match"
+    cat: "Classifying Critical Points"
+    match {
+      ask "Match each sign pattern to its classification."
+      skill: "appderiv-first-deriv-test"
+      pair "f' changes + to -" -> "local maximum"
+      pair "f' changes - to +" -> "local minimum"
+      pair "f' does not change sign" -> "neither a max nor a min"
+      decoy "f is always increasing"
+      ! "The first derivative test is entirely about which way the sign flips, if it flips at all."
+    }
+  }
+
+  slide "Evaluate the Local Minimum" {
+    id: "ad3-capstone"
+    cat: "Classifying Critical Points"
+    numeric {
+      ask "Find the value of the local minimum of $f(x) = x^{3} - 3x$."
+      skill: "appderiv-first-deriv-test"
+      answer: -2
+      hint "The local minimum happens at x = 1."
+      ! "f(1) = 1 - 3 = -2, so the local minimum value is -2."
+    }
+  }
+}

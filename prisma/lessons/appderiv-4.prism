@@ -1,0 +1,124 @@
+lesson "Applications IV: Concavity & the Second Derivative Test" {
+  course: "calculus"
+  skills: ["appderiv-concavity", "appderiv-second-deriv-test"]
+
+  slide "Which Way Does It Bend?" {
+    id: "ad4-intro"
+    cat: "Concavity"
+    > The first derivative tells you which way a graph is heading; the
+    > **second derivative** tells you which way it's bending:
+    >
+    > $$f''(x) > 0 \implies \text{concave up (holds water)} \qquad f''(x) < 0 \implies \text{concave down (spills water)}$$
+  }
+
+  slide "The Inflection Point" {
+    id: "ad4-scene"
+    cat: "Concavity"
+    > For $f(x) = x^{3} - 3x$: $f''(x) = 6x$, which is negative for $x < 0$ and
+    > positive for $x > 0$. The graph switches from concave down to concave up
+    > right at $x = 0$, an **inflection point**.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-4, 4]
+      grid
+      axes
+      curve f = x^3 - 3 * x { color: primary, width: 3 }
+      point inflection = (0, 0) { color: accent, r: 7, label: "inflection point" }
+    }
+  }
+
+  slide "Spot the Concave-Up Region" {
+    id: "ad4-quiz-region"
+    cat: "Concavity"
+    quiz {
+      ask "For $f(x) = x^{3} - 3x$, where is f concave up?"
+      skill: "appderiv-concavity"
+      - "x < 0" { why: "f''(x) = 6x is negative there, which is concave down." }
+      * "x > 0"
+      - "Everywhere" { why: "f'' changes sign at x = 0, so concavity isn't the same everywhere." }
+      - "Nowhere" { why: "f''(x) = 6x is positive for x > 0, so part of the graph is concave up." }
+      hint "f''(x) = 6x. Where is that positive?"
+      ! "f''(x) = 6x is positive whenever x > 0, so that's where f is concave up."
+    }
+  }
+
+  slide "Find the Inflection Point" {
+    id: "ad4-numeric-inflection"
+    cat: "Concavity"
+    numeric {
+      ask "Find the x-coordinate where $f(x) = x^{3} - 3x$ has an inflection point."
+      skill: "appderiv-concavity"
+      answer: 0
+      hint "Set f''(x) = 6x equal to 0."
+      ! "6x = 0 gives x = 0, exactly where concavity switches from down to up."
+    }
+  }
+
+  slide "The Second Derivative Test" {
+    id: "ad4-sdt"
+    cat: "Second Derivative Test"
+    > At a critical point (where $f'(x) = 0$), the second derivative offers a
+    > shortcut for classifying it, no sign chart needed:
+    >
+    > - $f''(x) > 0$ → local **minimum** (concave up, a valley)
+    > - $f''(x) < 0$ → local **maximum** (concave down, a peak)
+    > - $f''(x) = 0$ → inconclusive, fall back to the first derivative test
+  }
+
+  slide "Apply It at x = -1" {
+    id: "ad4-quiz-apply-max"
+    cat: "Second Derivative Test"
+    quiz {
+      ask "For $f(x) = x^{3} - 3x$, f''(x) = 6x. What does the second derivative test say about x = -1?"
+      skill: "appderiv-second-deriv-test"
+      * "Local maximum, since f''(-1) = -6 < 0"
+      - "Local minimum, since f''(-1) = -6 < 0" { why: "A negative second derivative means concave down, which signals a maximum, not a minimum." }
+      - "Inconclusive, since f''(-1) = -6" { why: "The test is only inconclusive when f'' equals 0, and -6 is not 0." }
+      - "Not a critical point" { why: "f'(-1) = 3(1) - 3 = 0, so it is a critical point." }
+      hint "f''(-1) = 6(-1) = -6."
+      ! "f''(-1) = -6 < 0, so the second derivative test confirms a local maximum, matching Lesson III's answer."
+    }
+  }
+
+  slide "Apply It at x = 1" {
+    id: "ad4-quiz-apply-min"
+    cat: "Second Derivative Test"
+    quiz {
+      ask "For $f(x) = x^{3} - 3x$, f''(x) = 6x. What does the second derivative test say about x = 1?"
+      skill: "appderiv-second-deriv-test"
+      - "Local maximum, since f''(1) = 6 > 0" { why: "A positive second derivative means concave up, which signals a minimum, not a maximum." }
+      * "Local minimum, since f''(1) = 6 > 0"
+      - "Inconclusive, since f''(1) = 6" { why: "The test is only inconclusive when f'' equals 0, and 6 is not 0." }
+      - "Not a critical point" { why: "f'(1) = 3(1) - 3 = 0, so it is a critical point." }
+      hint "f''(1) = 6(1) = 6."
+      ! "f''(1) = 6 > 0, so the second derivative test confirms a local minimum, matching Lesson III's answer."
+    }
+  }
+
+  slide "Evaluate a Second Derivative" {
+    id: "ad4-numeric-eval"
+    cat: "Second Derivative Test"
+    numeric {
+      ask "Let $f(x) = x^{4} - 4x^{2}$. Find $f''(2)$."
+      skill: "appderiv-second-deriv-test"
+      answer: 40
+      hint "f'(x) = 4x³ - 8x, so f''(x) = 12x² - 8."
+      ! "f''(x) = 12x² - 8, so f''(2) = 12(4) - 8 = 48 - 8 = 40."
+    }
+  }
+
+  slide "Match Each Sign" {
+    id: "ad4-match"
+    cat: "Second Derivative Test"
+    match {
+      ask "Match each condition to what it tells you."
+      skill: "appderiv-concavity"
+      pair "f'' > 0" -> "concave up, holds water"
+      pair "f'' < 0" -> "concave down, spills water"
+      pair "f'' = 0 at a critical point" -> "the second derivative test is inconclusive"
+      decoy "f' = 0 everywhere"
+      ! "Concavity and the second derivative test both come straight from the sign of f''."
+    }
+  }
+}

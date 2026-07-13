@@ -164,6 +164,78 @@ async function main() {
       iconName: 'Dumbbell',
       sortOrder: 12,
     },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'appderiv-1',
+      data: require('./lessons/appderiv-1.json'),
+      title: 'Linear Approximation & Differentials',
+      description:
+        'Use the tangent line as a stand-in for a harder function nearby, plus the differential notation that goes with it.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'Ruler',
+      sortOrder: 13,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'appderiv-2',
+      data: require('./lessons/appderiv-2.json'),
+      title: 'Related Rates',
+      description:
+        'Growing circles, sliding ladders, and every other problem where one rate of change is tied to another.',
+      category: 'Calculus',
+      difficulty: 'Intermediate',
+      iconName: 'Move',
+      sortOrder: 14,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'appderiv-3',
+      data: require('./lessons/appderiv-3.json'),
+      title: 'Increasing, Decreasing & the First Derivative Test',
+      description:
+        "Read a function's rise and fall straight off the sign of its derivative, then classify every critical point.",
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'Triangle',
+      sortOrder: 15,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'appderiv-4',
+      data: require('./lessons/appderiv-4.json'),
+      title: 'Concavity & the Second Derivative Test',
+      description:
+        'Find where a curve bends up or down, locate inflection points, and classify critical points without a sign chart.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'Undo2',
+      sortOrder: 16,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'appderiv-5',
+      data: require('./lessons/appderiv-5.json'),
+      title: 'Curve Sketching',
+      description:
+        'Combine critical points, concavity, and everything else from this unit into one complete sketching workflow.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'FunctionSquare',
+      sortOrder: 17,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'appderiv-6',
+      data: require('./lessons/appderiv-6.json'),
+      title: 'Optimization',
+      description:
+        'Turn a biggest-or-smallest word problem into a function, then let critical points find the real-world answer.',
+      category: 'Calculus',
+      difficulty: 'Advanced',
+      iconName: 'Star',
+      sortOrder: 18,
+    },
   ];
 
   for (const lesson of lessons) {

@@ -1,0 +1,133 @@
+lesson "Applications I: Linear Approximation & Differentials" {
+  course: "calculus"
+  skills: ["appderiv-linearization", "appderiv-differentials"]
+
+  slide "The Best Straight-Line Guess" {
+    id: "ad1-intro"
+    cat: "Linear Approximation"
+    > Near the point where it touches, a tangent line hugs a curve so closely
+    > that it makes a genuinely useful stand-in for the curve itself. That's
+    > **linear approximation**: use the easy-to-compute tangent line instead of
+    > the harder function, as long as you stay close to the point of tangency.
+  }
+
+  slide "Tracking the Curve" {
+    id: "ad1-scene"
+    cat: "Linear Approximation"
+    > $f(x) = \sqrt{x}$ and its tangent line at $x = 4$ agree closely nearby,
+    > then drift apart the further you move. Drag $x$ and compare the two
+    > readouts.
+
+    scene plane {
+      x: [0, 9]
+      y: [-1, 4]
+      grid
+      axes
+      curve f = sqrt(x) { color: primary, width: 3 }
+      curve L = 2 + (1 / 4) * (x - 4) { color: accent, style: dashed, width: 2 }
+      param xv = 4 { range: [0.5, 8.9], step: 0.1 }
+      point Pf = (xv, sqrt(xv)) { drag: x -> xv, color: primary, r: 6, label: "f(x) = ${sqrt(xv)}" }
+      point PL = (xv, 2 + (1 / 4) * (xv - 4)) { color: accent, r: 5, label: "L(x) = ${2 + (1 / 4) * (xv - 4)}" }
+      slider xv { label: "x" }
+    }
+  }
+
+  slide "The Formula" {
+    id: "ad1-formula"
+    cat: "Linear Approximation"
+    > The linear approximation of $f$ near $x = a$ is just the tangent line,
+    > written as a formula:
+    >
+    > $$L(x) = f(a) + f'(a)(x - a)$$
+    >
+    > Plug in an $x$ close to $a$ and $L(x)$ gives a fast estimate of $f(x)$
+    > without ever evaluating $f$ at the harder point.
+  }
+
+  slide "Pick the Formula" {
+    id: "ad1-quiz-formula"
+    cat: "Linear Approximation"
+    quiz {
+      ask "Which is the linear approximation of f near x = a?"
+      skill: "appderiv-linearization"
+      - "$f(a) + f(x)(x - a)$" { why: "That mixes up f(x) and f'(a). The slope has to come from the derivative." }
+      * "$f(a) + f'(a)(x - a)$"
+      - "$f'(a) + f(a)(x - a)$" { why: "The starting value and the slope are swapped here." }
+      - "$f(x) + f'(x)(x - a)$" { why: "Everything should be evaluated at the fixed point a, not at the variable x." }
+      hint "It's just the point-slope form of the tangent line at (a, f(a))."
+      ! "L(x) = f(a) + f'(a)(x - a): start at f(a), then move along the tangent's slope f'(a)."
+    }
+  }
+
+  slide "Estimate a Square Root" {
+    id: "ad1-numeric-estimate"
+    cat: "Linear Approximation"
+    numeric {
+      ask "Use linear approximation at a = 4 to estimate $\sqrt{4.1}$."
+      skill: "appderiv-linearization"
+      answer: 2.025
+      tolerance: 0.001
+      hint "f(4) = 2, f'(4) = 1/(2√4) = 1/4, and x - a = 0.1."
+      ! "L(4.1) = 2 + (1/4)(0.1) = 2 + 0.025 = 2.025."
+    }
+  }
+
+  slide "Differentials" {
+    id: "ad1-differentials"
+    cat: "Differentials"
+    > The same idea has its own notation: the **differential** $dy = f'(x)\,dx$
+    > estimates how much $y$ changes for a small nudge $dx$ in $x$, without
+    > needing the exact new value of $y$.
+    >
+    > For $y = x^{3}$ at $x = 2$ with $dx = 0.01$: $dy = 3x^{2}\,dx = 3(4)(0.01) = 0.12$.
+  }
+
+  slide "Compute a Differential" {
+    id: "ad1-numeric-differential"
+    cat: "Differentials"
+    numeric {
+      ask "For $y = x^{3}$, find $dy$ at $x = 3$ with $dx = 0.02$."
+      skill: "appderiv-differentials"
+      answer: 0.54
+      tolerance: 0.001
+      hint "dy = 3x² dx."
+      ! "dy = 3(3)²(0.02) = 3(9)(0.02) = 0.54."
+    }
+  }
+
+  slide "A Rate in Context: Marginal Cost" {
+    id: "ad1-marginal"
+    cat: "Rates in Context"
+    > The derivative is a rate of change wherever it shows up, including in
+    > economics: if $C(x)$ is the cost to produce $x$ units, $C'(x)$ is the
+    > **marginal cost**, roughly the cost of producing one more unit right now.
+    >
+    > For $C(x) = x^{2} + 50x + 200$: $C'(x) = 2x + 50$.
+  }
+
+  slide "Evaluate the Marginal Cost" {
+    id: "ad1-numeric-marginal"
+    cat: "Rates in Context"
+    numeric {
+      ask "For $C(x) = x^{2} + 50x + 200$, find the marginal cost at $x = 10$."
+      skill: "appderiv-differentials"
+      answer: 70
+      hint "C'(x) = 2x + 50."
+      ! "C'(10) = 2(10) + 50 = 70."
+    }
+  }
+
+  slide "Same Idea, Two Notations" {
+    id: "ad1-match"
+    cat: "Rates in Context"
+    match {
+      ask "Match each idea to its formula."
+      skill: "appderiv-linearization"
+      pair "linear approximation" -> "L(x) = f(a) + f'(a)(x - a)"
+      pair "differential" -> "dy = f'(x) dx"
+      pair "marginal cost" -> "C'(x)"
+      decoy "f(x) = f(a)"
+      ! "All three are the same core idea, the derivative as a local rate, just written for different purposes."
+    }
+  }
+}

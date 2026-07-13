@@ -1,0 +1,122 @@
+lesson "Applications VI: Optimization" {
+  course: "calculus"
+  skills: ["appderiv-optimization"]
+
+  slide "Turning Words Into a Function" {
+    id: "ad6-intro"
+    cat: "The Idea"
+    > **Optimization** takes a real-world biggest-or-smallest question, turns
+    > it into a function of one variable, and hands the rest to calculus: find
+    > the critical points, then confirm which one is the actual max or min.
+  }
+
+  slide "Fencing the Biggest Pen" {
+    id: "ad6-fence-scene"
+    cat: "Maximize Area"
+    > A farmer has 100 meters of fencing for a rectangular pen against a barn
+    > wall (so one side needs no fence). With length $l$ and width $w = 100 - 2l$,
+    > the area is $A(l) = l(100 - 2l) = 100l - 2l^{2}$. Drag $l$ to hunt for the
+    > peak.
+
+    scene plane {
+      x: [0, 50]
+      y: [0, 1400]
+      grid
+      axes
+      param l = 10 { range: [1, 49], step: 1 }
+      curve A = 100 * x - 2 * x^2 { color: primary, width: 3 }
+      point P = (l, 100 * l - 2 * l^2) { drag: x -> l, color: accent, r: 7, label: "Area = ${100 * l - 2 * l^2}" }
+      slider l { label: "length l" }
+    }
+
+    goal "Find the length that maximizes the area" {
+      when: abs(l - 25) < 1.5
+      hint: "Try values near the middle of the slider's range."
+    }
+  }
+
+  slide "Solve It With Calculus" {
+    id: "ad6-numeric-length"
+    cat: "Maximize Area"
+    numeric {
+      ask "For $A(l) = 100l - 2l^{2}$, find the length l that maximizes the area."
+      skill: "appderiv-optimization"
+      answer: 25
+      hint "Set A'(l) = 100 - 4l equal to 0."
+      ! "A'(l) = 100 - 4l = 0 gives l = 25."
+    }
+  }
+
+  slide "Evaluate the Maximum Area" {
+    id: "ad6-numeric-area"
+    cat: "Maximize Area"
+    numeric {
+      ask "For the fence problem, find the maximum possible area."
+      skill: "appderiv-optimization"
+      answer: 1250
+      hint "At l = 25, w = 100 - 2(25) = 50."
+      ! "A(25) = 25(50) = 1250 square meters."
+    }
+  }
+
+  slide "Confirming It's a Maximum" {
+    id: "ad6-quiz-confirm"
+    cat: "Maximize Area"
+    quiz {
+      ask "Why does A'(l) = 0 at l = 25 identify a maximum here, not a minimum?"
+      skill: "appderiv-optimization"
+      * "A''(l) = -4 is negative, so the graph is concave down there"
+      - "Because area is always maximized at the midpoint" { why: "That's true for this particular setup, but it isn't a general rule; the second derivative test is what actually confirms it." }
+      - "A'(l) = 0 always means a maximum" { why: "A zero derivative alone only marks a critical point. It could be a minimum instead, so the sign of A'' is what settles it." }
+      - "It can't be confirmed without trying every value of l" { why: "The second derivative test settles this with one calculation, no need to check every value." }
+      hint "Check the sign of the second derivative."
+      ! "A''(l) = -4 < 0 for every l, so the graph is concave down everywhere, confirming the one critical point is a maximum."
+    }
+  }
+
+  slide "The Open Box" {
+    id: "ad6-box"
+    cat: "Maximize Volume"
+    > Cut equal squares of side $x$ from the corners of a 12-by-12 sheet, then
+    > fold up the sides to make an open box. Its volume is
+    > $V(x) = x(12-2x)^{2}$ for $0 < x < 6$.
+  }
+
+  slide "Solve the Box Problem" {
+    id: "ad6-numeric-box-x"
+    cat: "Maximize Volume"
+    numeric {
+      ask "For $V(x) = x(12-2x)^{2}$, find the value of x that maximizes the volume."
+      skill: "appderiv-optimization"
+      answer: 2
+      hint "V'(x) = (12-2x)(12-6x). One root is x = 6, which gives zero volume, so it isn't the maximum."
+      ! "V'(x) = (12-2x)(12-6x) = 0 gives x = 6 or x = 2. x = 6 collapses the box to zero volume, so the maximum is at x = 2."
+    }
+  }
+
+  slide "Evaluate the Maximum Volume" {
+    id: "ad6-numeric-box-v"
+    cat: "Maximize Volume"
+    numeric {
+      ask "For the box problem, find the maximum volume."
+      skill: "appderiv-optimization"
+      answer: 128
+      hint "V(2) = 2(12 - 4)²."
+      ! "V(2) = 2(8)² = 2(64) = 128 cubic units."
+    }
+  }
+
+  slide "The Optimization Recipe" {
+    id: "ad6-match"
+    cat: "Maximize Volume"
+    match {
+      ask "Match each step to its purpose."
+      skill: "appderiv-optimization"
+      pair "write the quantity as a function of one variable" -> "use the given constraint to eliminate extra variables"
+      pair "set the derivative equal to 0" -> "find the critical points"
+      pair "check the second derivative or the endpoints" -> "confirm which critical point is the actual max or min"
+      decoy "always pick the largest number given in the problem"
+      ! "Reduce to one variable, find critical points, then confirm which one is the real answer."
+    }
+  }
+}
