@@ -80,6 +80,8 @@ const pointObj = z.object({
   x: expr,
   y: expr,
   r: z.number().optional(),
+  // hollow (unfilled) marker — open circles for limit holes / one-sided endpoints
+  open: z.boolean().optional(),
   label: liveText.optional(),
   // bind = x-axis state key; bindY = y-axis state key (for axis 'xy' free drag)
   // along = constrain the drag to a circle/segment, writing an angle/t param to bind instead

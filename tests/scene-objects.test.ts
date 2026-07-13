@@ -66,6 +66,19 @@ describe('area', () => {
   });
 });
 
+describe('point', () => {
+  it('is filled (no open flag) by default', () => {
+    const [p] = objectsOf(wrap('point p = (1, 1)'));
+    expect(p.type).toBe('point');
+    if (p.type === 'point') expect(p.open).toBeUndefined();
+  });
+
+  it('the bare `open` flag marks it hollow', () => {
+    const [p] = objectsOf(wrap('point p = (1, 1) { open, color: primary }'));
+    if (p.type === 'point') expect(p.open).toBe(true);
+  });
+});
+
 describe('reveal', () => {
   it('tags every object inside with phase: reveal', () => {
     const objects = objectsOf(

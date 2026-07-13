@@ -658,6 +658,7 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         }
         const r = propNum(s.props, 'r', s.ln, cScope);
         if (r != null) obj.r = r;
+        if (s.props.get('open')) obj.open = true;
         const label = propStr(s.props, 'label', cScope);
         if (label) obj.label = liveText(label, cScope, s.ln);
         const drag = s.props.get('drag');

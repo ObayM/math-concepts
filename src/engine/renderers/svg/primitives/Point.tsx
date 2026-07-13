@@ -24,8 +24,8 @@ export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
         cx={px}
         cy={py}
         r={r}
-        fill={color}
-        stroke="white"
+        fill={obj.open ? 'white' : color}
+        stroke={obj.open ? color : 'white'}
         strokeWidth={2.5}
         onPointerDown={onPointerDown}
       />

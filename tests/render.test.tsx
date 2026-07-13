@@ -194,3 +194,29 @@ describe('P5.37 image object renders to clean SVG', () => {
     expect(html).not.toContain('NaN');
   });
 });
+
+describe('curve breaks its stroke across a vertical asymptote', () => {
+  const pathD = (src: string) => {
+    const ir = compile(src);
+    const html = renderToStaticMarkup(React.createElement(Scene, { ir }));
+    expect(html).not.toContain('NaN');
+    const match = html.match(/<path d="([^"]+)"/);
+    if (!match) throw new Error('no <path> found');
+    return match[1];
+  };
+
+  it('tan(x) over a domain spanning its pole gets more than one subpath', () => {
+    const d = pathD('scene plane {\n  x: [-2, 2]\n  y: [-8, 8]\n  curve t = tan(x)\n}');
+    expect((d.match(/M/g) ?? []).length).toBeGreaterThan(1);
+  });
+
+  it('1/x over a domain spanning its pole gets more than one subpath', () => {
+    const d = pathD('scene plane {\n  x: [-2, 2]\n  y: [-8, 8]\n  curve f = 1/x\n}');
+    expect((d.match(/M/g) ?? []).length).toBeGreaterThan(1);
+  });
+
+  it('a continuous curve over the same viewport stays a single subpath', () => {
+    const d = pathD('scene plane {\n  x: [-2, 2]\n  y: [-8, 8]\n  curve f = x^3\n}');
+    expect((d.match(/M/g) ?? []).length).toBe(1);
+  });
+});

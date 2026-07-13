@@ -11,7 +11,7 @@ export const objectsSection: DocSection = {
       syntax:
         'curve <id> = <expr> { [props] }  OR  curve <id> = (x(t), y(t)) { t: [start, end], [steps: <n>] }',
       description:
-        'Plots f(x) across the domain. Give it a `(x, y)` pair instead to trace a parametric curve over the parameter `t` — supply `t: [start, end]`. State variables can appear in either form.',
+        'Plots f(x) across the domain. Give it a `(x, y)` pair instead to trace a parametric curve over the parameter `t` — supply `t: [start, end]`. State variables can appear in either form. A vertical asymptote (`tan(x)`, `1/x`, ...) breaks the stroke automatically — no special syntax needed, just let the domain span the pole.',
       props: [
         { name: 't', type: '[start, end]', description: 'parameter range (parametric form only)' },
         { name: 'steps', type: 'number', description: 'sample count for parametric curves' },
@@ -40,9 +40,9 @@ export const objectsSection: DocSection = {
     {
       keyword: 'point',
       syntax:
-        'point <id> = (x, y) { [drag: <axis> -> <bind>], [snap: <n>|(nx,ny)|grid], [r: <number>], [label: "text"], [props] }',
+        'point <id> = (x, y) { [drag: <axis> -> <bind>], [snap: <n>|(nx,ny)|grid], [r: <number>], [label: "text"], [open], [props] }',
       description:
-        "A point at scene coordinates (x, y). Both coords can be expressions. `drag` makes it draggable — axis is `x`, `y`, or `xy`; bind is the state key updated by the drag. `snap` rounds the dragged value to the nearest step (`grid` = nearest 1). `drag: along(<objId>) -> <bind>` constrains the drag to a `circle` or two-point `line` object — bind receives an angle (radians) for a circle, or 0..1 for a line segment; the point's own position should already be an expression of that param.",
+        "A point at scene coordinates (x, y). Both coords can be expressions. `drag` makes it draggable — axis is `x`, `y`, or `xy`; bind is the state key updated by the drag. `snap` rounds the dragged value to the nearest step (`grid` = nearest 1). `drag: along(<objId>) -> <bind>` constrains the drag to a `circle` or two-point `line` object — bind receives an angle (radians) for a circle, or 0..1 for a line segment; the point's own position should already be an expression of that param. The bare `open` flag draws a hollow (unfilled) marker instead of a solid disc — the standard way to mark a removable discontinuity or an excluded one-sided limit endpoint.",
       props: [
         { name: 'drag', type: 'axis -> bind', description: 'make it draggable, writes state' },
         {
@@ -52,8 +52,13 @@ export const objectsSection: DocSection = {
         },
         { name: 'r', type: 'number', description: 'radius in pixels (default 6)' },
         { name: 'label', type: 'string', description: 'text label next to the point' },
+        {
+          name: 'open',
+          type: 'flag',
+          description: 'draw a hollow marker instead of a filled disc',
+        },
       ],
-      example: `param t = 0 { range: [-3, 3] }\nparam vx = 2 { range: [-4, 4] }\nparam vy = 1 { range: [-4, 4] }\nparam theta = 0 { range: [0, 6.28] }\npoint p = (t, t^2) { drag: x -> t, color: accent, snap: 0.5 }\npoint v = (vx, vy) { drag: xy -> (vx, vy), label: "vertex" }\ncircle c = (0, 0) { r: 3 }\npoint onC = (3*cos(theta), 3*sin(theta)) { drag: along(c) -> theta }`,
+      example: `param t = 0 { range: [-3, 3] }\nparam vx = 2 { range: [-4, 4] }\nparam vy = 1 { range: [-4, 4] }\nparam theta = 0 { range: [0, 6.28] }\npoint p = (t, t^2) { drag: x -> t, color: accent, snap: 0.5 }\npoint v = (vx, vy) { drag: xy -> (vx, vy), label: "vertex" }\ncircle c = (0, 0) { r: 3 }\npoint onC = (3*cos(theta), 3*sin(theta)) { drag: along(c) -> theta }\npoint hole = (2, 4) { color: primary, open, label: "hole" }`,
     },
     {
       keyword: 'line',
