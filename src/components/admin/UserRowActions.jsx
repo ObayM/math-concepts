@@ -1,28 +1,28 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Button from '@/components/admin/ui/Button';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
-import {
-  setRoleAction,
-  banUserAction,
-  unbanUserAction,
-  impersonateUserAction,
-} from '@/app/admin/users/actions';
+import { authClient } from '@/lib/auth-client';
+import { setRoleAction, banUserAction, unbanUserAction } from '@/app/admin/users/actions';
 
 const ROLE_OPTIONS = ['student', 'admin', 'super_admin'];
 
 export default function UserRowActions({ user, viewerId, canManage, canImpersonate }) {
   const isSelf = user.id === viewerId;
+  const router = useRouter();
+
+  async function handleImpersonate() {
+    await authClient.admin.impersonateUser({ userId: user.id });
+    router.push('/dashboard');
+  }
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       {canImpersonate && !isSelf && (
-        <form action={impersonateUserAction}>
-          <input type="hidden" name="userId" value={user.id} />
-          <Button type="submit" variant="outline" size="sm">
-            Impersonate
-          </Button>
-        </form>
+        <Button type="button" variant="outline" size="sm" onClick={handleImpersonate}>
+          Impersonate
+        </Button>
       )}
       {canManage && !isSelf && (
         <form action={setRoleAction} className="flex items-center gap-1">

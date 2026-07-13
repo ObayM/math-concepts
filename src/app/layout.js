@@ -33,7 +33,7 @@ export default async function RootLayout({ children }) {
   }
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${nunito.variable} font-[family-name:var(--font-nunito)] antialiased`}>
         <AuthProvider initialUser={userInfo}>
           <ImpersonationBanner />

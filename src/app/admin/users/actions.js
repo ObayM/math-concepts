@@ -2,10 +2,9 @@
 
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getFullSession, isAdmin, isSuperAdmin } from '@/lib/authz';
+import { getFullSession, isSuperAdmin } from '@/lib/authz';
 import { ROLES } from '@/lib/permissions';
 import { countUsersWithRole } from '@/lib/db/userService';
 
@@ -61,16 +60,4 @@ export async function unbanUserAction(formData) {
 
   await auth.api.unbanUser({ headers: await headers(), body: { userId } });
   revalidatePath('/admin/users');
-}
-
-export async function impersonateUserAction(formData) {
-  const actor = await requireActor();
-  if (!isAdmin(actor)) throw new Error('Forbidden');
-
-  const userId = formData.get('userId')?.toString();
-  if (!userId) throw new Error('userId is required');
-  if (userId === actor.id) throw new Error("You can't impersonate yourself");
-
-  await auth.api.impersonateUser({ headers: await headers(), body: { userId } });
-  redirect('/dashboard');
 }
