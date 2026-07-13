@@ -38,6 +38,34 @@ lesson "Differentiation III — The Chain Rule" {
     }
   }
 
+  slide "Predict the Sign" {
+    id: "d3-reveal"
+    cat: "Chain Rule"
+    > Before we reveal the derivative curve, predict its sign at $x = 2$.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-4, 10]
+      grid
+      axes
+      curve h = (x^2 - 2)^2 { color: primary, width: 3 }
+      point at2 = (2, (2^2 - 2)^2) { color: neutral, r: 5, label: "x = 2" }
+      reveal {
+        curve hprime = 4*x*(x^2 - 2) { color: accent, width: 2, style: dashed }
+      }
+    }
+
+    quiz {
+      ask "Is h'(2) positive, negative, or zero, for h(x) = (x² - 2)²?"
+      skill: "deriv-chain-rule"
+      * "Positive"
+      - "Negative" { why: "Look at how steeply h is climbing just past x = 2." }
+      - "Zero" { why: "The curve isn't flat at x = 2." }
+      hint "h'(x) = 4x(x² - 2). Plug in x = 2."
+      ! "h'(2) = 4·2·(4-2) = 16, which is positive — the revealed dashed curve confirms it."
+    }
+  }
+
   slide "The Recipe" {
     id: "d3-recipe"
     cat: "Chain Rule"
@@ -52,11 +80,27 @@ lesson "Differentiation III — The Chain Rule" {
     > $$h'(x) = 5(3x + 1)^{4}\cdot 3 = 15(3x + 1)^{4}.$$
   }
 
+  slide "Order the Recipe" {
+    id: "d3-order"
+    cat: "Chain Rule"
+    order {
+      ask "Put these steps in order for differentiating h(x) = (3x + 1)⁵."
+      skill: "deriv-chain-rule"
+      item "Identify the outside function: (something)⁵"
+      item "Identify the inside function: 3x + 1"
+      item "Differentiate the outside, leaving the inside alone: 5(3x+1)⁴"
+      item "Differentiate the inside: 3"
+      item "Multiply the two results: 15(3x+1)⁴"
+      ! "Outside first, then multiply by the inside's derivative — that's the chain rule recipe."
+    }
+  }
+
   slide "Spot the Chain Rule" {
     id: "d3-quiz"
     cat: "Chain Rule"
     quiz {
       ask "What is $\frac{d}{dx}\left[(x^{2} + 1)^{3}\right]$?"
+      skill: "deriv-chain-rule"
       - "$3(x^2 + 1)^2$" { why: "You forgot to multiply by the derivative of the inside, 2x." }
       * "$6x(x^2 + 1)^2$"
       - "$3(2x)^2$" { why: "Differentiate the outside first, keeping the inside intact." }
@@ -71,6 +115,7 @@ lesson "Differentiation III — The Chain Rule" {
     cat: "Chain Rule"
     numeric {
       ask "Let $h(x) = (2x + 1)^{3}$. Find $h'(0)$."
+      skill: "deriv-chain-rule"
       answer: 6
       hint "$h'(x) = 3(2x+1)^2 \cdot 2 = 6(2x+1)^2$."
       ! "$h'(x) = 6(2x+1)^2$, so $h'(0) = 6 \cdot 1 = 6$."
@@ -82,6 +127,7 @@ lesson "Differentiation III — The Chain Rule" {
     cat: "Chain Rule"
     numeric {
       ask "Let $h(x) = \sqrt{x^{2} + 9}$. Find $h'(4)$."
+      skill: "deriv-chain-rule"
       answer: 0.8
       tolerance: 0.001
       hint "Write it as $(x^2+9)^{1/2}$; the inside derivative is $2x$."
@@ -94,6 +140,7 @@ lesson "Differentiation III — The Chain Rule" {
     cat: "Chain Rule"
     build {
       ask "Assemble the chain rule for $\frac{d}{dx}\,f(g(x))$."
+      skill: "deriv-chain-rule"
       bank: ["f'(g(x))", "·", "g'(x)", "g'(f(x))", "f'(x)"]
       answer: ["f'(g(x))", "·", "g'(x)"]
       hint "Outer derivative at the inner function, times the inner derivative."

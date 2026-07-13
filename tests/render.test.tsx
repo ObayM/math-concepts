@@ -11,15 +11,15 @@ import { Scene } from '@/engine';
 // catch a render crash that tsc can't. drag/effects don't run under SSR, but
 // the initial render evaluates all objects, which is what we care about.
 
-const quadratics = compileLesson(
+const differentiation1 = compileLesson(
   readFileSync(
-    fileURLToPath(new URL('../prisma/lessons/quadratics-1.prism', import.meta.url)),
+    fileURLToPath(new URL('../prisma/lessons/differentiation-1.prism', import.meta.url)),
     'utf8'
   )
 );
 
 describe('v2 scene render (SSR smoke)', () => {
-  const sceneSlides = quadratics.slides.filter((s) => s.scene);
+  const sceneSlides = differentiation1.slides.filter((s) => s.scene);
 
   it('has scenes to render', () => {
     expect(sceneSlides.length).toBeGreaterThan(0);

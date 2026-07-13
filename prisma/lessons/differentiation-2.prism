@@ -41,6 +41,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
     cat: "Product Rule"
     numeric {
       ask "Let $f(x) = (x + 1)(x^{2})$. Using the product rule, find $f'(2)$."
+      skill: "deriv-product-rule"
       answer: 16
       hint "With $u = x+1,\ v = x^2$: $f' = (1)(x^2) + (x+1)(2x)$."
       ! "$f'(x) = x^2 + 2x(x+1) = 3x^2 + 2x$, so $f'(2) = 12 + 4 = 16$."
@@ -52,6 +53,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
     cat: "Product Rule"
     quiz {
       ask "Which expression is $\frac{d}{dx}\left[u\,v\right]$?"
+      skill: "deriv-product-rule"
       - "$u'v'$" { why: "That's the trap — the derivative of a product is not the product of derivatives." }
       * "$u'v + uv'$"
       - "$u'v - uv'$" { why: "That's the numerator of the quotient rule, not the product rule." }
@@ -79,11 +81,37 @@ lesson "Differentiation II — Product & Quotient Rules" {
       grid
       axes
       param a = 1 { range: [-4, 4], step: 0.1 }
+      bool showTangent = false
       curve f = x / (x^2 + 1) { color: primary, width: 3 }
       curve fprime = (1 - x^2) / ((x^2 + 1)^2) { color: accent, width: 2, style: dashed }
       point P = (a, a / (a^2 + 1)) { color: primary, r: 7, drag: x -> a }
-      line tangent { through: P, slope: (1 - a^2) / ((a^2 + 1)^2), color: success, width: 2 }
+      line tangent { through: P, slope: (1 - a^2) / ((a^2 + 1)^2), color: success, width: 2, show: showTangent }
       slider a { label: "a" }
+      toggle showTangent { label: "show the tangent line" }
+    }
+  }
+
+  slide "Where Does the Slope Vanish?" {
+    id: "d2-hotspot"
+    cat: "Quotient Rule"
+    > The tangent goes flat exactly where $f'(x) = 0$. For
+    > $f(x) = \dfrac{x}{x^2+1}$, that's at $x = \pm 1$ — tap either hump.
+
+    scene plane {
+      x: [-4, 4]
+      y: [-1.2, 1.2]
+      grid
+      axes
+      curve f = x / (x^2 + 1) { color: primary, width: 3 }
+    }
+
+    hotspot {
+      ask "Tap the point where the curve's slope is zero."
+      skill: "deriv-quotient-rule"
+      target circle (1, 0.5) { r: 0.5 }
+      miss "Where is the curve momentarily flat — neither rising nor falling?"
+      hint "Solve f'(x) = (1 - x²)/(x²+1)² = 0."
+      ! "f'(x) = 0 when 1 - x² = 0, i.e. x = ±1. At x = 1, f(1) = 1/2."
     }
   }
 
@@ -92,6 +120,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
     cat: "Quotient Rule"
     numeric {
       ask "Let $f(x) = \dfrac{x}{x + 1}$. Find $f'(1)$."
+      skill: "deriv-quotient-rule"
       answer: 0.25
       tolerance: 0.001
       hint "$f'(x) = \dfrac{(1)(x+1) - x(1)}{(x+1)^2} = \dfrac{1}{(x+1)^2}$."
@@ -104,6 +133,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
     cat: "Quotient Rule"
     build {
       ask "Assemble the numerator of $\left[\dfrac{u}{v}\right]'$."
+      skill: "deriv-quotient-rule"
       bank: ["u'", "v", "-", "u", "v'", "+"]
       answer: ["u'", "v", "-", "u", "v'"]
       hint "It starts with the derivative of the top times the bottom."

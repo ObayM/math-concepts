@@ -1,0 +1,23 @@
+scene plane {
+  x: [-5, 5]
+  y: [-5, 5]
+  grid
+  axes
+
+  param theta = 0 { range: [0, 6.28] }
+  circle ring = (0, 0) { r: 3, color: neutral }
+  point onRing = (3*cos(theta), 3*sin(theta)) { drag: along(ring) -> theta, color: accent }
+
+  param sx = 2 { range: [-5, 5] }
+  param sy = 2 { range: [-5, 5] }
+  point snapped = (sx, sy) { drag: xy -> (sx, sy), snap: 0.5, color: success }
+
+  curve left = x + 3 { where: x < 0, color: primary }
+  curve right = 3 - x { where: x >= 0, color: primary }
+
+  param n = 4 { range: [1, 8], step: 1 }
+  repeat i in range(0, n) {
+    rect bar = (i - n/2, 0) { w: 0.6, h: (i - n/2)^2 * 0.1 + 0.5, color: accent, opacity: 0.4 }
+  }
+  slider n { label: "bars" }
+}

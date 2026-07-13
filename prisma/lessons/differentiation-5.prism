@@ -14,11 +14,28 @@ lesson "Differentiation V — Mixed Drill" {
     > **outside-in**. Let's drill.
   }
 
+  slide "Match Rule to Result" {
+    id: "d5-match"
+    cat: "Strategy"
+    match {
+      ask "Match each derivative rule to what it produces."
+      skill: "deriv-power-rule"
+      pair "d/dx[x^n]" -> "n·x^(n-1)"
+      pair "d/dx[u·v]" -> "u'v + uv'"
+      pair "d/dx[u/v]" -> "(u'v - uv')/v²"
+      pair "d/dx[f(g(x))]" -> "f'(g(x))·g'(x)"
+      pair "d/dx[sin x]" -> "cos x"
+      decoy "u'v'"
+      ! "That last one — u'v' — is the trap: the derivative of a product is never just the product of the derivatives."
+    }
+  }
+
   slide "Which Rule?" {
     id: "d5-quiz-which"
     cat: "Strategy"
     quiz {
       ask "Which rule do you apply **first** to differentiate $f(x) = x^{2}\sin x$?"
+      skill: "deriv-product-rule"
       - "Chain rule" { why: "There's no function-inside-a-function here." }
       * "Product rule" { why: "Correct — it's x² times sin x, a product." }
       - "Quotient rule" { why: "Nothing is being divided." }
@@ -33,6 +50,7 @@ lesson "Differentiation V — Mixed Drill" {
     cat: "Drills"
     numeric {
       ask "Let $f(x) = x^{2}(x + 3)$. Find $f'(2)$."
+      skill: "deriv-product-rule"
       answer: 24
       hint "$f'(x) = 2x(x+3) + x^2 = 3x^2 + 6x$."
       ! "$f'(x) = 3x^2 + 6x$, so $f'(2) = 12 + 12 = 24$."
@@ -44,6 +62,7 @@ lesson "Differentiation V — Mixed Drill" {
     cat: "Drills"
     numeric {
       ask "Let $f(x) = (x^{2} + 1)^{4}$. Find $f'(1)$."
+      skill: "deriv-chain-rule"
       answer: 64
       hint "$f'(x) = 4(x^2+1)^3 \cdot 2x = 8x(x^2+1)^3$."
       ! "$f'(x) = 8x(x^2+1)^3$, so $f'(1) = 8 \cdot 8 = 64$."
@@ -55,6 +74,7 @@ lesson "Differentiation V — Mixed Drill" {
     cat: "Drills"
     numeric {
       ask "Let $f(x) = \dfrac{x + 2}{x - 2}$. Find $f'(0)$."
+      skill: "deriv-quotient-rule"
       answer: -1
       tolerance: 0.001
       hint "$f'(x) = \dfrac{(1)(x-2) - (x+2)(1)}{(x-2)^2} = \dfrac{-4}{(x-2)^2}$."
@@ -67,6 +87,7 @@ lesson "Differentiation V — Mixed Drill" {
     cat: "Drills"
     numeric {
       ask "Let $f(x) = x\cos x$. Find $f'(0)$."
+      skill: "deriv-product-rule"
       answer: 1
       hint "Product rule: $f'(x) = \cos x - x\sin x$."
       ! "$f'(x) = \cos x - x\sin x$, so $f'(0) = 1 - 0 = 1$."
@@ -78,6 +99,7 @@ lesson "Differentiation V — Mixed Drill" {
     cat: "Drills"
     quiz {
       ask "What is $\frac{d}{dx}\left[\sin(x^{2})\right]$?"
+      skill: "deriv-chain-rule"
       - "$\cos(x^2)$" { why: "Multiply by the derivative of the inside, 2x." }
       * "$2x\cos(x^2)$"
       - "$2x\cos x$" { why: "The inside x² stays inside the cosine." }
@@ -92,6 +114,7 @@ lesson "Differentiation V — Mixed Drill" {
     cat: "Drills"
     build {
       ask "Assemble $\frac{d}{dx}\left[x\sin x\right]$."
+      skill: "deriv-product-rule"
       bank: ["sin x", "+", "x", "·", "cos x", "-"]
       answer: ["sin x", "+", "x", "·", "cos x"]
       hint "Product rule: (derivative of x)·sin x + x·(derivative of sin x)."
@@ -102,8 +125,25 @@ lesson "Differentiation V — Mixed Drill" {
   slide "Capstone" {
     id: "d5-capstone"
     cat: "Drills"
+    > One last one, tying it all together: the derivative as a **rate-of-change
+    > vector**, pointing in the direction $(1, f'(a))$. Drag the point and watch
+    > the arrow tilt with the slope.
+
+    scene plane {
+      x: [-1, 9.5]
+      y: [-1, 10]
+      grid
+      axes
+      param a = 4 { range: [-3, 8], step: 0.1 }
+      curve f = sqrt(x^2 + 9) { color: primary, width: 3 }
+      point P = (a, sqrt(a^2 + 9)) { color: primary, r: 7, drag: x -> a }
+      vector rate = (a, sqrt(a^2 + 9)) -> (a + 1, sqrt(a^2 + 9) + a / sqrt(a^2 + 9)) { color: accent, width: 2 }
+      slider a { label: "a" }
+    }
+
     numeric {
       ask "Let $f(x) = \sqrt{x^{2} + 9}$. Find $f'(4)$. (Chain + power together.)"
+      skill: "deriv-chain-rule"
       answer: 0.8
       tolerance: 0.001
       hint "$(x^2+9)^{1/2}$ gives $f'(x) = \dfrac{x}{\sqrt{x^2+9}}$."

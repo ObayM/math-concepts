@@ -9,16 +9,6 @@ const prisma = new PrismaClient();
 // build them first with `npm run build:lessons` (db:seed does this automatically).
 
 async function main() {
-  const algebraCourse = await prisma.course.upsert({
-    where: { name: 'Algebra' },
-    update: {},
-    create: {
-      name: 'Algebra',
-      slug: 'algebra',
-      description: 'Master the fundamentals of Algebra.',
-    },
-  });
-
   const calculusCourse = await prisma.course.upsert({
     where: { name: 'Calculus' },
     update: {},
@@ -30,53 +20,6 @@ async function main() {
   });
 
   const lessons = [
-    {
-      courseId: algebraCourse.id,
-      lessonKey: 'quadratics-1',
-      data: require('./lessons/quadratics-1.json'),
-      title: 'Quadratic Equations',
-      description:
-        'Explore parabolas from every angle — standard, vertex, and factored form, the discriminant, and factoring — with draggable, animated graphs and hands-on tiles.',
-      category: 'Algebra',
-      difficulty: 'Intermediate',
-      iconName: 'FunctionSquare',
-      sortOrder: 9,
-    },
-    {
-      courseId: algebraCourse.id,
-      lessonKey: 'real-functions-1',
-      data: require('./lessons/real-functions-1.json'),
-      title: 'Intro to Real Functions',
-      description:
-        'Understand how to determine the domain and range of real functions, including restrictions and interval representation.',
-      category: 'Algebra',
-      difficulty: 'Beginner',
-      iconName: 'FunctionSquare',
-      sortOrder: 1,
-    },
-    {
-      courseId: algebraCourse.id,
-      lessonKey: 'real-functions-2',
-      data: require('./lessons/real-functions-2.json'),
-      title: 'Monotonicity of Functions',
-      description:
-        'Learn how to analyze whether a function is increasing, decreasing, or non-monotonic.',
-      category: 'Algebra',
-      difficulty: 'Beginner',
-      iconName: 'TrendingUp',
-      sortOrder: 2,
-    },
-    {
-      courseId: algebraCourse.id,
-      lessonKey: 'real-functions-3',
-      data: require('./lessons/real-functions-3.json'),
-      title: 'Operations on Functions',
-      description: 'Explore how to add, subtract, multiply, divide, and compose functions.',
-      category: 'Algebra',
-      difficulty: 'Intermediate',
-      iconName: 'Sigma',
-      sortOrder: 3,
-    },
     {
       courseId: calculusCourse.id,
       lessonKey: 'differentiation-1',

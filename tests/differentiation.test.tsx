@@ -53,6 +53,27 @@ describe('differentiation course', () => {
   it('covers every requested rule via exercises across the course', () => {
     const all = LESSONS.map(load);
     const exerciseCount = all.flatMap((l) => l.slides).filter((s) => s.exercise).length;
-    expect(exerciseCount).toBeGreaterThanOrEqual(15); // quizzes + numerics + builds
+    expect(exerciseCount).toBeGreaterThanOrEqual(30); // spans all 8 exercise kinds
+  });
+
+  it('tags every exercise with a skill, feeding the mastery model (#29)', () => {
+    const all = LESSONS.map(load);
+    const exercises = all.flatMap((l) => l.slides).filter((s) => s.exercise);
+    for (const slide of exercises) {
+      expect(slide.exercise!.skill).toBeTruthy();
+    }
+    const skills = new Set(exercises.map((s) => s.exercise!.skill));
+    expect(skills).toEqual(
+      new Set([
+        'deriv-definition',
+        'deriv-power-rule',
+        'deriv-sum-rule',
+        'deriv-product-rule',
+        'deriv-quotient-rule',
+        'deriv-chain-rule',
+        'deriv-trig-sin-cos',
+        'deriv-trig-other',
+      ])
+    );
   });
 });

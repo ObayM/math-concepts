@@ -34,6 +34,7 @@ lesson "Differentiation I — The Derivative & the Power Rule" {
       line sec = (1, 1) -> (1 + h, (1 + h)^2) { color: accent, width: 2 }
       label at (1.4, 8) = "secant slope = ${((1 + h)^2 - 1) / h}" { color: accent }
       slider h { label: "gap h" }
+      button "watch it shrink" { animate: { h: 0.1 }, dur: 1500, ease: easeInOut }
     }
 
     goal "Shrink h below 0.3 and watch the secant become the tangent" {
@@ -67,6 +68,32 @@ lesson "Differentiation I — The Derivative & the Power Rule" {
     }
   }
 
+  slide "Draw the Tangent" {
+    id: "d1-sketch-tangent"
+    cat: "Foundations"
+    > You've watched the tangent trace itself out — now draw it yourself. At
+    > $x = 1$ on $f(x) = x^2$, the tangent has slope $f'(1) = 2\cdot 1 = 2$ and
+    > passes through $(1, 1)$.
+
+    scene plane {
+      x: [-1, 4]
+      y: [-1, 9]
+      grid
+      axes
+      curve f = x^2 { color: primary, width: 3 }
+      point A = (1, 1) { color: success, r: 6, label: "(1, 1)" }
+    }
+
+    sketch line {
+      ask "Draw the tangent line to f(x) = x² at x = 1."
+      through (1, 1)
+      slope: 2
+      skill: "deriv-definition"
+      hint "f'(1) = 2·1 = 2 — that's the slope, and it must pass through (1, 1)."
+      ! "The tangent at x = 1 has slope 2 and passes through (1, 1): y = 2x - 1."
+    }
+  }
+
   slide "The Power Rule" {
     id: "d1-power"
     cat: "Power Rule"
@@ -96,6 +123,7 @@ lesson "Differentiation I — The Derivative & the Power Rule" {
     cat: "Power Rule"
     quiz {
       ask "Using the power rule, what is $\frac{d}{dx}\left[x^{5}\right]$?"
+      skill: "deriv-power-rule"
       - "$x^4$" { why: "Don't forget to bring the 5 down in front." }
       * "$5x^4$"
       - "$5x^5$" { why: "The exponent drops by one: 5 − 1 = 4." }
@@ -110,6 +138,7 @@ lesson "Differentiation I — The Derivative & the Power Rule" {
     cat: "Power Rule"
     numeric {
       ask "If $f(x) = x^{3}$, compute $f'(2)$."
+      skill: "deriv-power-rule"
       answer: 12
       hint "First differentiate: $f'(x) = 3x^2$."
       ! "$f'(x) = 3x^2$, so $f'(2) = 3\cdot 4 = 12$."
@@ -134,9 +163,28 @@ lesson "Differentiation I — The Derivative & the Power Rule" {
     cat: "Combining Terms"
     numeric {
       ask "Let $g(x) = 3x^{2} + 2x - 5$. Find $g'(1)$."
+      skill: "deriv-sum-rule"
       answer: 8
       hint "Differentiate term by term: $g'(x) = 6x + 2$."
       ! "$g'(x) = 6x + 2$, so $g'(1) = 6 + 2 = 8$."
+    }
+  }
+
+  slide "Derivative Values Table" {
+    id: "d1-table"
+    cat: "Combining Terms"
+    > For $g(x) = 3x^{2} + 2x - 5$, we found $g'(x) = 6x + 2$. Fill in $g'(x)$ at
+    > each of these inputs.
+
+    table {
+      ask "Complete the table for g'(x) = 6x + 2."
+      skill: "deriv-sum-rule"
+      header: ["x", "g'(x)"]
+      row: -1, blank(-4)
+      row: 0, blank(2)
+      row: 1, blank(8)
+      row: 2, blank(14)
+      ! "g'(x) = 6x + 2, plug in each x: -4, 2, 8, 14."
     }
   }
 
@@ -145,6 +193,7 @@ lesson "Differentiation I — The Derivative & the Power Rule" {
     cat: "Combining Terms"
     build {
       ask "Assemble $\frac{d}{dx}\left[x^{4}\right]$ from the tiles."
+      skill: "deriv-power-rule"
       bank: ["4", "x", "^", "3", "2"]
       answer: ["4", "x", "^", "3"]
       ! "Bring the 4 down, drop the power by one: $4x^3$."

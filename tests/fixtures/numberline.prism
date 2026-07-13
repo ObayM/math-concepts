@@ -1,0 +1,8 @@
+scene numberline {
+  x: [-5, 5]
+
+  param t = 0 { range: [-5, 5], step: 0.5 }
+  point p = (t, 0) { drag: x -> t, color: primary, label: "t = ${t}" }
+  label at (0, 0) = "0"
+  slider t { label: "t" }
+}
