@@ -22,6 +22,66 @@ async function main() {
   const lessons = [
     {
       courseId: calculusCourse.id,
+      lessonKey: 'limits-1',
+      data: require('./lessons/limits-1.json'),
+      title: 'What a Limit Is',
+      description:
+        'The core idea of calculus: what a function does near a point, not at it, numerically, graphically, and with proper notation.',
+      category: 'Calculus',
+      difficulty: 'Beginner',
+      iconName: 'Circle',
+      sortOrder: 1,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'limits-2',
+      data: require('./lessons/limits-2.json'),
+      title: 'Computing Limits',
+      description:
+        'Direct substitution, factor-and-cancel, rationalizing with a conjugate, and the squeeze theorem: the toolkit for evaluating limits by hand.',
+      category: 'Calculus',
+      difficulty: 'Beginner',
+      iconName: 'Sigma',
+      sortOrder: 2,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'limits-3',
+      data: require('./lessons/limits-3.json'),
+      title: 'One-Sided & Infinite Limits',
+      description:
+        'When left and right disagree, and when a function blows up entirely: jump discontinuities, vertical asymptotes, and reading both kinds off a graph.',
+      category: 'Calculus',
+      difficulty: 'Beginner',
+      iconName: 'LineChart',
+      sortOrder: 3,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'limits-4',
+      data: require('./lessons/limits-4.json'),
+      title: 'Limits at Infinity',
+      description:
+        'What happens way out there: horizontal asymptotes, end behavior, and the degree-comparison shortcut for rational functions.',
+      category: 'Calculus',
+      difficulty: 'Beginner',
+      iconName: 'Move',
+      sortOrder: 4,
+    },
+    {
+      courseId: calculusCourse.id,
+      lessonKey: 'limits-5',
+      data: require('./lessons/limits-5.json'),
+      title: 'Continuity & the Intermediate Value Theorem',
+      description:
+        'The three conditions behind continuity, the three ways a function can break them, and the guaranteed-root payoff of the Intermediate Value Theorem.',
+      category: 'Calculus',
+      difficulty: 'Beginner',
+      iconName: 'Check',
+      sortOrder: 5,
+    },
+    {
+      courseId: calculusCourse.id,
       lessonKey: 'differentiation-1',
       data: require('./lessons/differentiation-1.json'),
       title: 'The Derivative & the Power Rule',
@@ -30,7 +90,7 @@ async function main() {
       category: 'Calculus',
       difficulty: 'Intermediate',
       iconName: 'TrendingUp',
-      sortOrder: 1,
+      sortOrder: 6,
     },
     {
       courseId: calculusCourse.id,
@@ -42,7 +102,7 @@ async function main() {
       category: 'Calculus',
       difficulty: 'Intermediate',
       iconName: 'X',
-      sortOrder: 2,
+      sortOrder: 7,
     },
     {
       courseId: calculusCourse.id,
@@ -54,7 +114,7 @@ async function main() {
       category: 'Calculus',
       difficulty: 'Intermediate',
       iconName: 'Link',
-      sortOrder: 3,
+      sortOrder: 8,
     },
     {
       courseId: calculusCourse.id,
@@ -66,7 +126,7 @@ async function main() {
       category: 'Calculus',
       difficulty: 'Intermediate',
       iconName: 'Waves',
-      sortOrder: 4,
+      sortOrder: 10,
     },
     {
       courseId: calculusCourse.id,
@@ -78,7 +138,7 @@ async function main() {
       category: 'Calculus',
       difficulty: 'Advanced',
       iconName: 'Dumbbell',
-      sortOrder: 5,
+      sortOrder: 12,
     },
   ];
 

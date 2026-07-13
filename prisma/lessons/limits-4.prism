@@ -1,0 +1,130 @@
+lesson "Limits IV: Limits at Infinity" {
+  course: "calculus"
+  skills: ["lim-at-infinity"]
+
+  slide "What Happens Way Out There?" {
+    id: "l4-intro"
+    cat: "End Behavior"
+    > So far every limit has asked "what happens near a finite point $a$?" Now
+    > flip the question: what does $f(x)$ do as $x$ grows **without bound**?
+    > We write $\lim_{x \to \infty} f(x)$ for that end behavior, and when it
+    > settles on a single value $L$, the line $y = L$ is a **horizontal
+    > asymptote**: the graph hugs it more and more tightly the further right you go.
+  }
+
+  slide "Hugging a Horizontal Line" {
+    id: "l4-scene"
+    cat: "End Behavior"
+    > Watch $f(x) = \dfrac{x+2}{x}$. As $x$ grows, the graph flattens out toward
+    > $y = 1$ (dashed), which is the horizontal asymptote. (There's a second
+    > asymptote hiding here too: the graph also breaks apart at $x = 0$, where
+    > the function divides by zero, a vertical asymptote just like Lesson III.)
+
+    scene plane {
+      x: [-10, 10]
+      y: [-4, 6]
+      grid
+      axes
+      curve f = (x + 2) / x { color: primary, width: 3 }
+      curve asym = 1 { style: dashed, color: neutral, width: 2 }
+    }
+  }
+
+  slide "Read the Values" {
+    id: "l4-table"
+    cat: "End Behavior"
+    > Zoom out numerically instead of graphically: plug in bigger and bigger
+    > $x$ and watch $f(x) = \dfrac{x+2}{x}$ close in on 1.
+
+    table {
+      ask "Complete the table for f(x) = (x+2)/x."
+      skill: "lim-at-infinity"
+      header: ["x", "f(x)"]
+      row: 10, blank(1.2)
+      row: 100, blank(1.02)
+      row: 1000, blank(1.002)
+      row: 10000, blank(1.0002)
+      tolerance: 0.001
+      ! "f(x) = 1 + 2/x. As x grows, 2/x shrinks toward 0, so f(x) closes in on 1."
+    }
+  }
+
+  slide "Evaluate the End Behavior" {
+    id: "l4-numeric"
+    cat: "End Behavior"
+    numeric {
+      ask "Find $\lim_{x \to \infty} \dfrac{x+2}{x}$."
+      skill: "lim-at-infinity"
+      answer: 1
+      hint "Split the fraction: (x+2)/x = 1 + 2/x."
+      ! "1 + 2/x → 1 + 0 = 1 as x → ∞."
+    }
+  }
+
+  slide "Comparing Degrees" {
+    id: "l4-degree-rule"
+    cat: "The Degree Rule"
+    > For a ratio of polynomials, you don't need a trick: just compare the
+    > **degrees** of the top and bottom:
+    >
+    > - Top degree **less than** bottom degree → limit is **0**
+    > - Top degree **equals** bottom degree → limit is the **ratio of leading coefficients**
+    > - Top degree **greater than** bottom degree → **no horizontal asymptote**, it grows without bound
+  }
+
+  slide "Smaller Top" {
+    id: "l4-quiz-less"
+    cat: "The Degree Rule"
+    quiz {
+      ask "Find $\lim_{x \to \infty} \dfrac{3x^{2}+1}{x^{3}-5}$."
+      skill: "lim-at-infinity"
+      * "0"
+      - "3" { why: "That would be the answer if the degrees matched, but the bottom's degree (3) is bigger." }
+      - "+∞" { why: "The bottom grows faster than the top here, so the ratio shrinks, not grows." }
+      - "Does not exist"
+      hint "Degree 2 on top, degree 3 on the bottom: which one wins as x grows huge?"
+      ! "The denominator's x³ overwhelms the numerator's x², so the whole fraction shrinks to 0."
+    }
+  }
+
+  slide "Matching Degrees" {
+    id: "l4-numeric-equal"
+    cat: "The Degree Rule"
+    numeric {
+      ask "Find $\lim_{x \to \infty} \dfrac{5x^{3}-2}{2x^{3}+1}$."
+      skill: "lim-at-infinity"
+      answer: 2.5
+      hint "Same degree top and bottom: the limit is just the ratio of the leading coefficients."
+      ! "Both are degree 3, so only the leading coefficients matter: 5/2 = 2.5."
+    }
+  }
+
+  slide "Bigger Top" {
+    id: "l4-quiz-greater"
+    cat: "The Degree Rule"
+    quiz {
+      ask "Find $\lim_{x \to \infty} \dfrac{x^{3}}{x^{2}+1}$."
+      skill: "lim-at-infinity"
+      - "0" { why: "That's what happens when the bottom's degree is bigger, and here it's the top." }
+      - "1" { why: "The degrees aren't equal here, so it's not just a ratio of coefficients." }
+      * "+∞ (no horizontal asymptote)"
+      - "Does not exist, oscillating"
+      hint "The top's degree (3) beats the bottom's degree (2): nothing reins this fraction in."
+      ! "With a bigger top degree, the fraction grows without bound, so there's no horizontal asymptote here at all."
+    }
+  }
+
+  slide "Match Each Case" {
+    id: "l4-match"
+    cat: "The Degree Rule"
+    match {
+      ask "Match each degree comparison to its end behavior."
+      skill: "lim-at-infinity"
+      pair "deg(top) < deg(bottom)" -> "horizontal asymptote y = 0"
+      pair "deg(top) = deg(bottom)" -> "horizontal asymptote at the ratio of leading coefficients"
+      pair "deg(top) > deg(bottom)" -> "no horizontal asymptote, grows without bound"
+      decoy "always y = 1"
+      ! "The degree comparison alone tells you everything about a rational function's end behavior."
+    }
+  }
+}

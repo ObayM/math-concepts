@@ -1,0 +1,136 @@
+lesson "Limits II: Computing Limits" {
+  course: "calculus"
+  skills: ["lim-algebraic", "lim-squeeze"]
+
+  slide "The Easy Case: Direct Substitution" {
+    id: "l2-intro"
+    cat: "Techniques"
+    > When a function is "nice" (no division by zero, no square roots of
+    > negatives) at $x = a$, the limit is just the function's value there:
+    >
+    > $$\lim_{x \to a} f(x) = f(a)$$
+    >
+    > For $f(x) = x^{2} + 3x$, finding $\lim_{x \to 2} f(x)$ is as easy as
+    > plugging in: $2^{2} + 3(2) = 4 + 6 = 10$. Most limits you'll meet aren't
+    > this easy, so always try substitution first.
+  }
+
+  slide "Substitute First" {
+    id: "l2-numeric-sub"
+    cat: "Techniques"
+    numeric {
+      ask "Find $\lim_{x \to 2}\left(x^{2} + 3x\right)$."
+      skill: "lim-algebraic"
+      answer: 10
+      hint "Just plug x = 2 in: nothing here breaks at x = 2."
+      ! "2² + 3(2) = 4 + 6 = 10."
+    }
+  }
+
+  slide "When Substitution Breaks: Factor" {
+    id: "l2-factor"
+    cat: "Techniques"
+    > Direct substitution gives $\frac{0}{0}$ when both the top and bottom share
+    > a factor that vanishes at $a$. The fix: **factor, cancel, then substitute.**
+    >
+    > $$\lim_{x \to 3} \frac{x^{2}-9}{x-3} = \lim_{x \to 3} \frac{(x-3)(x+3)}{x-3} = \lim_{x \to 3}(x+3) = 6$$
+    >
+    > The open circle below marks where the original function is undefined: the
+    > cancelled factor is exactly the hole.
+
+    scene plane {
+      x: [-1, 6]
+      y: [-1, 10]
+      grid
+      axes
+      curve left = (x^2 - 9) / (x - 3) { where: x < 2.99, color: primary, width: 3 }
+      curve right = (x^2 - 9) / (x - 3) { where: x > 3.01, color: primary, width: 3 }
+      point hole = (3, 6) { open, color: primary, r: 7, label: "limit = 6" }
+    }
+  }
+
+  slide "Factor and Cancel" {
+    id: "l2-numeric-factor"
+    cat: "Techniques"
+    numeric {
+      ask "Find $\lim_{x \to 5} \dfrac{x^{2}-25}{x-5}$."
+      skill: "lim-algebraic"
+      answer: 10
+      hint "x² - 25 factors as (x-5)(x+5)."
+      ! "(x²-25)/(x-5) = (x-5)(x+5)/(x-5) = x+5, so the limit as x → 5 is 5+5 = 10."
+    }
+  }
+
+  slide "When There's a Square Root: Rationalize" {
+    id: "l2-conjugate"
+    cat: "Techniques"
+    > Square roots need a different trick: multiply by the **conjugate** to turn
+    > the subtraction into something that cancels:
+    >
+    > $$\lim_{x \to 0} \frac{\sqrt{x+4}-2}{x} = \lim_{x \to 0} \frac{\sqrt{x+4}-2}{x}\cdot\frac{\sqrt{x+4}+2}{\sqrt{x+4}+2} = \lim_{x \to 0}\frac{x}{x\left(\sqrt{x+4}+2\right)} = \lim_{x \to 0}\frac{1}{\sqrt{x+4}+2}$$
+    >
+    > Now substitution works fine: $\frac{1}{\sqrt{4}+2} = \frac{1}{4}$.
+  }
+
+  slide "Rationalize the Numerator" {
+    id: "l2-numeric-conjugate"
+    cat: "Techniques"
+    numeric {
+      ask "Find $\lim_{x \to 0} \dfrac{\sqrt{x+4}-2}{x}$."
+      skill: "lim-algebraic"
+      answer: 0.25
+      hint "Multiply top and bottom by the conjugate, √(x+4) + 2."
+      ! "Multiplying by the conjugate leaves 1/(√(x+4)+2), and at x = 0 that's 1/4."
+    }
+  }
+
+  slide "Trapped Between Two Curves" {
+    id: "l2-squeeze"
+    cat: "The Squeeze Theorem"
+    > Some functions can't be simplified at all, but if you can trap $f$ between
+    > two functions that squeeze to the *same* limit, $f$ has no choice but to go
+    > there too:
+    >
+    > $$\text{if } g(x) \le f(x) \le h(x) \text{ near } a \text{ and } \lim_{x\to a} g = \lim_{x\to a} h = L, \text{ then } \lim_{x\to a} f = L$$
+    >
+    > Below, $x^{2}\sin(1/x)$ (blue) oscillates wildly near 0, but it's always
+    > squeezed between $-x^{2}$ and $x^{2}$ (dashed), both of which pinch to 0.
+
+    scene plane {
+      x: [-1, 1]
+      y: [-1, 1]
+      grid
+      axes
+      curve upper = x^2 { color: neutral, style: dashed, width: 2 }
+      curve lower = 0 - x^2 { color: neutral, style: dashed, width: 2 }
+      curve f = x^2 * sin(1 / x) { color: primary, width: 2 }
+    }
+  }
+
+  slide "Squeeze It" {
+    id: "l2-numeric-squeeze"
+    cat: "The Squeeze Theorem"
+    numeric {
+      ask "Given $-x^{2} \le x^{2}\sin(1/x) \le x^{2}$ for all $x \ne 0$, find $\lim_{x \to 0} x^{2}\sin(1/x)$."
+      skill: "lim-squeeze"
+      answer: 0
+      hint "Both bounding functions go to 0 as x → 0, so the squeeze theorem does the rest."
+      ! "Since -x² and x² both → 0 as x → 0, the squeezed function must too: the limit is 0."
+    }
+  }
+
+  slide "Pick the Right Tool" {
+    id: "l2-quiz-strategy"
+    cat: "Strategy"
+    quiz {
+      ask "Which technique handles $\lim_{x \to 4} \dfrac{x^{2}-16}{x-4}$?"
+      skill: "lim-algebraic"
+      - "Direct substitution" { why: "Plugging in x = 4 gives 0/0, so substitution alone doesn't work." }
+      * "Factor and cancel"
+      - "Rationalize with a conjugate" { why: "That's for expressions with a square root, not this one." }
+      - "The squeeze theorem" { why: "There's nothing here to trap between two bounding functions." }
+      hint "x² - 16 factors nicely."
+      ! "x² - 16 = (x-4)(x+4), so factor and cancel the shared (x-4)."
+    }
+  }
+}

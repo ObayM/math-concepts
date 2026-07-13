@@ -1,0 +1,130 @@
+lesson "Limits I: What a Limit Is" {
+  course: "calculus"
+  skills: ["lim-notation", "lim-numerical"]
+
+  slide "Approaching, Not Arriving" {
+    id: "l1-intro"
+    cat: "Foundations"
+    > Calculus starts with a question that sounds strange at first: *what does a
+    > function do near a point*, never mind what it does **at** that point?
+    >
+    > That question is a **limit**. We write $\lim_{x \to a} f(x) = L$ to mean:
+    > as $x$ gets arbitrarily close to $a$ (from either side), $f(x)$ gets
+    > arbitrarily close to $L$, whether or not $f$ is even defined at $a$ itself.
+  }
+
+  slide "A Function With a Hole" {
+    id: "l1-hole"
+    cat: "Foundations"
+    > Take $f(x) = \dfrac{x^{2}-1}{x-1}$. Plug in $x = 1$ and you get $\frac{0}{0}$,
+    > which is undefined. But for every *other* $x$, the expression simplifies:
+    > $f(x) = x + 1$. Drag the point toward $x = 1$ from either side and watch
+    > $f(a)$ close in on **2**, even though the function has no value to give you
+    > right at $x = 1$ (the open circle marks that missing point).
+
+    scene plane {
+      x: [-2, 4]
+      y: [-2, 6]
+      grid
+      axes
+      param a = -1 { range: [-1.9, 3.9], step: 0.1 }
+      curve left = (x^2 - 1) / (x - 1) { where: x < 0.99, color: primary, width: 3 }
+      curve right = (x^2 - 1) / (x - 1) { where: x > 1.01, color: primary, width: 3 }
+      point hole = (1, 2) { open, color: primary, r: 7, label: "limit = 2" }
+      point probe = (a, (a^2 - 1) / (a - 1)) { drag: x -> a, color: accent, r: 6, label: "f(a) = ${(a^2 - 1) / (a - 1)}" }
+      slider a { label: "a" }
+    }
+
+    goal "Bring the probe within 0.15 of x = 1" {
+      when: abs(a - 1) < 0.15
+      hint: "Drag the slider until it nearly touches the open circle."
+    }
+  }
+
+  slide "Read the Values" {
+    id: "l1-table"
+    cat: "Foundations"
+    > Watching the graph is convincing, but a table of values nails it down.
+    > For $f(x) = \dfrac{x^{2}-1}{x-1}$, fill in $f(x)$ as $x$ approaches 1 from
+    > both sides.
+
+    table {
+      ask "Complete the table for f(x) = (x²-1)/(x-1)."
+      skill: "lim-numerical"
+      header: ["x", "f(x)"]
+      row: 0.9, blank(1.9)
+      row: 0.99, blank(1.99)
+      row: 1.01, blank(2.01)
+      row: 1.1, blank(2.1)
+      tolerance: 0.01
+      ! "f(x) = x + 1 for every x ≠ 1, so plugging in each x gives x + 1: 1.9, 1.99, 2.01, 2.1, closing in on 2 from both sides."
+    }
+  }
+
+  slide "Tap the Limit" {
+    id: "l1-hotspot"
+    cat: "Foundations"
+    > Even though $f(1)$ doesn't exist, the limit still lives on the graph,
+    > right where the open circle is. Tap where $\lim_{x \to 1} f(x)$ sits.
+
+    scene plane {
+      x: [-2, 4]
+      y: [-2, 6]
+      grid
+      axes
+      curve left = (x^2 - 1) / (x - 1) { where: x < 0.99, color: primary, width: 3 }
+      curve right = (x^2 - 1) / (x - 1) { where: x > 1.01, color: primary, width: 3 }
+      point hole = (1, 2) { open, color: primary, r: 7 }
+    }
+
+    hotspot {
+      ask "Tap the point (1, limit value)."
+      skill: "lim-numerical"
+      target circle (1, 2) { r: 0.5 }
+      miss "The function isn't defined at x = 1, but its limit there is 2: look at where the open circle sits."
+      ! "The open circle at (1, 2) marks the limit, the value f(x) approaches, even though f(1) itself doesn't exist."
+    }
+  }
+
+  slide "Reading Limit Notation" {
+    id: "l1-quiz-notation"
+    cat: "Notation"
+    quiz {
+      ask "What does $\lim_{x \to 3} g(x) = 7$ mean?"
+      skill: "lim-notation"
+      - "$g(3) = 7$" { why: "The limit doesn't require the function to even be defined at 3." }
+      * "As x gets arbitrarily close to 3, g(x) gets arbitrarily close to 7"
+      - "g is increasing near x = 3" { why: "A limit says nothing about increasing or decreasing." }
+      - "g(x) = 7 for every x near 3" { why: "g(x) only has to get close to 7, not equal it." }
+      hint "A limit describes behavior *near* a point, not necessarily *at* it."
+      ! "lim(x→3) g(x) = 7 means g(x) can be made as close as you like to 7 by taking x close enough to 3, regardless of g(3)."
+    }
+  }
+
+  slide "Evaluate the Limit" {
+    id: "l1-numeric"
+    cat: "Notation"
+    numeric {
+      ask "Find $\lim_{x \to 1} \dfrac{x^{2}-1}{x-1}$."
+      skill: "lim-numerical"
+      answer: 2
+      hint "Factor the numerator: x² - 1 = (x-1)(x+1)."
+      ! "(x²-1)/(x-1) = (x-1)(x+1)/(x-1) = x+1 for x ≠ 1, so the limit as x → 1 is 1 + 1 = 2."
+    }
+  }
+
+  slide "Limit vs. Value" {
+    id: "l1-quiz-vs-value"
+    cat: "Notation"
+    quiz {
+      ask "For $f(x) = \dfrac{x^{2}-1}{x-1}$, which statement is true?"
+      skill: "lim-notation"
+      * "$\lim_{x \to 1} f(x) = 2$, but f(1) is undefined"
+      - "f(1) = 2 and the limit also equals 2" { why: "f(1) is undefined: plugging in x = 1 gives 0/0." }
+      - "The limit doesn't exist because f(1) is undefined" { why: "The limit only cares about values *near* 1, not the missing value at 1." }
+      - "$\lim_{x \to 1} f(x)$ and f(1) must always be equal" { why: "That's only true when a function is continuous at that point, which isn't the case here." }
+      hint "The limit and the function's actual value at that point are two different questions."
+      ! "The limit exists and equals 2 even though f(1) itself is undefined, which is exactly what the open circle shows."
+    }
+  }
+}

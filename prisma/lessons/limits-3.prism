@@ -1,0 +1,157 @@
+lesson "Limits III: One-Sided & Infinite Limits" {
+  course: "calculus"
+  skills: ["lim-one-sided", "lim-infinite"]
+
+  slide "Approaching From Just One Side" {
+    id: "l3-intro"
+    cat: "One-Sided Limits"
+    > Sometimes a function behaves completely differently depending on *which
+    > side* you approach from. We write $\lim_{x \to a^{-}} f(x)$ for the limit
+    > from the **left** and $\lim_{x \to a^{+}} f(x)$ for the limit from the
+    > **right**. The two-sided limit $\lim_{x \to a} f(x)$ only exists when both
+    > one-sided limits agree.
+  }
+
+  slide "When the Two Sides Disagree" {
+    id: "l3-sign"
+    cat: "One-Sided Limits"
+    > $f(x) = \dfrac{|x|}{x}$ is $-1$ for every negative $x$ and $+1$ for every
+    > positive $x$, and undefined at $x = 0$ itself. The left and right limits
+    > both exist, but they don't match, so the two-sided limit **does not
+    > exist**.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-2, 2]
+      grid
+      axes
+      curve left = 0 - 1 { where: x < 0, color: danger, width: 3 }
+      curve right = 1 { where: x > 0, color: success, width: 3 }
+      point holeL = (0, -1) { open, color: danger, r: 7, label: "left limit = -1" }
+      point holeR = (0, 1) { open, color: success, r: 7, label: "right limit = 1" }
+    }
+  }
+
+  slide "Does the Limit Exist?" {
+    id: "l3-quiz-dne"
+    cat: "One-Sided Limits"
+    quiz {
+      ask "For $f(x) = |x|/x$, what is $\lim_{x \to 0} f(x)$?"
+      skill: "lim-one-sided"
+      - "0" { why: "0 is never a value f actually takes: it's -1 or +1 everywhere." }
+      - "1"
+      - "-1"
+      * "Does not exist"
+      hint "Check whether the left-hand and right-hand limits agree."
+      ! "The left limit is -1 and the right limit is 1, so since they disagree, the two-sided limit does not exist."
+    }
+  }
+
+  slide "A Jump Discontinuity" {
+    id: "l3-jump"
+    cat: "One-Sided Limits"
+    > $h(x) = x + 1$ for $x < 1$, and $h(x) = x + 3$ for $x \ge 1$: a function
+    > that jumps by 2 right at $x = 1$. Find each one-sided limit separately.
+
+    scene plane {
+      x: [-2, 4]
+      y: [-2, 8]
+      grid
+      axes
+      curve left = x + 1 { where: x < 0.99, color: primary, width: 3 }
+      curve right = x + 3 { where: x > 1, color: primary, width: 3 }
+      point holeL = (1, 2) { open, color: primary, r: 7, label: "left limit = 2" }
+      point solidR = (1, 4) { color: primary, r: 7, label: "right limit = 4" }
+    }
+  }
+
+  slide "Left-Hand Limit" {
+    id: "l3-numeric-left"
+    cat: "One-Sided Limits"
+    numeric {
+      ask "For h(x) above, find $\lim_{x \to 1^{-}} h(x)$."
+      skill: "lim-one-sided"
+      answer: 2
+      hint "Use the x + 1 branch, since it applies just to the left of 1."
+      ! "Just left of x = 1, h(x) = x + 1, so the left-hand limit is 1 + 1 = 2."
+    }
+  }
+
+  slide "Right-Hand Limit" {
+    id: "l3-numeric-right"
+    cat: "One-Sided Limits"
+    numeric {
+      ask "For h(x) above, find $\lim_{x \to 1^{+}} h(x)$."
+      skill: "lim-one-sided"
+      answer: 4
+      hint "Use the x + 3 branch, since it applies at and to the right of 1."
+      ! "At and just right of x = 1, h(x) = x + 3, so the right-hand limit is 1 + 3 = 4."
+    }
+  }
+
+  slide "Blowing Up at a Pole" {
+    id: "l3-asymptote"
+    cat: "Infinite Limits"
+    > Some functions don't jump: they **explode**. Watch $f(x) = \dfrac{1}{x-2}$
+    > near $x = 2$: drag the probe point rightward toward 2 and $f(a)$ rockets
+    > upward without bound; approach from the left and it plunges downward
+    > instead. The graph itself breaks apart at the pole, and that vertical gap
+    > *is* the asymptote.
+
+    scene plane {
+      x: [-2, 6]
+      y: [-8, 8]
+      grid
+      axes
+      param a = 0 { range: [-1.9, 5.9], step: 0.1 }
+      curve f = 1 / (x - 2) { color: primary, width: 3 }
+      point probe = (a, 1 / (a - 2)) { drag: x -> a, color: accent, r: 6, label: "f(a) = ${1 / (a - 2)}" }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "Naming the Blow-Up" {
+    id: "l3-quiz-infinite-right"
+    cat: "Infinite Limits"
+    quiz {
+      ask "For $f(x) = 1/(x-2)$, what is $\lim_{x \to 2^{+}} f(x)$?"
+      skill: "lim-infinite"
+      - "0" { why: "As x → 2, the denominator shrinks to 0, so f(x) grows unboundedly and doesn't settle at 0." }
+      * "+∞ (grows without bound)"
+      - "-∞ (drops without bound)" { why: "That's the left-hand behavior: just right of 2, x - 2 is positive, so f(x) is positive too." }
+      - "2"
+      hint "Just right of x = 2, x - 2 is a tiny positive number: what happens when you divide 1 by something tiny and positive?"
+      ! "Just right of 2, x - 2 → 0⁺, so 1/(x-2) grows without bound: the right-hand limit is +∞."
+    }
+  }
+
+  slide "The Other Side" {
+    id: "l3-quiz-infinite-left"
+    cat: "Infinite Limits"
+    quiz {
+      ask "For $f(x) = 1/(x-2)$, what is $\lim_{x \to 2^{-}} f(x)$?"
+      skill: "lim-infinite"
+      - "+∞ (grows without bound)" { why: "That's the right-hand behavior: just left of 2, x - 2 is negative." }
+      * "-∞ (drops without bound)"
+      - "0"
+      - "Does not exist, but not because of ±∞" { why: "It does fail to exist as a real number, but the reason is exactly that it plunges to -∞." }
+      hint "Just left of x = 2, x - 2 is a tiny negative number."
+      ! "Just left of 2, x - 2 → 0⁻, so 1/(x-2) plunges without bound: the left-hand limit is -∞."
+    }
+  }
+
+  slide "Spot the Vertical Asymptote" {
+    id: "l3-quiz-which"
+    cat: "Infinite Limits"
+    quiz {
+      ask "Which function has a vertical asymptote at x = 3?"
+      skill: "lim-infinite"
+      - "$x - 3$" { why: "This is just a line: no denominator, no blow-up." }
+      * "$\dfrac{1}{x-3}$"
+      - "$\sqrt{x-3}$" { why: "This has a domain restriction at x = 3, not a blow-up: it starts there, it doesn't explode." }
+      - "$\dfrac{x-3}{x+1}$" { why: "The (x-3) here is in the numerator, so this is 0 at x = 3, not undefined." }
+      hint "A vertical asymptote comes from a denominator that hits 0 while the numerator doesn't."
+      ! "1/(x-3) is undefined at x = 3 with a numerator that never cancels the zero, which is the signature of a vertical asymptote."
+    }
+  }
+}

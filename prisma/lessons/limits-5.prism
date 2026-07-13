@@ -1,0 +1,130 @@
+lesson "Limits V: Continuity & the Intermediate Value Theorem" {
+  course: "calculus"
+  skills: ["lim-continuity", "lim-ivt"]
+
+  slide "Three Things Have to Line Up" {
+    id: "l5-intro"
+    cat: "Continuity"
+    > A function $f$ is **continuous** at $x = a$ when three separate facts all
+    > hold at once:
+    >
+    > 1. $f(a)$ is defined
+    > 2. $\lim_{x \to a} f(x)$ exists
+    > 3. That limit actually **equals** $f(a)$
+    >
+    > Every discontinuity you've met so far (holes, jumps, poles) is really
+    > just one of these three conditions failing.
+  }
+
+  slide "Three Ways to Break" {
+    id: "l5-picker"
+    cat: "Continuity"
+    > Pick a discontinuity type and see which condition fails.
+
+    scene plane {
+      x: [-3, 5]
+      y: [-3, 6]
+      grid
+      axes
+      choice kind = "removable" { options: ["removable", "jump", "infinite"] }
+      curve remLeft = (x^2 - 1) / (x - 1) { where: x < 0.99, color: primary, width: 3, show: kind == "removable" }
+      curve remRight = (x^2 - 1) / (x - 1) { where: x > 1.01, color: primary, width: 3, show: kind == "removable" }
+      point remHole = (1, 2) { open, color: primary, r: 7, label: "hole at x=1", show: kind == "removable" }
+      curve jumpLeft = x { where: x < 1, color: primary, width: 3, show: kind == "jump" }
+      curve jumpRight = x + 2 { where: x >= 1, color: primary, width: 3, show: kind == "jump" }
+      point jumpHole = (1, 1) { open, color: primary, r: 7, show: kind == "jump" }
+      point jumpSolid = (1, 3) { color: primary, r: 7, label: "jump at x=1", show: kind == "jump" }
+      curve pole = 1 / (x - 1) { color: primary, width: 3, show: kind == "infinite" }
+      label at (1.2, 5.2) = "pole at x=1" { show: kind == "infinite" }
+      picker kind { label: "pick a discontinuity type" }
+    }
+  }
+
+  slide "Name the Failure" {
+    id: "l5-match"
+    cat: "Continuity"
+    match {
+      ask "Match each discontinuity type to what breaks."
+      skill: "lim-continuity"
+      pair "removable (a hole)" -> "the limit exists, but f(a) is undefined or doesn't match it"
+      pair "jump" -> "the left and right limits exist but disagree"
+      pair "infinite (a pole)" -> "the limit is unbounded, and doesn't settle on any finite value"
+      decoy "the function isn't defined anywhere nearby"
+      ! "Every discontinuity traces back to one of the three continuity conditions failing."
+    }
+  }
+
+  slide "All Three or Nothing" {
+    id: "l5-quiz-def"
+    cat: "Continuity"
+    quiz {
+      ask "Which is required for f to be continuous at x = a?"
+      skill: "lim-continuity"
+      - "Just that f(a) is defined" { why: "f(a) can be defined and the function still jump or oscillate nearby." }
+      - "Just that the limit exists" { why: "The limit can exist while f(a) is undefined, which is exactly a removable discontinuity." }
+      * "f(a) is defined, the limit exists, and they're equal"
+      - "f is differentiable at a" { why: "Differentiability is a stronger, separate condition: continuity comes first." }
+      hint "It takes all three conditions together: any one missing breaks continuity."
+      ! "Continuity needs f(a) defined, the limit to exist, and the two to match. Miss any one and the function is discontinuous there."
+    }
+  }
+
+  slide "A Function That Must Cross Zero" {
+    id: "l5-ivt-intro"
+    cat: "The Intermediate Value Theorem"
+    > Here's a payoff of continuity: the **Intermediate Value Theorem (IVT)**
+    > says that if $f$ is continuous on $[a, b]$, then $f$ hits *every* value
+    > between $f(a)$ and $f(b)$ somewhere in between, with no jumps to skip over.
+    >
+    > Take $f(x) = x^{3} - x - 2$ on $[1, 2]$: $f(1) = -2$ and $f(2) = 4$. Since
+    > $f$ is continuous (no holes, no poles, since it's a polynomial) and 0 sits
+    > between $-2$ and $4$, IVT guarantees a root somewhere in $(1, 2)$. Drag
+    > the point until you find it.
+
+    scene plane {
+      x: [1, 2]
+      y: [-2, 4]
+      grid
+      axes
+      param c = 1.5 { range: [1, 2], step: 0.01 }
+      curve f = x^3 - x - 2 { color: primary, width: 3 }
+      point probe = (c, c^3 - c - 2) { drag: x -> c, color: accent, r: 6, label: "f(c) = ${c^3 - c - 2}" }
+      slider c { label: "c" }
+    }
+
+    goal "Find c where f(c) is within 0.15 of zero" {
+      when: abs(c^3 - c - 2) < 0.15
+      hint: "The root is a little past the midpoint of [1, 2]."
+    }
+  }
+
+  slide "What IVT Guarantees" {
+    id: "l5-quiz-ivt"
+    cat: "The Intermediate Value Theorem"
+    quiz {
+      ask "IVT says a continuous f on [a, b] with f(a) and f(b) of opposite sign must..."
+      skill: "lim-ivt"
+      - "be increasing on [a, b]" { why: "IVT says nothing about increasing or decreasing, only that it hits every value in between." }
+      * "have at least one root in (a, b)"
+      - "have exactly one root in (a, b)" { why: "IVT guarantees at least one root, but there could be more than one." }
+      - "be differentiable on [a, b]" { why: "IVT is a statement about continuity, not differentiability." }
+      hint "Opposite signs at the endpoints means 0 is squarely between f(a) and f(b)."
+      ! "Since f(a) and f(b) have opposite signs, 0 is between them, so IVT guarantees f hits 0 somewhere in (a, b)."
+    }
+  }
+
+  slide "Locate the Root" {
+    id: "l5-quiz-locate"
+    cat: "The Intermediate Value Theorem"
+    quiz {
+      ask "For $g(x) = x^{3} - 2x - 5$, between which two consecutive integers does IVT guarantee a root?"
+      skill: "lim-ivt"
+      - "0 and 1" { why: "g(0) = -5 and g(1) = -6, both negative, no sign change." }
+      - "1 and 2" { why: "g(1) = -6 and g(2) = -1, both negative, no sign change." }
+      * "2 and 3"
+      - "3 and 4" { why: "g(3) = 16 and g(4) = 51, both positive, no sign change." }
+      hint "Evaluate g at each integer and look for a sign change."
+      ! "g(2) = 8 - 4 - 5 = -1 and g(3) = 27 - 6 - 5 = 16, opposite signs, so IVT guarantees a root in (2, 3)."
+    }
+  }
+}
