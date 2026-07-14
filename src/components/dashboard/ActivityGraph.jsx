@@ -4,7 +4,7 @@ import { Zap, Calendar } from 'lucide-react';
 
 const DAY_LABELS = ['S', 'Su', 'M', 'T', 'W', 'Th', 'F'];
 
-const ActivityGraph = ({ activityData }) => {
+const ActivityGraph = ({ activityData, streak, hasActivityToday }) => {
   const [view, setView] = useState('week');
 
   const activityMap = useMemo(() => {
@@ -44,14 +44,15 @@ const ActivityGraph = ({ activityData }) => {
     return days;
   }, []);
 
-  const activeDays = weekDays.filter((d) => (activityMap[d.date] || 0) > 0).length;
-  const target = 3;
-  const remaining = Math.max(0, target - activeDays);
-
   return (
     <div className="w-full">
       {view === 'week' ? (
-        <StreakView weekDays={weekDays} activityMap={activityMap} remaining={remaining} />
+        <StreakView
+          weekDays={weekDays}
+          activityMap={activityMap}
+          streak={streak ?? 0}
+          hasActivityToday={hasActivityToday}
+        />
       ) : (
         <GridView monthDays={monthDays} activityMap={activityMap} />
       )}
@@ -70,19 +71,20 @@ const ActivityGraph = ({ activityData }) => {
   );
 };
 
-const StreakView = ({ weekDays, activityMap, remaining }) => (
+const StreakView = ({ weekDays, activityMap, streak, hasActivityToday }) => (
   <div>
     <p className="text-center text-sm text-neutral-500 mb-6">
-      {remaining > 0 ? (
+      {streak === 0 ? (
+        <>Solve a problem to start a streak</>
+      ) : hasActivityToday ? (
         <>
-          Solve{' '}
           <span className="font-bold text-neutral-800">
-            {remaining} problem{remaining !== 1 ? 's' : ''}
+            {streak} day{streak !== 1 ? 's' : ''}
           </span>{' '}
-          to start a streak
+          strong. Keep it going.
         </>
       ) : (
-        <>7 days straight. Keep it going.</>
+        <>Keep your streak alive by taking one lesson</>
       )}
     </p>
 

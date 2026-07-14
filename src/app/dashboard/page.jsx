@@ -69,15 +69,31 @@ const DashboardPage = async () => {
     if (match) currentCourse = match;
   }
 
+  const completedInCourse = currentCourse
+    ? currentCourse.lessons.filter((l) => l.status === 'completed').length
+    : 0;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const hasActivityToday = activityData.some((a) => a.date === todayStr);
+
   return (
     <div className="bg-surface min-h-[calc(100vh-var(--nav-h))]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
-          <WelcomeHeader name={user.username} streak={streak} />
+          <WelcomeHeader
+            name={user.username}
+            streak={streak}
+            completed={completedInCourse}
+            courseName={currentCourse?.name}
+            hasActivityToday={hasActivityToday}
+          />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <ContinueLearningCard course={currentCourse} />
-              <ActivitySection activityData={activityData} />
+              <ContinueLearningCard course={currentCourse} completed={completedInCourse} />
+              <ActivitySection
+                activityData={activityData}
+                streak={streak}
+                hasActivityToday={hasActivityToday}
+              />
             </div>
             <div>
               <UpNextPanel course={currentCourse} />
@@ -89,11 +105,29 @@ const DashboardPage = async () => {
   );
 };
 
-const WelcomeHeader = ({ name, streak }) => (
+function getSubheadline({ completed, courseName, streak, hasActivityToday }) {
+  if (!courseName || completed === 0) {
+    return courseName
+      ? `Let's start ${courseName} — solve your first problem today.`
+      : 'Keep the momentum going.';
+  }
+  const lessonWord = `${completed} lesson${completed !== 1 ? 's' : ''}`;
+  if (hasActivityToday) {
+    return `Nice work today — you're ${lessonWord} into ${courseName}.`;
+  }
+  if (streak > 0) {
+    return `You're ${lessonWord} into ${courseName} and only 1 lesson away from a ${streak + 1}-day streak.`;
+  }
+  return `You're ${lessonWord} into ${courseName}. Solve one to start a streak.`;
+}
+
+const WelcomeHeader = ({ name, streak, completed, courseName, hasActivityToday }) => (
   <div className="flex items-start justify-between animate-fade-in-up">
     <div>
       <h1 className="text-3xl font-bold text-neutral-900">Hey, {name ?? 'there'}! 👋</h1>
-      <p className="mt-1 text-neutral-500">Keep the momentum going.</p>
+      <p className="mt-1 text-neutral-500">
+        {getSubheadline({ completed, courseName, streak: streak ?? 0, hasActivityToday })}
+      </p>
     </div>
     <div className="flex items-center gap-2 bg-white border border-neutral-200 rounded-2xl px-4 py-2.5 shrink-0">
       <Flame className="w-5 h-5 text-orange-500" />
@@ -103,10 +137,9 @@ const WelcomeHeader = ({ name, streak }) => (
   </div>
 );
 
-const ContinueLearningCard = ({ course }) => {
+const ContinueLearningCard = ({ course, completed }) => {
   if (!course) return null;
 
-  const completed = course.lessons.filter((l) => l.status === 'completed').length;
   const total = course.lessons.length;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
   const coursePath = courseUrlSlug(course);
@@ -148,9 +181,13 @@ const ContinueLearningCard = ({ course }) => {
   );
 };
 
-const ActivitySection = ({ activityData }) => (
+const ActivitySection = ({ activityData, streak, hasActivityToday }) => (
   <Card className="animate-fade-in-up [animation-delay:200ms] opacity-0 p-6">
-    <ActivityGraph activityData={activityData} />
+    <ActivityGraph
+      activityData={activityData}
+      streak={streak}
+      hasActivityToday={hasActivityToday}
+    />
   </Card>
 );
 
