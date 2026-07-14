@@ -76,7 +76,7 @@ const DashboardPage = async () => {
   const hasActivityToday = activityData.some((a) => a.date === todayStr);
 
   return (
-    <div className="bg-surface min-h-[calc(100vh-var(--nav-h))]">
+    <div className="bg-grid-snow min-h-[calc(100vh-var(--nav-h))]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
           <WelcomeHeader

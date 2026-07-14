@@ -74,7 +74,7 @@ export default async function CoursePage({ params }) {
   }
   // Integrate a flash cards system here, wehre you can memorize, revise everything you learned in a very short time
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface">
+    <div className="min-h-[calc(100vh-var(--nav-h))] bg-grid-snow">
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <Badge variant="primary" className="mb-4 text-sm px-4 py-1.5">
