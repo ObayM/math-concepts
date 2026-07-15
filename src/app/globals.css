@@ -126,3 +126,40 @@
     24px 24px,
     24px 24px;
 }
+
+.bg-grid-interactive {
+  --mx: 50%;
+  --my: 30%;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-snow);
+  background-image:
+    linear-gradient(var(--color-snow-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-snow-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-grid-interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    500px circle at var(--mx) var(--my),
+    rgba(59, 130, 246, 0.08),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.bg-grid-interactive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.45) 1px, transparent 1px);
+  background-size: 32px 32px;
+  -webkit-mask-image: radial-gradient(220px circle at var(--mx) var(--my), black, transparent 70%);
+  mask-image: radial-gradient(220px circle at var(--mx) var(--my), black, transparent 70%);
+  pointer-events: none;
+}
