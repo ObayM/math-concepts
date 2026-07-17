@@ -163,3 +163,14 @@
   mask-image: radial-gradient(220px circle at var(--mx) var(--my), black, transparent 70%);
   pointer-events: none;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-pop-in,
+  .animate-slide-in-right,
+  .animate-slide-in-left {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
