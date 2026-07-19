@@ -1292,6 +1292,16 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   const allowedIds = scene ? Object.keys(scene.state ?? {}) : [];
   const goals = goalItems.map((g) => emitGoal(g, allowedIds));
 
+  if (
+    scene?.space?.type === 'numberline' &&
+    (exercise?.kind === 'hotspot' || exercise?.kind === 'sketch')
+  ) {
+    throw new CompileError(
+      `a ${exercise.kind} exercise needs a plane scene; the numberline renderer can't host its input layer`,
+      s.ln
+    );
+  }
+
   const category = pStr(s.props, 'cat');
   const skill = pStr(s.props, 'skill');
   return {

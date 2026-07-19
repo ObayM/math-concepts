@@ -10,6 +10,8 @@ exports[`lesson compile errors > build without a bank 1`] = `"line 3: build need
 
 exports[`lesson compile errors > goal when references undefined state 1`] = `"line 8: "zorp" is not defined here"`;
 
+exports[`lesson compile errors > hotspot on a numberline scene is rejected 1`] = `"line 2: a hotspot exercise needs a plane scene; the numberline renderer can't host its input layer"`;
+
 exports[`lesson compile errors > numeric with a string answer 1`] = `"line 3: expected a number, got a string"`;
 
 exports[`lesson compile errors > numeric without an answer 1`] = `"line 3: numeric needs an answer: <number>"`;

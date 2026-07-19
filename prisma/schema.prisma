@@ -45,6 +45,7 @@ model Session {
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("session")
 }
 
@@ -64,6 +65,7 @@ model Account {
   createdAt             DateTime
   updatedAt             DateTime
 
+  @@index([userId])
   @@map("account")
 }
 
@@ -86,7 +88,7 @@ enum ContentStatus {
 model Course {
   id          String        @id @default(uuid())
   name        String        @unique
-  slug        String?
+  slug        String?       @unique
   description String?
   status      ContentStatus @default(published)
   sortOrder   Int           @default(0) @map("sort_order")
@@ -124,6 +126,8 @@ model Lesson {
   progress UserLessonProgress[]
   attempts LessonAttempt[]
 
+  @@index([courseId])
+  @@index([status])
   @@map("lessons")
 }
 
@@ -185,5 +189,6 @@ model UserSkillMastery {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, skill])
+  @@index([skill])
   @@map("user_skill_mastery")
 }

@@ -57,6 +57,8 @@ const lessonCases: Record<string, string> = {
   'unknown thing in slide': 'lesson "L" {\n  slide "s" {\n    wobble\n  }\n}',
   'goal when references undefined state':
     'lesson "L" {\n  slide "s" {\n    scene plane {\n      x: [-1, 1]\n      y: [-1, 1]\n      param t = 1\n    }\n    goal "reach it" { when: zorp > 1 }\n  }\n}',
+  'hotspot on a numberline scene is rejected':
+    'lesson "L" {\n  slide "s" {\n    scene numberline {\n      x: [0, 10]\n    }\n    hotspot {\n      ask "Tap it"\n      target circle (2, 0) { r: 0.6 }\n    }\n  }\n}',
 };
 
 describe('scene compile errors', () => {

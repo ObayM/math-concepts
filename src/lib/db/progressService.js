@@ -30,21 +30,21 @@ export function verifyAttempts(slideMap, attempts) {
 
 const MASTERY_ALPHA = 0.3;
 
-async function recordSkillMastery(userId, skill, correct) {
+async function recordSkillMastery(tx, userId, skill, correct) {
   const correctInc = correct ? 1 : 0;
-  const existing = await prisma.userSkillMastery.findUnique({
+  const existing = await tx.userSkillMastery.findUnique({
     where: { userId_skill: { userId, skill } },
   });
 
   if (!existing) {
-    await prisma.userSkillMastery.create({
+    await tx.userSkillMastery.create({
       data: { userId, skill, score: correctInc, attempts: 1, correct: correctInc },
     });
     return;
   }
 
   const score = existing.score * (1 - MASTERY_ALPHA) + correctInc * MASTERY_ALPHA;
-  await prisma.userSkillMastery.update({
+  await tx.userSkillMastery.update({
     where: { userId_skill: { userId, skill } },
     data: { score, attempts: existing.attempts + 1, correct: existing.correct + correctInc },
   });
@@ -64,18 +64,20 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) 
   const correct = checker ? Boolean(checker.check(slide, answer)) : false;
   const skill = slide.exercise.skill ?? slide.skill ?? null;
 
-  await prisma.lessonAttempt.create({
-    data: {
-      userId,
-      lessonId: lesson.id,
-      slideId,
-      exerciseKind: slide.exercise.kind,
-      skill,
-      question: slide.exercise.prompt ?? slide.title ?? '',
-      correct,
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.lessonAttempt.create({
+      data: {
+        userId,
+        lessonId: lesson.id,
+        slideId,
+        exerciseKind: slide.exercise.kind,
+        skill,
+        question: slide.exercise.prompt ?? slide.title ?? '',
+        correct,
+      },
+    });
+    if (skill) await recordSkillMastery(tx, userId, skill, correct);
   });
-  if (skill) await recordSkillMastery(userId, skill, correct);
 
   return { correct };
 }
@@ -110,65 +112,69 @@ export async function upsertLessonProgress(
   if (!lesson) return null;
 
   const now = new Date();
-  let verifiedQuizHistory = quizHistory;
 
-  if (quizHistory !== undefined) {
-    const existing = await prisma.userLessonProgress.findUnique({
-      where: { userId_lessonId: { userId, lessonId: lesson.id } },
-      select: { quizHistory: true },
-    });
-    const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
-    const newAttempts = quizHistory.slice(priorLength);
+  await prisma.$transaction(async (tx) => {
+    let verifiedQuizHistory = quizHistory;
 
-    if (newAttempts.length) {
-      const slideMap = buildSlideMap(lesson.publishedData);
-      const verified = verifyAttempts(slideMap, newAttempts);
-
-      await prisma.lessonAttempt.createMany({
-        data: verified.map((v) => ({
-          userId,
-          lessonId: lesson.id,
-          slideId: v.slideId,
-          exerciseKind: v.kind,
-          skill: v.skill,
-          question: v.question,
-          correct: v.correct,
-        })),
+    if (quizHistory !== undefined) {
+      const existing = await tx.userLessonProgress.findUnique({
+        where: { userId_lessonId: { userId, lessonId: lesson.id } },
+        select: { quizHistory: true },
       });
-      for (const v of verified) {
-        if (v.skill) await recordSkillMastery(userId, v.skill, v.correct);
+      const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
+      const newAttempts = quizHistory.slice(priorLength);
+
+      if (newAttempts.length) {
+        const slideMap = buildSlideMap(lesson.publishedData);
+        const verified = verifyAttempts(slideMap, newAttempts);
+
+        await tx.lessonAttempt.createMany({
+          data: verified.map((v) => ({
+            userId,
+            lessonId: lesson.id,
+            slideId: v.slideId,
+            exerciseKind: v.kind,
+            skill: v.skill,
+            question: v.question,
+            correct: v.correct,
+          })),
+        });
+        for (const v of verified) {
+          if (v.skill) await recordSkillMastery(tx, userId, v.skill, v.correct);
+        }
+
+        verifiedQuizHistory = [
+          ...quizHistory.slice(0, priorLength),
+          ...verified.map(({ title, question, slideId, kind, correct }) => ({
+            title,
+            question,
+            slideId,
+            kind,
+            correct,
+          })),
+        ];
       }
-
-      verifiedQuizHistory = [
-        ...quizHistory.slice(0, priorLength),
-        ...verified.map(({ title, question, slideId, kind, correct }) => ({
-          title,
-          question,
-          slideId,
-          kind,
-          correct,
-        })),
-      ];
     }
-  }
 
-  await prisma.userLessonProgress.upsert({
-    where: { userId_lessonId: { userId, lessonId: lesson.id } },
-    update: {
-      currentStep,
-      lastPlayedAt: now,
-      ...(isCompleted && { completed: true, completedAt: now }),
-      ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
-    },
-    create: {
-      userId,
-      lessonId: lesson.id,
-      currentStep,
-      lastPlayedAt: now,
-      ...(isCompleted && { completed: true, completedAt: now }),
-      ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
-    },
+    await tx.userLessonProgress.upsert({
+      where: { userId_lessonId: { userId, lessonId: lesson.id } },
+      update: {
+        currentStep,
+        lastPlayedAt: now,
+        ...(isCompleted && { completed: true, completedAt: now }),
+        ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
+      },
+      create: {
+        userId,
+        lessonId: lesson.id,
+        currentStep,
+        lastPlayedAt: now,
+        ...(isCompleted && { completed: true, completedAt: now }),
+        ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
+      },
+    });
   });
+
   return lesson.id;
 }
 
