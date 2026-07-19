@@ -3,6 +3,7 @@ import type { ExprIR } from '@/engine/expr';
 import { evalNumber } from './eval';
 
 const MAX_INSTANCES = 500;
+const MAX_TOTAL = 2000;
 
 // fields on any scene object that can hold a NumExpr (the where a `repeat`'s
 // loop var could show up). points/text get walked separately below.
@@ -83,12 +84,16 @@ function instantiate(obj: Record<string, unknown>, varName: string, k: number): 
 }
 
 // renderers call this once on `ir.objects` before drawing — flattens any
-// `repeat` groups into their expanded instances (recursively, in declaration order).
-export function expandObjects(objects: SceneObject[], scope: Scope): SceneObject[] {
+// `repeat` groups into their expanded instances (recursively, in declaration
+// order). a per-level cap bounds each loop; a shared budget bounds the total so
+// nested repeats can't multiply into a render-time blowup.
+function expandInto(objects: SceneObject[], scope: Scope, budget: { left: number }): SceneObject[] {
   const out: SceneObject[] = [];
   for (const obj of objects) {
     const o = obj as unknown as Record<string, unknown>;
     if (o.type !== 'repeat') {
+      if (budget.left <= 0) break;
+      budget.left--;
       out.push(obj);
       continue;
     }
@@ -101,7 +106,12 @@ export function expandObjects(objects: SceneObject[], scope: Scope): SceneObject
     for (let k = 0; k < count; k++) {
       for (const item of body) instances.push(instantiate(item, o.var as string, k));
     }
-    out.push(...expandObjects(instances, scope));
+    out.push(...expandInto(instances, scope, budget));
+    if (budget.left <= 0) break;
   }
   return out;
+}
+
+export function expandObjects(objects: SceneObject[], scope: Scope): SceneObject[] {
+  return expandInto(objects, scope, { left: MAX_TOTAL });
 }

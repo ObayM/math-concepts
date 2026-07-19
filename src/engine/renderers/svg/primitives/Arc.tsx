@@ -20,7 +20,7 @@ export default function Arc({ obj, scope, cx }: PrimProps) {
   const ex = px + rpx * Math.cos(end);
   const ey = py - rpx * Math.sin(end);
   const largeArc = Math.abs(end - start) > Math.PI ? 1 : 0;
-  const sweep = end > start ? 1 : 0;
+  const sweep = end > start ? 0 : 1;
 
   const color = resolveColor(obj.color);
   return (

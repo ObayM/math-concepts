@@ -8,6 +8,8 @@ exports[`formatCompileError caret frame > points at the offending column with a 
 
 exports[`lesson compile errors > build without a bank 1`] = `"line 3: build needs a bank: [...]"`;
 
+exports[`lesson compile errors > goal when references undefined state 1`] = `"line 8: "zorp" is not defined here"`;
+
 exports[`lesson compile errors > numeric with a string answer 1`] = `"line 3: expected a number, got a string"`;
 
 exports[`lesson compile errors > numeric without an answer 1`] = `"line 3: numeric needs an answer: <number>"`;
@@ -27,6 +29,10 @@ exports[`scene compile errors > bad expression 1`] = `"line 4:14: unexpected tok
 exports[`scene compile errors > bad identifier 1`] = `"line 4:9: expected IDENT, got NUM"`;
 
 exports[`scene compile errors > call to undefined macro 1`] = `"line 4: undefined macro "tick""`;
+
+exports[`scene compile errors > drag axis must be x, y, or xy 1`] = `"line 5: drag axis must be x, y, or xy"`;
+
+exports[`scene compile errors > drag to a literal is rejected, not silently dropped 1`] = `"line 5: drag binds one param (axis -> p) or two (xy -> (px, py))"`;
 
 exports[`scene compile errors > empty source 1`] = `"line 2:1: a Prism file must start with a "scene <type> { ... }" or "lesson" block"`;
 

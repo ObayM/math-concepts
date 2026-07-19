@@ -674,7 +674,10 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
               along: { ref: drag.from.args[0].name },
             };
           } else {
-            const axis = drag.from.k === 'id' ? drag.from.name : ser(drag.from, cScope);
+            if (drag.from.k !== 'id' || !['x', 'y', 'xy'].includes(drag.from.name)) {
+              throw new CompileError('drag axis must be x, y, or xy', s.ln);
+            }
+            const axis = drag.from.name;
             if (drag.to.k === 'id') {
               obj.draggable = { axis, bind: bindTo(drag.to.name, 'drag', s.ln) };
             } else if (drag.to.k === 'tuple' && drag.to.items.length === 2) {
@@ -687,6 +690,11 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
                 bind: bindTo(bindX, 'drag', s.ln),
                 bindY: bindTo(bindY, 'drag', s.ln),
               };
+            } else {
+              throw new CompileError(
+                'drag binds one param (axis -> p) or two (xy -> (px, py))',
+                s.ln
+              );
             }
             const snap = s.props.get('snap');
             if (snap && snap !== true) obj.draggable.snap = parseSnap(snap, s.ln);
@@ -1183,9 +1191,48 @@ function emitTable(s: Extract<Stmt, { k: 'table' }>) {
   };
 }
 
-function emitGoal(s: Extract<Stmt, { k: 'goal' }>) {
+function validateGoalIds(expr: Expr, allowed: string[], ln: number): void {
+  const walk = (e: Expr): void => {
+    switch (e.k) {
+      case 'id': {
+        if (allowed.includes(e.name) || e.name in CONSTS) return;
+        const cands = [...allowed, ...Object.keys(CONSTS)];
+        throw new CompileError(`"${e.name}" is not defined here${suggest(e.name, cands)}`, ln);
+      }
+      case 'un':
+        return walk(e.e);
+      case 'bin':
+        walk(e.l);
+        walk(e.r);
+        return;
+      case 'call':
+        if (!(e.fn in BUILTINS)) {
+          throw new CompileError(`unknown function "${e.fn}"${suggest(e.fn, BUILTIN_NAMES)}`, ln);
+        }
+        e.args.forEach(walk);
+        return;
+      case 'tuple':
+      case 'list':
+        e.items.forEach(walk);
+        return;
+      case 'dict':
+        e.entries.forEach(([, v]) => walk(v));
+        return;
+      case 'arrow':
+        walk(e.from);
+        walk(e.to);
+        return;
+      default:
+        return;
+    }
+  };
+  walk(expr);
+}
+
+function emitGoal(s: Extract<Stmt, { k: 'goal' }>, allowedIds: string[]) {
   const whenExpr = s.props.get('when');
   if (!whenExpr || whenExpr === true) throw new CompileError('goal needs a when: condition', s.ln);
+  validateGoalIds(whenExpr, allowedIds, s.ln);
   const when = asIR(lower(whenExpr, {}));
   const hint = pStr(s.props, 'hint');
   return { prompt: s.prompt, when, ...(hint && { hint }) };
@@ -1205,7 +1252,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
     | ReturnType<typeof emitOrder>
     | ReturnType<typeof emitTable>
     | undefined;
-  const goals: ReturnType<typeof emitGoal>[] = [];
+  const goalItems: Extract<Stmt, { k: 'goal' }>[] = [];
 
   for (const item of s.items) {
     if (item.k === 'prose') {
@@ -1238,9 +1285,12 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitTable(item);
     } else if (item.k === 'goal') {
-      goals.push(emitGoal(item));
+      goalItems.push(item);
     }
   }
+
+  const allowedIds = scene ? Object.keys(scene.state ?? {}) : [];
+  const goals = goalItems.map((g) => emitGoal(g, allowedIds));
 
   const category = pStr(s.props, 'cat');
   const skill = pStr(s.props, 'skill');

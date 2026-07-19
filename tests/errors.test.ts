@@ -35,6 +35,10 @@ const sceneCases: Record<string, string> = {
   'None is gone': 'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  point p = (None, 0)\n}',
   'member access is not a thing':
     'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  point p = (1, 2)\n  label at (0, 0) = p.x\n}',
+  'drag to a literal is rejected, not silently dropped':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param t = 1\n  point p = (1, 1) { drag: x -> 5, snap: 0.5 }\n}',
+  'drag axis must be x, y, or xy':
+    'scene plane {\n  x: [-1, 1]\n  y: [-1, 1]\n  param t = 1\n  point p = (1, 1) { drag: (1 + 2) -> t }\n}',
 };
 
 const lessonCases: Record<string, string> = {
@@ -51,6 +55,8 @@ const lessonCases: Record<string, string> = {
   'two exercises on one slide':
     'lesson "L" {\n  slide "s" {\n    quiz { ask "?"\n - "a"\n * "b" }\n    quiz { ask "?"\n - "c"\n * "d" }\n  }\n}',
   'unknown thing in slide': 'lesson "L" {\n  slide "s" {\n    wobble\n  }\n}',
+  'goal when references undefined state':
+    'lesson "L" {\n  slide "s" {\n    scene plane {\n      x: [-1, 1]\n      y: [-1, 1]\n      param t = 1\n    }\n    goal "reach it" { when: zorp > 1 }\n  }\n}',
 };
 
 describe('scene compile errors', () => {
