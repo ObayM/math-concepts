@@ -35,7 +35,11 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
             <button
               key={i}
               onClick={() => filled && removeAt(i)}
-              className={`w-full min-h-12 px-4 py-2 rounded-xl border-2 flex items-center gap-3 text-left font-bold text-neutral-700 transition-all ${cls}`}
+              disabled={checked || !filled}
+              aria-label={
+                filled ? `position ${i + 1}, filled, tap to remove` : `position ${i + 1}, empty`
+              }
+              className={`w-full min-h-12 px-4 py-2 rounded-xl border-2 flex items-center gap-3 text-left font-bold text-neutral-700 transition-all disabled:cursor-default ${cls}`}
             >
               <span className="text-neutral-400 text-sm shrink-0">{i + 1}.</span>
               {filled && <RichText>{bank[idx]}</RichText>}
@@ -43,7 +47,11 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
           );
         })}
       </div>
-      <div className="flex flex-wrap justify-center gap-2">
+      <div
+        className="flex flex-wrap justify-center gap-2"
+        role="group"
+        aria-label="Available items"
+      >
         {bank.map((label, idx) => {
           const disabled = placed.length >= ex.items.length || placed.includes(idx);
           return (

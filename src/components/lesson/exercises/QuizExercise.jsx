@@ -13,7 +13,7 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
         {ex.prompt}
       </RichText>
 
-      <div className="grid gap-3">
+      <div className="grid gap-3" role="radiogroup" aria-label="Answer choices">
         {ex.options.map((option, idx) => {
           const isSelected = selected === idx;
           const isCorrect = idx === ex.correct;
@@ -30,8 +30,11 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
           return (
             <div key={idx}>
               <button
+                role="radio"
+                aria-checked={isSelected}
+                disabled={checked}
                 onClick={() => !checked && onChange(idx)}
-                className={`w-full p-5 rounded-2xl text-left text-lg font-bold transition-all flex items-center justify-between active:scale-95 ${cls}`}
+                className={`w-full p-5 rounded-2xl text-left text-lg font-bold transition-all flex items-center justify-between active:scale-95 disabled:cursor-default ${cls}`}
               >
                 <span
                   className={

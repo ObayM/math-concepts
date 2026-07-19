@@ -269,6 +269,7 @@ export default function LessonPlayer({
           onClick={handleReset}
           className="bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors"
           title="Restart lesson"
+          aria-label="Restart lesson"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -276,7 +277,15 @@ export default function LessonPlayer({
 
       <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-2xl overflow-hidden border border-neutral-200 flex flex-col relative">
         <div className="pt-8 px-10 pb-2 flex items-center justify-between">
-          <div className="flex-1 mx-8 flex space-x-1 h-2">
+          <div
+            className="flex-1 mx-8 flex space-x-1 h-2"
+            role="progressbar"
+            aria-label="Lesson progress"
+            aria-valuemin={1}
+            aria-valuemax={slides.length}
+            aria-valuenow={currentIndex + 1}
+            aria-valuetext={`Slide ${currentIndex + 1} of ${slides.length}`}
+          >
             {slides.map((_, idx) => (
               <div
                 key={idx}
@@ -312,6 +321,11 @@ export default function LessonPlayer({
                 goalsMet={goalsMet}
                 onScopeChange={handleScopeChange}
               />
+              <div aria-live="polite" className="sr-only">
+                {checked &&
+                  correct !== null &&
+                  (correct ? 'Correct.' : 'Not quite. Review the explanation and try again.')}
+              </div>
             </div>
           </div>
         </div>
@@ -326,6 +340,7 @@ export default function LessonPlayer({
               onClick={() => setTutorOpen((o) => !o)}
               className="text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
               title="Ask AI Tutor"
+              aria-label="Ask AI Tutor"
             >
               <Sparkles className="w-5 h-5" />
             </button>

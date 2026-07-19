@@ -77,7 +77,10 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
               <button
                 key={i}
                 onClick={() => pickLeft(i)}
-                className={`p-4 rounded-2xl text-left font-bold transition-all flex items-center justify-between active:scale-95 ${cls}`}
+                disabled={checked}
+                aria-pressed={armed === i}
+                aria-label={matched ? `paired with ${matches[i]}` : undefined}
+                className={`p-4 rounded-2xl text-left font-bold transition-all flex items-center justify-between active:scale-95 disabled:cursor-default ${cls}`}
               >
                 <RichText>{p.left}</RichText>
                 {isCorrect && <CheckCircle2 className="w-4 h-4 shrink-0 text-success-500" />}
@@ -102,6 +105,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
                 key={text}
                 onClick={() => pickRight(text)}
                 disabled={checked}
+                aria-pressed={used}
                 className={`p-4 rounded-2xl text-left font-bold transition-all active:scale-95 disabled:cursor-default ${cls}`}
               >
                 <RichText>{text}</RichText>
