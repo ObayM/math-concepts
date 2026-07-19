@@ -2,7 +2,14 @@
 import React, { useMemo, useState } from 'react';
 import { Zap, Calendar } from 'lucide-react';
 
-const DAY_LABELS = ['S', 'Su', 'M', 'T', 'W', 'Th', 'F'];
+const DAY_LABELS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa'];
+
+const utcKey = (d) => d.toISOString().split('T')[0];
+
+function utcToday() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
 
 const ActivityGraph = ({ activityData, streak, hasActivityToday }) => {
   const [view, setView] = useState('week');
@@ -18,28 +25,29 @@ const ActivityGraph = ({ activityData, streak, hasActivityToday }) => {
   }, [activityData]);
 
   const weekDays = useMemo(() => {
-    const today = new Date();
-    const dow = today.getDay();
+    const base = utcToday();
+    const todayKey = utcKey(base);
+    const dow = base.getUTCDay();
     const days = [];
     for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - dow + i);
+      const d = new Date(base);
+      d.setUTCDate(d.getUTCDate() - dow + i);
       days.push({
-        date: d.toISOString().split('T')[0],
-        label: DAY_LABELS[d.getDay()],
-        isToday: d.toDateString() === today.toDateString(),
+        date: utcKey(d),
+        label: DAY_LABELS[d.getUTCDay()],
+        isToday: utcKey(d) === todayKey,
       });
     }
     return days;
   }, []);
 
   const monthDays = useMemo(() => {
-    const today = new Date();
+    const base = utcToday();
     const days = [];
     for (let i = 27; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      days.push(d.toISOString().split('T')[0]);
+      const d = new Date(base);
+      d.setUTCDate(d.getUTCDate() - i);
+      days.push(utcKey(d));
     }
     return days;
   }, []);

@@ -38,7 +38,7 @@ const DashboardPage = async () => {
   const [streak, activityData, courses, progressRows] = await Promise.all([
     getStreak(user.id),
     getActivityHeatmap(user.id),
-    prisma.course.findMany({ orderBy: { createdAt: 'asc' } }),
+    prisma.course.findMany({ where: { status: 'published' }, orderBy: { createdAt: 'asc' } }),
     prisma.userLessonProgress.findMany({
       where: { userId: user.id },
       select: {
@@ -52,15 +52,21 @@ const DashboardPage = async () => {
 
   const progressByLessonKey = new Map(progressRows.map((p) => [p.lesson.lessonKey, p]));
 
-  const coursesWithLessons = await Promise.all(
-    courses.map(async (course) => {
-      const lessons = await prisma.lesson.findMany({
-        where: { courseId: course.id },
-        orderBy: { sortOrder: 'asc' },
-      });
-      return { ...course, lessons: withLessonStatus(lessons, progressByLessonKey) };
-    })
-  );
+  const allLessons = await prisma.lesson.findMany({
+    where: { courseId: { in: courses.map((c) => c.id) }, status: 'published' },
+    orderBy: { sortOrder: 'asc' },
+  });
+  const lessonsByCourse = new Map();
+  for (const lesson of allLessons) {
+    const list = lessonsByCourse.get(lesson.courseId) ?? [];
+    list.push(lesson);
+    lessonsByCourse.set(lesson.courseId, list);
+  }
+
+  const coursesWithLessons = courses.map((course) => ({
+    ...course,
+    lessons: withLessonStatus(lessonsByCourse.get(course.id) ?? [], progressByLessonKey),
+  }));
 
   let currentCourse = coursesWithLessons[0] ?? null;
   if (progressRows.length > 0) {

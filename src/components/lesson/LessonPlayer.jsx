@@ -204,6 +204,7 @@ export default function LessonPlayer({
     if (!confirm('Restart this lesson from the beginning? Your progress will be cleared.')) return;
     fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
     setCurrentIndex(0);
+    setResetForIndex(-1);
     setQuizHistory([]);
     setIsComplete(false);
     setChecked(false);
