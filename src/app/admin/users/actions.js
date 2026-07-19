@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getFullSession, isSuperAdmin } from '@/lib/authz';
+import { getFullSession, isSuperAdmin, isAdmin } from '@/lib/authz';
 import { ROLES } from '@/lib/permissions';
 import { countUsersWithRole } from '@/lib/db/userService';
 
@@ -12,6 +12,17 @@ const CODED_IN_IDS = (process.env.ADMIN_USER_IDS ?? '')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+
+const RANK = { student: 0, admin: 1, super_admin: 2 };
+
+function rankOf(user) {
+  if (!user) return -1;
+  if (CODED_IN_IDS.includes(user.id)) return RANK.super_admin;
+  return String(user.role ?? '')
+    .split(',')
+    .map((r) => r.trim())
+    .reduce((max, r) => Math.max(max, RANK[r] ?? 0), 0);
+}
 
 async function requireActor() {
   const session = await getFullSession();
@@ -60,4 +71,22 @@ export async function unbanUserAction(formData) {
 
   await auth.api.unbanUser({ headers: await headers(), body: { userId } });
   revalidatePath('/admin/users');
+}
+
+export async function impersonateUserAction(userId) {
+  const actor = await requireActor();
+  if (!isAdmin(actor)) throw new Error('Forbidden');
+  if (!userId) throw new Error('userId is required');
+  if (userId === actor.id) throw new Error("You can't impersonate yourself");
+
+  const target = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true },
+  });
+  if (!target) throw new Error('User not found');
+  if (CODED_IN_IDS.includes(target.id) || rankOf(target) >= rankOf(actor)) {
+    throw new Error("You can't impersonate a user at or above your own role");
+  }
+
+  await auth.api.impersonateUser({ headers: await headers(), body: { userId } });
 }

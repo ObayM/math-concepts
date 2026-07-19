@@ -38,6 +38,8 @@ Difficulty: ${difficulty}.${context ? `\nLesson context: ${context}` : ''}
 
 Make it genuinely interactive — the learner should manipulate something and see math respond.
 Return ONLY the Prism source. No markdown, no explanation.`,
+      maxOutputTokens: 2048,
+      abortSignal: AbortSignal.timeout(45_000),
     });
     prism = result.text;
   } catch (err: unknown) {

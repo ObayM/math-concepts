@@ -1,6 +1,12 @@
 export async function sendEmail({ to, subject, html }) {
   if (!process.env.SMTP_HOST) {
-    console.log(`\n[EMAIL — no SMTP configured]\nTo: ${to}\nSubject: ${subject}\n${html}\n`);
+    if (process.env.NODE_ENV === 'production') {
+      console.error(
+        `[EMAIL] SMTP is not configured; refusing to send "${subject}" to ${to}. Set SMTP_* to enable delivery.`
+      );
+      throw new Error('Email delivery is not configured');
+    }
+    console.log(`\n[EMAIL - no SMTP configured]\nTo: ${to}\nSubject: ${subject}\n${html}\n`);
     return;
   }
 

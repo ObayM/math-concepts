@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Zap } from 'lucide-react';
 import LessonCard from '@/components/lesson/LessonCard';
 import Badge from '@/components/ui/Badge';
-import { resolveCourseBySlug } from '@/lib/db/courseService';
+import { resolveCourseBySlug, courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
 export default async function CoursePage({ params }) {
@@ -59,10 +59,8 @@ export default async function CoursePage({ params }) {
   });
 
   const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;
+  const slug = courseUrlSlug(course);
 
-  // group consecutive lessons sharing a `unit` under one header; lessons with
-  // no unit (e.g. a course that hasn't adopted units yet) fall into a single
-  // ungrouped run, so this degrades to the old flat list.
   const groups = [];
   for (const lesson of lessonsWithProgress) {
     const last = groups[groups.length - 1];
@@ -72,7 +70,6 @@ export default async function CoursePage({ params }) {
       groups.push({ unit: lesson.unit, lessons: [lesson] });
     }
   }
-  // Integrate a flash cards system here, wehre you can memorize, revise everything you learned in a very short time
   return (
     <div className="min-h-[calc(100vh-var(--nav-h))] bg-grid-snow">
       <main className="container mx-auto px-4 py-16 md:py-24">
@@ -126,6 +123,7 @@ export default async function CoursePage({ params }) {
                   <LessonCard
                     key={lesson.id}
                     lesson={lesson}
+                    courseSlug={slug}
                     index={i}
                     isLast={i === group.lessons.length - 1}
                   />

@@ -3,8 +3,12 @@
 import { useRouter } from 'next/navigation';
 import Button from '@/components/admin/ui/Button';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
-import { authClient } from '@/lib/auth-client';
-import { setRoleAction, banUserAction, unbanUserAction } from '@/app/admin/users/actions';
+import {
+  setRoleAction,
+  banUserAction,
+  unbanUserAction,
+  impersonateUserAction,
+} from '@/app/admin/users/actions';
 
 const ROLE_OPTIONS = ['student', 'admin', 'super_admin'];
 
@@ -13,7 +17,7 @@ export default function UserRowActions({ user, viewerId, canManage, canImpersona
   const router = useRouter();
 
   async function handleImpersonate() {
-    await authClient.admin.impersonateUser({ userId: user.id });
+    await impersonateUserAction(user.id);
     router.push('/dashboard');
   }
 

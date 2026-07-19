@@ -31,7 +31,7 @@ export const auth = betterAuth({
               Reset Password
             </a>
             <p style="margin-top:16px;color:#6b7280;font-size:13px">
-              If you didn't request this, you can safely ignore this email — your password won't change.
+              If you didn't request this, you can safely ignore this email. Your password won't change.
             </p>
           </div>
         `,

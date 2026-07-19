@@ -23,12 +23,18 @@ export async function POST(req: Request) {
   }
   const { context, question } = parsed.data;
 
-  const { text } = await generateText({
-    model: TUTOR_MODEL,
-    instructions:
-      'You are a friendly, encouraging math tutor. Explain concepts simply. Keep responses under 80 words.', // Need to change this later
-    prompt: `Context: ${context}\n\nUser Question: ${question}`,
-  });
-
-  return NextResponse.json({ answer: text });
+  try {
+    const { text } = await generateText({
+      model: TUTOR_MODEL,
+      instructions:
+        'You are a friendly, encouraging math tutor. Explain concepts simply. Keep responses under 80 words.',
+      prompt: `Context: ${context}\n\nUser Question: ${question}`,
+      maxOutputTokens: 512,
+      abortSignal: AbortSignal.timeout(30_000),
+    });
+    return NextResponse.json({ answer: text });
+  } catch (err: unknown) {
+    const detail = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: 'Tutor is unavailable right now', detail }, { status: 502 });
+  }
 }

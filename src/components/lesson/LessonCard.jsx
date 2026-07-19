@@ -31,8 +31,8 @@ const statusConfig = {
   },
 };
 
-export default function LessonCard({ lesson, index, isLast = false }) {
-  const { id, title, description, category, difficulty, status, iconName } = lesson;
+export default function LessonCard({ lesson, courseSlug, index, isLast = false }) {
+  const { id, title, description, difficulty, status, iconName } = lesson;
   const Icon = iconMap[iconName] || iconMap['FunctionSquare'];
   const config = statusConfig[status] || statusConfig.locked;
   const isLocked = status === 'locked';
@@ -100,7 +100,7 @@ export default function LessonCard({ lesson, index, isLast = false }) {
   if (isLocked) return inner;
 
   return (
-    <Link href={`/courses/${category.toLowerCase()}/${id}`} className="block">
+    <Link href={`/courses/${courseSlug}/${id}`} className="block">
       {inner}
     </Link>
   );

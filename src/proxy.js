@@ -25,7 +25,9 @@ export function proxy(request) {
   const isPublic = pathname === '/' || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
   if (!isPublic) {
-    const sessionToken = request.cookies.get('better-auth.session_token');
+    const sessionToken =
+      request.cookies.get('better-auth.session_token') ??
+      request.cookies.get('__Secure-better-auth.session_token');
     if (!sessionToken) {
       const url = request.nextUrl.clone();
       url.pathname = '/login';

@@ -42,6 +42,8 @@ slide with a scene should be genuinely interactive — the learner manipulates
 something and sees math respond, not a static picture.
 
 Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markdown, no explanation.`,
+      maxOutputTokens: 4096,
+      abortSignal: AbortSignal.timeout(60_000),
     });
     prism = result.text;
   } catch (err: unknown) {
