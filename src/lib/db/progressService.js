@@ -50,6 +50,36 @@ async function recordSkillMastery(userId, skill, correct) {
   });
 }
 
+export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { lessonKey },
+    select: { id: true, status: true, publishedData: true },
+  });
+  if (!lesson || lesson.status !== 'published') return null;
+
+  const slide = buildSlideMap(lesson.publishedData).get(slideId);
+  if (!slide?.exercise) return null;
+
+  const checker = exercises[slide.exercise.kind];
+  const correct = checker ? Boolean(checker.check(slide, answer)) : false;
+  const skill = slide.exercise.skill ?? slide.skill ?? null;
+
+  await prisma.lessonAttempt.create({
+    data: {
+      userId,
+      lessonId: lesson.id,
+      slideId,
+      exerciseKind: slide.exercise.kind,
+      skill,
+      question: slide.exercise.prompt ?? slide.title ?? '',
+      correct,
+    },
+  });
+  if (skill) await recordSkillMastery(userId, skill, correct);
+
+  return { correct };
+}
+
 export async function getLessonProgress(userId, lessonKey) {
   const lesson = await prisma.lesson.findUnique({
     where: { lessonKey },

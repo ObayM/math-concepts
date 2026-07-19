@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { requireUser } from '@/lib/session';
+import { consume } from '@/lib/rate-limit';
 import {
   getLessonProgress,
   upsertLessonProgress,
@@ -40,6 +41,9 @@ export async function GET(request) {
 export async function POST(request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  if (!consume(user.id, 'progress'))
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {

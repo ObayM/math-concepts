@@ -74,6 +74,13 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
       activityTouched.current = true;
       fetch('/api/activity', { method: 'POST' }).catch(() => {});
     }
+    if (slide.lessonKey) {
+      fetch('/api/practice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lessonKey: slide.lessonKey, slideId: slide.id, answer: value }),
+      }).catch(() => {});
+    }
   };
 
   const handleNext = () => {

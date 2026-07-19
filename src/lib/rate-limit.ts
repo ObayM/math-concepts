@@ -6,6 +6,8 @@ const LIMITS = {
   generate: { max: 5, perMin: 5 },
   'generate-lesson': { max: 2, perMin: 2 },
   'content-save': { max: 30, perMin: 30 },
+  practice: { max: 60, perMin: 60 },
+  progress: { max: 60, perMin: 60 },
 } as const;
 
 export function consume(key: string, tier: keyof typeof LIMITS): boolean {
