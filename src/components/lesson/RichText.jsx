@@ -1,19 +1,20 @@
 'use client';
 import katex from 'katex';
 
-// renders lesson prose: $inline$ / $$display$$ math (KaTeX) + **bold** / *italic*
+export const proseClass = 'block max-w-[42rem] text-xl leading-[1.75] font-normal text-neutral-700';
+
 const tex = (src, displayMode) => katex.renderToString(src, { throwOnError: false, displayMode });
 
-const TOKEN = /\$\$([^$]+)\$\$|\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+const DISPLAY_ONLY = /^\$\$([^$]+)\$\$$/;
 
-export default function RichText({ children, className }) {
-  const text = typeof children === 'string' ? children : '';
+function renderInline(text) {
+  const re = /\$\$([^$]+)\$\$|\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
   const parts = [];
   let last = 0;
   let key = 0;
   let m;
 
-  while ((m = TOKEN.exec(text)) !== null) {
+  while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     if (m[1] != null) {
       parts.push(<span key={key++} dangerouslySetInnerHTML={{ __html: tex(m[1], true) }} />);
@@ -21,16 +22,51 @@ export default function RichText({ children, className }) {
       parts.push(<span key={key++} dangerouslySetInnerHTML={{ __html: tex(m[2], false) }} />);
     } else if (m[3] != null) {
       parts.push(
-        <strong key={key++} className="font-bold text-neutral-800">
+        <strong key={key++} className="font-bold text-neutral-900">
           {m[3]}
         </strong>
       );
     } else if (m[4] != null) {
-      parts.push(<em key={key++}>{m[4]}</em>);
+      parts.push(
+        <em key={key++} className="italic text-neutral-800">
+          {m[4]}
+        </em>
+      );
     }
-    last = TOKEN.lastIndex;
+    last = re.lastIndex;
   }
   if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
 
-  return <span className={className}>{parts}</span>;
+export default function RichText({ children, className }) {
+  const text = typeof children === 'string' ? children : '';
+  const cls = className ? `rich-text ${className}` : 'rich-text';
+  const paragraphs = text.split(/\n\n+/);
+
+  if (paragraphs.length <= 1) {
+    return <span className={cls}>{renderInline(text)}</span>;
+  }
+
+  return (
+    <div className={cls}>
+      {paragraphs.map((para, i) => {
+        const dm = para.trim().match(DISPLAY_ONLY);
+        if (dm) {
+          return (
+            <div
+              key={i}
+              className={i > 0 ? 'mt-5 text-center' : 'text-center'}
+              dangerouslySetInnerHTML={{ __html: tex(dm[1], true) }}
+            />
+          );
+        }
+        return (
+          <p key={i} className={i > 0 ? 'mt-4' : ''}>
+            {renderInline(para)}
+          </p>
+        );
+      })}
+    </div>
+  );
 }

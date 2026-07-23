@@ -1,6 +1,6 @@
 'use client';
 import { Scene } from '@/engine';
-import RichText from './RichText';
+import RichText, { proseClass } from './RichText';
 import GoalBanner from './GoalBanner';
 import QuizExercise from './exercises/QuizExercise';
 import NumericExercise from './exercises/NumericExercise';
@@ -11,8 +11,6 @@ import MatchExercise from './exercises/MatchExercise';
 import OrderExercise from './exercises/OrderExercise';
 import TableExercise from './exercises/TableExercise';
 
-// renders a v2 slide as a composition: prose + scene + exercise.
-// a slide is no longer one "type" — it stacks whatever parts it declares.
 const exerciseRegistry = {
   quiz: QuizExercise,
   numeric: NumericExercise,
@@ -54,12 +52,8 @@ export default function SlideView({
     : undefined;
 
   return (
-    <div className="flex flex-col gap-6 h-full">
-      {slide.prose && (
-        <RichText className="text-xl text-neutral-600 leading-relaxed font-medium block">
-          {slide.prose}
-        </RichText>
-      )}
+    <div className="flex flex-col gap-8 h-full">
+      {slide.prose && <RichText className={proseClass}>{slide.prose}</RichText>}
 
       {slide.scene && (
         <Scene

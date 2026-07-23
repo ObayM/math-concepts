@@ -14,7 +14,7 @@ export default function SketchExercise({ slide, value, checked, correct, onChang
 
   return (
     <div className="flex flex-col">
-      <RichText className="text-xl text-neutral-600 leading-relaxed font-medium mb-4">
+      <RichText className="text-xl text-neutral-700 leading-[1.75] font-normal max-w-[42rem] mb-6">
         {ex.prompt}
       </RichText>
 

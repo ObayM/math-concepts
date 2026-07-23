@@ -303,13 +303,13 @@ export default function LessonPlayer({
             key={currentIndex}
             className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
           >
-            <div className="mb-6">
-              <div className="flex items-center space-x-2 mb-2">
-                <span className="text-neutral-400 font-bold text-sm tracking-wider uppercase">
+            <div className="mb-8">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-primary-500 font-bold text-sm tracking-wider uppercase">
                   {slide?.category || 'Concept'}
                 </span>
               </div>
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight">
+              <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight">
                 {slide?.title}
               </h1>
             </div>

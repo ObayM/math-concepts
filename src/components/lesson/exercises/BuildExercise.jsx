@@ -20,7 +20,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
   return (
     <div className="flex flex-col items-center gap-6">
       {ex.prompt && (
-        <RichText className="text-xl text-neutral-600 leading-relaxed font-medium text-center block">
+        <RichText className="text-xl text-neutral-700 leading-[1.75] font-normal max-w-[42rem] mx-auto text-center block">
           {ex.prompt}
         </RichText>
       )}

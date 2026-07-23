@@ -58,7 +58,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
 
   return (
     <div className="flex flex-col">
-      <RichText className="text-xl text-neutral-600 leading-relaxed font-medium mb-6">
+      <RichText className="text-xl text-neutral-700 leading-[1.75] font-normal max-w-[42rem] mb-6">
         {ex.prompt}
       </RichText>
 
