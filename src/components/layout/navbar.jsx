@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
@@ -56,14 +57,16 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:pt-4">
         <nav
-          className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8"
+          className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-neutral-200/80 bg-white px-4 py-2.5 shadow-[0_4px_16px_-6px_rgba(15,23,42,0.12)] lg:px-5"
           aria-label="Global"
         >
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-xl font-bold tracking-tight text-primary-900">Mathly</span>
+              <span className="font-display text-2xl font-bold tracking-tight text-neutral-900">
+                Mathly
+              </span>
             </Link>
           </div>
 
@@ -78,18 +81,24 @@ export default function Navbar() {
             </button>
           </div>
 
-          <div className="hidden lg:flex lg:items-center lg:gap-x-12">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`text-sm font-semibold leading-6 transition-colors ${
-                  pathname === link.href ? 'text-primary-600' : 'text-neutral-700 hover:text-black'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+          <div className="hidden lg:flex lg:items-center lg:gap-x-1">
+            {navLinks.map((link) => {
+              const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={clsx(
+                    'rounded-full px-4 py-2 text-sm font-semibold transition-colors',
+                    active
+                      ? 'bg-neutral-100 text-neutral-900'
+                      : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
+                  )}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -139,17 +148,17 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center gap-x-2">
                 <Link
                   href="/login"
-                  className="text-sm font-semibold leading-6 text-neutral-700 transition-colors hover:text-black"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
                 >
                   Log in
                 </Link>
 
                 <Link
                   href="/signup"
-                  className="rounded-md bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+                  className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-neutral-800"
                 >
                   Sign up
                 </Link>
@@ -165,7 +174,9 @@ export default function Navbar() {
           <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-black/5">
             <div className="flex items-center justify-between">
               <Link href="/" className="-m-1.5 p-1.5" onClick={() => setIsMobileMenuOpen(false)}>
-                <span className="text-xl font-bold tracking-tight text-neutral-900">Mathly</span>
+                <span className="font-display text-2xl font-bold tracking-tight text-neutral-900">
+                  Mathly
+                </span>
               </Link>
               <button
                 type="button"

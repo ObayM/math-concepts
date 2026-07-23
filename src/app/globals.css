@@ -111,6 +111,42 @@
   --nav-h: 73px;
 }
 
+.font-display {
+  font-family: var(--font-fraunces), ui-serif, Georgia, 'Times New Roman', serif;
+}
+
+.bg-app {
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 230px,
+      rgba(255, 255, 255, 0.4) 560px,
+      rgba(255, 255, 255, 0.78) 860px,
+      #ffffff 1200px
+    ),
+    linear-gradient(to right, #e6ebf3 1px, transparent 1px),
+    linear-gradient(to bottom, #e6ebf3 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    34px 34px,
+    34px 34px;
+  background-repeat: no-repeat, repeat, repeat;
+}
+
+.card-soft {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 10px -4px rgba(15, 23, 42, 0.05);
+}
+
+.card-hero {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 6px 16px -8px rgba(15, 23, 42, 0.07);
+}
+
 .bg-grid-snow {
   background-color: var(--color-snow);
   background-image:

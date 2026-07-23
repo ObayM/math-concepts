@@ -11,7 +11,7 @@ function utcToday() {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 }
 
-const ActivityGraph = ({ activityData, streak, hasActivityToday }) => {
+const ActivityGraph = ({ activityData, streak, hasActivityToday, showCaption = true }) => {
   const [view, setView] = useState('week');
 
   const activityMap = useMemo(() => {
@@ -60,6 +60,7 @@ const ActivityGraph = ({ activityData, streak, hasActivityToday }) => {
           activityMap={activityMap}
           streak={streak ?? 0}
           hasActivityToday={hasActivityToday}
+          showCaption={showCaption}
         />
       ) : (
         <GridView monthDays={monthDays} activityMap={activityMap} />
@@ -79,24 +80,26 @@ const ActivityGraph = ({ activityData, streak, hasActivityToday }) => {
   );
 };
 
-const StreakView = ({ weekDays, activityMap, streak, hasActivityToday }) => (
+const StreakView = ({ weekDays, activityMap, streak, hasActivityToday, showCaption }) => (
   <div>
-    <p className="text-center text-sm text-neutral-500 mb-6">
-      {streak === 0 ? (
-        <>Solve a problem to start a streak</>
-      ) : hasActivityToday ? (
-        <>
-          <span className="font-bold text-neutral-800">
-            {streak} day{streak !== 1 ? 's' : ''}
-          </span>{' '}
-          strong. Keep it going.
-        </>
-      ) : (
-        <>Keep your streak alive by taking one lesson</>
-      )}
-    </p>
+    {showCaption && (
+      <p className="text-center text-sm text-neutral-500 mb-6">
+        {streak === 0 ? (
+          <>Solve a problem to start a streak</>
+        ) : hasActivityToday ? (
+          <>
+            <span className="font-bold text-neutral-800">
+              {streak} day{streak !== 1 ? 's' : ''}
+            </span>{' '}
+            strong. Keep it going.
+          </>
+        ) : (
+          <>Keep your streak alive by taking one lesson</>
+        )}
+      </p>
+    )}
 
-    <div className="flex items-center justify-center gap-3 sm:gap-5">
+    <div className="flex items-end justify-between">
       {weekDays.map((day) => {
         const count = activityMap[day.date] || 0;
         const active = count > 0;
@@ -105,15 +108,15 @@ const StreakView = ({ weekDays, activityMap, streak, hasActivityToday }) => (
           <div key={day.date} className="flex flex-col items-center gap-2">
             <div
               className={[
-                'w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-colors duration-200',
+                'w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200',
                 active
-                  ? 'bg-neutral-800 text-white'
+                  ? 'bg-success-500 text-white'
                   : day.isToday
-                    ? 'ring-2 ring-neutral-200 bg-white text-neutral-400'
+                    ? 'ring-2 ring-success-300 bg-white text-success-500'
                     : 'bg-neutral-100 text-neutral-300',
               ].join(' ')}
             >
-              <Zap className={`w-4 h-4 sm:w-[18px] sm:h-[18px] ${active ? 'fill-white' : ''}`} />
+              <Zap className={`w-4 h-4 ${active ? 'fill-white' : ''}`} />
             </div>
             <span
               className={`text-xs font-medium ${day.isToday ? 'text-neutral-700' : 'text-neutral-400'}`}

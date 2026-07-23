@@ -1,4 +1,4 @@
-import { Nunito } from 'next/font/google';
+import { Nunito, Fraunces } from 'next/font/google';
 import './globals.css';
 import 'katex/dist/katex.min.css';
 import Navbar from '@/components/layout/navbar';
@@ -12,6 +12,13 @@ const nunito = Nunito({
   variable: '--font-nunito',
   subsets: ['latin'],
   weight: ['400', '600', '700', '800'],
+});
+
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '900'],
+  display: 'swap',
 });
 
 export const metadata = {
@@ -34,7 +41,9 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${nunito.variable} font-[family-name:var(--font-nunito)] antialiased`}>
+      <body
+        className={`${nunito.variable} ${fraunces.variable} font-[family-name:var(--font-nunito)] antialiased`}
+      >
         <AuthProvider initialUser={userInfo}>
           <ImpersonationBanner />
           {!pathname.startsWith('/dsl-preview') && !pathname.startsWith('/prism') && <Navbar />}
