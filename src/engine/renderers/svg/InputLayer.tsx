@@ -1,6 +1,6 @@
 'use client';
 import React, { useRef, useState } from 'react';
-import { toDataCoords } from './coords';
+import { toDataCoords, PLOT_PAD } from './coords';
 import { simplify } from '@/engine/runtime/rdp';
 import { resolveColor } from '@/engine/colors';
 import type { Pt } from '@/engine/checks/geometry';
@@ -34,7 +34,7 @@ export default function InputLayer({
   const getPoint = (clientX: number, clientY: number): Pt => {
     const svg = svgRef.current;
     if (!svg) return [0, 0];
-    return toDataCoords(svg, clientX, clientY, cx.xDomain, cx.yDomain);
+    return toDataCoords(svg, clientX, clientY, cx.xDomain, cx.yDomain, PLOT_PAD);
   };
 
   const handleDown = (e: React.PointerEvent<SVGRectElement>) => {
@@ -105,10 +105,10 @@ export default function InputLayer({
               key={i}
               cx={cx.toX(x)}
               cy={cx.toY(y)}
-              r={6}
+              r={7}
               fill={color}
               stroke="white"
-              strokeWidth={2}
+              strokeWidth={2.5}
               pointerEvents="none"
             />
           ))

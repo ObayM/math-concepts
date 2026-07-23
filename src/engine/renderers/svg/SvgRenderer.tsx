@@ -6,7 +6,7 @@ import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
 import { resolveColor, GRID_LINE, AXIS_LINE, AXIS_LABEL, LABEL_HALO } from '@/engine/colors';
-import { toDataCoords } from './coords';
+import { toDataCoords, PLOT_PAD } from './coords';
 import InputLayer, { type InputLayerConfig } from './InputLayer';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
@@ -53,8 +53,8 @@ export default function SvgRenderer({
   const [yMin, yMax] = ir.space.yDomain;
 
   const cx: CoordSystem = {
-    toX: (x) => ((x - xMin) / (xMax - xMin)) * W,
-    toY: (y) => H - ((y - yMin) / (yMax - yMin)) * H,
+    toX: (x) => PLOT_PAD + ((x - xMin) / (xMax - xMin)) * (W - 2 * PLOT_PAD),
+    toY: (y) => H - PLOT_PAD - ((y - yMin) / (yMax - yMin)) * (H - 2 * PLOT_PAD),
     W,
     H,
     xDomain: ir.space.xDomain,
@@ -76,7 +76,14 @@ export default function SvgRenderer({
     const move = (ev: PointerEvent) => {
       const svg = svgRef.current;
       if (!svg) return;
-      const [dataX, dataY] = toDataCoords(svg, ev.clientX, ev.clientY, [xMin, xMax], [yMin, yMax]);
+      const [dataX, dataY] = toDataCoords(
+        svg,
+        ev.clientX,
+        ev.clientY,
+        [xMin, xMax],
+        [yMin, yMax],
+        PLOT_PAD
+      );
       const patch = applyDrag(draggable, dataX, dataY, ir, scope);
       for (const key in patch) set(key, patch[key]);
     };
@@ -91,7 +98,14 @@ export default function SvgRenderer({
   const handleTap = (e: React.PointerEvent<SVGRectElement>) => {
     const svg = svgRef.current;
     if (!svg || !onTap) return;
-    const [dataX, dataY] = toDataCoords(svg, e.clientX, e.clientY, [xMin, xMax], [yMin, yMax]);
+    const [dataX, dataY] = toDataCoords(
+      svg,
+      e.clientX,
+      e.clientY,
+      [xMin, xMax],
+      [yMin, yMax],
+      PLOT_PAD
+    );
     onTap(dataX, dataY);
   };
 
@@ -113,15 +127,21 @@ export default function SvgRenderer({
     const sy = niceStep(yMax - yMin, clamp(Math.floor(H / 90), 2, 6));
     const axisXpx = cx.toX(clamp(0, xMin, xMax));
     const axisYpx = cx.toY(clamp(0, yMin, yMax));
+    const xLabelY = axisYpx <= H - PLOT_PAD - 22 ? axisYpx + 17 : axisYpx - 10;
+    const yLabelRight = axisXpx <= PLOT_PAD + 22;
+    const yLabelX = yLabelRight ? axisXpx + 9 : axisXpx - 9;
+    const yLabelAnchor = yLabelRight ? 'start' : 'end';
     for (let t = Math.ceil(xMin / sx) * sx, k = 0; t <= xMax + 1e-9; t += sx, k++) {
       const X = cx.toX(t);
-      grid.push(<line key={`gx${k}`} x1={X} y1={0} x2={X} y2={H} stroke={GRID_LINE} />);
+      grid.push(
+        <line key={`gx${k}`} x1={X} y1={PLOT_PAD} x2={X} y2={H - PLOT_PAD} stroke={GRID_LINE} />
+      );
       if (Math.abs(t) > 1e-9)
         ticks.push(
           <text
             key={`tx${k}`}
             x={X}
-            y={axisYpx + 17}
+            y={xLabelY}
             textAnchor="middle"
             fontSize={13}
             fill={AXIS_LABEL}
@@ -136,14 +156,16 @@ export default function SvgRenderer({
     }
     for (let t = Math.ceil(yMin / sy) * sy, k = 0; t <= yMax + 1e-9; t += sy, k++) {
       const Y = cx.toY(t);
-      grid.push(<line key={`gy${k}`} x1={0} y1={Y} x2={W} y2={Y} stroke={GRID_LINE} />);
+      grid.push(
+        <line key={`gy${k}`} x1={PLOT_PAD} y1={Y} x2={W - PLOT_PAD} y2={Y} stroke={GRID_LINE} />
+      );
       if (Math.abs(t) > 1e-9)
         ticks.push(
           <text
             key={`ty${k}`}
-            x={axisXpx - 9}
+            x={yLabelX}
             y={Y}
-            textAnchor="end"
+            textAnchor={yLabelAnchor}
             dominantBaseline="central"
             fontSize={13}
             fill={AXIS_LABEL}
@@ -165,9 +187,9 @@ export default function SvgRenderer({
         <line
           key="ay"
           x1={cx.toX(0)}
-          y1={0}
+          y1={PLOT_PAD}
           x2={cx.toX(0)}
-          y2={H}
+          y2={H - PLOT_PAD}
           stroke={AXIS_LINE}
           strokeWidth={1.5}
         />
@@ -176,9 +198,9 @@ export default function SvgRenderer({
       axes.push(
         <line
           key="ax"
-          x1={0}
+          x1={PLOT_PAD}
           y1={cx.toY(0)}
-          x2={W}
+          x2={W - PLOT_PAD}
           y2={cx.toY(0)}
           stroke={AXIS_LINE}
           strokeWidth={1.5}
