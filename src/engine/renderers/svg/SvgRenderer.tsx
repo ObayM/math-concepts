@@ -109,8 +109,8 @@ export default function SvgRenderer({
   const ticks: React.ReactNode[] = [];
   if (ir.space.grid) {
     // fewer ticks on narrow screens so labels never crowd
-    const sx = niceStep(xMax - xMin, clamp(Math.floor(W / 70), 4, 12));
-    const sy = niceStep(yMax - yMin, clamp(Math.floor(H / 50), 3, 10));
+    const sx = niceStep(xMax - xMin, clamp(Math.floor(W / 120), 3, 8));
+    const sy = niceStep(yMax - yMin, clamp(Math.floor(H / 90), 2, 6));
     const axisXpx = cx.toX(clamp(0, xMin, xMax));
     const axisYpx = cx.toY(clamp(0, yMin, yMax));
     for (let t = Math.ceil(xMin / sx) * sx, k = 0; t <= xMax + 1e-9; t += sx, k++) {
@@ -186,7 +186,7 @@ export default function SvgRenderer({
   return (
     <div
       ref={wrapRef}
-      className="w-full bg-white rounded-2xl border border-neutral-100 overflow-hidden"
+      className="w-full bg-white rounded-2xl border border-neutral-200 overflow-hidden"
     >
       <svg
         ref={svgRef}

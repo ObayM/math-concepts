@@ -217,7 +217,7 @@ export default function LessonPlayer({
 
   if (!slides.length) {
     return (
-      <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
           <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">Loading lesson...</h2>
           <p className="text-neutral-500 mt-2">Hang tight while we get things ready.</p>
@@ -231,7 +231,7 @@ export default function LessonPlayer({
 
   if (isComplete) {
     return (
-      <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
@@ -253,18 +253,18 @@ export default function LessonPlayer({
   const correct = checked && checker ? checker.check(slide, answer) : null;
 
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface text-neutral-900 p-4 md:p-6 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
       {saveError && (
-        <div className="absolute top-4 left-4 flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10">
+        <div className="absolute left-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10">
           Couldn&apos;t save your progress.
           <button onClick={handleRetrySave} className="underline hover:no-underline">
             Retry
           </button>
         </div>
       )}
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+      <div className="absolute right-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10">
         {streak !== null && (
-          <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2">
+          <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 card-soft">
             🔥 {streak} Day Streak
           </div>
         )}
@@ -278,7 +278,7 @@ export default function LessonPlayer({
         </button>
       </div>
 
-      <div className="animate-fade-in-up w-full max-w-4xl bg-white rounded-2xl overflow-hidden border border-neutral-200 flex flex-col relative">
+      <div className="card-hero animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex flex-col relative">
         <div className="pt-8 px-10 pb-2 flex items-center justify-between">
           <div
             className="flex-1 mx-8 flex space-x-1 h-2"
@@ -292,7 +292,7 @@ export default function LessonPlayer({
             {slides.map((_, idx) => (
               <div
                 key={idx}
-                className={`flex-1 rounded-full transition-all duration-500 ${idx <= currentIndex ? 'bg-success-500' : 'bg-neutral-200'}`}
+                className={`flex-1 rounded-full transition-all duration-500 ${idx <= currentIndex ? 'bg-primary-500' : 'bg-neutral-200'}`}
               />
             ))}
           </div>
@@ -309,7 +309,7 @@ export default function LessonPlayer({
                   {slide?.category || 'Concept'}
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 tracking-tight">
+              <h1 className="font-display text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight">
                 {slide?.title}
               </h1>
             </div>
@@ -351,13 +351,13 @@ export default function LessonPlayer({
             {checker && !checked ? (
               <Button
                 onClick={handleCheck}
-                variant="success"
+                variant="primary"
                 disabled={!checker.isComplete(slide, answer)}
               >
                 Check
               </Button>
             ) : (
-              <Button onClick={handleNext} variant="success" disabled={!canAdvance}>
+              <Button onClick={handleNext} variant="primary" disabled={!canAdvance}>
                 {isLast ? 'Complete!' : 'Continue'}
               </Button>
             )}
@@ -369,19 +369,19 @@ export default function LessonPlayer({
         >
           <div className="p-6">
             <div className="flex items-start gap-4">
-              <div className="bg-accent-600 p-2 rounded-xl text-white">
+              <div className="bg-primary-600 p-2 rounded-xl text-white">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-accent-500 uppercase mb-2">AI Math Tutor</p>
+                <p className="text-xs font-bold text-primary-500 uppercase mb-2">AI Math Tutor</p>
 
                 {tutorResponse ? (
-                  <div className="animate-fade-in-up bg-white p-4 rounded-2xl border border-accent-100 text-neutral-700 text-sm leading-relaxed">
+                  <div className="animate-fade-in-up bg-white p-4 rounded-2xl border border-primary-100 text-neutral-700 text-sm leading-relaxed">
                     {tutorResponse}
                     <div className="mt-3 pt-3 border-t border-neutral-100 flex justify-end">
                       <button
                         onClick={() => setTutorResponse('')}
-                        className="text-xs font-bold text-accent-600 flex items-center hover:underline"
+                        className="text-xs font-bold text-primary-600 flex items-center hover:underline"
                       >
                         <RotateCcw className="w-3 h-3 mr-1" /> Ask new question
                       </button>
@@ -389,7 +389,7 @@ export default function LessonPlayer({
                   </div>
                 ) : tutorLoading ? (
                   <div className="flex items-center gap-3 text-neutral-500 text-sm">
-                    <BrainCircuit className="w-5 h-5 text-accent-500 animate-pulse" />
+                    <BrainCircuit className="w-5 h-5 text-primary-500 animate-pulse" />
                     Thinking...
                   </div>
                 ) : (
@@ -399,9 +399,9 @@ export default function LessonPlayer({
                       onChange={(e) => setTutorQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
                       placeholder="e.g. Why is symmetry important?"
-                      className="flex-1 bg-white border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-accent-500 outline-none"
+                      className="flex-1 bg-white border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                     />
-                    <Button onClick={handleTutorAsk} variant="accent" size="sm">
+                    <Button onClick={handleTutorAsk} variant="primary" size="sm">
                       Ask
                     </Button>
                   </div>

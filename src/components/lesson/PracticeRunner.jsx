@@ -39,8 +39,8 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
 
   if (!slide) {
     return (
-      <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center">
-        <Card className="p-8">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
+        <Card className="card-soft p-8">
           <p className="text-neutral-500 animate-pulse">Loading practice...</p>
         </Card>
       </div>
@@ -91,7 +91,7 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
   };
 
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface p-4 md:p-6 flex items-center justify-center">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="flex items-center justify-between mb-4">
           <button
@@ -106,14 +106,14 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
           </div>
         </div>
 
-        <Card className="animate-fade-in-up p-8 md:p-10">
+        <Card className="card-hero animate-fade-in-up rounded-3xl p-8 md:p-10">
           <div key={slide.id} className="animate-slide-in-right">
             <div className="mb-6">
               <span className="text-neutral-400 font-bold text-sm tracking-wider uppercase">
                 {slide.category || courseName}
               </span>
               {slide.title && (
-                <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-900 tracking-tight mt-1">
+                <h1 className="font-display text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight mt-1">
                   {slide.title}
                 </h1>
               )}
@@ -134,13 +134,13 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
             {!checked ? (
               <Button
                 onClick={handleCheck}
-                variant="success"
+                variant="primary"
                 disabled={!checker.isComplete(slide, value)}
               >
                 Check
               </Button>
             ) : (
-              <Button onClick={handleNext} variant="success" disabled={!goalsSatisfied}>
+              <Button onClick={handleNext} variant="primary" disabled={!goalsSatisfied}>
                 Next
               </Button>
             )}

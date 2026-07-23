@@ -1,4 +1,3 @@
-// i map token names -> hex for svg. raw hex just passes thru
 const TOKENS: Record<string, string> = {
   primary: '#3b82f6',
   accent: '#a855f7',
@@ -13,7 +12,7 @@ export function resolveColor(c?: string): string {
   return TOKENS[c] ?? c;
 }
 
-export const GRID_LINE = 'var(--color-neutral-200)';
+export const GRID_LINE = 'var(--color-neutral-100)';
 export const AXIS_LINE = 'var(--color-neutral-300)';
 export const AXIS_LABEL = 'var(--color-neutral-400)';
 
