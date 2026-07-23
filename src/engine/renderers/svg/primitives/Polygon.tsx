@@ -1,5 +1,5 @@
 import { evalNumber } from '@/engine/runtime/eval';
-import { resolveColor, dash } from '@/engine/colors';
+import { resolveColor, dash, SHAPE_FILL_OPACITY, SHAPE_STROKE_WIDTH } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Polygon({ obj, scope, cx }: PrimProps) {
@@ -14,9 +14,9 @@ export default function Polygon({ obj, scope, cx }: PrimProps) {
     <polygon
       points={pts.map((p: number[]) => p.join(',')).join(' ')}
       fill={color}
-      fillOpacity={obj.opacity ?? 0.15}
+      fillOpacity={obj.opacity ?? SHAPE_FILL_OPACITY}
       stroke={color}
-      strokeWidth={obj.strokeWidth ?? 2}
+      strokeWidth={obj.strokeWidth ?? SHAPE_STROKE_WIDTH}
       strokeLinejoin="round"
       strokeDasharray={dash(obj.style)}
     />

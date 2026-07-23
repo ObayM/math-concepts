@@ -1,5 +1,5 @@
 import { evalNumber } from '@/engine/runtime/eval';
-import { resolveColor, dash } from '@/engine/colors';
+import { resolveColor, dash, SHAPE_FILL_OPACITY, SHAPE_STROKE_WIDTH } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Rect({ obj, scope, cx }: PrimProps) {
@@ -21,10 +21,12 @@ export default function Rect({ obj, scope, cx }: PrimProps) {
       y={py}
       width={width}
       height={height}
+      rx={Math.min(4, Math.min(width, height) * 0.12)}
       fill={color}
-      fillOpacity={obj.opacity ?? 0.2}
+      fillOpacity={obj.opacity ?? SHAPE_FILL_OPACITY}
       stroke={color}
-      strokeWidth={obj.strokeWidth ?? 1.5}
+      strokeWidth={obj.strokeWidth ?? SHAPE_STROKE_WIDTH}
+      strokeLinejoin="round"
       strokeDasharray={dash(obj.style)}
     />
   );

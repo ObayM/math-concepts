@@ -1,5 +1,5 @@
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
-import { resolveColor } from '@/engine/colors';
+import { resolveColor, LABEL_HALO } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
@@ -7,17 +7,25 @@ export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
   const py = cx.toY(evalNumber(obj.y, scope));
   if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
   const color = resolveColor(obj.color);
-  const r = obj.r ?? 6;
+  const r = obj.r ?? 7;
   const draggable = !!obj.draggable;
   const onPointerDown = draggable ? startDrag(obj) : undefined;
 
   return (
     <g className={draggable ? 'cursor-grab active:cursor-grabbing' : undefined}>
-      {/* soft halo signals "you can grab me" + a fat invisible hit area */}
       {draggable && (
         <>
-          <circle cx={px} cy={py} r={r + 5} fill={color} opacity={0.18} />
-          <circle cx={px} cy={py} r={r + 14} fill="transparent" onPointerDown={onPointerDown} />
+          <circle cx={px} cy={py} r={r + 8} fill={color} opacity={0.12} />
+          <circle
+            cx={px}
+            cy={py}
+            r={r + 4}
+            fill="none"
+            stroke={color}
+            strokeWidth={2}
+            opacity={0.55}
+          />
+          <circle cx={px} cy={py} r={r + 16} fill="transparent" onPointerDown={onPointerDown} />
         </>
       )}
       <circle
@@ -25,18 +33,18 @@ export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
         cy={py}
         r={r}
         fill={obj.open ? 'white' : color}
-        stroke={obj.open ? color : 'white'}
+        stroke={obj.open ? color : LABEL_HALO}
         strokeWidth={2.5}
         onPointerDown={onPointerDown}
       />
       {obj.label && (
         <text
-          x={px + r + 6}
-          y={py - r - 2}
-          fontSize={13}
-          fontWeight={700}
+          x={px + r + 7}
+          y={py - r - 3}
+          fontSize={15}
+          fontWeight={600}
           fill={color}
-          stroke="white"
+          stroke={LABEL_HALO}
           strokeWidth={3}
           paintOrder="stroke"
         >

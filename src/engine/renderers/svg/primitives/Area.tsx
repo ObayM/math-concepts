@@ -1,5 +1,5 @@
 import { evalNumber } from '@/engine/runtime/eval';
-import { resolveColor } from '@/engine/colors';
+import { resolveColor, SHAPE_FILL_OPACITY } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 const SAMPLES = 240;
@@ -31,6 +31,11 @@ export default function Area({ obj, scope, cx }: PrimProps) {
 
   const d = `M ${top.join(' L ')} L ${bottom.reverse().join(' L ')} Z`;
   return (
-    <path d={d} fill={resolveColor(obj.color)} fillOpacity={obj.opacity ?? 0.15} stroke="none" />
+    <path
+      d={d}
+      fill={resolveColor(obj.color)}
+      fillOpacity={obj.opacity ?? SHAPE_FILL_OPACITY}
+      stroke="none"
+    />
   );
 }

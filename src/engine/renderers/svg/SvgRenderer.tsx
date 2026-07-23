@@ -5,7 +5,7 @@ import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
-import { resolveColor, GRID_LINE, AXIS_LINE, AXIS_LABEL } from '@/engine/colors';
+import { resolveColor, GRID_LINE, AXIS_LINE, AXIS_LABEL, LABEL_HALO } from '@/engine/colors';
 import { toDataCoords } from './coords';
 import InputLayer, { type InputLayerConfig } from './InputLayer';
 import type { SceneIR } from '@/engine/ir/types';
@@ -46,7 +46,7 @@ export default function SvgRenderer({
   }, []);
 
   const W = Math.max(240, Math.round(measuredW ?? DEFAULT_W));
-  const H = Math.round(W * ASPECT);
+  const H = Math.min(Math.round(W * ASPECT), 460);
 
   if (!ir.space.yDomain) return null; // plane scenes must have yDomain
   const [xMin, xMax] = ir.space.xDomain;
@@ -121,13 +121,14 @@ export default function SvgRenderer({
           <text
             key={`tx${k}`}
             x={X}
-            y={axisYpx + 14}
+            y={axisYpx + 17}
             textAnchor="middle"
-            fontSize={11}
+            fontSize={13}
             fill={AXIS_LABEL}
-            stroke="white"
+            stroke={LABEL_HALO}
             strokeWidth={3}
             paintOrder="stroke"
+            style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-nunito)' }}
           >
             {fmt(t)}
           </text>
@@ -140,14 +141,16 @@ export default function SvgRenderer({
         ticks.push(
           <text
             key={`ty${k}`}
-            x={axisXpx - 7}
-            y={Y + 4}
+            x={axisXpx - 9}
+            y={Y}
             textAnchor="end"
-            fontSize={11}
+            dominantBaseline="central"
+            fontSize={13}
             fill={AXIS_LABEL}
-            stroke="white"
+            stroke={LABEL_HALO}
             strokeWidth={3}
             paintOrder="stroke"
+            style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-nunito)' }}
           >
             {fmt(t)}
           </text>
@@ -186,7 +189,7 @@ export default function SvgRenderer({
   return (
     <div
       ref={wrapRef}
-      className="w-full bg-white rounded-2xl border border-neutral-200 overflow-hidden"
+      className="w-full bg-white rounded-2xl border border-neutral-100 card-soft overflow-hidden"
     >
       <svg
         ref={svgRef}
@@ -225,17 +228,27 @@ export default function SvgRenderer({
           );
         })}
         {marker && (
-          <circle
-            cx={cx.toX(marker.x)}
-            cy={cx.toY(marker.y)}
-            r={7}
-            fill={resolveColor(
-              marker.correct == null ? 'primary' : marker.correct ? 'success' : 'danger'
-            )}
-            stroke="white"
-            strokeWidth={2}
-            pointerEvents="none"
-          />
+          <g pointerEvents="none">
+            <circle
+              cx={cx.toX(marker.x)}
+              cy={cx.toY(marker.y)}
+              r={13}
+              fill={resolveColor(
+                marker.correct == null ? 'primary' : marker.correct ? 'success' : 'danger'
+              )}
+              opacity={0.16}
+            />
+            <circle
+              cx={cx.toX(marker.x)}
+              cy={cx.toY(marker.y)}
+              r={7}
+              fill={resolveColor(
+                marker.correct == null ? 'primary' : marker.correct ? 'success' : 'danger'
+              )}
+              stroke={LABEL_HALO}
+              strokeWidth={2.5}
+            />
+          </g>
         )}
         {inputLayer && <InputLayer cx={cx} svgRef={svgRef} {...inputLayer} />}
       </svg>

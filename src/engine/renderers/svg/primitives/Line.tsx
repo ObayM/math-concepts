@@ -1,5 +1,5 @@
 import { evalNumber } from '@/engine/runtime/eval';
-import { resolveColor, dash } from '@/engine/colors';
+import { resolveColor, dash, STROKE } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Line({ obj, scope, cx, points }: PrimProps) {
@@ -34,7 +34,7 @@ export default function Line({ obj, scope, cx, points }: PrimProps) {
       x2={X2}
       y2={Y2}
       stroke={resolveColor(obj.color)}
-      strokeWidth={obj.strokeWidth ?? 2}
+      strokeWidth={obj.strokeWidth ?? STROKE.aux}
       strokeDasharray={dash(obj.style)}
       strokeLinecap="round"
     />

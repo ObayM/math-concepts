@@ -8,16 +8,21 @@ const TOKENS: Record<string, string> = {
 };
 
 export function resolveColor(c?: string): string {
-  if (!c) return '#3b82f6';
+  if (!c) return TOKENS.primary;
   return TOKENS[c] ?? c;
 }
 
 export const GRID_LINE = 'var(--color-neutral-100)';
 export const AXIS_LINE = 'var(--color-neutral-300)';
-export const AXIS_LABEL = 'var(--color-neutral-400)';
+export const AXIS_LABEL = 'var(--color-neutral-500)';
+export const LABEL_HALO = 'white';
+
+export const STROKE = { hero: 3.5, data: 3, aux: 2.5, hairline: 1.5 };
+export const SHAPE_FILL_OPACITY = 0.15;
+export const SHAPE_STROKE_WIDTH = 1.5;
 
 export function dash(style?: string): string | undefined {
-  if (style === 'dashed') return '8 6';
-  if (style === 'dotted') return '2 5';
+  if (style === 'dashed') return '7 6';
+  if (style === 'dotted') return '0.01 7';
   return undefined;
 }

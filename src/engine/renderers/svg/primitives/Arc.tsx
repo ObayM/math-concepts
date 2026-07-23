@@ -1,5 +1,5 @@
 import { evalNumber } from '@/engine/runtime/eval';
-import { resolveColor } from '@/engine/colors';
+import { resolveColor, dash, STROKE } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Arc({ obj, scope, cx }: PrimProps) {
@@ -28,7 +28,9 @@ export default function Arc({ obj, scope, cx }: PrimProps) {
       d={`M ${sx} ${sy} A ${rpx} ${rpx} 0 ${largeArc} ${sweep} ${ex} ${ey}`}
       fill="none"
       stroke={color}
-      strokeWidth={obj.strokeWidth ?? 2}
+      strokeWidth={obj.strokeWidth ?? STROKE.aux}
+      strokeLinecap="round"
+      strokeDasharray={dash(obj.style)}
     />
   );
 }
