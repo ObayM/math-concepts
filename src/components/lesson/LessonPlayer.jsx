@@ -232,7 +232,7 @@ export default function LessonPlayer({
   if (isComplete) {
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
-        <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex items-center justify-center">
+        <Card className="card-hero animate-fade-in-up w-full max-w-4xl min-h-[500px] rounded-3xl flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
             onBack={handleBackToCourse}

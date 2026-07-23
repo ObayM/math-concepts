@@ -25,8 +25,8 @@ export default function LessonCompletion({
       </div>
 
       <div className="animate-fade-in-up [animation-delay:300ms] opacity-0">
-        <h2 className="text-4xl font-extrabold text-neutral-900 mb-4">Lesson Complete!</h2>
-        <p className="text-xl text-neutral-500 mb-8">You&apos;re making great progress.</p>
+        <h2 className="font-display text-4xl font-bold text-neutral-900 mb-4">Lesson complete</h2>
+        <p className="text-xl text-neutral-500 mb-8">Nice work. That one&apos;s in the bank.</p>
       </div>
 
       <div className="animate-fade-in-up [animation-delay:500ms] opacity-0 grid grid-cols-2 gap-4 w-full max-w-sm mb-10">
@@ -49,13 +49,13 @@ export default function LessonCompletion({
 
       <div className="animate-fade-in-up [animation-delay:600ms] opacity-0 flex flex-col gap-3 w-full max-w-xs">
         <Button
-          variant="success"
+          variant="primary"
           size="lg"
           fullWidth
           onClick={onContinue}
           className="rounded-2xl font-extrabold"
         >
-          {nextLessonId ? 'Next Lesson' : 'Finish Course'} <ArrowRight className="w-5 h-5" />
+          {nextLessonId ? 'Next lesson' : 'Finish course'} <ArrowRight className="w-5 h-5" />
         </Button>
 
         <Button variant="ghost" size="lg" fullWidth onClick={onBack}>
