@@ -42,7 +42,6 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
       className={`animate-fade-in-up opacity-0 flex items-stretch gap-0 ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer group'}`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      {/* left: connector + node */}
       <div className="flex flex-col items-center w-12 shrink-0">
         <div
           className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center shrink-0 ${config.nodeBg} ${config.nodeBorder}`}
@@ -52,24 +51,21 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
         {!isLast && <div className="w-0.5 flex-1 mt-1 bg-neutral-200" />}
       </div>
 
-      {/* right: lesson card */}
       <div
-        className={`flex-1 mb-3 ml-3 border rounded-lg p-4 transition-colors ${
+        className={`card-soft flex-1 mb-3 ml-3 rounded-xl border p-4 transition-colors ${
           isLocked
             ? 'border-neutral-200 bg-white opacity-60'
-            : 'border-neutral-200 bg-white group-hover:border-primary-300 group-hover:bg-primary-50'
+            : 'border-neutral-200 bg-white group-hover:border-primary-200 group-hover:bg-primary-50'
         }`}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div
-              className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${isLocked ? 'bg-neutral-100' : 'bg-primary-50'}`}
-            >
-              <Icon size={16} className={isLocked ? 'text-neutral-400' : 'text-primary-600'} />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-neutral-100">
+              <Icon size={16} className={isLocked ? 'text-neutral-400' : 'text-neutral-500'} />
             </div>
             <div className="min-w-0">
               <p
-                className={`font-bold text-sm leading-tight ${isLocked ? 'text-neutral-500' : 'text-neutral-900 group-hover:text-primary-700 transition-colors'}`}
+                className={`font-bold text-sm leading-tight ${isLocked ? 'text-neutral-500' : 'text-neutral-900'}`}
               >
                 {title}
               </p>
@@ -84,7 +80,7 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
             {!isLocked && (
               <ChevronRight
                 size={16}
-                className="text-neutral-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all"
+                className="text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary-500"
               />
             )}
           </div>

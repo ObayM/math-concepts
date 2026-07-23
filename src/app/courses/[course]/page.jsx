@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Zap } from 'lucide-react';
+import { Zap, ArrowLeft } from 'lucide-react';
 import LessonCard from '@/components/lesson/LessonCard';
-import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import { resolveCourseBySlug, courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
@@ -59,6 +59,7 @@ export default async function CoursePage({ params }) {
   });
 
   const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;
+  const pct = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0;
   const slug = courseUrlSlug(course);
 
   const groups = [];
@@ -70,51 +71,74 @@ export default async function CoursePage({ params }) {
       groups.push({ unit: lesson.unit, lessons: [lesson] });
     }
   }
+
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] bg-grid-snow">
-      <main className="container mx-auto px-4 py-16 md:py-24">
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <Badge variant="primary" className="mb-4 text-sm px-4 py-1.5">
-            {course.name}
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900 mb-4">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)]">
+      <main className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <Link
+          href="/courses"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-400 transition-colors hover:text-neutral-700"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          All courses
+        </Link>
+
+        <header className="mt-5 animate-fade-in-up">
+          <h1 className="font-display text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
             {course.name}
           </h1>
-          <p className="text-xl text-neutral-500 leading-relaxed mb-4">
+          <p className="mt-3 text-lg text-neutral-500">
             {course.description || 'Complete each lesson to unlock the next.'}
           </p>
-          <p className="text-sm font-bold text-neutral-400 mb-6">
-            {completedCount} / {lessons.length} lessons completed
-          </p>
-          {lessons.length > 0 && (
-            <Link
-              href={`/courses/${courseSlug}/practice`}
-              className="inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl border-b-[3px] border-accent-800 active:border-b-0 active:translate-y-[3px] transition-all"
-            >
-              <Zap className="w-4 h-4" />
-              Practice
-            </Link>
-          )}
-        </div>
 
-        <div className="max-w-2xl mx-auto">
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex items-center justify-between text-sm">
+                <span className="text-neutral-500">
+                  {completedCount} of {lessons.length} completed
+                </span>
+                <span className="font-bold text-neutral-700">{pct}%</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+                <div
+                  className="h-full rounded-full bg-primary-500 transition-all duration-700"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+            {lessons.length > 0 && (
+              <Button
+                as={Link}
+                href={`/courses/${courseSlug}/practice`}
+                variant="outline"
+                size="sm"
+                icon={<Zap className="h-4 w-4" />}
+                className="shrink-0"
+              >
+                Practice
+              </Button>
+            )}
+          </div>
+        </header>
+
+        <div className="mt-12">
           {groups.map((group, gi) => {
             const groupCompleted = group.lessons.filter((l) => l.status === 'completed').length;
             return (
               <div key={group.unit ?? `ungrouped-${gi}`}>
                 {group.unit && (
                   <div
-                    className={`flex items-baseline justify-between ${gi === 0 ? 'mb-4' : 'mt-10 mb-4 pt-6 border-t border-neutral-100'}`}
+                    className={`flex items-baseline justify-between ${gi === 0 ? 'mb-4' : 'mt-10 mb-4 border-t border-neutral-100 pt-8'}`}
                   >
                     <div>
-                      <p className="text-primary-600 font-bold text-xs tracking-wider uppercase">
+                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-neutral-400">
                         Unit {gi + 1}
                       </p>
-                      <h2 className="text-xl font-extrabold text-neutral-900 mt-0.5">
+                      <h2 className="mt-1 font-display text-xl font-bold text-neutral-900">
                         {group.unit}
                       </h2>
                     </div>
-                    <p className="text-xs font-bold text-neutral-400 shrink-0">
+                    <p className="shrink-0 text-xs font-bold text-neutral-400">
                       {groupCompleted} / {group.lessons.length}
                     </p>
                   </div>

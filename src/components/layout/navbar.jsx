@@ -91,7 +91,7 @@ export default function Navbar() {
                   className={clsx(
                     'rounded-full px-4 py-2 text-sm font-semibold transition-colors',
                     active
-                      ? 'bg-neutral-100 text-neutral-900'
+                      ? 'bg-primary-50 text-primary-700'
                       : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
                   )}
                 >
@@ -158,7 +158,7 @@ export default function Navbar() {
 
                 <Link
                   href="/signup"
-                  className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-neutral-800"
+                  className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
                 >
                   Sign up
                 </Link>

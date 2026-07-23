@@ -184,7 +184,7 @@ const HeroContinue = ({ course, nextLesson, completed }) => {
           <p className="text-3xl font-extrabold leading-none text-neutral-900">{progress}%</p>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-neutral-100">
             <div
-              className="h-full rounded-full bg-success-500 transition-all duration-700"
+              className="h-full rounded-full bg-primary-500 transition-all duration-700"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -197,7 +197,7 @@ const HeroContinue = ({ course, nextLesson, completed }) => {
       <Button
         as={Link}
         href={`/courses/${coursePath}/${nextLesson.id}`}
-        variant="success"
+        variant="primary"
         size="lg"
         icon={<PlayCircle size={20} />}
         className="mt-8"
@@ -256,7 +256,7 @@ const LessonRow = ({ lesson, coursePath }) => {
             ? 'bg-success-50 text-success-600'
             : isLocked
               ? 'bg-neutral-100 text-neutral-400'
-              : 'bg-success-500 text-white'
+              : 'bg-primary-500 text-white'
         )}
       >
         {isCompleted ? <CheckCircle className="h-4 w-4" /> : lesson.number}
@@ -268,7 +268,7 @@ const LessonRow = ({ lesson, coursePath }) => {
       {isLocked ? (
         <Lock className="h-4 w-4 shrink-0 text-neutral-300" />
       ) : (
-        <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-success-500" />
+        <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary-500" />
       )}
     </div>
   );
