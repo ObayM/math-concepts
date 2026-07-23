@@ -1,5 +1,6 @@
 import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { resolveColor, dash, STROKE } from '@/engine/colors';
+import { PLOT_PAD } from '@/engine/renderers/svg/coords';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 const SAMPLES = 240;
@@ -36,7 +37,7 @@ export default function Curve({ obj, scope, cx }: PrimProps) {
     }
     const X = cx.toX(x);
     const Y = cx.toY(y);
-    const crossesAsymptote = prevY !== undefined && Math.abs(Y - prevY) > cx.H;
+    const crossesAsymptote = prevY !== undefined && Math.abs(Y - prevY) > cx.H - 2 * PLOT_PAD;
     d +=
       penDown && !crossesAsymptote
         ? ` L ${X.toFixed(2)} ${Y.toFixed(2)}`

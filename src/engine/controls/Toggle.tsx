@@ -17,7 +17,7 @@ export default function Toggle({ control }: { control: ToggleControl }) {
         {control.label || control.bind}
       </span>
       <span
-        className={`relative w-11 h-6 rounded-full transition-colors ${on ? 'bg-success-500' : 'bg-neutral-300'}`}
+        className={`relative w-11 h-6 rounded-full transition-colors ${on ? 'bg-primary-500' : 'bg-neutral-300'}`}
       >
         <span
           className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all ${on ? 'left-[22px]' : 'left-0.5'}`}

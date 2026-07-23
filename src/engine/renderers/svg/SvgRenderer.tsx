@@ -187,11 +187,12 @@ export default function SvgRenderer({
         <line
           key="ay"
           x1={cx.toX(0)}
-          y1={PLOT_PAD}
+          y1={H - PLOT_PAD}
           x2={cx.toX(0)}
-          y2={H - PLOT_PAD}
+          y2={PLOT_PAD}
           stroke={AXIS_LINE}
           strokeWidth={1.5}
+          markerEnd="url(#mathly-axis-arrow)"
         />
       );
     if (yMin <= 0 && yMax >= 0)
@@ -204,6 +205,7 @@ export default function SvgRenderer({
           y2={cx.toY(0)}
           stroke={AXIS_LINE}
           strokeWidth={1.5}
+          markerEnd="url(#mathly-axis-arrow)"
         />
       );
   }
@@ -219,6 +221,19 @@ export default function SvgRenderer({
         className="w-full select-none"
         style={{ touchAction: 'none' }}
       >
+        <defs>
+          <marker
+            id="mathly-axis-arrow"
+            markerUnits="userSpaceOnUse"
+            markerWidth={12}
+            markerHeight={12}
+            refX={10}
+            refY={6}
+            orient="auto"
+          >
+            <polygon points="2,2 10,6 2,10" fill={AXIS_LINE} />
+          </marker>
+        </defs>
         {grid}
         {axes}
         {ticks}
