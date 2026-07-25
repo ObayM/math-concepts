@@ -128,7 +128,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
             {pct >= 80
               ? 'Sharp work. That stuff is sticking.'
               : pct >= 50
-                ? 'Solid middle ground — another round will tighten it up.'
+                ? 'Solid middle ground. Another round will tighten it up.'
                 : 'Rough round, but this is exactly where the practice pays off.'}
           </p>
           <div className="flex flex-col gap-3">

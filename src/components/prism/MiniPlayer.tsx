@@ -48,7 +48,7 @@ export default function MiniPlayer({ lesson }: { lesson: LessonIR }) {
               key={s.id}
               className={`mini-player-tab ${i === idx ? 'active' : ''} ${s.hidden ? 'detour' : ''}`}
               onClick={() => setIdx(i)}
-              title={s.hidden ? `${s.id} — detour, off the main path` : s.title}
+              title={s.hidden ? `${s.id}: detour, off the main path` : s.title}
             >
               {s.hidden ? '↳' : i + 1}
             </button>
