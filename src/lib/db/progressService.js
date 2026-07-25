@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { lessonSchema } from '@/engine/ir/lesson';
 import { exercises } from '@/components/lesson/exercises';
+import { xpForAttempts, XP_LESSON_COMPLETE, XP_CORRECT, XP_ATTEMPT } from '@/lib/xp';
+import { awardXp } from '@/lib/db/activityService';
 
 export function buildSlideMap(publishedData) {
   const parsed = lessonSchema.safeParse(publishedData);
@@ -85,9 +87,10 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) 
       },
     });
     if (skill) await recordSkillMastery(tx, userId, skill, correct);
+    await awardXp(tx, userId, correct ? XP_CORRECT : XP_ATTEMPT);
   });
 
-  return { correct };
+  return { correct, xp: correct ? XP_CORRECT : XP_ATTEMPT };
 }
 
 export async function getLessonProgress(userId, lessonKey) {
@@ -121,14 +124,17 @@ export async function upsertLessonProgress(
 
   const now = new Date();
 
+  let earnedXp = 0;
+
   await prisma.$transaction(async (tx) => {
     let verifiedQuizHistory = quizHistory;
 
+    const existing = await tx.userLessonProgress.findUnique({
+      where: { userId_lessonId: { userId, lessonId: lesson.id } },
+      select: { quizHistory: true, completed: true },
+    });
+
     if (quizHistory !== undefined) {
-      const existing = await tx.userLessonProgress.findUnique({
-        where: { userId_lessonId: { userId, lessonId: lesson.id } },
-        select: { quizHistory: true },
-      });
       const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
       const newAttempts = quizHistory.slice(priorLength);
 
@@ -150,6 +156,7 @@ export async function upsertLessonProgress(
         for (const v of verified) {
           if (v.skill) await recordSkillMastery(tx, userId, v.skill, v.correct);
         }
+        earnedXp += xpForAttempts(verified);
 
         verifiedQuizHistory = [
           ...quizHistory.slice(0, priorLength),
@@ -163,6 +170,8 @@ export async function upsertLessonProgress(
         ];
       }
     }
+
+    if (isCompleted && !existing?.completed) earnedXp += XP_LESSON_COMPLETE;
 
     await tx.userLessonProgress.upsert({
       where: { userId_lessonId: { userId, lessonId: lesson.id } },
@@ -181,9 +190,11 @@ export async function upsertLessonProgress(
         ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
       },
     });
+
+    await awardXp(tx, userId, earnedXp);
   });
 
-  return lesson.id;
+  return { lessonId: lesson.id, xp: earnedXp };
 }
 
 export async function resetLessonProgress(userId, lessonKey) {

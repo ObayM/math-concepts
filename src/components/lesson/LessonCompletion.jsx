@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CheckCircle2, ArrowRight, Home, RotateCcw, Star } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Home, RotateCcw, Star, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function LessonCompletion({
@@ -10,6 +10,7 @@ export default function LessonCompletion({
   onRetake,
   nextLessonId,
   streak,
+  xpEarned,
   quizHistory = [],
 }) {
   const quizCount = quizHistory.length;
@@ -26,7 +27,12 @@ export default function LessonCompletion({
 
       <div className="animate-fade-in-up [animation-delay:300ms] opacity-0">
         <h2 className="font-display text-4xl font-bold text-neutral-900 mb-4">Lesson complete</h2>
-        <p className="text-xl text-neutral-500 mb-8">Nice work. That one&apos;s in the bank.</p>
+        <p className="text-xl text-neutral-500 mb-6">Nice work. That one&apos;s in the bank.</p>
+        {xpEarned > 0 && (
+          <p className="mb-8 inline-flex items-center gap-2 rounded-full bg-success-50 border-2 border-success-100 px-4 py-2 text-sm font-bold text-success-700">
+            <Zap className="h-4 w-4 fill-current" />+{xpEarned} XP
+          </p>
+        )}
       </div>
 
       <div className="animate-fade-in-up [animation-delay:500ms] opacity-0 grid grid-cols-2 gap-4 w-full max-w-sm mb-10">

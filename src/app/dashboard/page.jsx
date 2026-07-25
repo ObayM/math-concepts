@@ -6,8 +6,9 @@ import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle, Target } from 'lucide
 
 import { requireUser } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
-import { getStreak, getActivityHeatmap } from '@/lib/db/activityService';
+import { getStreak, getActivityHeatmap, getTodayXp } from '@/lib/db/activityService';
 import { courseUrlSlug } from '@/lib/db/courseService';
+import { goalProgress } from '@/lib/xp';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -45,9 +46,10 @@ const DashboardPage = async () => {
   const user = await requireUser();
   if (!user) redirect('/login');
 
-  const [streak, activityData, courses, progressRows] = await Promise.all([
+  const [streak, activityData, todayXp, courses, progressRows] = await Promise.all([
     getStreak(user.id),
     getActivityHeatmap(user.id),
+    getTodayXp(user.id),
     prisma.course.findMany({ where: { status: 'published' }, orderBy: { createdAt: 'asc' } }),
     prisma.userLessonProgress.findMany({
       where: { userId: user.id },
@@ -131,6 +133,7 @@ const DashboardPage = async () => {
               streak={streak ?? 0}
               activityData={activityData}
               hasActivityToday={hasActivityToday}
+              todayXp={todayXp}
             />
             <PracticeCard course={currentCourse} />
           </div>
@@ -281,12 +284,14 @@ const LessonRow = ({ lesson, coursePath }) => {
   );
 };
 
-const MomentumCard = ({ streak, activityData, hasActivityToday }) => {
-  const caption =
-    streak === 0
+const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp }) => {
+  const goal = goalProgress(todayXp);
+  const caption = goal.met
+    ? 'Daily goal done. Anything past this is a bonus.'
+    : streak === 0
       ? 'Solve a problem to start your streak.'
       : hasActivityToday
-        ? 'Nice work today. Keep it rolling.'
+        ? `${goal.remaining} XP to go today.`
         : 'Take one lesson to keep it alive.';
 
   return (
@@ -300,6 +305,26 @@ const MomentumCard = ({ streak, activityData, hasActivityToday }) => {
             day{streak !== 1 ? 's' : ''}
           </span>
         </div>
+
+        <div className="mt-6">
+          <div className="mb-2 flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-neutral-500">Today</span>
+            <span className="text-sm font-bold text-neutral-900">
+              {goal.xp}
+              <span className="font-semibold text-neutral-400"> / {goal.goal} XP</span>
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
+            <div
+              className={clsx(
+                'h-full rounded-full transition-all duration-700',
+                goal.met ? 'bg-success-500' : 'bg-primary-500'
+              )}
+              style={{ width: `${Math.max(goal.pct, goal.xp > 0 ? 4 : 0)}%` }}
+            />
+          </div>
+        </div>
+
         <div className="mt-7">
           <ActivityGraph
             activityData={activityData}

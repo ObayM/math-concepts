@@ -42,6 +42,7 @@ export default function LessonPlayer({
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [streak, setStreak] = useState(null);
   const [saveError, setSaveError] = useState(false);
+  const [xpEarned, setXpEarned] = useState(0);
 
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorQuery, setTutorQuery] = useState('');
@@ -88,7 +89,11 @@ export default function LessonPlayer({
         quizHistory,
       }),
     })
-      .then(() => setSaveError(false))
+      .then((r) => r.json())
+      .then((d) => {
+        setSaveError(false);
+        if (d?.xp) setXpEarned((x) => x + d.xp);
+      })
       .catch(() => setSaveError(true));
   }, [pathIndex, quizHistory, lessonId, progressLoaded]);
 
@@ -131,7 +136,11 @@ export default function LessonPlayer({
         quizHistory,
       }),
     })
-      .then(() => setSaveError(false))
+      .then((r) => r.json())
+      .then((d) => {
+        setSaveError(false);
+        if (d?.xp) setXpEarned((x) => x + d.xp);
+      })
       .catch(() => setSaveError(true));
   };
 
@@ -250,6 +259,7 @@ export default function LessonPlayer({
             onRetake={handleReset}
             nextLessonId={nextLessonId}
             streak={streak}
+            xpEarned={xpEarned}
             quizHistory={quizHistory}
           />
         </Card>

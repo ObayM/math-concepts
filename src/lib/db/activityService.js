@@ -17,17 +17,36 @@ export async function touchActivity(userId) {
   });
 }
 
+export async function awardXp(tx, userId, amount) {
+  if (!amount) return;
+  const today = todayUTC();
+  await tx.userDailyActivity.upsert({
+    where: { userId_activityDate: { userId, activityDate: today } },
+    update: { xp: { increment: amount } },
+    create: { userId, activityDate: today, xp: amount },
+  });
+}
+
+export async function getTodayXp(userId) {
+  const row = await prisma.userDailyActivity.findUnique({
+    where: { userId_activityDate: { userId, activityDate: todayUTC() } },
+    select: { xp: true },
+  });
+  return row?.xp ?? 0;
+}
+
 export async function getActivityHeatmap(userId) {
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
   const rows = await prisma.userDailyActivity.findMany({
     where: { userId, activityDate: { gte: oneYearAgo } },
-    select: { activityDate: true },
+    select: { activityDate: true, xp: true },
     orderBy: { activityDate: 'asc' },
   });
   return rows.map((r) => ({
     date: r.activityDate.toISOString().split('T')[0],
     count: 1,
+    xp: r.xp,
   }));
 }
 

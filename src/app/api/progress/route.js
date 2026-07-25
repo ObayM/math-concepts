@@ -58,7 +58,7 @@ export async function POST(request) {
   });
   if (result === null) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, xp: result.xp });
 }
 
 export async function DELETE(request) {
