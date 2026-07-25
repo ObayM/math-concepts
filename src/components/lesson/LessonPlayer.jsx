@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, RotateCcw, BrainCircuit } from 'lucide-react';
 
@@ -8,6 +8,16 @@ import Card from '@/components/ui/Card';
 import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor } from '@/utils/aiService';
 import { evalGoals } from '@/engine/runtime/goals';
+import {
+  visiblePath,
+  initialFlow,
+  activeSlide,
+  slideKey,
+  canGoBack,
+  stageBranch,
+  next as nextFlow,
+  back as backFlow,
+} from '@/engine/runtime/flow';
 
 import SlideView from './SlideView';
 import { exercises } from './exercises';
@@ -22,7 +32,7 @@ export default function LessonPlayer({
 }) {
   const router = useRouter();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [flow, setFlow] = useState(() => initialFlow(0));
   const [slideDir, setSlideDir] = useState('right');
   const [answer, setAnswer] = useState(null);
   const [checked, setChecked] = useState(false);
@@ -38,8 +48,12 @@ export default function LessonPlayer({
   const [tutorResponse, setTutorResponse] = useState('');
   const [tutorLoading, setTutorLoading] = useState(false);
 
-  const slide = slides[currentIndex] ?? null;
-  const isLast = currentIndex === slides.length - 1;
+  const path = useMemo(() => visiblePath(slides), [slides]);
+  const slide = useMemo(() => activeSlide(slides, flow), [slides, flow]);
+  const pathIndex = flow.pathIndex;
+  const inDetour = Boolean(flow.detour);
+  const currentKey = slideKey(flow);
+  const isLast = !inDetour && pathIndex === path.length - 1;
   const checker = getChecker(slide);
 
   useEffect(() => {
@@ -47,7 +61,7 @@ export default function LessonPlayer({
     fetch(`/api/progress?lessonKey=${lessonId}`)
       .then((r) => r.json())
       .then((d) => {
-        if (d.currentStep > 0 && d.currentStep < slides.length) setCurrentIndex(d.currentStep);
+        if (d.currentStep > 0 && d.currentStep < path.length) setFlow(initialFlow(d.currentStep));
         if (d.completed) {
           setIsComplete(true);
           if (Array.isArray(d.quizHistory)) setQuizHistory(d.quizHistory);
@@ -55,7 +69,7 @@ export default function LessonPlayer({
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
-  }, [lessonId, slides.length]);
+  }, [lessonId, path.length]);
 
   const skipNextSaveRef = useRef(true);
   useEffect(() => {
@@ -69,14 +83,14 @@ export default function LessonPlayer({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lessonKey: lessonId,
-        currentStep: currentIndex,
+        currentStep: pathIndex,
         isCompleted: false,
         quizHistory,
       }),
     })
       .then(() => setSaveError(false))
       .catch(() => setSaveError(true));
-  }, [currentIndex, quizHistory, lessonId, progressLoaded]);
+  }, [pathIndex, quizHistory, lessonId, progressLoaded]);
 
   useEffect(() => {
     fetch('/api/activity')
@@ -87,12 +101,10 @@ export default function LessonPlayer({
       .catch(console.error);
   }, []);
 
-  const [resetForIndex, setResetForIndex] = useState(-1);
-  if (resetForIndex !== currentIndex) {
-    setResetForIndex(currentIndex);
-    const next = slides[currentIndex];
-    const c = getChecker(next);
-    setAnswer(c ? c.initial(next) : null);
+  const [resetForKey, setResetForKey] = useState(null);
+  if (resetForKey !== currentKey) {
+    setResetForKey(currentKey);
+    setAnswer(checker ? checker.initial(slide) : null);
     setChecked(false);
     setTutorOpen(false);
     setTutorResponse('');
@@ -114,7 +126,7 @@ export default function LessonPlayer({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lessonKey: lessonId,
-        currentStep: currentIndex,
+        currentStep: pathIndex,
         isCompleted: true,
         quizHistory,
       }),
@@ -129,7 +141,7 @@ export default function LessonPlayer({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lessonKey: lessonId,
-        currentStep: currentIndex,
+        currentStep: pathIndex,
         isCompleted: isComplete,
         quizHistory,
       }),
@@ -139,26 +151,25 @@ export default function LessonPlayer({
   };
 
   const handleNext = () => {
-    if (isLast) {
+    const { state, complete } = nextFlow(slides, flow);
+    setSlideDir(flow.detour?.retry ? 'left' : 'right');
+    setFlow(state);
+    if (complete) {
       markComplete();
       setIsComplete(true);
-    } else {
-      setSlideDir('right');
-      setCurrentIndex((i) => i + 1);
     }
   };
 
   const handleBack = () => {
-    if (currentIndex > 0) {
-      setSlideDir('left');
-      setCurrentIndex((i) => i - 1);
-    }
+    setSlideDir('left');
+    setFlow(backFlow(slides, flow));
   };
 
   const handleCheck = () => {
     if (!checker) return;
     setChecked(true);
     const correct = checker.check(slide, answer);
+    setFlow((f) => stageBranch(slides, f, correct));
     const question = slide.exercise?.prompt ?? slide.content ?? '';
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;
@@ -206,8 +217,8 @@ export default function LessonPlayer({
   const handleReset = () => {
     if (!confirm('Restart this lesson from the beginning? Your progress will be cleared.')) return;
     fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
-    setCurrentIndex(0);
-    setResetForIndex(-1);
+    setFlow(initialFlow(0));
+    setResetForKey(null);
     setQuizHistory([]);
     setIsComplete(false);
     setChecked(false);
@@ -215,7 +226,7 @@ export default function LessonPlayer({
     setSlideDir('right');
   };
 
-  if (!slides.length) {
+  if (!path.length) {
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
@@ -251,6 +262,15 @@ export default function LessonPlayer({
   const goalsSatisfied = !slide?.goals?.length || goalsMet.every(Boolean);
   const canAdvance = (!checker || checked) && goalsSatisfied;
   const correct = checked && checker ? checker.check(slide, answer) : null;
+  const nextLabel = flow.pending
+    ? "Let's back up"
+    : inDetour
+      ? flow.detour.retry
+        ? 'Try it again'
+        : 'Got it'
+      : isLast
+        ? 'Complete!'
+        : 'Continue';
 
   return (
     <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
@@ -285,14 +305,24 @@ export default function LessonPlayer({
             role="progressbar"
             aria-label="Lesson progress"
             aria-valuemin={1}
-            aria-valuemax={slides.length}
-            aria-valuenow={currentIndex + 1}
-            aria-valuetext={`Slide ${currentIndex + 1} of ${slides.length}`}
+            aria-valuemax={path.length}
+            aria-valuenow={pathIndex + 1}
+            aria-valuetext={
+              inDetour
+                ? `Detour off slide ${pathIndex + 1} of ${path.length}`
+                : `Slide ${pathIndex + 1} of ${path.length}`
+            }
           >
-            {slides.map((_, idx) => (
+            {path.map((_, idx) => (
               <div
                 key={idx}
-                className={`flex-1 rounded-full transition-all duration-500 ${idx <= currentIndex ? 'bg-primary-500' : 'bg-neutral-200'}`}
+                className={`flex-1 rounded-full transition-all duration-500 ${
+                  inDetour && idx === pathIndex
+                    ? 'bg-primary-200'
+                    : idx <= pathIndex
+                      ? 'bg-primary-500'
+                      : 'bg-neutral-200'
+                }`}
               />
             ))}
           </div>
@@ -300,13 +330,13 @@ export default function LessonPlayer({
 
         <div className="flex-1 px-10 py-6 overflow-hidden relative">
           <div
-            key={currentIndex}
+            key={currentKey}
             className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
           >
             <div className="mb-8">
               <div className="flex items-center space-x-2 mb-3">
                 <span className="text-primary-500 font-bold text-sm tracking-wider uppercase">
-                  {slide?.category || 'Concept'}
+                  {inDetour ? 'Quick detour' : slide?.category || 'Concept'}
                 </span>
               </div>
               <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight">
@@ -334,7 +364,7 @@ export default function LessonPlayer({
         </div>
 
         <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4">
-          <Button onClick={handleBack} variant="ghost" disabled={currentIndex === 0}>
+          <Button onClick={handleBack} variant="ghost" disabled={!canGoBack(flow)}>
             Back
           </Button>
 
@@ -358,7 +388,7 @@ export default function LessonPlayer({
               </Button>
             ) : (
               <Button onClick={handleNext} variant="primary" disabled={!canAdvance}>
-                {isLast ? 'Complete!' : 'Continue'}
+                {nextLabel}
               </Button>
             )}
           </div>

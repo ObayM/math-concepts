@@ -896,6 +896,10 @@
   color: #fff;
 }
 
+.mini-player-tab.detour {
+  border-style: dashed;
+}
+
 .mini-player-actions {
   display: flex;
   justify-content: flex-end;

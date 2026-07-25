@@ -34,7 +34,7 @@ export async function getExercisePoolByCourse(courseId) {
     const parsed = lessonSchema.safeParse(lesson.publishedData);
     if (!parsed.success) continue;
     for (const slide of parsed.data.slides) {
-      if (slide.exercise) pool.push({ ...slide, lessonKey: lesson.lessonKey });
+      if (slide.exercise && !slide.hidden) pool.push({ ...slide, lessonKey: lesson.lessonKey });
     }
   }
   return pool;

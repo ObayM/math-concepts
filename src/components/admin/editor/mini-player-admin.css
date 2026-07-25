@@ -21,6 +21,10 @@
   color: var(--color-primary-700);
 }
 
+.mini-player-tab.detour {
+  border-style: dashed;
+}
+
 .mini-player-actions {
   margin-top: 12px;
 }

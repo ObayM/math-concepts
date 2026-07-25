@@ -1,9 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { PRISM_DOCS, toAIContext } from '@/engine/lang/docs';
 
-// every construct the parser recognizes must be documented. keep this list in
-// sync with the parser's keyword surface — if you add a keyword and forget to
-// document it, this test fails.
 const GRAMMAR_KEYWORDS = [
   // lesson level
   'lesson',
