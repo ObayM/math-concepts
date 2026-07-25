@@ -134,4 +134,5 @@ export type ExerciseCommon = {
   hints: string[];
   explanation?: string;
   skill?: string;
+  onwrong?: { slide: string; retry: boolean };
 };

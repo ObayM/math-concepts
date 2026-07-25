@@ -2,16 +2,12 @@ import { z } from 'zod';
 import { sceneSchema } from './schema';
 import { exprIRSchema } from '@/engine/expr';
 
-// Lesson IR v2 — the whole lesson compiles to this from one Prism source.
-// a slide is a COMPOSITION (prose? + scene? + exercise? + goals?), not a type,
-// so a new interaction is a new exercise kind, never a new slide type.
-
-// every exercise shares these; `kind` discriminates the rest
 const exerciseBase = {
   prompt: z.string(),
   hints: z.array(z.string()).default([]),
   explanation: z.string().optional(),
   skill: z.string().optional(),
+  onwrong: z.object({ slide: z.string(), retry: z.boolean().optional() }).optional(),
 };
 
 const quizExercise = z.object({
@@ -116,6 +112,7 @@ const slide = z.object({
   title: z.string().optional(),
   category: z.string().optional(),
   skill: z.string().optional(),
+  hidden: z.boolean().optional(),
   prose: z.string().optional(),
   scene: sceneSchema.optional(),
   exercise: exercise.optional(),

@@ -10,6 +10,7 @@ const GRAMMAR_KEYWORDS = [
   'slide',
   '>',
   'goal',
+  'onwrong',
   'quiz',
   'numeric',
   'build',

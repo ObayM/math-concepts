@@ -971,6 +971,13 @@ function pStr(props: PropMap, key: string): string | undefined {
   return undefined;
 }
 
+function pBool(props: PropMap, key: string): boolean | undefined {
+  const v = props.get(key);
+  if (v === true) return true;
+  if (v && v.k === 'bool') return v.v;
+  return undefined;
+}
+
 function pStrList(props: PropMap, key: string): string[] | undefined {
   const v = props.get(key);
   if (v && v !== true && v.k === 'list') {
@@ -991,6 +998,12 @@ function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1010,6 +1023,12 @@ function emitNumeric(s: Extract<Stmt, { k: 'numeric' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1032,6 +1051,12 @@ function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1069,6 +1094,12 @@ function emitHotspot(s: Extract<Stmt, { k: 'hotspot' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1099,6 +1130,12 @@ function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
       hints: s.common.hints,
       ...(s.common.explanation && { explanation: s.common.explanation }),
       ...(s.common.skill && { skill: s.common.skill }),
+      ...(s.common.onwrong && {
+        onwrong: {
+          slide: s.common.onwrong.slide,
+          ...(s.common.onwrong.retry && { retry: true }),
+        },
+      }),
     };
   }
 
@@ -1117,6 +1154,12 @@ function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1136,6 +1179,12 @@ function emitMatch(s: Extract<Stmt, { k: 'match' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1150,6 +1199,12 @@ function emitOrder(s: Extract<Stmt, { k: 'order' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1188,6 +1243,12 @@ function emitTable(s: Extract<Stmt, { k: 'table' }>) {
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
   };
 }
 
@@ -1304,16 +1365,57 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
 
   const category = pStr(s.props, 'cat');
   const skill = pStr(s.props, 'skill');
+  const hidden = pBool(s.props, 'hidden');
   return {
     id,
     title: s.title,
     ...(category && { category }),
     ...(skill && { skill }),
+    ...(hidden && { hidden }),
     ...(prose.length && { prose: prose.join('\n\n') }),
     ...(scene && { scene }),
     ...(exercise && { exercise }),
     ...(goals.length && { goals }),
   };
+}
+
+function validateSlideFlow(slides: ReturnType<typeof emitSlide>[], stmts: SlideStmt[]) {
+  const byId = new Map<string, ReturnType<typeof emitSlide>>();
+  slides.forEach((s, i) => {
+    if (byId.has(s.id))
+      throw new CompileError(
+        `two slides share the id "${s.id}"; ids must be unique so progress and detours can find them`,
+        stmts[i].ln
+      );
+    byId.set(s.id, s);
+  });
+
+  slides.forEach((s, i) => {
+    const branch = s.exercise?.onwrong;
+    if (!branch) return;
+    const ln = stmts[i].ln;
+    const target = byId.get(branch.slide);
+    if (!target)
+      throw new CompileError(
+        `onwrong: "${branch.slide}" is not a slide in this lesson${suggest(branch.slide, byId.keys())}`,
+        ln
+      );
+    if (target.id === s.id)
+      throw new CompileError(`onwrong: "${branch.slide}" points at its own slide`, ln);
+    if (!target.hidden)
+      throw new CompileError(
+        `onwrong: "${branch.slide}" needs hidden: true, or it would also show on the main path`,
+        ln
+      );
+    if (target.exercise?.onwrong)
+      throw new CompileError(
+        `onwrong: "${branch.slide}" is itself a detour; detours can't chain`,
+        ln
+      );
+  });
+
+  if (slides.every((s) => s.hidden))
+    throw new CompileError('a lesson needs at least one slide that is not hidden');
 }
 
 export function emitLesson(stmts: Stmt[]): LessonIR {
@@ -1325,12 +1427,14 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
 
   const course = pStr(root.props, 'course');
   const skills = pStrList(root.props, 'skills');
+  const slides = root.slides.map((s, i) => emitSlide(s, i, lessonMacros));
+  validateSlideFlow(slides, root.slides);
   const ir = {
     version: 2 as const,
     title: root.title,
     ...(course && { course }),
     ...(skills && { skills }),
-    slides: root.slides.map((s, i) => emitSlide(s, i, lessonMacros)),
+    slides,
   };
 
   const result = lessonSchema.safeParse(ir);

@@ -411,7 +411,7 @@ function makeParser(tokens: Token[]) {
     return { k: 'lesson', title, props, slides, defs, ln };
   }
 
-  const SLIDE_PROPS = new Set(['cat', 'id', 'skill']);
+  const SLIDE_PROPS = new Set(['cat', 'id', 'skill', 'hidden']);
 
   function parseSlide(ln: number): SlideStmt {
     eat('IDENT', 'slide');
@@ -511,6 +511,19 @@ function makeParser(tokens: Token[]) {
       pos++;
       eat('COLON');
       common.skill = eatStr();
+      endStmt();
+      return true;
+    }
+    if (at('onwrong')) {
+      pos++;
+      eat('COLON');
+      const target = eatStr();
+      let retry = false;
+      if (at('retry')) {
+        pos++;
+        retry = true;
+      }
+      common.onwrong = { slide: target, retry };
       endStmt();
       return true;
     }

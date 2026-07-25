@@ -91,4 +91,12 @@ export const PRISM_ERRORS: DocError[] = [
     bad: 'match {\n  ask "match them"\n  pair "a"\n  pair "b" -> "2"\n}',
     good: 'match {\n  ask "match them"\n  pair "a" -> "1"\n  pair "b" -> "2"\n}',
   },
+  {
+    code: 'E_ONWRONG_TARGET',
+    title: 'Detour target must be a hidden slide',
+    explanation:
+      'An `onwrong:` target has to name a slide in the same lesson that is marked `hidden: true`. Without `hidden`, the scaffold would also appear on the main path, so every learner would see the remediation whether they needed it or not. Unknown ids get a "did you mean" suggestion.',
+    bad: 'lesson "L" {\n  slide "Question" {\n    numeric {\n      ask "2 + 2?"\n      answer: 4\n      onwrong: "help"\n    }\n  }\n  slide "Help" {\n    id: "help"\n    > count on your fingers\n  }\n}',
+    good: 'lesson "L" {\n  slide "Question" {\n    numeric {\n      ask "2 + 2?"\n      answer: 4\n      onwrong: "help" retry\n    }\n  }\n  slide "Help" {\n    id: "help"\n    hidden: true\n    > count on your fingers\n  }\n}',
+  },
 ];

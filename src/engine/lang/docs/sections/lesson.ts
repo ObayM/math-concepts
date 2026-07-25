@@ -33,6 +33,11 @@ export const lessonSection: DocSection = {
           description: 'stable id (auto-slugged from the title if omitted)',
         },
         { name: 'skill', type: 'string', description: 'skill id this slide targets' },
+        {
+          name: 'hidden',
+          type: 'boolean',
+          description: 'keep off the main path; only reachable as an onwrong: detour',
+        },
       ],
       example:
         'slide "Vertex form" {\n  cat: "Forms"\n  > Drag the vertex — the curve follows.\n  scene plane {\n    x: [-6, 6]\n    y: [-6, 6]\n    param h = 1 { range: [-4, 4] }\n    param k = -2 { range: [-4, 4] }\n    curve f = (x-h)^2 + k { color: primary }\n    point v = (h, k) { drag: xy -> (h, k), color: accent }\n  }\n}',
@@ -60,6 +65,27 @@ export const lessonSection: DocSection = {
       ],
       example:
         'scene plane {\n  x: [-6, 6]\n  y: [-6, 6]\n  grid\n  axes\n  param r1 = -3 { range: [-6, 6] }\n  param r2 = 2 { range: [-6, 6] }\n  point p1 = (r1, 0) { drag: x -> r1, color: danger }\n  point p2 = (r2, 0) { drag: x -> r2, color: danger }\n}\ngoal "Make both roots negative" { when: r1 < 0 and r2 < 0, hint: "Drag both points left." }',
+    },
+    {
+      keyword: 'onwrong',
+      syntax: 'onwrong: "slide-id" [retry]',
+      description:
+        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide — which must be a `hidden: true` slide in the same lesson — and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead. Detours fire at most once per question and cannot chain.',
+      props: [
+        {
+          name: 'onwrong',
+          type: 'string',
+          description: 'id of the hidden slide to detour to',
+          required: true,
+        },
+        {
+          name: 'retry',
+          type: 'flag',
+          description: 'send them back to the question afterwards instead of onward',
+        },
+      ],
+      example:
+        'lesson "Chain rule" {\n  slide "Differentiate it" {\n    quiz {\n      ask "What is the derivative of $(3x+1)^2$?"\n      * "$6(3x+1)$"\n      - "$2(3x+1)$" { why: "That drops the inner derivative." }\n      onwrong: "forgot-inner" retry\n      ! "Outer derivative times inner derivative."\n    }\n  }\n\n  slide "The inner bit" {\n    id: "forgot-inner"\n    hidden: true\n    > The outside is squaring, so its derivative is $2(3x+1)$. But the inside $3x+1$ changes **three times as fast** as $x$, so you multiply by $3$ too.\n    numeric {\n      ask "What is the derivative of the inside, $3x+1$?"\n      answer: 3\n    }\n  }\n}',
     },
   ],
 };
