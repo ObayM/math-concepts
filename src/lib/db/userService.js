@@ -58,6 +58,17 @@ export async function updateUserProfile(userId, { name, image }) {
   });
 }
 
+export async function getUserSettings(userId) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, reminderEmails: true, emailVerified: true },
+  });
+}
+
+export async function updateReminderPreference(userId, reminderEmails) {
+  await prisma.user.update({ where: { id: userId }, data: { reminderEmails } });
+}
+
 export async function getUsersCompletedCounts(userIds) {
   if (!userIds.length) return new Map();
   const rows = await prisma.userLessonProgress.groupBy({

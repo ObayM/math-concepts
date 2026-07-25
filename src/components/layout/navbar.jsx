@@ -137,6 +137,13 @@ export default function Navbar() {
                           Your Profile
                         </Link>
                       )}
+                      <Link
+                        href="/settings"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50"
+                      >
+                        Settings
+                      </Link>
                       <button
                         onClick={handleLogout}
                         className="text-danger-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-50"
@@ -219,6 +226,13 @@ export default function Navbar() {
                           Your Profile
                         </Link>
                       )}
+                      <Link
+                        href="/settings"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-neutral-900 hover:bg-neutral-100"
+                      >
+                        Settings
+                      </Link>
                       <button
                         onClick={handleLogout}
                         className="w-full rounded-md bg-danger-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-danger-500"

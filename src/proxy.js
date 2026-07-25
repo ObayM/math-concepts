@@ -8,6 +8,7 @@ const PUBLIC_PATHS = [
   '/auth',
   '/api/auth',
   '/api/check-username',
+  '/api/cron/',
   '/error',
   '/u/',
 ];
