@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { compile, compileLesson, CompileError, formatCompileError } from '@/engine/lang';
+import { verifyLesson } from '@/engine/verify';
 import { PRISM_DOCS } from '@/engine/lang/docs';
 import { PRISM_COOKBOOK } from '@/engine/lang/docs/cookbook';
 import { PRISM_ERRORS } from '@/engine/lang/docs/errors';
@@ -13,6 +14,7 @@ const Y = '\x1b[33m';
 const C = '\x1b[36m';
 const B = '\x1b[1m';
 const X = '\x1b[0m';
+const D = '\x1b[2m';
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
@@ -112,6 +114,44 @@ if (cmd === 'docs-check') {
     if (!checkFile(path.join(dir, f))) anyFail = true;
   }
   process.exit(anyFail ? 1 : 0);
+} else if (cmd === 'verify') {
+  const dir = argv[1] ?? 'prisma/lessons';
+  const target = fs.statSync(dir).isDirectory()
+    ? fs
+        .readdirSync(dir)
+        .filter((f) => f.endsWith('.prism'))
+        .map((f) => path.join(dir, f))
+    : [dir];
+  let total = 0;
+  for (const file of target) {
+    const src = fs.readFileSync(file, 'utf8');
+    if (!isLesson(src)) continue;
+    let findings;
+    try {
+      findings = verifyLesson(compileLesson(src));
+    } catch (e) {
+      console.log(`${R}✗${X} ${path.basename(file)} ${D}(does not compile)${X}`);
+      printError(src, e, '  ');
+      total++;
+      continue;
+    }
+    if (!findings.length) {
+      console.log(`${G}✓${X} ${path.basename(file)}`);
+      continue;
+    }
+    total += findings.length;
+    console.log(`${Y}!${X} ${path.basename(file)} ${D}(${findings.length})${X}`);
+    for (const f of findings) {
+      console.log(`  ${Y}${f.code}${X} ${D}${f.slideId}${X}`);
+      console.log(`    ${f.message}`);
+    }
+  }
+  console.log(
+    total
+      ? `\n${Y}${total} thing${total === 1 ? '' : 's'} worth a look${X}`
+      : `\n${G}nothing to flag${X}`
+  );
+  process.exit(total ? 1 : 0);
 } else if (cmd === 'compile') {
   const file = argv[1];
   if (!file) {
@@ -133,6 +173,7 @@ if (cmd === 'docs-check') {
 ${B}commands:${X}
   check <file>       validate a .prism lesson or scene file
   check-all [dir]    validate every .prism file (default: prisma/lessons)
+  verify [dir|file]  look for math and reachability problems the compiler can't catch
   compile <file>     compile and print the IR as JSON
   docs-check         compile every /prism doc example, gallery entry, and cookbook source
 

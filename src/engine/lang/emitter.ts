@@ -990,6 +990,23 @@ function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
   if (!s.common.ask) throw new CompileError('quiz needs an ask "..."', s.ln);
   const correct = s.options.findIndex((o) => o.correct);
   if (correct < 0) throw new CompileError('quiz needs a * correct option', s.ln);
+  const starCount = s.options.filter((o) => o.correct).length;
+  if (starCount > 1) {
+    throw new CompileError(
+      `quiz has ${starCount} options marked *, but a quiz takes exactly one correct answer`,
+      s.ln
+    );
+  }
+  const seen = new Set<string>();
+  for (const o of s.options) {
+    if (seen.has(o.text)) {
+      throw new CompileError(
+        `quiz lists "${o.text}" twice, so the learner can't tell them apart`,
+        s.ln
+      );
+    }
+    seen.add(o.text);
+  }
   return {
     kind: 'quiz' as const,
     prompt: s.common.ask,

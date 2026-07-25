@@ -1,4 +1,4 @@
-.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-compile dsl-preview dsl-docs-check promote
+.PHONY: dev stop up down logs migrate seed studio clean install dsl-check dsl-check-all dsl-verify dsl-compile dsl-preview dsl-docs-check promote
 
 
 dev: install
@@ -50,6 +50,9 @@ dsl-check:
 
 dsl-check-all:
 	npx tsx scripts/dsl.ts check-all
+
+dsl-verify:
+	npx tsx scripts/dsl.ts verify
 
 dsl-compile:
 	npx tsx scripts/dsl.ts compile $(f) $(or $(scene),1)
