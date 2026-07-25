@@ -54,6 +54,9 @@ jobs:
       - name: Docs examples, gallery, and cookbook all compile
         run: npm run dsl docs-check
 
+      - name: Lesson content has no broken curves or unreachable answers
+        run: npm run dsl verify
+
       - name: Migrations apply cleanly to a fresh database
         run: npm run db:migrate
 
