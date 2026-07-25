@@ -136,7 +136,45 @@ lesson "Limits III: One-Sided & Infinite Limits" {
       - "0"
       - "Does not exist, but not because of ±∞" { why: "It does fail to exist as a real number, but the reason is exactly that it plunges to -∞." }
       hint "Just left of x = 2, x - 2 is a tiny negative number."
+      onwrong: "l3-watch-the-sign" retry
       ! "Just left of 2, x - 2 → 0⁻, so 1/(x-2) plunges without bound: the left-hand limit is -∞."
+    }
+  }
+
+  slide "Watch the Sign of the Bottom" {
+    id: "l3-watch-the-sign"
+    hidden: true
+    cat: "Infinite Limits"
+    > The size is never the hard part — the **sign** is. Everything depends on
+    > whether the denominator is a tiny *positive* or a tiny *negative* number.
+    >
+    > Slide $x$ up toward $2$ from the left. The dashed line is the denominator
+    > $x - 2$. Notice it stays **below** the axis the whole way: to the left of $2$,
+    > $x$ is smaller than $2$, so $x - 2$ is negative. One divided by a tiny negative
+    > number is a huge *negative* number, which is why this side plunges.
+
+    scene plane {
+      x: [0, 4]
+      y: [-8, 8]
+      grid
+      axes
+      param a = 1.5 { range: [0.5, 1.8], step: 0.05 }
+      curve inner = x - 2 { where: x < 2, color: neutral, width: 2, style: dashed }
+      curve f = 1/(x - 2) { color: primary, width: 3 }
+      point Pi = (a, a - 2) { color: neutral, r: 6, drag: x -> a }
+      point Pf = (a, 1/(a - 2)) { color: accent, r: 6 }
+      label at (0.95, 6.6) = "x - 2 = ${a - 2}" { color: neutral }
+      label at (0.95, 5.2) = "1/(x-2) = ${1/(a - 2)}" { color: accent }
+      slider a { label: "x" }
+    }
+
+    numeric {
+      ask "At $x = 1.9$, what is the denominator $x - 2$?"
+      skill: "lim-infinite"
+      answer: -0.1
+      tolerance: 0.001
+      hint "Subtract: 1.9 - 2."
+      ! "$-0.1$ — negative. So $1/(x-2) = -10$, and it only gets more negative as $x$ creeps toward 2."
     }
   }
 

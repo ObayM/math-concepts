@@ -59,7 +59,46 @@ lesson "Differentiation II — Product & Quotient Rules" {
       - "$u'v - uv'$" { why: "That's the numerator of the quotient rule, not the product rule." }
       - "$u'v + u'v'$"
       hint "Differentiate one factor, keep the other, then swap and add."
+      onwrong: "d2-why-a-sum" retry
       ! "$[uv]' = u'v + uv'$."
+    }
+  }
+
+  slide "Why It's a Sum, Not a Product" {
+    id: "d2-why-a-sum"
+    hidden: true
+    cat: "Product Rule"
+    > Picture $u\,v$ as the **area** of a rectangle with width $u$ and height $v$.
+    > Nudge the slider: the area grows by two thin strips, not by one tiny corner.
+    >
+    > The blue strip along the top is $u\,\Delta v$. The green strip up the side is
+    > $v\,\Delta u$. Growth comes from **both** strips, so the rate is $u'v + uv'$ — a
+    > sum. The little corner piece $\Delta u\,\Delta v$ is what shrinks away to nothing,
+    > and multiplying the two derivatives is essentially keeping only that corner.
+
+    scene plane {
+      x: [-0.4, 4.6]
+      y: [-0.4, 5]
+      grid
+      axes
+      param d = 0.8 { range: [0, 1.5], step: 0.05 }
+      rect base = (0, 0) { w: 2.5, h: 3, color: neutral, opacity: 0.25 }
+      rect top = (0, 3) { w: 2.5, h: d, color: primary, opacity: 0.5 }
+      rect side = (2.5, 0) { w: d, h: 3, color: success, opacity: 0.5 }
+      rect corner = (2.5, 3) { w: d, h: d, color: danger, opacity: 0.5 }
+      label at (1.25, 1.5) = "u\\,v" { tex }
+      label at (1.25, 3.4) = "u\\,\\Delta v" { tex }
+      label at (3.9, 1.5) = "v\\,\\Delta u" { tex, color: success }
+      slider d { label: "change in x" }
+    }
+
+    quiz {
+      ask "When $u$ and $v$ both grow a little, where does the new area come from?"
+      skill: "deriv-product-rule"
+      - "Only the small corner piece" { why: "That corner is the part that vanishes — it's the product of two tiny changes." }
+      * "Both strips added together"
+      - "The two strips multiplied together" { why: "Areas of separate pieces add up; they don't multiply." }
+      ! "Both strips: $u\,\Delta v + v\,\Delta u$. Divide by $\Delta x$ and you have $uv' + u'v$."
     }
   }
 
