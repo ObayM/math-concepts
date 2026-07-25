@@ -106,7 +106,42 @@ lesson "Differentiation III — The Chain Rule" {
       - "$3(2x)^2$" { why: "Differentiate the outside first, keeping the inside intact." }
       - "$(x^2+1)^2 \cdot 2x$" { why: "Close, but the outer power 3 must come down too." }
       hint "Outside: 3(inside)². Inside derivative: 2x. Multiply."
+      onwrong: "d3-forgot-inner" retry
       ! "$3(x^2+1)^2 \cdot 2x = 6x(x^2+1)^2$."
+    }
+  }
+
+  slide "The Inside Moves Too" {
+    id: "d3-forgot-inner"
+    hidden: true
+    cat: "Chain Rule"
+    > Here's the piece that goes missing most often. Power-ruling the outside gives
+    > $3(\text{inside})^{2}$ — but that is a rate **per unit of inside**, not per unit
+    > of $x$. And the inside $u = x^{2} + 1$ doesn't move at the same speed as $x$.
+    >
+    > Drag the point. The dashed line is the inside's own rate of change, $u' = 2x$.
+    > Out at $x = 3$ the inside is racing six times faster than $x$ — so the final
+    > answer has to be six times bigger too.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-6, 10]
+      grid
+      axes
+      param a = 1 { range: [-3, 3], step: 0.1 }
+      curve u = x^2 + 1 { color: primary, width: 3 }
+      curve uprime = 2*x { color: accent, width: 2, style: dashed }
+      point Pu = (a, a^2 + 1) { color: primary, r: 7, drag: x -> a }
+      point Su = (a, 2*a) { color: accent, r: 5, label: "u'(a) = ${2*a}" }
+      slider a { label: "a" }
+    }
+
+    numeric {
+      ask "For the inside $u = x^{2} + 1$, what is $u'$ at $x = 3$?"
+      skill: "deriv-chain-rule"
+      answer: 6
+      hint "Just the power rule on $x^2 + 1$."
+      ! "$u' = 2x$, so $u'(3) = 6$. That factor of $2x$ is exactly what the wrong answer dropped."
     }
   }
 
