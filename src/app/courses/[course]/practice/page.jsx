@@ -1,16 +1,23 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getExercisePoolByCourse } from '@/lib/db/lessonService';
 import { resolveCourseBySlug } from '@/lib/db/courseService';
+import { getMyMastery } from '@/lib/db/progressService';
+import { requireUser } from '@/lib/session';
 import PracticeRunner from '@/components/lesson/PracticeRunner';
 import Button from '@/components/ui/Button';
 
 export default async function PracticePage({ params }) {
   const { course: courseSlug } = await params;
+  const user = await requireUser();
+  if (!user) redirect('/login');
 
   const course = await resolveCourseBySlug(courseSlug);
   if (!course) notFound();
 
-  const pool = await getExercisePoolByCourse(course.id);
+  const [pool, mastery] = await Promise.all([
+    getExercisePoolByCourse(course.id),
+    getMyMastery(user.id),
+  ]);
 
   if (!pool.length) {
     return (
@@ -29,5 +36,12 @@ export default async function PracticePage({ params }) {
     );
   }
 
-  return <PracticeRunner pool={pool} coursePath={courseSlug} courseName={course.name} />;
+  return (
+    <PracticeRunner
+      pool={pool}
+      mastery={mastery}
+      coursePath={courseSlug}
+      courseName={course.name}
+    />
+  );
 }

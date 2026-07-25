@@ -50,6 +50,14 @@ async function recordSkillMastery(tx, userId, skill, correct) {
   });
 }
 
+export async function getMyMastery(userId) {
+  const rows = await prisma.userSkillMastery.findMany({
+    where: { userId },
+    select: { skill: true, score: true },
+  });
+  return Object.fromEntries(rows.map((r) => [r.skill, r.score]));
+}
+
 export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) {
   const lesson = await prisma.lesson.findUnique({
     where: { lessonKey },

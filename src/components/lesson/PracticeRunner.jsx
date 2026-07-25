@@ -8,17 +8,11 @@ import Card from '@/components/ui/Card';
 import SlideView from '@/components/lesson/SlideView';
 import { exercises } from '@/components/lesson/exercises';
 import { evalGoals } from '@/engine/runtime/goals';
+import { weightedPick, slideSkill } from '@/lib/practice';
 
-function pickRandom(pool, exclude) {
-  if (pool.length === 1) return pool[0];
-  let next;
-  do {
-    next = pool[Math.floor(Math.random() * pool.length)];
-  } while (next === exclude);
-  return next;
-}
+const SESSION_LENGTH = 10;
 
-export default function PracticeRunner({ pool, coursePath, courseName }) {
+export default function PracticeRunner({ pool, mastery = {}, coursePath, courseName }) {
   const router = useRouter();
   // picked client-side only — picking during the render that also runs on
   // the server would make the server and client disagree on Math.random()
@@ -28,10 +22,12 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
   const [checked, setChecked] = useState(false);
   const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
   const [stats, setStats] = useState({ attempted: 0, correct: 0 });
+  const [done, setDone] = useState(false);
+  const liveMastery = useRef({ ...mastery });
   const activityTouched = useRef(false);
 
   useEffect(() => {
-    const first = pickRandom(pool);
+    const first = weightedPick(pool, liveMastery.current);
     setSlide(first);
     setValue(exercises[first.exercise.kind].initial(first));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,6 +66,13 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
     const isCorrect = checker.check(slide, value);
     setChecked(true);
     setStats((s) => ({ attempted: s.attempted + 1, correct: s.correct + (isCorrect ? 1 : 0) }));
+
+    const skill = slideSkill(slide);
+    if (skill) {
+      const prev = liveMastery.current[skill] ?? 0;
+      liveMastery.current[skill] = prev * 0.7 + (isCorrect ? 1 : 0) * 0.3;
+    }
+
     if (!activityTouched.current) {
       activityTouched.current = true;
       fetch('/api/activity', { method: 'POST' }).catch(() => {});
@@ -79,16 +82,67 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lessonKey: slide.lessonKey, slideId: slide.id, answer: value }),
-      }).catch(() => {});
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (typeof d?.correct === 'boolean' && d.correct !== isCorrect) {
+            setStats((s) => ({ ...s, correct: s.correct + (d.correct ? 1 : -1) }));
+          }
+        })
+        .catch(() => {});
     }
   };
 
   const handleNext = () => {
-    const next = pickRandom(pool, slide);
+    if (stats.attempted >= SESSION_LENGTH) {
+      setDone(true);
+      return;
+    }
+    const next = weightedPick(pool, liveMastery.current, Math.random, slide);
     setSlide(next);
     setValue(exercises[next.exercise.kind].initial(next));
     setChecked(false);
   };
+
+  const handleAgain = () => {
+    setStats({ attempted: 0, correct: 0 });
+    setDone(false);
+    setChecked(false);
+    const next = weightedPick(pool, liveMastery.current, Math.random, slide);
+    setSlide(next);
+    setValue(exercises[next.exercise.kind].initial(next));
+  };
+
+  if (done) {
+    const pct = stats.attempted ? Math.round((stats.correct / stats.attempted) * 100) : 0;
+    return (
+      <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
+        <Card className="card-hero animate-fade-in-up rounded-3xl p-10 w-full max-w-lg text-center">
+          <p className="text-primary-500 font-bold text-sm tracking-wider uppercase mb-3">
+            Session done
+          </p>
+          <h1 className="font-display text-4xl font-bold text-neutral-900 tracking-tight mb-2">
+            {stats.correct} out of {stats.attempted}
+          </h1>
+          <p className="text-neutral-500 mb-8">
+            {pct >= 80
+              ? 'Sharp work. That stuff is sticking.'
+              : pct >= 50
+                ? 'Solid middle ground — another round will tighten it up.'
+                : 'Rough round, but this is exactly where the practice pays off.'}
+          </p>
+          <div className="flex flex-col gap-3">
+            <Button onClick={handleAgain} variant="primary">
+              Go again
+            </Button>
+            <Button onClick={() => router.push(`/courses/${coursePath}`)} variant="ghost">
+              Back to {courseName}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
@@ -101,8 +155,18 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
             <ArrowLeft className="w-4 h-4" />
             Back to {courseName}
           </button>
-          <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-sm text-neutral-500">
-            {stats.correct} / {stats.attempted} correct
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1">
+              {Array.from({ length: SESSION_LENGTH }, (_, i) => (
+                <div
+                  key={i}
+                  className={`h-2 w-4 rounded-full transition-colors ${i < stats.attempted ? 'bg-primary-500' : 'bg-neutral-200'}`}
+                />
+              ))}
+            </div>
+            <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-sm text-neutral-500">
+              {stats.correct} / {stats.attempted} correct
+            </div>
           </div>
         </div>
 
@@ -141,7 +205,7 @@ export default function PracticeRunner({ pool, coursePath, courseName }) {
               </Button>
             ) : (
               <Button onClick={handleNext} variant="primary" disabled={!goalsSatisfied}>
-                Next
+                {stats.attempted >= SESSION_LENGTH ? 'See how you did' : 'Next'}
               </Button>
             )}
           </div>

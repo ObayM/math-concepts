@@ -26,5 +26,5 @@ export async function POST(request) {
   const result = await recordPracticeAttempt(user.id, lessonKey, slideId, answer);
   if (result === null) return NextResponse.json({ error: 'Exercise not found' }, { status: 404 });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, correct: result.correct });
 }
