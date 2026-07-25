@@ -514,6 +514,14 @@ function makeParser(tokens: Token[]) {
       endStmt();
       return true;
     }
+    if (at('expect')) {
+      const ln = peek().line;
+      pos++;
+      eat('COLON');
+      common.expect = { expr: parseExpr(), ln };
+      endStmt();
+      return true;
+    }
     if (at('onwrong')) {
       pos++;
       eat('COLON');

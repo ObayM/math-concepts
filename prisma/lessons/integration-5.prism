@@ -90,6 +90,7 @@ lesson "Integration V: Area Between Curves" {
       ask "Find the area between $y = x$ and $y = x^{3}$ from x = 0 to x = 1."
       skill: "int-area-between-curves"
       answer: 0.25
+      expect: 1/2 - 1/4
       hint "For 0 ≤ x ≤ 1, x ≥ x³, so integrate (x - x³)."
       ! "∫₀¹ (x - x³) dx = [x²/2 - x⁴/4] from 0 to 1 = 0.5 - 0.25 = 0.25."
     }

@@ -99,4 +99,12 @@ export const PRISM_ERRORS: DocError[] = [
     bad: 'lesson "L" {\n  slide "Question" {\n    numeric {\n      ask "2 + 2?"\n      answer: 4\n      onwrong: "help"\n    }\n  }\n  slide "Help" {\n    id: "help"\n    > count on your fingers\n  }\n}',
     good: 'lesson "L" {\n  slide "Question" {\n    numeric {\n      ask "2 + 2?"\n      answer: 4\n      onwrong: "help" retry\n    }\n  }\n  slide "Help" {\n    id: "help"\n    hidden: true\n    > count on your fingers\n  }\n}',
   },
+  {
+    code: 'E_EXPECT_MISMATCH',
+    title: 'expect: disagrees with the answer',
+    explanation:
+      "`expect:` states the derivation of a numeric answer so the compiler can double-check it. If the two don't agree within the exercise's tolerance, the build fails and names both values. That's the point: it catches a mistyped answer before a learner ever sees it. Fix whichever one is actually wrong.",
+    bad: 'numeric {\n  ask "What is 3/8 as a decimal?"\n  answer: 0.385\n  tolerance: 0.0001\n  expect: 3/8\n}',
+    good: 'numeric {\n  ask "What is 3/8 as a decimal?"\n  answer: 0.375\n  tolerance: 0.0001\n  expect: 3/8\n}',
+  },
 ];

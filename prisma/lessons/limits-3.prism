@@ -145,7 +145,7 @@ lesson "Limits III: One-Sided & Infinite Limits" {
     id: "l3-watch-the-sign"
     hidden: true
     cat: "Infinite Limits"
-    > The size is never the hard part — the **sign** is. Everything depends on
+    > The size is never the hard part. The **sign** is, and everything depends on
     > whether the denominator is a tiny *positive* or a tiny *negative* number.
     >
     > Slide $x$ up toward $2$ from the left. The dashed line is the denominator
@@ -172,9 +172,10 @@ lesson "Limits III: One-Sided & Infinite Limits" {
       ask "At $x = 1.9$, what is the denominator $x - 2$?"
       skill: "lim-infinite"
       answer: -0.1
+      expect: 1.9 - 2
       tolerance: 0.001
       hint "Subtract: 1.9 - 2."
-      ! "$-0.1$ — negative. So $1/(x-2) = -10$, and it only gets more negative as $x$ creeps toward 2."
+      ! "$-0.1$, negative. So $1/(x-2) = -10$, and it only gets more negative as $x$ creeps toward 2."
     }
   }
 

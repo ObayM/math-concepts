@@ -54,6 +54,7 @@ lesson "Integration IV: u-Substitution" {
       ask "Evaluate $\int_{0}^{\pi/2} \cos(x)\sin(x)\,dx$."
       skill: "int-u-sub"
       answer: 0.5
+      expect: 1/2
       hint "Let u = sin(x), so du = cos(x) dx. When x = 0, u = 0; when x = π/2, u = 1."
       ! "∫₀¹ u du = [u²/2] from 0 to 1 = 0.5."
     }
@@ -95,6 +96,7 @@ lesson "Integration IV: u-Substitution" {
       ask "Evaluate $\int_{1}^{2} \dfrac{2x}{x^{2}+3}\,dx$."
       skill: "int-u-sub"
       answer: 0.56
+      expect: log(7) - log(4)
       tolerance: 0.01
       hint "Let u = x²+3, du = 2x dx. When x = 1, u = 4; when x = 2, u = 7."
       ! "∫₄⁷ (1/u) du = [ln(u)] from 4 to 7 = ln(7) - ln(4) ≈ 0.56."

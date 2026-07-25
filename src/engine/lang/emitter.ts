@@ -1014,6 +1014,20 @@ function emitNumeric(s: Extract<Stmt, { k: 'numeric' }>) {
   const answers = s.answers.map((a) => cNum(a, {}, s.ln));
   const tolerance = s.tolerance ? cNum(s.tolerance, {}, s.ln) : 1e-6;
   if (tolerance < 0) throw new CompileError('tolerance must not be negative', s.ln);
+
+  if (s.common.expect) {
+    const { expr, ln } = s.common.expect;
+    const expected = cNum(expr, {}, ln);
+    if (!Number.isFinite(expected)) {
+      throw new CompileError(`expect: worked out to ${expected}, which can't be an answer`, ln);
+    }
+    if (!answers.some((a) => Math.abs(a - expected) <= Math.max(tolerance, 1e-9))) {
+      throw new CompileError(
+        `expect: works out to ${expected}, but the answer is ${answers.join(' or ')}, so one of them is wrong`,
+        ln
+      );
+    }
+  }
   return {
     kind: 'numeric' as const,
     prompt: s.common.ask,
@@ -1316,6 +1330,12 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   const goalItems: Extract<Stmt, { k: 'goal' }>[] = [];
 
   for (const item of s.items) {
+    if ('common' in item && item.common.expect && item.k !== 'numeric') {
+      throw new CompileError(
+        `expect: only works on a numeric exercise, not ${item.k}`,
+        item.common.expect.ln
+      );
+    }
     if (item.k === 'prose') {
       prose.push(item.text);
     } else if (item.k === 'scene') {

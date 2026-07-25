@@ -7,6 +7,22 @@ export const exercisesSection: DocSection = {
     'An exercise is the checkable part of a slide — the thing the learner answers. Every exercise shares four optional lines: `ask "..."` (the prompt), `hint "..."` (repeatable — a hint ladder), `! "..."` (the explanation shown after checking), and `skill: "..."` (the skill it tests).',
   entries: [
     {
+      keyword: 'expect',
+      syntax: 'expect: <expression>',
+      description:
+        "A correctness check for the author, not the learner. Goes inside a `numeric` exercise and states, as a formula, *why* the answer is what it is. The compiler works it out and refuses to build if it disagrees with `answer:`. It's double-entry bookkeeping for math: writing `answer: 0.8` next to `expect: 4/sqrt(4^2+9)` means a slipped decimal becomes a compile error instead of a wrong answer a student has to argue with. Nothing about it reaches the browser. Only `numeric` takes it, since it needs one unambiguous value to compare against.",
+      props: [
+        {
+          name: 'expect',
+          type: 'expr',
+          description: 'closed-form value the answer must match, within tolerance',
+          required: true,
+        },
+      ],
+      example:
+        'lesson "Chain rule" {\n  slide "Under a root" {\n    numeric {\n      ask "For $h(x) = \\sqrt{x^2+9}$, find $h\'(4)$."\n      answer: 0.8\n      tolerance: 0.001\n      expect: 4/sqrt(4^2+9)\n      ! "$h\'(x) = x/\\sqrt{x^2+9}$, so $h\'(4) = 4/5$."\n    }\n  }\n}',
+    },
+    {
       keyword: 'quiz',
       syntax:
         'quiz {\n  ask "Question?"\n  - "wrong option" { [why: "..."] }\n  * "correct option"\n  [hint "..."]\n  [! "explanation"]\n}',

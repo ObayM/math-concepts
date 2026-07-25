@@ -128,3 +128,66 @@ describe('onwrong detours', () => {
     }
   });
 });
+
+describe('expect: as a compile-time answer check', () => {
+  const numeric = (body: string) =>
+    `lesson "L" {\n  slide "s" {\n    numeric {\n      ask "q"\n${body}\n    }\n  }\n}`;
+
+  it('compiles when the derivation agrees with the answer', () => {
+    const l = lesson(
+      numeric('      answer: 0.8\n      tolerance: 0.001\n      expect: 4/sqrt(4^2+9)')
+    );
+    const ex = l.slides[0].exercise!;
+    expect(ex.kind).toBe('numeric');
+    if (ex.kind === 'numeric') expect(ex.answers).toEqual([0.8]);
+  });
+
+  it('never reaches the IR, since it is only an author-time assertion', () => {
+    const l = lesson(numeric('      answer: 4\n      expect: 2+2'));
+    expect(JSON.stringify(l)).not.toContain('expect');
+  });
+
+  it('fails when the derivation disagrees, naming both values', () => {
+    expect(() =>
+      compileLesson(numeric('      answer: 0.75\n      tolerance: 0.001\n      expect: 4/5'))
+    ).toThrow(/works out to 0.8, but the answer is 0.75/);
+  });
+
+  it('accepts any of several answers', () => {
+    expect(() =>
+      compileLesson(numeric('      answer: 2\n      answer: 3\n      expect: 3'))
+    ).not.toThrow();
+  });
+
+  it('respects the declared tolerance', () => {
+    expect(() =>
+      compileLesson(numeric('      answer: 0.33\n      tolerance: 0.01\n      expect: 1/3'))
+    ).not.toThrow();
+    expect(() =>
+      compileLesson(numeric('      answer: 0.33\n      tolerance: 0.0001\n      expect: 1/3'))
+    ).toThrow(/one of them is wrong/);
+  });
+
+  it('rejects a derivation that is not finite', () => {
+    expect(() => compileLesson(numeric('      answer: 1\n      expect: 1/0'))).toThrow(
+      /can't be an answer/
+    );
+  });
+
+  it('rejects expect: on exercise kinds with no single answer to check', () => {
+    expect(() =>
+      compileLesson(
+        'lesson "L" {\n  slide "s" {\n    quiz {\n      ask "q"\n      * "a"\n      - "b"\n      expect: 2\n    }\n  }\n}'
+      )
+    ).toThrow(/only works on a numeric exercise, not quiz/);
+  });
+
+  it('points the error at the expect: line', () => {
+    try {
+      compileLesson(numeric('      answer: 9\n      expect: 1+1'));
+      expect.unreachable();
+    } catch (e) {
+      expect((e as CompileError).line).toBe(6);
+    }
+  });
+});

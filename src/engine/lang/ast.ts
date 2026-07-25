@@ -135,4 +135,5 @@ export type ExerciseCommon = {
   explanation?: string;
   skill?: string;
   onwrong?: { slide: string; retry: boolean };
+  expect?: { expr: Expr; ln: number };
 };

@@ -89,6 +89,7 @@ lesson "Applications I: Linear Approximation & Differentials" {
       ask "For $y = x^{3}$, find $dy$ at $x = 3$ with $dx = 0.02$."
       skill: "appderiv-differentials"
       answer: 0.54
+      expect: 3*3^2*0.02
       tolerance: 0.001
       hint "dy = 3x² dx."
       ! "dy = 3(3)²(0.02) = 3(9)(0.02) = 0.54."

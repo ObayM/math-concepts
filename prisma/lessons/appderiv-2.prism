@@ -73,6 +73,7 @@ lesson "Applications II: Related Rates" {
       ask "The base slides away at $\dfrac{dx}{dt} = 1$ ft/s. Find $\dfrac{dy}{dt}$ when $x = 6$ ft (so $y = 8$ ft)."
       skill: "appderiv-related-rates"
       answer: -0.75
+      expect: -(6*1)/8
       hint "2x·dx/dt + 2y·dy/dt = 0, so dy/dt = -(x·dx/dt)/y."
       ! "dy/dt = -(6)(1)/8 = -0.75 ft/s: the top slides down at 0.75 ft/s."
     }

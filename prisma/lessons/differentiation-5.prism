@@ -198,6 +198,7 @@ lesson "Differentiation V: Mixed Drill" {
       ask "Let $f(x) = \sqrt{x^{2} + 9}$. Find $f'(4)$. (Chain + power together.)"
       skill: "deriv-chain-rule"
       answer: 0.8
+      expect: 4/sqrt(4^2+9)
       tolerance: 0.001
       hint "$(x^2+9)^{1/2}$ gives $f'(x) = \dfrac{x}{\sqrt{x^2+9}}$."
       ! "$f'(4) = \dfrac{4}{\sqrt{25}} = \dfrac{4}{5} = 0.8$. You've got the toolkit."

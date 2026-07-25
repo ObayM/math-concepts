@@ -70,7 +70,7 @@ export const lessonSection: DocSection = {
       keyword: 'onwrong',
       syntax: 'onwrong: "slide-id" [retry]',
       description:
-        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide — which must be a `hidden: true` slide in the same lesson — and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead. Detours fire at most once per question and cannot chain.',
+        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide (which must be a `hidden: true` slide in the same lesson) and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead. Detours fire at most once per question and cannot chain.',
       props: [
         {
           name: 'onwrong',

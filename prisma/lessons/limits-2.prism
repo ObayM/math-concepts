@@ -79,6 +79,7 @@ lesson "Limits II: Computing Limits" {
       ask "Find $\lim_{x \to 0} \dfrac{\sqrt{x+4}-2}{x}$."
       skill: "lim-algebraic"
       answer: 0.25
+      expect: 1/4
       hint "Multiply top and bottom by the conjugate, √(x+4) + 2."
       ! "Multiplying by the conjugate leaves 1/(√(x+4)+2), and at x = 0 that's 1/4."
     }

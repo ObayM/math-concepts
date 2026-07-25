@@ -8,6 +8,7 @@ const GRAMMAR_KEYWORDS = [
   '>',
   'goal',
   'onwrong',
+  'expect',
   'quiz',
   'numeric',
   'build',

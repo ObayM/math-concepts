@@ -116,11 +116,11 @@ lesson "Differentiation III — The Chain Rule" {
     hidden: true
     cat: "Chain Rule"
     > Here's the piece that goes missing most often. Power-ruling the outside gives
-    > $3(\text{inside})^{2}$ — but that is a rate **per unit of inside**, not per unit
+    > $3(\text{inside})^{2}$, but that is a rate **per unit of inside**, not per unit
     > of $x$. And the inside $u = x^{2} + 1$ doesn't move at the same speed as $x$.
     >
     > Drag the point. The dashed line is the inside's own rate of change, $u' = 2x$.
-    > Out at $x = 3$ the inside is racing six times faster than $x$ — so the final
+    > Out at $x = 3$ the inside is racing six times faster than $x$, so the final
     > answer has to be six times bigger too.
 
     scene plane {
@@ -164,6 +164,7 @@ lesson "Differentiation III — The Chain Rule" {
       ask "Let $h(x) = \sqrt{x^{2} + 9}$. Find $h'(4)$."
       skill: "deriv-chain-rule"
       answer: 0.8
+      expect: 4/sqrt(4^2+9)
       tolerance: 0.001
       hint "Write it as $(x^2+9)^{1/2}$; the inside derivative is $2x$."
       ! "$h'(x) = \dfrac{x}{\sqrt{x^2+9}}$, so $h'(4) = \dfrac{4}{5} = 0.8$."

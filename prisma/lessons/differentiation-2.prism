@@ -72,7 +72,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
     > Nudge the slider: the area grows by two thin strips, not by one tiny corner.
     >
     > The blue strip along the top is $u\,\Delta v$. The green strip up the side is
-    > $v\,\Delta u$. Growth comes from **both** strips, so the rate is $u'v + uv'$ — a
+    > $v\,\Delta u$. Growth comes from **both** strips, so the rate is $u'v + uv'$, a
     > sum. The little corner piece $\Delta u\,\Delta v$ is what shrinks away to nothing,
     > and multiplying the two derivatives is essentially keeping only that corner.
 
@@ -95,7 +95,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
     quiz {
       ask "When $u$ and $v$ both grow a little, where does the new area come from?"
       skill: "deriv-product-rule"
-      - "Only the small corner piece" { why: "That corner is the part that vanishes — it's the product of two tiny changes." }
+      - "Only the small corner piece" { why: "That corner is the part that vanishes, being the product of two tiny changes." }
       * "Both strips added together"
       - "The two strips multiplied together" { why: "Areas of separate pieces add up; they don't multiply." }
       ! "Both strips: $u\,\Delta v + v\,\Delta u$. Divide by $\Delta x$ and you have $uv' + u'v$."
@@ -161,6 +161,7 @@ lesson "Differentiation II — Product & Quotient Rules" {
       ask "Let $f(x) = \dfrac{x}{x + 1}$. Find $f'(1)$."
       skill: "deriv-quotient-rule"
       answer: 0.25
+      expect: 1/(1+1)^2
       tolerance: 0.001
       hint "$f'(x) = \dfrac{(1)(x+1) - x(1)}{(x+1)^2} = \dfrac{1}{(x+1)^2}$."
       ! "$f'(x) = \dfrac{1}{(x+1)^2}$, so $f'(1) = \dfrac{1}{4} = 0.25$."

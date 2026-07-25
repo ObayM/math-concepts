@@ -68,6 +68,7 @@ lesson "Differentiation VII: Implicit Differentiation" {
       ask "For $x^{2} + y^{2} = 25$, find $\dfrac{dy}{dx}$ at the point (3, 4)."
       skill: "deriv-implicit"
       answer: -0.75
+      expect: -3/4
       hint "Differentiate to get 2x + 2y·dy/dx = 0, then solve for dy/dx and plug in."
       ! "2x + 2y·dy/dx = 0 gives dy/dx = -x/y. At (3, 4), that's -3/4 = -0.75."
     }
