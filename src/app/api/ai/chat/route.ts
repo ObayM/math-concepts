@@ -2,7 +2,7 @@ import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireUser } from '@/lib/session';
-import { consume } from '@/lib/rate-limit';
+import { consume, tooManyRequests } from '@/lib/rate-limit';
 import { TUTOR_MODEL } from '@/lib/ai';
 
 const bodySchema = z.object({
@@ -14,8 +14,8 @@ export async function POST(req: Request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!consume(user.id, 'chat'))
-    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+  const limit = await consume(user.id, 'chat');
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

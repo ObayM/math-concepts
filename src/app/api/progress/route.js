@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { requireUser } from '@/lib/session';
-import { consume } from '@/lib/rate-limit';
+import { consume, tooManyRequests } from '@/lib/rate-limit';
 import {
   getLessonProgress,
   upsertLessonProgress,
@@ -42,8 +42,8 @@ export async function POST(request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!consume(user.id, 'progress'))
-    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+  const limit = await consume(user.id, 'progress');
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
@@ -64,6 +64,9 @@ export async function POST(request) {
 export async function DELETE(request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const limit = await consume(user.id, 'progress');
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
   const lessonKey = request.nextUrl.searchParams.get('lessonKey');
   if (!lessonKey) return NextResponse.json({ error: 'lessonKey is required' }, { status: 400 });

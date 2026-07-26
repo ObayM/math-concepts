@@ -1,6 +1,7 @@
 import { requireUser } from '@/lib/session';
 import { getActivityHeatmap, getStreak, touchActivity } from '@/lib/db/activityService';
 import { NextResponse } from 'next/server';
+import { consume, tooManyRequests } from '@/lib/rate-limit';
 
 export async function GET() {
   const user = await requireUser();
@@ -13,6 +14,9 @@ export async function GET() {
 export async function POST() {
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const limit = await consume(user.id, 'activity');
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
   await touchActivity(user.id);
   return NextResponse.json({ success: true });
