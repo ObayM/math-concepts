@@ -177,6 +177,7 @@ model LessonAttempt {
 
   @@index([userId])
   @@index([lessonId])
+  @@index([userId, skill, createdAt])
   @@map("lesson_attempts")
 }
 

@@ -30,25 +30,59 @@ export function verifyAttempts(slideMap, attempts) {
   });
 }
 
-const MASTERY_ALPHA = 0.3;
+export const MASTERY_ALPHA = 0.3;
+
+export function firstMasteryScore(correct) {
+  return correct ? 1 : 0;
+}
+
+export function nextMasteryScore(prev, correct) {
+  return prev * (1 - MASTERY_ALPHA) + (correct ? 1 : 0) * MASTERY_ALPHA;
+}
+
+export function replayMastery(attempts) {
+  let score = 0;
+  let correct = 0;
+  attempts.forEach((a, i) => {
+    score = i === 0 ? firstMasteryScore(a.correct) : nextMasteryScore(score, a.correct);
+    if (a.correct) correct += 1;
+  });
+  return { score, attempts: attempts.length, correct };
+}
 
 async function recordSkillMastery(tx, userId, skill, correct) {
-  const correctInc = correct ? 1 : 0;
-  const existing = await tx.userSkillMastery.findUnique({
-    where: { userId_skill: { userId, skill } },
+  const inc = correct ? 1 : 0;
+  const decay = 1 - MASTERY_ALPHA;
+  const gain = inc * MASTERY_ALPHA;
+
+  await tx.$executeRaw`
+    INSERT INTO user_skill_mastery (user_id, skill, score, attempts, correct, updated_at)
+    VALUES (${userId}, ${skill}, ${inc}::double precision, 1, ${inc}::int, NOW())
+    ON CONFLICT (user_id, skill) DO UPDATE SET
+      score      = user_skill_mastery.score * ${decay}::double precision + ${gain}::double precision,
+      attempts   = user_skill_mastery.attempts + 1,
+      correct    = user_skill_mastery.correct + ${inc}::int,
+      updated_at = NOW()
+  `;
+}
+
+async function rebuildSkillMastery(tx, userId, skill) {
+  const surviving = await tx.lessonAttempt.findMany({
+    where: { userId, skill },
+    select: { correct: true },
+    orderBy: { createdAt: 'asc' },
   });
 
-  if (!existing) {
-    await tx.userSkillMastery.create({
-      data: { userId, skill, score: correctInc, attempts: 1, correct: correctInc },
-    });
+  if (!surviving.length) {
+    await tx.userSkillMastery.deleteMany({ where: { userId, skill } });
     return;
   }
 
-  const score = existing.score * (1 - MASTERY_ALPHA) + correctInc * MASTERY_ALPHA;
-  await tx.userSkillMastery.update({
+  const rebuilt = replayMastery(surviving);
+  await tx.userSkillMastery.upsert({
     where: { userId_skill: { userId, skill } },
-    data: { score, attempts: existing.attempts + 1, correct: existing.correct + correctInc },
+    create: { userId, skill, ...rebuilt },
+    update: rebuilt,
   });
 }
 
@@ -204,8 +238,18 @@ export async function resetLessonProgress(userId, lessonKey) {
   });
   if (!lesson) return null;
 
-  await prisma.userLessonProgress.deleteMany({
-    where: { userId, lessonId: lesson.id },
+  await prisma.$transaction(async (tx) => {
+    const touched = await tx.lessonAttempt.findMany({
+      where: { userId, lessonId: lesson.id, skill: { not: null } },
+      select: { skill: true },
+      distinct: ['skill'],
+    });
+
+    await tx.lessonAttempt.deleteMany({ where: { userId, lessonId: lesson.id } });
+    await tx.userLessonProgress.deleteMany({ where: { userId, lessonId: lesson.id } });
+
+    for (const { skill } of touched) await rebuildSkillMastery(tx, userId, skill);
   });
+
   return lesson.id;
 }
