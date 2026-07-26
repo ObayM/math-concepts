@@ -3,7 +3,7 @@ import { assertPermission } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
-  const { ok, status } = await assertPermission({ content: ['update'] });
+  const { ok, status } = await assertPermission({ content: ['read'] });
   if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status });
 
   const lessons = await prisma.lesson.findMany({

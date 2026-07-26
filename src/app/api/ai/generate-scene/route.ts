@@ -1,8 +1,8 @@
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireUser } from '@/lib/session';
-import { consume } from '@/lib/rate-limit';
+import { assertPermission } from '@/lib/authz';
+import { consume, tooManyRequests } from '@/lib/rate-limit';
 import { SCENE_GEN_MODEL } from '@/lib/ai';
 import { compile, CompileError, formatCompileError } from '@/engine';
 import { toAIContext } from '@/engine/lang/docs';
@@ -16,11 +16,11 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const user = await requireUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { ok, status, user } = await assertPermission({ content: ['create'] });
+  if (!ok || !user) return NextResponse.json({ error: 'Forbidden' }, { status: status ?? 403 });
 
-  if (!consume(user.id, 'generate'))
-    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+  const limit = await consume(user.id, 'generate');
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
