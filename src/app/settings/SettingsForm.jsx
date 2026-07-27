@@ -9,6 +9,8 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
   const [reminders, setReminders] = useState(reminderEmails);
   const [savingReminders, setSavingReminders] = useState(false);
   const [reminderNote, setReminderNote] = useState('');
+  const [resending, setResending] = useState(false);
+  const [resendNote, setResendNote] = useState('');
 
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
@@ -57,6 +59,20 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
     setPwNote('Password changed. Other devices have been signed out.');
   };
 
+  async function resendVerification() {
+    setResending(true);
+    setResendNote('');
+    try {
+      const res = await fetch('/api/user/resend-verification', { method: 'POST' });
+      const body = await res.json().catch(() => ({}));
+      setResendNote(res.ok ? 'Sent. Check your inbox.' : (body.error ?? "Couldn't send it."));
+    } catch {
+      setResendNote("Couldn't send it. Check your connection.");
+    } finally {
+      setResending(false);
+    }
+  }
+
   return (
     <div className="mt-8 space-y-6">
       <Card className="card-soft p-6">
@@ -87,9 +103,23 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
         </div>
 
         {!emailVerified && (
-          <p className="mt-4 rounded-xl bg-warning-50 px-4 py-3 text-sm text-warning-700">
-            Your email isn&apos;t verified yet, so nothing will be sent either way.
-          </p>
+          <div className="mt-4 rounded-xl bg-warning-50 px-4 py-3">
+            <p className="text-sm text-warning-700">
+              Your email isn&apos;t verified yet, so nothing will be sent either way.
+            </p>
+            <div className="mt-3 flex items-center gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={resendVerification}
+                disabled={resending}
+              >
+                {resending ? 'Sending...' : 'Resend the email'}
+              </Button>
+              {resendNote && <span className="text-sm text-neutral-600">{resendNote}</span>}
+            </div>
+          </div>
         )}
         {reminderNote && <p className="mt-3 text-sm text-neutral-500">{reminderNote}</p>}
       </Card>

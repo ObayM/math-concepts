@@ -32,7 +32,7 @@ const statusConfig = {
 };
 
 export default function LessonCard({ lesson, courseSlug, index, isLast = false }) {
-  const { id, title, description, difficulty, status, iconName } = lesson;
+  const { id, title, description, difficulty, status, iconName, isDraft } = lesson;
   const Icon = iconMap[iconName] || iconMap['FunctionSquare'];
   const config = statusConfig[status] || statusConfig.locked;
   const isLocked = status === 'locked';
@@ -74,6 +74,11 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {isDraft && (
+              <Badge variant="warning" className="text-xs whitespace-nowrap">
+                Draft
+              </Badge>
+            )}
             <Badge variant={config.badgeVariant} className="text-xs whitespace-nowrap">
               {config.label}
             </Badge>

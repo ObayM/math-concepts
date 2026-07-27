@@ -14,6 +14,9 @@ const PUBLIC_PATHS = [
   '/error',
   '/privacy',
   '/terms',
+  '/prism',
+  '/robots.txt',
+  '/sitemap.xml',
   '/u/',
 ];
 

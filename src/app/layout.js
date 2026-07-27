@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/navbar';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { getUserInfo } from '@/components/auth/getUserInfo';
 import ImpersonationBanner from '@/components/admin/ImpersonationBanner';
+import Footer from '@/components/layout/Footer';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -21,14 +22,36 @@ const fraunces = Fraunces({
   display: 'swap',
 });
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
 export const metadata = {
-  title: 'Mathly — Learn Math Visually',
-  description: 'Interactive math lessons with visual intuition for Algebra and Geometry.',
+  metadataBase: new URL(appUrl),
+  title: {
+    default: 'Mathly — make math click',
+    template: '%s · Mathly',
+  },
+  description:
+    'Interactive math lessons you can drag, build and poke at, with a tutor that can see the question you are stuck on.',
+  applicationName: 'Mathly',
+  openGraph: {
+    type: 'website',
+    siteName: 'Mathly',
+    title: 'Mathly — make math click',
+    description:
+      'Interactive math lessons you can drag, build and poke at, with a tutor that can see the question you are stuck on.',
+    url: appUrl,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mathly — make math click',
+    description: 'Interactive math lessons that respond to you.',
+  },
 };
 
 export default async function RootLayout({ children }) {
   const userInfo = await getUserInfo();
   const pathname = (await headers()).get('x-pathname') ?? '';
+  const chromeless = pathname.startsWith('/dsl-preview') || pathname.startsWith('/prism');
 
   if (
     userInfo?.user &&
@@ -46,8 +69,15 @@ export default async function RootLayout({ children }) {
       >
         <AuthProvider initialUser={userInfo}>
           <ImpersonationBanner />
-          {!pathname.startsWith('/dsl-preview') && !pathname.startsWith('/prism') && <Navbar />}
-          {children}
+          {chromeless ? (
+            children
+          ) : (
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <div className="flex-1">{children}</div>
+              {!pathname.startsWith('/admin') && <Footer />}
+            </div>
+          )}
         </AuthProvider>
       </body>
     </html>

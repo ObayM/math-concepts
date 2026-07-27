@@ -55,7 +55,7 @@ export default async function CoursePage({ params }) {
     }
     if (status === 'locked' && isStarted) status = 'unlocked';
 
-    return { ...lesson, id: lesson.lessonKey, status };
+    return { ...lesson, id: lesson.lessonKey, status, isDraft: lesson.status !== 'published' };
   });
 
   const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;

@@ -1,9 +1,19 @@
 import { notFound } from 'next/navigation';
-import { Flame, BookOpen, Award } from 'lucide-react';
+import { Flame, BookOpen, Award, Zap } from 'lucide-react';
 import { requireUser } from '@/lib/session';
 import { getUserProfile } from '@/lib/db/userService';
 import Card from '@/components/ui/Card';
 import ProfileHeaderCard from '@/components/profile/ProfileHeaderCard';
+import ActivityGraph from '@/components/dashboard/ActivityGraph';
+
+const MAX_SKILLS = 12;
+
+const band = (score) =>
+  score >= 0.75
+    ? { label: 'solid', bar: 'bg-success-500', text: 'text-success-600' }
+    : score >= 0.4
+      ? { label: 'getting there', bar: 'bg-primary-500', text: 'text-primary-600' }
+      : { label: 'shaky', bar: 'bg-warning-500', text: 'text-warning-600' };
 
 export default async function ProfilePage({ params }) {
   const { username } = await params;
@@ -13,13 +23,14 @@ export default async function ProfilePage({ params }) {
   if (!profile) notFound();
 
   const isOwn = viewer?.id === profile.id;
+  const skills = profile.skillMastery.slice(0, MAX_SKILLS);
 
   return (
     <div className="bg-grid-snow min-h-[calc(100vh-var(--nav-h))]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
         <ProfileHeaderCard profile={profile} isOwn={isOwn} />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <StatCard
             icon={<Flame className="w-5 h-5 text-orange-500" />}
             value={profile.streak}
@@ -30,34 +41,70 @@ export default async function ProfilePage({ params }) {
             value={profile.completedCount}
             label="lessons done"
           />
+          <StatCard
+            icon={<Zap className="w-5 h-5 text-warning-500" />}
+            value={profile.totalXp}
+            label="total xp"
+          />
         </div>
 
-        {profile.skillMastery.length > 0 ? (
+        {profile.heatmap.length > 0 && (
           <Card className="p-6">
             <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-5">
+              Activity
+            </h2>
+            <ActivityGraph
+              activityData={profile.heatmap}
+              streak={profile.streak}
+              showCaption={false}
+              timezone={profile.timezone}
+            />
+          </Card>
+        )}
+
+        {skills.length > 0 ? (
+          <Card className="p-6">
+            <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">
               Skill Mastery
             </h2>
+            <p className="mb-5 text-xs text-neutral-400">
+              How confident we are right now, which leans on your recent answers more than your old
+              ones.
+            </p>
             <div className="space-y-4">
-              {profile.skillMastery.map((s) => {
+              {skills.map((s) => {
+                const mastery = Math.round(s.score * 100);
                 const accuracy = s.attempts > 0 ? Math.round((s.correct / s.attempts) * 100) : 0;
+                const tone = band(s.score);
                 return (
                   <div key={s.skill}>
                     <div className="flex justify-between text-sm mb-1.5">
                       <span className="font-medium text-neutral-800 capitalize">
                         {s.skill.replace(/-/g, ' ')}
                       </span>
-                      <span className="text-neutral-400">{accuracy}%</span>
+                      <span className={`font-semibold ${tone.text}`}>
+                        {mastery}%
+                        <span className="ml-2 font-normal text-neutral-400">{tone.label}</span>
+                      </span>
                     </div>
                     <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-primary-500 rounded-full transition-all"
-                        style={{ width: `${accuracy}%` }}
+                        className={`h-full rounded-full transition-all ${tone.bar}`}
+                        style={{ width: `${Math.max(mastery, 2)}%` }}
                       />
                     </div>
+                    <p className="mt-1 text-xs text-neutral-400">
+                      {s.correct} of {s.attempts} right all time ({accuracy}%)
+                    </p>
                   </div>
                 );
               })}
             </div>
+            {profile.skillMastery.length > MAX_SKILLS && (
+              <p className="mt-5 text-xs text-neutral-400">
+                and {profile.skillMastery.length - MAX_SKILLS} more
+              </p>
+            )}
           </Card>
         ) : (
           <Card className="p-8 text-center">

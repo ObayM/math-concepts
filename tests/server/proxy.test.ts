@@ -49,6 +49,10 @@ describe('the page gate', () => {
       '/api/health',
       '/privacy',
       '/terms',
+      '/prism',
+      '/prism/cookbook',
+      '/robots.txt',
+      '/sitemap.xml',
       '/u/obay',
     ]) {
       expect(proxy(request(path)).status, path).toBe(200);

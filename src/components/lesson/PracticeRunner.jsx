@@ -27,6 +27,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   const [stats, setStats] = useState({ attempted: 0, correct: 0 });
   const [done, setDone] = useState(false);
   const [empty, setEmpty] = useState(false);
+  const [xpEarned, setXpEarned] = useState(0);
   const liveMastery = useRef({ ...mastery });
   const activityTouched = useRef(false);
 
@@ -113,6 +114,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
       })
         .then((r) => r.json())
         .then((d) => {
+          if (typeof d?.xp === 'number') setXpEarned((x) => x + d.xp);
           if (typeof d?.correct === 'boolean' && d.correct !== isCorrect) {
             setStats((s) => ({ ...s, correct: s.correct + (d.correct ? 1 : -1) }));
           }
@@ -137,6 +139,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
 
   const handleAgain = () => {
     setStats({ attempted: 0, correct: 0 });
+    setXpEarned(0);
     setDone(false);
     setChecked(false);
     const next = playable(weightedPick(pool, liveMastery.current, Math.random, slide));
@@ -159,13 +162,18 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
           <h1 className="font-display text-4xl font-bold text-neutral-900 tracking-tight mb-2">
             {stats.correct} out of {stats.attempted}
           </h1>
-          <p className="text-neutral-500 mb-8">
+          <p className="text-neutral-500 mb-6">
             {pct >= 80
               ? 'Sharp work. That stuff is sticking.'
               : pct >= 50
                 ? 'Solid middle ground. Another round will tighten it up.'
                 : 'Rough round, but this is exactly where the practice pays off.'}
           </p>
+          {xpEarned > 0 && (
+            <p className="mb-8 inline-flex items-center gap-1.5 rounded-full bg-warning-100 px-4 py-1.5 text-sm font-bold text-warning-600">
+              +{xpEarned} XP
+            </p>
+          )}
           <div className="flex flex-col gap-3">
             <Button onClick={handleAgain} variant="primary">
               Go again
