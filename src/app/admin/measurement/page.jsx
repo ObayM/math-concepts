@@ -1,6 +1,7 @@
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
 import { getSkillMasteryDistribution, getLessonAccuracyStats } from '@/lib/db/measurementService';
+import { requireAdmin } from '@/lib/authz';
 
 function scoreBadgeVariant(score) {
   if (score >= 0.75) return 'success';
@@ -13,6 +14,7 @@ function pct(n) {
 }
 
 export default async function AdminMeasurementPage() {
+  await requireAdmin();
   const [skills, lessons] = await Promise.all([
     getSkillMasteryDistribution(),
     getLessonAccuracyStats(),

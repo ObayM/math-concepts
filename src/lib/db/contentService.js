@@ -98,7 +98,11 @@ export async function updateLessonSource(id, source) {
 }
 
 export async function moveLessonToCourse(id, courseId) {
-  return prisma.lesson.update({ where: { id }, data: { courseId } });
+  const agg = await prisma.lesson.aggregate({ where: { courseId }, _max: { sortOrder: true } });
+  return prisma.lesson.update({
+    where: { id },
+    data: { courseId, sortOrder: (agg._max.sortOrder ?? 0) + 1 },
+  });
 }
 
 export async function publishLesson(id, { force = false } = {}) {
@@ -127,10 +131,33 @@ export async function deleteLesson(id) {
   return prisma.lesson.delete({ where: { id } });
 }
 
-export async function reorderLessons(orderedIds) {
+export async function reorderLessons(courseId, orderedIds) {
   await prisma.$transaction(
-    orderedIds.map((id, idx) => prisma.lesson.update({ where: { id }, data: { sortOrder: idx } }))
+    orderedIds.map((id, idx) =>
+      prisma.lesson.updateMany({ where: { id, courseId }, data: { sortOrder: idx + 1 } })
+    )
   );
+}
+
+// read the current order, swap one step, write the whole list back, so the
+// batch writer stays the only thing that ever touches sortOrder.
+export async function moveLesson(id, direction) {
+  const lesson = await prisma.lesson.findUnique({ where: { id }, select: { courseId: true } });
+  if (!lesson?.courseId) return null;
+
+  const siblings = await prisma.lesson.findMany({
+    where: { courseId: lesson.courseId },
+    orderBy: { sortOrder: 'asc' },
+    select: { id: true },
+  });
+  const ids = siblings.map((l) => l.id);
+  const from = ids.indexOf(id);
+  const to = direction === 'up' ? from - 1 : from + 1;
+  if (from < 0 || to < 0 || to >= ids.length) return null;
+
+  [ids[from], ids[to]] = [ids[to], ids[from]];
+  await reorderLessons(lesson.courseId, ids);
+  return lesson.courseId;
 }
 
 async function generateUniqueCourseSlug(name) {
@@ -157,8 +184,62 @@ export async function updateCourse(id, { name, description, status }) {
 
 export async function reorderCourses(orderedIds) {
   await prisma.$transaction(
-    orderedIds.map((id, idx) => prisma.course.update({ where: { id }, data: { sortOrder: idx } }))
+    orderedIds.map((id, idx) =>
+      prisma.course.update({ where: { id }, data: { sortOrder: idx + 1 } })
+    )
   );
+}
+
+export async function moveCourse(id, direction) {
+  const courses = await prisma.course.findMany({
+    orderBy: { sortOrder: 'asc' },
+    select: { id: true },
+  });
+  const ids = courses.map((c) => c.id);
+  const from = ids.indexOf(id);
+  const to = direction === 'up' ? from - 1 : from + 1;
+  if (from < 0 || to < 0 || to >= ids.length) return false;
+
+  [ids[from], ids[to]] = [ids[to], ids[from]];
+  await reorderCourses(ids);
+  return true;
+}
+
+export async function publishedLessonCount(courseId) {
+  return prisma.lesson.count({ where: { courseId, status: 'published' } });
+}
+
+// what a delete would actually destroy. the confirm copy names these numbers
+// instead of a vague warning, and the force path audits them.
+export async function lessonImpact(id) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { id },
+    select: {
+      title: true,
+      lessonKey: true,
+      _count: { select: { attempts: true, progress: true } },
+    },
+  });
+  if (!lesson) return null;
+  return {
+    label: lesson.title ?? lesson.lessonKey,
+    attempts: lesson._count.attempts,
+    progress: lesson._count.progress,
+  };
+}
+
+export async function courseImpact(id) {
+  const course = await prisma.course.findUnique({
+    where: { id },
+    select: { name: true, lessons: { select: { id: true } } },
+  });
+  if (!course) return null;
+  const lessonIds = course.lessons.map((l) => l.id);
+  const [attempts, progress] = await Promise.all([
+    prisma.lessonAttempt.count({ where: { lessonId: { in: lessonIds } } }),
+    prisma.userLessonProgress.count({ where: { lessonId: { in: lessonIds } } }),
+  ]);
+  return { label: course.name, lessons: lessonIds.length, attempts, progress };
 }
 
 export async function deleteCourse(id) {

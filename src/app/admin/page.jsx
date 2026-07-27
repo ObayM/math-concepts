@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { ADMIN_ROLES } from '@/lib/permissions';
 import Card from '@/components/admin/ui/Card';
+import { requireAdmin } from '@/lib/authz';
 
 async function getCounts() {
   const [totalUsers, admins, banned, recentSignups] = await Promise.all([
@@ -24,6 +25,7 @@ function StatCard({ label, value }) {
 }
 
 export default async function AdminOverviewPage() {
+  await requireAdmin();
   const counts = await getCounts();
 
   return (

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { authClient } from '@/lib/auth-client';
 import Button from '@/components/admin/ui/Button';
+import { stopImpersonatingAction } from '@/app/admin/users/actions';
 
 export default function ImpersonationBanner() {
   const { user, isImpersonating } = useAuth();
@@ -15,7 +15,7 @@ export default function ImpersonationBanner() {
   if (!isImpersonating) return null;
 
   async function handleExit() {
-    await authClient.admin.stopImpersonating();
+    await stopImpersonatingAction();
     router.push('/admin/users');
     router.refresh();
   }

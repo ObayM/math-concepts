@@ -54,7 +54,7 @@ const DashboardPage = async () => {
     getStreak(user.id, timezone),
     getActivityHeatmap(user.id),
     getTodayXp(user.id, timezone),
-    prisma.course.findMany({ where: { status: 'published' }, orderBy: { createdAt: 'asc' } }),
+    prisma.course.findMany({ where: { status: 'published' }, orderBy: { sortOrder: 'asc' } }),
     prisma.userLessonProgress.findMany({
       where: { userId: user.id },
       select: {

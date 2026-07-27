@@ -7,6 +7,7 @@ const navLinks = [
   { name: 'Users', href: '/admin/users' },
   { name: 'Content', href: '/admin/content' },
   { name: 'Measurement', href: '/admin/measurement' },
+  { name: 'Audit log', href: '/admin/audit', superAdminOnly: true },
 ];
 
 export default async function AdminLayout({ children }) {
@@ -21,15 +22,17 @@ export default async function AdminLayout({ children }) {
           <p className="text-lg font-bold text-primary-900">Admin</p>
         </div>
         <nav className="flex flex-col">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="border-l-2 border-transparent px-3 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary-600 hover:bg-neutral-50 hover:text-primary-700"
-            >
-              {link.name}
-            </Link>
-          ))}
+          {navLinks
+            .filter((link) => superAdmin || !link.superAdminOnly)
+            .map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="border-l-2 border-transparent px-3 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary-600 hover:bg-neutral-50 hover:text-primary-700"
+              >
+                {link.name}
+              </Link>
+            ))}
         </nav>
         <div className="mt-8">
           <Badge variant={superAdmin ? 'accent' : 'primary'}>

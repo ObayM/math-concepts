@@ -31,6 +31,7 @@ model User {
   attempts        LessonAttempt[]
   authoredLessons Lesson[]
   skillMastery    UserSkillMastery[]
+  auditEntries    AuditLog[]
 
   @@map("user")
 }
@@ -179,6 +180,31 @@ model LessonAttempt {
   @@index([lessonId])
   @@index([userId, skill, createdAt])
   @@map("lesson_attempts")
+}
+
+// an audit row must outlive the thing it describes, so nothing here is a
+// foreign key to content and the actor/target labels are snapshots. if this
+// row cascaded with the lesson, deleting a lesson would erase the record of
+// its own deletion.
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorId     String?  @map("actor_id")
+  actorEmail  String   @map("actor_email")
+  action      String
+  targetType  String?  @map("target_type")
+  targetId    String?  @map("target_id")
+  targetLabel String?  @map("target_label")
+  meta        Json?
+  ip          String?
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId])
+  @@map("audit_log")
 }
 
 model UserSkillMastery {

@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
-import { getFullSession, isAdmin, isSuperAdmin } from '@/lib/authz';
+import { getFullSession, isAdmin, isSuperAdmin, requireAdmin } from '@/lib/authz';
 import { getUsersCompletedCounts } from '@/lib/db/userService';
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
@@ -14,6 +14,7 @@ const roleBadgeVariant = (role) => {
 };
 
 export default async function AdminUsersPage({ searchParams }) {
+  await requireAdmin();
   const { q } = await searchParams;
   const session = await getFullSession();
   const viewer = session?.user ?? null;

@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation';
 import { getLessonById } from '@/lib/db/lessonService';
 import LessonEditor from '@/components/admin/editor/LessonEditor';
+import { requireAdmin } from '@/lib/authz';
 
 export default async function LessonEditPage({ params }) {
+  await requireAdmin();
   const { id } = await params;
   const lesson = await getLessonById(id);
   if (!lesson) notFound();
