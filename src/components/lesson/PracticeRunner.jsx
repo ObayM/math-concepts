@@ -75,7 +75,11 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
 
     if (!activityTouched.current) {
       activityTouched.current = true;
-      fetch('/api/activity', { method: 'POST' }).catch(() => {});
+      fetch('/api/activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+      }).catch(() => {});
     }
     if (slide.lessonKey) {
       fetch('/api/practice', {

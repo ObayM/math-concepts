@@ -17,6 +17,7 @@ model User {
   displayUsername String?
   role            String    @default("student")
   reminderEmails  Boolean   @default(true) @map("reminder_emails")
+  timezone        String?
   banned          Boolean   @default(false)
   banReason       String?
   banExpires      DateTime?

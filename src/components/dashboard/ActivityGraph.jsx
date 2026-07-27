@@ -4,14 +4,25 @@ import { Zap, Calendar } from 'lucide-react';
 
 const DAY_LABELS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa'];
 
-const utcKey = (d) => d.toISOString().split('T')[0];
+const dayKey = (d) => d.toISOString().slice(0, 10);
 
-function utcToday() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+function localToday(timezone) {
+  const key = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone || undefined,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+  return new Date(`${key}T00:00:00.000Z`);
 }
 
-const ActivityGraph = ({ activityData, streak, hasActivityToday, showCaption = true }) => {
+const ActivityGraph = ({
+  activityData,
+  streak,
+  hasActivityToday,
+  showCaption = true,
+  timezone,
+}) => {
   const [view, setView] = useState('week');
 
   const activityMap = useMemo(() => {
@@ -25,32 +36,32 @@ const ActivityGraph = ({ activityData, streak, hasActivityToday, showCaption = t
   }, [activityData]);
 
   const weekDays = useMemo(() => {
-    const base = utcToday();
-    const todayKey = utcKey(base);
+    const base = localToday(timezone);
+    const todayKey = dayKey(base);
     const dow = base.getUTCDay();
     const days = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(base);
       d.setUTCDate(d.getUTCDate() - dow + i);
       days.push({
-        date: utcKey(d),
+        date: dayKey(d),
         label: DAY_LABELS[d.getUTCDay()],
-        isToday: utcKey(d) === todayKey,
+        isToday: dayKey(d) === todayKey,
       });
     }
     return days;
-  }, []);
+  }, [timezone]);
 
   const monthDays = useMemo(() => {
-    const base = utcToday();
+    const base = localToday(timezone);
     const days = [];
     for (let i = 27; i >= 0; i--) {
       const d = new Date(base);
       d.setUTCDate(d.getUTCDate() - i);
-      days.push(utcKey(d));
+      days.push(dayKey(d));
     }
     return days;
-  }, []);
+  }, [timezone]);
 
   return (
     <div className="w-full">

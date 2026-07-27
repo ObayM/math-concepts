@@ -70,7 +70,10 @@ export default function OnboardingForm() {
       const res = await fetch('/api/user/username', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: candidate }),
+        body: JSON.stringify({
+          username: candidate,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
       });
       const data = await res.json();
 

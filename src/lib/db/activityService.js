@@ -1,15 +1,8 @@
 import { prisma } from '@/lib/prisma';
+import { addDays, dayKeyOf, localDayKey, localDayStart } from '@/lib/timezone';
 
-// UTC-normalized "today" — reads (getStreak/getActivityHeatmap) compare dates
-// via toISOString(), which is UTC. Using local midnight here would drift by a
-// day whenever the server's timezone isn't UTC.
-function todayUTC() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-}
-
-export async function touchActivity(userId) {
-  const today = todayUTC();
+export async function touchActivity(userId, timezone) {
+  const today = localDayStart(timezone);
   await prisma.userDailyActivity.upsert({
     where: { userId_activityDate: { userId, activityDate: today } },
     update: {},
@@ -17,9 +10,9 @@ export async function touchActivity(userId) {
   });
 }
 
-export async function awardXp(tx, userId, amount) {
+export async function awardXp(tx, userId, amount, timezone) {
   if (!amount) return;
-  const today = todayUTC();
+  const today = localDayStart(timezone);
   await tx.userDailyActivity.upsert({
     where: { userId_activityDate: { userId, activityDate: today } },
     update: { xp: { increment: amount } },
@@ -27,12 +20,20 @@ export async function awardXp(tx, userId, amount) {
   });
 }
 
-export async function getTodayXp(userId) {
+export async function getTodayXp(userId, timezone) {
   const row = await prisma.userDailyActivity.findUnique({
-    where: { userId_activityDate: { userId, activityDate: todayUTC() } },
+    where: { userId_activityDate: { userId, activityDate: localDayStart(timezone) } },
     select: { xp: true },
   });
   return row?.xp ?? 0;
+}
+
+export async function getTotalXp(userId) {
+  const agg = await prisma.userDailyActivity.aggregate({
+    where: { userId },
+    _sum: { xp: true },
+  });
+  return agg._sum.xp ?? 0;
 }
 
 export async function getActivityHeatmap(userId) {
@@ -44,44 +45,35 @@ export async function getActivityHeatmap(userId) {
     orderBy: { activityDate: 'asc' },
   });
   return rows.map((r) => ({
-    date: r.activityDate.toISOString().split('T')[0],
+    date: dayKeyOf(r.activityDate),
     count: 1,
     xp: r.xp,
   }));
 }
 
-export async function getStreak(userId) {
+export async function getStreak(userId, timezone) {
   const rows = await prisma.userDailyActivity.findMany({
     where: { userId },
     select: { activityDate: true },
     orderBy: { activityDate: 'desc' },
   });
-
   if (rows.length === 0) return 0;
 
-  const toStr = (d) => d.toISOString().split('T')[0];
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
+  const days = rows.map((r) => dayKeyOf(r.activityDate));
+  const today = localDayKey(timezone);
+  const yesterday = addDays(today, -1);
 
-  const dates = rows.map((r) => toStr(r.activityDate));
-  const hasToday = dates.includes(toStr(today));
-  const hasYesterday = dates.includes(toStr(yesterday));
-
-  if (!hasToday && !hasYesterday) return 0;
+  let cursor = days.includes(today) ? today : days.includes(yesterday) ? yesterday : null;
+  if (!cursor) return 0;
 
   let streak = 0;
-  let cursor = hasToday ? today : yesterday;
-
-  for (const d of dates) {
-    if (d === toStr(cursor)) {
+  for (const day of days) {
+    if (day === cursor) {
       streak++;
-      cursor = new Date(cursor);
-      cursor.setDate(cursor.getDate() - 1);
-    } else if (d < toStr(cursor)) {
+      cursor = addDays(cursor, -1);
+    } else if (day < cursor) {
       break;
     }
   }
-
   return streak;
 }

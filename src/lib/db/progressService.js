@@ -3,6 +3,7 @@ import { lessonSchema } from '@/engine/ir/lesson';
 import { exercises } from '@/components/lesson/exercises';
 import { xpForAttempts, XP_LESSON_COMPLETE, XP_CORRECT, XP_ATTEMPT } from '@/lib/xp';
 import { awardXp } from '@/lib/db/activityService';
+import { getUserTimeZone } from '@/lib/db/userService';
 
 export function buildSlideMap(publishedData) {
   const parsed = lessonSchema.safeParse(publishedData);
@@ -95,10 +96,13 @@ export async function getMyMastery(userId) {
 }
 
 export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) {
-  const lesson = await prisma.lesson.findUnique({
-    where: { lessonKey },
-    select: { id: true, status: true, publishedData: true },
-  });
+  const [lesson, timezone] = await Promise.all([
+    prisma.lesson.findUnique({
+      where: { lessonKey },
+      select: { id: true, status: true, publishedData: true },
+    }),
+    getUserTimeZone(userId),
+  ]);
   if (!lesson || lesson.status !== 'published') return null;
 
   const slide = buildSlideMap(lesson.publishedData).get(slideId);
@@ -121,7 +125,7 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) 
       },
     });
     if (skill) await recordSkillMastery(tx, userId, skill, correct);
-    await awardXp(tx, userId, correct ? XP_CORRECT : XP_ATTEMPT);
+    await awardXp(tx, userId, correct ? XP_CORRECT : XP_ATTEMPT, timezone);
   });
 
   return { correct, xp: correct ? XP_CORRECT : XP_ATTEMPT };
@@ -150,10 +154,13 @@ export async function upsertLessonProgress(
   lessonKey,
   { currentStep, isCompleted, quizHistory }
 ) {
-  const lesson = await prisma.lesson.findUnique({
-    where: { lessonKey },
-    select: { id: true, publishedData: true },
-  });
+  const [lesson, timezone] = await Promise.all([
+    prisma.lesson.findUnique({
+      where: { lessonKey },
+      select: { id: true, publishedData: true },
+    }),
+    getUserTimeZone(userId),
+  ]);
   if (!lesson) return null;
 
   const now = new Date();
@@ -225,7 +232,7 @@ export async function upsertLessonProgress(
       },
     });
 
-    await awardXp(tx, userId, earnedXp);
+    await awardXp(tx, userId, earnedXp, timezone);
   });
 
   return { lessonId: lesson.id, xp: earnedXp };

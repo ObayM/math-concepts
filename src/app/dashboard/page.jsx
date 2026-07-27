@@ -7,6 +7,8 @@ import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle, Target } from 'lucide
 import { requireUser } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { getStreak, getActivityHeatmap, getTodayXp } from '@/lib/db/activityService';
+import { getUserTimeZone } from '@/lib/db/userService';
+import { localDayKey } from '@/lib/timezone';
 import { courseUrlSlug } from '@/lib/db/courseService';
 import { goalProgress } from '@/lib/xp';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
@@ -46,10 +48,12 @@ const DashboardPage = async () => {
   const user = await requireUser();
   if (!user) redirect('/login');
 
+  const timezone = await getUserTimeZone(user.id);
+
   const [streak, activityData, todayXp, courses, progressRows] = await Promise.all([
-    getStreak(user.id),
+    getStreak(user.id, timezone),
     getActivityHeatmap(user.id),
-    getTodayXp(user.id),
+    getTodayXp(user.id, timezone),
     prisma.course.findMany({ where: { status: 'published' }, orderBy: { createdAt: 'asc' } }),
     prisma.userLessonProgress.findMany({
       where: { userId: user.id },
@@ -97,7 +101,7 @@ const DashboardPage = async () => {
       null)
     : null;
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = localDayKey(timezone);
   const hasActivityToday = activityData.some((a) => a.date === todayStr);
   const firstName = (user.name || user.displayUsername || user.username || 'there').split(' ')[0];
 
@@ -134,6 +138,7 @@ const DashboardPage = async () => {
               activityData={activityData}
               hasActivityToday={hasActivityToday}
               todayXp={todayXp}
+              timezone={timezone}
             />
             <PracticeCard course={currentCourse} />
           </div>
@@ -284,7 +289,7 @@ const LessonRow = ({ lesson, coursePath }) => {
   );
 };
 
-const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp }) => {
+const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp, timezone }) => {
   const goal = goalProgress(todayXp);
   const caption = goal.met
     ? 'Daily goal done. Anything past this is a bonus.'
@@ -331,6 +336,7 @@ const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp }) => {
             streak={streak}
             hasActivityToday={hasActivityToday}
             showCaption={false}
+            timezone={timezone}
           />
         </div>
         <p className="mt-6 text-sm text-neutral-500">{caption}</p>

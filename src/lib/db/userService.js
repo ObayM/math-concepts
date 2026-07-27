@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { getStreak } from '@/lib/db/activityService';
+import { getStreak, getActivityHeatmap, getTotalXp } from '@/lib/db/activityService';
+import { isValidTimeZone } from '@/lib/timezone';
 
 export const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/;
 
@@ -11,11 +12,25 @@ export async function isUsernameAvailable(username) {
   return !existing;
 }
 
-export async function setUsername(userId, username) {
+export async function setUsername(userId, username, timezone) {
   await prisma.user.update({
     where: { id: userId },
-    data: { username },
+    data: { username, ...(isValidTimeZone(timezone) && { timezone }) },
   });
+}
+
+export async function getUserTimeZone(userId) {
+  const row = await prisma.user.findUnique({ where: { id: userId }, select: { timezone: true } });
+  return row?.timezone ?? null;
+}
+
+export async function setTimeZoneIfUnset(userId, timezone) {
+  if (!isValidTimeZone(timezone)) return null;
+  const { count } = await prisma.user.updateMany({
+    where: { id: userId, timezone: null },
+    data: { timezone },
+  });
+  return count ? timezone : null;
 }
 
 export async function countUsersWithRole(role) {
@@ -32,6 +47,7 @@ export async function getUserProfile(username) {
       displayUsername: true,
       image: true,
       createdAt: true,
+      timezone: true,
       skillMastery: {
         orderBy: { score: 'desc' },
         select: { skill: true, score: true, attempts: true, correct: true },
@@ -40,12 +56,14 @@ export async function getUserProfile(username) {
   });
   if (!user) return null;
 
-  const [streak, completedCount] = await Promise.all([
-    getStreak(user.id),
+  const [streak, completedCount, totalXp, heatmap] = await Promise.all([
+    getStreak(user.id, user.timezone),
     prisma.userLessonProgress.count({ where: { userId: user.id, completed: true } }),
+    getTotalXp(user.id),
+    getActivityHeatmap(user.id),
   ]);
 
-  return { ...user, streak, completedCount };
+  return { ...user, streak, completedCount, totalXp, heatmap };
 }
 
 export async function updateUserProfile(userId, { name, image }) {
@@ -61,7 +79,7 @@ export async function updateUserProfile(userId, { name, image }) {
 export async function getUserSettings(userId) {
   return prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, reminderEmails: true, emailVerified: true },
+    select: { email: true, reminderEmails: true, emailVerified: true, timezone: true },
   });
 }
 

@@ -3,10 +3,7 @@ import { sendEmail } from '@/lib/email';
 import { getStreak } from '@/lib/db/activityService';
 import { pickReminders, reminderBody } from '@/lib/reminders';
 
-function daysAgoUTC(date) {
-  const day = (d) => Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-  return Math.round((day(new Date()) - day(date)) / 86400000);
-}
+import { dayKeyOf, daysBetween, localDayKey } from '@/lib/timezone';
 
 export async function POST(request) {
   const secret = process.env.CRON_SECRET;
@@ -19,7 +16,14 @@ export async function POST(request) {
 
   const users = await prisma.user.findMany({
     where: { emailVerified: true, reminderEmails: true, banned: false },
-    select: { id: true, email: true, name: true, emailVerified: true, reminderEmails: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      emailVerified: true,
+      reminderEmails: true,
+      timezone: true,
+    },
   });
 
   const candidates = [];
@@ -30,12 +34,14 @@ export async function POST(request) {
         orderBy: { activityDate: 'desc' },
         select: { activityDate: true },
       }),
-      getStreak(u.id),
+      getStreak(u.id, u.timezone),
     ]);
     candidates.push({
       ...u,
       streak,
-      lastActiveDaysAgo: lastActivity ? daysAgoUTC(lastActivity.activityDate) : null,
+      lastActiveDaysAgo: lastActivity
+        ? daysBetween(dayKeyOf(lastActivity.activityDate), localDayKey(u.timezone))
+        : null,
     });
   }
 

@@ -116,7 +116,11 @@ export default function LessonPlayer({
   }
 
   const markComplete = () => {
-    fetch('/api/activity', { method: 'POST' })
+    fetch('/api/activity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+    })
       .then(() =>
         fetch('/api/activity')
           .then((r) => r.json())
