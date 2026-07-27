@@ -5,6 +5,7 @@ import { assertPermission } from '@/lib/authz';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
 import { LESSON_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
+import { verifyLesson } from '@/engine/verify';
 import { toAIContext } from '@/engine/lang/docs';
 
 const INSTRUCTIONS = toAIContext();
@@ -55,7 +56,7 @@ Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markd
 
   try {
     const lesson = compileLesson(prism);
-    return NextResponse.json({ lesson, prism });
+    return NextResponse.json({ lesson, prism, findings: verifyLesson(lesson) });
   } catch (err: unknown) {
     // a caret frame in the detail lets the model see exactly what broke and retry
     const detail =

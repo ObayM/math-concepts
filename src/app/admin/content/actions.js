@@ -10,6 +10,7 @@ import {
   deleteLesson,
   publishLesson,
   unpublishLesson,
+  VerifyError,
 } from '@/lib/db/contentService';
 
 async function requireContentPermission(action) {
@@ -40,12 +41,21 @@ export async function createLessonAction(formData) {
   redirect(`/admin/content/lessons/${lesson.id}/edit`);
 }
 
-export async function publishLessonAction(formData) {
+export async function publishLessonAction(prevState, formData) {
   await requireContentPermission('publish');
   const id = formData.get('id')?.toString();
   if (!id) throw new Error('Lesson id is required');
-  await publishLesson(id);
+  const force = formData.get('force') === '1';
+
+  try {
+    await publishLesson(id, { force });
+  } catch (err) {
+    if (err instanceof VerifyError) return { ok: false, findings: err.findings };
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+
   revalidatePath('/admin/content');
+  return { ok: true, forced: force };
 }
 
 export async function unpublishLessonAction(formData) {

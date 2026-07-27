@@ -5,6 +5,7 @@ import Badge from '@/components/admin/ui/Badge';
 import Button from '@/components/admin/ui/Button';
 import Input from '@/components/admin/ui/Input';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
+import PublishLessonButton from '@/components/admin/PublishLessonButton';
 import {
   createCourseAction,
   createLessonAction,
@@ -83,16 +84,16 @@ export default async function AdminContentPage() {
                         Edit
                       </Button>
                     </Link>
-                    <form
-                      action={
-                        lesson.status === 'published' ? unpublishLessonAction : publishLessonAction
-                      }
-                    >
-                      <input type="hidden" name="id" value={lesson.id} />
-                      <Button type="submit" variant="outline" size="sm">
-                        {lesson.status === 'published' ? 'Unpublish' : 'Publish'}
-                      </Button>
-                    </form>
+                    {lesson.status === 'published' ? (
+                      <form action={unpublishLessonAction}>
+                        <input type="hidden" name="id" value={lesson.id} />
+                        <Button type="submit" variant="outline" size="sm">
+                          Unpublish
+                        </Button>
+                      </form>
+                    ) : (
+                      <PublishLessonButton lessonId={lesson.id} action={publishLessonAction} />
+                    )}
                     <form action={deleteLessonAction}>
                       <input type="hidden" name="id" value={lesson.id} />
                       <ConfirmSubmitButton

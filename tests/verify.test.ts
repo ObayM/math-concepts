@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { compileLesson } from '@/engine/lang';
+import { compileLesson, slideLines } from '@/engine/lang';
 import { lessonSchema } from '@/engine/ir/lesson';
 import { verifyLesson } from '@/engine/verify';
 
@@ -240,4 +240,65 @@ describe('the real content', () => {
       expect(verifyLesson(lessonSchema.parse(compileLesson(src)))).toEqual([]);
     });
   }
+});
+
+describe('slideLines', () => {
+  it('maps every slide id back to the line its slide keyword sits on', () => {
+    const src = `lesson "L" {
+  slide "First" {
+    id: "one"
+    > a
+  }
+
+  slide "Second Slide" {
+    > b
+  }
+
+  slide "Third" {
+    id: "three"
+    > c
+  }
+}`;
+    expect(slideLines(src)).toEqual(
+      new Map([
+        ['one', 2],
+        ['second-slide', 7],
+        ['three', 11],
+      ])
+    );
+  });
+
+  it('pairs a verify finding with a real line', () => {
+    const src = `lesson "L" {
+  slide "Intro" {
+    > nothing here
+  }
+
+  slide "Broken" {
+    id: "broken"
+    scene plane {
+      x: [0, 4]
+      y: [0, 16]
+      curve f = x^2
+    }
+    table {
+      ask "t"
+      header: ["x", "f(x)"]
+      row: 1, blank(99)
+    }
+  }
+}`;
+    const [finding] = verifyLesson(compileLesson(src));
+    expect(finding.code).toBe('V_TABLE_OFF_CURVE');
+    expect(slideLines(src).get(finding.slideId)).toBe(6);
+  });
+
+  it('is empty for a bare scene file', () => {
+    const scene = `scene plane {
+  x: [0, 1]
+  y: [0, 1]
+  curve f = x
+}`;
+    expect(slideLines(scene)).toEqual(new Map());
+  });
 });

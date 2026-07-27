@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
+import { verifyLesson } from '@/engine/verify';
 
 function slugify(name) {
   return name
@@ -26,9 +27,17 @@ export function derivedMetadata(data) {
 
 // the single server-side trust boundary: client-compiled IR is never accepted,
 // only source text, which gets recompiled here before it touches the DB.
+export class VerifyError extends Error {
+  constructor(findings) {
+    super('This lesson has content problems that publishing would ship to students.');
+    this.findings = findings;
+  }
+}
+
 export function compileAndValidate(source) {
   try {
-    return { data: compileLesson(source), error: null };
+    const data = compileLesson(source);
+    return { data, findings: verifyLesson(data), error: null };
   } catch (err) {
     const detail =
       err instanceof CompileError
@@ -36,7 +45,7 @@ export function compileAndValidate(source) {
         : err instanceof Error
           ? err.message
           : String(err);
-    return { data: null, error: detail };
+    return { data: null, findings: [], error: detail };
   }
 }
 
@@ -76,25 +85,28 @@ export async function createLesson({ courseId, title, source, authorId }) {
   });
 }
 
+// saving never blocks on findings: a half-written slide legitimately has an
+// offscreen target. publishing is where they have to be dealt with.
 export async function updateLessonSource(id, source) {
   const compiled = compileAndValidate(source);
-  if (compiled.error) return { lesson: null, error: compiled.error };
+  if (compiled.error) return { lesson: null, findings: [], error: compiled.error };
   const lesson = await prisma.lesson.update({
     where: { id },
     data: { source, data: compiled.data, ...derivedMetadata(compiled.data) },
   });
-  return { lesson, error: null };
+  return { lesson, findings: compiled.findings, error: null };
 }
 
 export async function moveLessonToCourse(id, courseId) {
   return prisma.lesson.update({ where: { id }, data: { courseId } });
 }
 
-export async function publishLesson(id) {
+export async function publishLesson(id, { force = false } = {}) {
   const lesson = await prisma.lesson.findUnique({ where: { id } });
   if (!lesson) throw new Error('lesson not found');
   const compiled = compileAndValidate(lesson.source);
   if (compiled.error) throw new Error(compiled.error);
+  if (compiled.findings.length && !force) throw new VerifyError(compiled.findings);
   return prisma.lesson.update({
     where: { id },
     data: {

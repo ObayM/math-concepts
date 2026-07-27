@@ -959,6 +959,10 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
 
 // --- lesson emission --------------------------------------------------------
 
+export function slideIdFor(props: PropMap, title: string, index: number): string {
+  return pStr(props, 'id') || slug(title) || `slide-${index + 1}`;
+}
+
 function slug(s: string): string {
   return s
     .toLowerCase()
@@ -1349,7 +1353,7 @@ function emitGoal(s: Extract<Stmt, { k: 'goal' }>, allowedIds: string[]) {
 }
 
 function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
-  const id = pStr(s.props, 'id') || slug(s.title) || `slide-${i + 1}`;
+  const id = slideIdFor(s.props, s.title, i);
   const prose: string[] = [];
   let scene: SceneIR | undefined;
   let exercise:

@@ -19,8 +19,8 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { lesson, error } = await updateLessonSource(id, parsed.data.source);
+  const { lesson, findings, error } = await updateLessonSource(id, parsed.data.source);
   if (error) return NextResponse.json({ error: 'Compile failed', detail: error }, { status: 422 });
 
-  return NextResponse.json({ data: lesson.data, updatedAt: lesson.updatedAt });
+  return NextResponse.json({ data: lesson.data, findings, updatedAt: lesson.updatedAt });
 }
