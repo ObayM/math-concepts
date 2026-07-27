@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
@@ -12,6 +13,8 @@ import { weightedPick, slideSkill } from '@/lib/practice';
 
 const SESSION_LENGTH = 10;
 
+const playable = (slide) => (slide && exercises[slide.exercise?.kind] ? slide : null);
+
 export default function PracticeRunner({ pool, mastery = {}, coursePath, courseName }) {
   const router = useRouter();
   // picked client-side only — picking during the render that also runs on
@@ -23,15 +26,36 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
   const [stats, setStats] = useState({ attempted: 0, correct: 0 });
   const [done, setDone] = useState(false);
+  const [empty, setEmpty] = useState(false);
   const liveMastery = useRef({ ...mastery });
   const activityTouched = useRef(false);
 
   useEffect(() => {
-    const first = weightedPick(pool, liveMastery.current);
+    const first = playable(weightedPick(pool, liveMastery.current));
+    if (!first) {
+      setEmpty(true);
+      return;
+    }
     setSlide(first);
     setValue(exercises[first.exercise.kind].initial(first));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (empty) {
+    return (
+      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
+        <Card className="card-soft p-8 text-center">
+          <h1 className="font-display text-2xl font-bold text-neutral-900">Nothing to practice</h1>
+          <p className="mt-2 text-neutral-500">
+            {courseName} has no questions ready yet. Try a lesson first.
+          </p>
+          <Link href={`/courses/${coursePath}`} className="mt-6 inline-block">
+            <Button variant="secondary">Back to {courseName}</Button>
+          </Link>
+        </Card>
+      </div>
+    );
+  }
 
   if (!slide) {
     return (
@@ -98,11 +122,14 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   };
 
   const handleNext = () => {
-    if (stats.attempted >= SESSION_LENGTH) {
+    const next =
+      stats.attempted >= SESSION_LENGTH
+        ? null
+        : playable(weightedPick(pool, liveMastery.current, Math.random, slide));
+    if (!next) {
       setDone(true);
       return;
     }
-    const next = weightedPick(pool, liveMastery.current, Math.random, slide);
     setSlide(next);
     setValue(exercises[next.exercise.kind].initial(next));
     setChecked(false);
@@ -112,7 +139,11 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
     setStats({ attempted: 0, correct: 0 });
     setDone(false);
     setChecked(false);
-    const next = weightedPick(pool, liveMastery.current, Math.random, slide);
+    const next = playable(weightedPick(pool, liveMastery.current, Math.random, slide));
+    if (!next) {
+      setDone(true);
+      return;
+    }
     setSlide(next);
     setValue(exercises[next.exercise.kind].initial(next));
   };

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -16,7 +16,12 @@
     "db:seed": "npm run build:lessons && node prisma/seed.js",
     "prepare": "husky",
     "dsl": "tsx scripts/dsl.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:fast": "vitest run --project engine --project dom --project server",
+    "test:db:setup": "node --env-file-if-exists=.env scripts/test-db.mjs",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "postbuild": "node scripts/postbuild-standalone.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.3",
@@ -37,14 +42,20 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4.3.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/katex": "^0.16.8",
     "@types/node": "^26.0.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "husky": "^9.1.7",
+    "jsdom": "^26.1.0",
     "lint-staged": "^17.0.8",
     "prettier": "^3.8.5",
     "prisma": "^6.0.0",

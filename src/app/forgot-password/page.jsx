@@ -79,6 +79,7 @@ export default function ForgotPasswordPage() {
             autoComplete="email"
             required
             placeholder="Email address"
+            aria-label="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail className="w-5 h-5" />}

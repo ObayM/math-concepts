@@ -20,6 +20,23 @@ export const auth = betterAuth({
 
   ...(trustedOrigins.length && { trustedOrigins }),
 
+  // better-auth rate limits by default in production only, and its defaults are
+  // strict (3 per 10s on sign-in/sign-up). pin them here so the behaviour is a
+  // decision rather than an inherited surprise. the store is per-process, same
+  // caveat as src/lib/rate-limit.ts.
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+    customRules: {
+      '/sign-in/email': { window: 10, max: 5 },
+      '/sign-up/email': { window: 60, max: 5 },
+      '/forget-password': { window: 60, max: 3 },
+      '/request-password-reset': { window: 60, max: 3 },
+      '/send-verification-email': { window: 60, max: 3 },
+    },
+  },
+
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,

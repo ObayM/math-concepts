@@ -45,3 +45,8 @@ next-env.d.ts
 
 # generated from prisma/lessons/*.dsl by scripts/build-lessons.mjs
 prisma/lessons/*.json
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/

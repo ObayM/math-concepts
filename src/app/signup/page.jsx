@@ -67,6 +67,7 @@ export default function SignupPage() {
             autoComplete="email"
             required
             placeholder="Email address"
+            aria-label="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail className="w-5 h-5" />}
@@ -78,6 +79,7 @@ export default function SignupPage() {
             autoComplete="new-password"
             required
             placeholder="Password"
+            aria-label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

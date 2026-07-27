@@ -12,6 +12,23 @@ import Input from '@/components/ui/Input';
 import PasswordInput from '@/components/ui/PasswordInput';
 import Card from '@/components/ui/Card';
 
+// telling someone their password is wrong when they are actually rate limited,
+// unverified or banned sends them in circles.
+function signInMessage(error) {
+  if (error.status === 429) return 'Too many attempts. Wait a minute and try again.';
+  switch (error.code) {
+    case 'EMAIL_NOT_VERIFIED':
+      return 'Check your inbox and verify your email before signing in.';
+    case 'USER_BANNED':
+    case 'BANNED_USER':
+      return 'This account has been suspended.';
+    case 'INVALID_EMAIL_OR_PASSWORD':
+      return 'Invalid credentials. Please try again.';
+    default:
+      return error.message || 'Something went wrong. Please try again.';
+  }
+}
+
 export default function LoginPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -35,7 +52,7 @@ export default function LoginPage() {
     });
 
     if (authError) {
-      setError('Invalid credentials. Please try again.');
+      setError(signInMessage(authError));
       setLoading(false);
     } else {
       router.push('/dashboard');
@@ -61,6 +78,7 @@ export default function LoginPage() {
             autoComplete="email"
             required
             placeholder="Email address"
+            aria-label="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail className="w-5 h-5" />}

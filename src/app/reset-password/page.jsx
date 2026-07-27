@@ -105,6 +105,7 @@ export default function ResetPasswordPage() {
             autoComplete="new-password"
             required
             placeholder="New password"
+            aria-label="New password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
