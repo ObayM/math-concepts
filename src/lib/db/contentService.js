@@ -87,13 +87,32 @@ export async function createLesson({ courseId, title, source, authorId }) {
 
 // saving never blocks on findings: a half-written slide legitimately has an
 // offscreen target. publishing is where they have to be dealt with.
-export async function updateLessonSource(id, source) {
+export async function updateLessonSource(id, source, expectedUpdatedAt) {
   const compiled = compileAndValidate(source);
   if (compiled.error) return { lesson: null, findings: [], error: compiled.error };
-  const lesson = await prisma.lesson.update({
-    where: { id },
-    data: { source, data: compiled.data, ...derivedMetadata(compiled.data) },
-  });
+
+  const data = { source, data: compiled.data, ...derivedMetadata(compiled.data) };
+
+  // updateMany is the trick: `update` needs a unique where, but updateMany
+  // accepts the extra predicate, so the version check and the write are one
+  // statement with no read-then-write in between.
+  if (expectedUpdatedAt) {
+    const { count } = await prisma.lesson.updateMany({
+      where: { id, updatedAt: new Date(expectedUpdatedAt) },
+      data,
+    });
+    if (count === 0) {
+      const current = await prisma.lesson.findUnique({
+        where: { id },
+        select: { source: true, updatedAt: true },
+      });
+      return { lesson: null, findings: [], error: null, conflict: current ?? { missing: true } };
+    }
+  } else {
+    await prisma.lesson.update({ where: { id }, data });
+  }
+
+  const lesson = await prisma.lesson.findUnique({ where: { id } });
   return { lesson, findings: compiled.findings, error: null };
 }
 

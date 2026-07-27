@@ -4,7 +4,10 @@ import { assertPermission } from '@/lib/authz';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
 import { updateLessonSource } from '@/lib/db/contentService';
 
-const bodySchema = z.object({ source: z.string().max(65_536) });
+const bodySchema = z.object({
+  source: z.string().max(65_536),
+  expectedUpdatedAt: z.string().datetime().optional(),
+});
 
 export async function PUT(request, { params }) {
   const { id } = await params;
@@ -19,8 +22,23 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { lesson, findings, error } = await updateLessonSource(id, parsed.data.source);
+  const { lesson, findings, error, conflict } = await updateLessonSource(
+    id,
+    parsed.data.source,
+    parsed.data.expectedUpdatedAt
+  );
   if (error) return NextResponse.json({ error: 'Compile failed', detail: error }, { status: 422 });
+  if (conflict) {
+    return NextResponse.json(
+      {
+        error: 'Someone else saved this lesson while you were editing.',
+        conflict: true,
+        theirSource: conflict.source ?? null,
+        updatedAt: conflict.updatedAt ?? null,
+      },
+      { status: 409 }
+    );
+  }
 
   return NextResponse.json({ data: lesson.data, findings, updatedAt: lesson.updatedAt });
 }

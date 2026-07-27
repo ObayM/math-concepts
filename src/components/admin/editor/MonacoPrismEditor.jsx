@@ -1,9 +1,14 @@
 'use client';
 
 import { useRef, useCallback, useEffect } from 'react';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
+import * as monacoEditor from 'monaco-editor';
 import { configurePrismLanguage } from './monaco/configurePrismLanguage';
 import { computeMarkers } from './monaco/prismMarkers';
+
+// without this @monaco-editor/react fetches monaco from jsdelivr at runtime,
+// which makes the whole editor dead offline or behind a CDN block.
+loader.config({ monaco: monacoEditor });
 
 export default function MonacoPrismEditor({
   value,

@@ -17,6 +17,7 @@ export default async function LessonEditPage({ params }) {
         lessonId={lesson.id}
         title={lesson.title ?? lesson.lessonKey}
         initialSource={lesson.source}
+        initialUpdatedAt={lesson.updatedAt.toISOString()}
       />
     </div>
   );

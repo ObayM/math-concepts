@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const STORAGE_KEY = 'mathly-admin-recent-lessons';
 const MAX_TABS = 6;
 
-export default function RecentLessonTabs({ lessonId, title }) {
+export default function RecentLessonTabs({ lessonId, title, confirmLeave }) {
   const [recent, setRecent] = useState([]);
+  const router = useRouter();
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
@@ -29,9 +30,14 @@ export default function RecentLessonTabs({ lessonId, title }) {
   return (
     <div className="mb-3 flex gap-1 overflow-x-auto border-b border-neutral-200">
       {recent.map((l) => (
-        <Link
+        <button
           key={l.id}
-          href={`/admin/content/lessons/${l.id}/edit`}
+          type="button"
+          onClick={() => {
+            if (l.id === lessonId) return;
+            if (confirmLeave && !confirmLeave('Switch lessons and lose them?')) return;
+            router.push(`/admin/content/lessons/${l.id}/edit`);
+          }}
           className={`shrink-0 border-b-2 px-3 py-1.5 text-xs font-semibold ${
             l.id === lessonId
               ? 'border-primary-600 text-primary-700'
@@ -39,7 +45,7 @@ export default function RecentLessonTabs({ lessonId, title }) {
           }`}
         >
           {l.title}
-        </Link>
+        </button>
       ))}
     </div>
   );

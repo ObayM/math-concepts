@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { compileAny } from '@/components/prism/compileAny';
 import MiniPlayer from '@/components/prism/MiniPlayer';
@@ -17,8 +17,11 @@ const vSeparator =
 const hSeparator =
   'h-1.5 shrink-0 cursor-row-resize bg-neutral-200 transition-colors hover:bg-primary-300 active:bg-primary-400';
 
-export default function LessonEditor({ lessonId, title, initialSource }) {
+export default function LessonEditor({ lessonId, title, initialSource, initialUpdatedAt }) {
   const [source, setSource] = useState(initialSource);
+  const [savedSource, setSavedSource] = useState(initialSource);
+  const [serverUpdatedAt, setServerUpdatedAt] = useState(initialUpdatedAt ?? null);
+  const [conflict, setConflict] = useState(null);
   const [saveState, setSaveState] = useState('idle');
   const [saveError, setSaveError] = useState(null);
   const [showAi, setShowAi] = useState(true);
@@ -26,7 +29,23 @@ export default function LessonEditor({ lessonId, title, initialSource }) {
   const abortRef = useRef(null);
   const editorApiRef = useRef(null);
 
+  const isDirty = source !== savedSource;
   const { lesson, error: previewError } = useMemo(() => compileAny(source), [source]);
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [isDirty]);
+
+  const confirmDiscard = useCallback(
+    (what) => !isDirty || confirm(`You have unsaved changes. ${what}`),
+    [isDirty]
+  );
 
   const handleEditorReady = useCallback((editor, monaco) => {
     editorApiRef.current = { editor, monaco };
@@ -40,25 +59,52 @@ export default function LessonEditor({ lessonId, title, initialSource }) {
     api.editor.focus();
   }
 
+  function insertAtCursor(text) {
+    const api = editorApiRef.current;
+    if (!api) {
+      setSource((prev) => `${prev}\n\n${text}`);
+      return;
+    }
+    const selection = api.editor.getSelection();
+    api.editor.executeEdits('ai-insert', [{ range: selection, text, forceMoveMarkers: true }]);
+    api.editor.focus();
+  }
+
   async function handleSave() {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
     setSaveState('saving');
     setSaveError(null);
+    setConflict(null);
+
+    const attempted = source;
     try {
       const res = await fetch(`/api/admin/content/lessons/${lessonId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source }),
+        body: JSON.stringify({
+          source: attempted,
+          ...(serverUpdatedAt && { expectedUpdatedAt: serverUpdatedAt }),
+        }),
         signal: controller.signal,
       });
       const body = await res.json();
+
+      if (res.status === 409) {
+        setSaveState('error');
+        setConflict(body);
+        setServerUpdatedAt(body.updatedAt ?? serverUpdatedAt);
+        return;
+      }
       if (!res.ok) {
         setSaveState('error');
         setSaveError(body.detail ?? body.error ?? 'Save failed');
         return;
       }
+
+      setSavedSource(attempted);
+      setServerUpdatedAt(body.updatedAt ?? null);
       setSaveState('saved');
     } catch (err) {
       if (err.name === 'AbortError') return;
@@ -69,8 +115,8 @@ export default function LessonEditor({ lessonId, title, initialSource }) {
 
   return (
     <div className="mt-6">
-      <RecentLessonTabs lessonId={lessonId} title={title} />
-      <LessonSwitcher currentLessonId={lessonId} />
+      <RecentLessonTabs lessonId={lessonId} title={title} confirmLeave={confirmDiscard} />
+      <LessonSwitcher currentLessonId={lessonId} confirmLeave={confirmDiscard} />
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button onClick={handleSave} isLoading={saveState === 'saving'}>
@@ -79,7 +125,8 @@ export default function LessonEditor({ lessonId, title, initialSource }) {
           <span className="text-xs text-neutral-400">
             Ctrl/Cmd+S · Ctrl/Cmd+K to switch lessons
           </span>
-          {saveState === 'saved' && (
+          {isDirty && <span className="text-sm font-semibold text-warning-600">Unsaved</span>}
+          {!isDirty && saveState === 'saved' && (
             <span className="text-sm font-semibold text-success-600">Saved</span>
           )}
           {saveState === 'error' && (
@@ -90,6 +137,44 @@ export default function LessonEditor({ lessonId, title, initialSource }) {
           {showAi ? 'Just write Prism' : 'Show AI panel'}
         </Button>
       </div>
+
+      {conflict && (
+        <div className="mb-3 border border-warning-500 bg-warning-50 p-3">
+          <p className="text-sm font-bold text-warning-600">{conflict.error}</p>
+          <p className="mt-1 text-xs text-neutral-600">
+            Their version was saved at{' '}
+            {conflict.updatedAt
+              ? conflict.updatedAt.replace('T', ' ').slice(0, 16)
+              : 'an unknown time'}
+            . Loading theirs discards what you have on screen.
+          </p>
+          <div className="mt-3 flex gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                if (!confirmDiscard('Load their version and discard yours?')) return;
+                setSource(conflict.theirSource ?? source);
+                setSavedSource(conflict.theirSource ?? source);
+                setConflict(null);
+                setSaveState('idle');
+              }}
+            >
+              Load theirs
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => {
+                setConflict(null);
+                handleSave();
+              }}
+            >
+              Overwrite with mine
+            </Button>
+          </div>
+        </div>
+      )}
 
       {saveError && (
         <pre className="mb-3 whitespace-pre-wrap border border-danger-100 bg-danger-50 p-3 text-xs text-danger-700">
@@ -132,7 +217,14 @@ export default function LessonEditor({ lessonId, title, initialSource }) {
               <Separator className={vSeparator} />
               <Panel defaultSize={20} minSize={12} collapsible collapsedSize={0}>
                 <div className="h-full min-w-0 overflow-auto">
-                  <AiPanel source={source} onApply={setSource} />
+                  <AiPanel
+                    source={source}
+                    onApply={(next) => {
+                      if (!confirmDiscard('Replace the whole lesson with the AI version?')) return;
+                      setSource(next);
+                    }}
+                    onInsertScene={insertAtCursor}
+                  />
                 </div>
               </Panel>
             </>

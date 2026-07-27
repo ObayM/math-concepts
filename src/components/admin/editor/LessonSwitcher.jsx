@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function LessonSwitcher({ currentLessonId }) {
+export default function LessonSwitcher({ currentLessonId, confirmLeave }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [lessons, setLessons] = useState(null);
@@ -13,7 +13,7 @@ export default function LessonSwitcher({ currentLessonId }) {
   useEffect(() => {
     function handleKeyDown(e) {
       const isMod = e.metaKey || e.ctrlKey;
-      if (isMod && e.key.toLowerCase() === 'k') {
+      if (isMod && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setOpen((v) => !v);
       }
@@ -49,8 +49,13 @@ export default function LessonSwitcher({ currentLessonId }) {
   });
 
   function go(lesson) {
+    if (lesson.id === currentLessonId) {
+      setOpen(false);
+      return;
+    }
+    if (confirmLeave && !confirmLeave('Switch lessons and lose them?')) return;
     setOpen(false);
-    if (lesson.id !== currentLessonId) router.push(`/admin/content/lessons/${lesson.id}/edit`);
+    router.push(`/admin/content/lessons/${lesson.id}/edit`);
   }
 
   return (
