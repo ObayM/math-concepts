@@ -8,6 +8,7 @@ import { evalExpr, ExprError, BUILTINS, BUILTIN_NAMES, CONSTS } from '@/engine/e
 import { lex } from './lexer';
 import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
+import { LESSON_DIFFICULTIES, LESSON_ICONS } from './icons';
 
 type CompileScope = Record<string, number | boolean>;
 type Macros = Map<string, { params: string[]; body: Stmt[] }>;
@@ -978,6 +979,23 @@ function pBool(props: PropMap, key: string): boolean | undefined {
   return undefined;
 }
 
+function pEnum<T extends string>(
+  props: PropMap,
+  key: string,
+  allowed: readonly T[],
+  ln: number
+): T | undefined {
+  const v = pStr(props, key);
+  if (v === undefined) return undefined;
+  if (!allowed.includes(v as T)) {
+    throw new CompileError(
+      `${key} must be one of ${allowed.join(', ')}, got "${v}"${suggest(v, allowed)}`,
+      ln
+    );
+  }
+  return v as T;
+}
+
 function pStrList(props: PropMap, key: string): string[] | undefined {
   const v = props.get(key);
   if (v && v !== true && v.k === 'list') {
@@ -1464,6 +1482,10 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
 
   const course = pStr(root.props, 'course');
   const skills = pStrList(root.props, 'skills');
+  const unit = pStr(root.props, 'unit');
+  const summary = pStr(root.props, 'summary');
+  const difficulty = pEnum(root.props, 'difficulty', LESSON_DIFFICULTIES, root.ln);
+  const icon = pEnum(root.props, 'icon', LESSON_ICONS, root.ln);
   const slides = root.slides.map((s, i) => emitSlide(s, i, lessonMacros));
   validateSlideFlow(slides, root.slides);
   const ir = {
@@ -1471,6 +1493,10 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
     title: root.title,
     ...(course && { course }),
     ...(skills && { skills }),
+    ...(unit && { unit }),
+    ...(difficulty && { difficulty }),
+    ...(icon && { icon }),
+    ...(summary && { summary }),
     slides,
   };
 

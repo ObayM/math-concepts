@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { sceneSchema } from './schema';
 import { exprIRSchema } from '@/engine/expr';
+import { LESSON_DIFFICULTIES, LESSON_ICONS } from '@/engine/lang/icons';
 
 const exerciseBase = {
   prompt: z.string(),
@@ -124,6 +125,10 @@ export const lessonSchema = z.object({
   title: z.string(),
   course: z.string().optional(),
   skills: z.array(z.string()).optional(),
+  unit: z.string().optional(),
+  difficulty: z.enum(LESSON_DIFFICULTIES).optional(),
+  icon: z.enum(LESSON_ICONS).optional(),
+  summary: z.string().optional(),
   slides: z.array(slide).min(1),
 });
 

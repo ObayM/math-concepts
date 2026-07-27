@@ -398,7 +398,11 @@ function makeParser(tokens: Token[]) {
         defs.push(parseDef(peek().line) as Extract<Stmt, { k: 'def' }>);
         skipNL();
       } else if (check('IDENT')) {
+        const t = peek();
         const key = eatIdent();
+        if (!LESSON_PROPS.has(key)) {
+          throw new CompileError(`unknown lesson property "${key}"`, t.line, t.col);
+        }
         eat('COLON');
         props.set(key, parseExpr());
         endStmt();
@@ -410,6 +414,8 @@ function makeParser(tokens: Token[]) {
     eat('RC');
     return { k: 'lesson', title, props, slides, defs, ln };
   }
+
+  const LESSON_PROPS = new Set(['course', 'skills', 'unit', 'difficulty', 'icon', 'summary']);
 
   const SLIDE_PROPS = new Set(['cat', 'id', 'skill', 'hidden']);
 
