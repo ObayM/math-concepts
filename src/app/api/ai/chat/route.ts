@@ -1,16 +1,42 @@
-import { generateText } from 'ai';
+import { streamText } from 'ai';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireUser } from '@/lib/session';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
-import { TUTOR_MODEL } from '@/lib/ai';
+import { TUTOR_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
+import { getLessonByKey } from '@/lib/db/lessonService';
+import { getMyMastery } from '@/lib/db/progressService';
+import { lessonSchema } from '@/engine/ir/lesson';
+import {
+  MAX_QUESTION_CHARS,
+  MAX_HISTORY_TURNS,
+  MAX_TURN_CHARS,
+  buildTutorContext,
+  buildTutorRequest,
+} from '@/lib/tutor';
 
 const bodySchema = z.object({
-  context: z.string().max(4000),
-  question: z.string().min(1).max(500),
+  lessonKey: z.string().min(1).max(200),
+  slideId: z.string().min(1).max(200),
+  question: z.string().trim().min(1).max(MAX_QUESTION_CHARS),
+  checked: z.boolean().optional(),
+  correct: z.boolean().optional(),
+  answer: z.unknown().optional(),
+  scope: z.record(z.string(), z.unknown()).optional(),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().max(MAX_TURN_CHARS),
+      })
+    )
+    .max(MAX_HISTORY_TURNS * 2)
+    .optional(),
 });
 
 export async function POST(req: Request) {
+  if (!isAiConfigured()) return aiNotConfigured();
+
   const user = await requireUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -21,20 +47,36 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const { context, question } = parsed.data;
+  const { lessonKey, slideId, question, checked, correct, answer, scope, history } = parsed.data;
+
+  const row = await getLessonByKey(lessonKey);
+  const ir = lessonSchema.safeParse(row?.publishedData);
+  if (!row || row.status !== 'published' || !ir.success) {
+    return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+  }
+
+  const slide = ir.data.slides.find((s) => s.id === slideId);
+  if (!slide) return NextResponse.json({ error: 'Slide not found' }, { status: 404 });
+
+  const skill = slide.exercise?.skill ?? slide.skill;
+  const mastery = skill ? ((await getMyMastery(user.id))[skill] ?? null) : null;
+
+  const ctx = buildTutorContext(ir.data, slideId, { checked, correct, answer, scope, mastery });
+  if (!ctx) return NextResponse.json({ error: 'Slide not found' }, { status: 404 });
+
+  const { instructions, messages } = buildTutorRequest(ctx, history, question);
 
   try {
-    const { text } = await generateText({
+    const result = streamText({
       model: TUTOR_MODEL,
-      instructions:
-        'You are a friendly, encouraging math tutor. Explain concepts simply. Keep responses under 80 words.',
-      prompt: `Context: ${context}\n\nUser Question: ${question}`,
-      maxOutputTokens: 512,
+      instructions,
+      messages,
+      maxOutputTokens: 400,
       abortSignal: AbortSignal.timeout(30_000),
+      onError: ({ error }) => console.error('tutor stream failed', error),
     });
-    return NextResponse.json({ answer: text });
-  } catch (err: unknown) {
-    const detail = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: 'Tutor is unavailable right now', detail }, { status: 502 });
+    return result.toTextStreamResponse();
+  } catch {
+    return NextResponse.json({ error: 'Tutor is unavailable right now' }, { status: 502 });
   }
 }

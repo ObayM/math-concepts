@@ -1,12 +1,12 @@
 'use client';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, RotateCcw, BrainCircuit } from 'lucide-react';
+import { Sparkles, RotateCcw, Send } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import LessonCompletion from '@/components/lesson/LessonCompletion';
-import { askTutor } from '@/utils/aiService';
+import { askTutor, TutorError } from '@/utils/aiService';
 import { evalGoals } from '@/engine/runtime/goals';
 import {
   visiblePath,
@@ -19,6 +19,7 @@ import {
   back as backFlow,
 } from '@/engine/runtime/flow';
 
+import RichText from './RichText';
 import SlideView from './SlideView';
 import { exercises } from './exercises';
 
@@ -46,8 +47,11 @@ export default function LessonPlayer({
 
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorQuery, setTutorQuery] = useState('');
-  const [tutorResponse, setTutorResponse] = useState('');
-  const [tutorLoading, setTutorLoading] = useState(false);
+  const [tutorTurns, setTutorTurns] = useState([]);
+  const [tutorStreaming, setTutorStreaming] = useState(false);
+  const [tutorError, setTutorError] = useState(null);
+  const scopeRef = useRef({});
+  const transcriptRef = useRef(null);
 
   const path = useMemo(() => visiblePath(slides), [slides]);
   const slide = useMemo(() => activeSlide(slides, flow), [slides, flow]);
@@ -112,7 +116,10 @@ export default function LessonPlayer({
     setAnswer(checker ? checker.initial(slide) : null);
     setChecked(false);
     setTutorOpen(false);
-    setTutorResponse('');
+    setTutorTurns([]);
+    setTutorError(null);
+    setTutorQuery('');
+    scopeRef.current = {};
   }
 
   const markComplete = () => {
@@ -183,7 +190,7 @@ export default function LessonPlayer({
     setChecked(true);
     const correct = checker.check(slide, answer);
     setFlow((f) => stageBranch(slides, f, correct));
-    const question = slide.exercise?.prompt ?? slide.content ?? '';
+    const question = slide.exercise?.prompt ?? slide.title ?? '';
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;
       return [
@@ -206,6 +213,7 @@ export default function LessonPlayer({
   };
 
   const handleScopeChange = (scope) => {
+    scopeRef.current = scope;
     const goals = slide?.goals;
     if (!goals?.length) return;
     setGoalsState((prev) => {
@@ -214,13 +222,52 @@ export default function LessonPlayer({
     });
   };
 
+  useEffect(() => {
+    const el = transcriptRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [tutorTurns]);
+
   const handleTutorAsk = async () => {
-    if (!tutorQuery.trim()) return;
-    setTutorLoading(true);
-    const context = slide.content ?? slide.prose ?? slide.exercise?.prompt ?? slide.title;
-    const reply = await askTutor(context, tutorQuery);
-    setTutorResponse(reply);
-    setTutorLoading(false);
+    const question = tutorQuery.trim();
+    if (!question || tutorStreaming || !slide) return;
+
+    const history = tutorTurns;
+    setTutorQuery('');
+    setTutorError(null);
+    setTutorTurns([
+      ...history,
+      { role: 'user', content: question },
+      { role: 'assistant', content: '' },
+    ]);
+    setTutorStreaming(true);
+
+    const land = (content) =>
+      setTutorTurns((prev) => {
+        const next = [...prev];
+        next[next.length - 1] = { role: 'assistant', content };
+        return next;
+      });
+
+    try {
+      await askTutor(
+        {
+          lessonKey: lessonId,
+          slideId: slide.id,
+          question,
+          checked,
+          ...(correct !== null && { correct }),
+          answer,
+          scope: scopeRef.current,
+          history,
+        },
+        { onChunk: land }
+      );
+    } catch (err) {
+      setTutorError(err instanceof TutorError ? err.message : 'Something went wrong. Try again.');
+      setTutorTurns((prev) => prev.slice(0, -1));
+    } finally {
+      setTutorStreaming(false);
+    }
   };
 
   const handleContinue = () =>
@@ -412,45 +459,82 @@ export default function LessonPlayer({
           className={`border-t border-neutral-100 bg-neutral-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
         >
           <div className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="bg-primary-600 p-2 rounded-xl text-white">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold text-primary-500 uppercase mb-2">AI Math Tutor</p>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
+                <Sparkles className="h-4 w-4" />
+                AI Tutor
+              </p>
+              {tutorTurns.length > 0 && !tutorStreaming && (
+                <button
+                  onClick={() => {
+                    setTutorTurns([]);
+                    setTutorError(null);
+                  }}
+                  className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-primary-600"
+                >
+                  <RotateCcw className="h-3 w-3" /> Start over
+                </button>
+              )}
+            </div>
 
-                {tutorResponse ? (
-                  <div className="animate-fade-in-up bg-white p-4 rounded-2xl border border-primary-100 text-neutral-700 text-sm leading-relaxed">
-                    {tutorResponse}
-                    <div className="mt-3 pt-3 border-t border-neutral-100 flex justify-end">
-                      <button
-                        onClick={() => setTutorResponse('')}
-                        className="text-xs font-bold text-primary-600 flex items-center hover:underline"
-                      >
-                        <RotateCcw className="w-3 h-3 mr-1" /> Ask new question
-                      </button>
+            {tutorTurns.length > 0 && (
+              <div
+                ref={transcriptRef}
+                className="mb-3 max-h-72 space-y-3 overflow-y-auto pr-1"
+                aria-live="polite"
+              >
+                {tutorTurns.map((turn, i) =>
+                  turn.role === 'user' ? (
+                    <p
+                      key={i}
+                      className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
+                    >
+                      {turn.content}
+                    </p>
+                  ) : (
+                    <div
+                      key={i}
+                      className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
+                    >
+                      {turn.content ? (
+                        <RichText>{turn.content}</RichText>
+                      ) : (
+                        <span className="flex gap-1" aria-label="Thinking">
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:150ms]" />
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:300ms]" />
+                        </span>
+                      )}
                     </div>
-                  </div>
-                ) : tutorLoading ? (
-                  <div className="flex items-center gap-3 text-neutral-500 text-sm">
-                    <BrainCircuit className="w-5 h-5 text-primary-500 animate-pulse" />
-                    Thinking...
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      value={tutorQuery}
-                      onChange={(e) => setTutorQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
-                      placeholder="e.g. Why is symmetry important?"
-                      className="flex-1 bg-white border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-                    />
-                    <Button onClick={handleTutorAsk} variant="primary" size="sm">
-                      Ask
-                    </Button>
-                  </div>
+                  )
                 )}
               </div>
+            )}
+
+            {tutorError && (
+              <p className="mb-3 text-sm font-medium text-danger-600" role="alert">
+                {tutorError}
+              </p>
+            )}
+
+            <div className="flex gap-2">
+              <input
+                value={tutorQuery}
+                onChange={(e) => setTutorQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
+                disabled={tutorStreaming}
+                placeholder={tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'}
+                aria-label="Ask the tutor"
+                className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
+              />
+              <Button
+                onClick={handleTutorAsk}
+                variant="primary"
+                size="sm"
+                disabled={tutorStreaming || !tutorQuery.trim()}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>

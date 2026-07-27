@@ -1,43 +1,33 @@
-export const askTutor = async (context, question) => {
-  const res = await fetch('/api/ai/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ context, question }),
-  });
+export class TutorError extends Error {}
 
-  if (res.status === 429) return 'Too many questions, wait a moment and try again.';
-  if (!res.ok) return 'Something went wrong. Try again.';
-
-  const data = await res.json();
-  return data.answer || 'Something went wrong.';
-};
-
-export const generateScene = async (concept, difficulty = 'intermediate', context = '') => {
-  const res = await fetch('/api/ai/generate-scene', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ concept, difficulty, context }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Scene generation failed');
+export async function askTutor(body, { onChunk, signal } = {}) {
+  let res;
+  try {
+    res = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal,
+    });
+  } catch {
+    throw new TutorError("Couldn't reach the tutor. Check your connection.");
   }
 
-  return res.json();
-};
+  if (res.status === 429) throw new TutorError('Slow down a moment, then ask again.');
+  if (!res.ok || !res.body) throw new TutorError("The tutor isn't available right now.");
 
-export const generateLesson = async (topic, course = '', difficulty = 'intermediate') => {
-  const res = await fetch('/api/ai/generate-lesson', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ topic, course, difficulty }),
-  });
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let answer = '';
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Lesson generation failed');
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    answer += decoder.decode(value, { stream: true });
+    onChunk?.(answer);
   }
 
-  return res.json();
-};
+  answer = answer.trim();
+  if (!answer) throw new TutorError('The tutor had nothing to say. Try rephrasing it.');
+  return answer;
+}

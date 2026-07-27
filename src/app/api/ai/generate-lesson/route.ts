@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { assertPermission } from '@/lib/authz';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
-import { LESSON_GEN_MODEL } from '@/lib/ai';
+import { LESSON_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 import { toAIContext } from '@/engine/lang/docs';
 
@@ -16,6 +16,8 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
+  if (!isAiConfigured()) return aiNotConfigured();
+
   const { ok, status, user } = await assertPermission({ content: ['create'] });
   if (!ok || !user) return NextResponse.json({ error: 'Forbidden' }, { status: status ?? 403 });
 
