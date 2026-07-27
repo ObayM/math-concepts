@@ -1,5 +1,9 @@
-lesson "Applications V: Curve Sketching" {
+lesson "Curve Sketching" {
   course: "calculus"
+  unit: "Applications of the Derivative"
+  difficulty: "Advanced"
+  icon: "FunctionSquare"
+  summary: "Combine critical points, concavity, and everything else from this unit into one complete sketching workflow."
   skills: ["appderiv-curve-sketching"]
 
   slide "The Complete Recipe" {

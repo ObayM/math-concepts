@@ -1,5 +1,9 @@
-lesson "Applications IV: Concavity & the Second Derivative Test" {
+lesson "Concavity & the Second Derivative Test" {
   course: "calculus"
+  unit: "Applications of the Derivative"
+  difficulty: "Advanced"
+  icon: "Undo2"
+  summary: "Find where a curve bends up or down, locate inflection points, and classify critical points without a sign chart."
   skills: ["appderiv-concavity", "appderiv-second-deriv-test"]
 
   slide "Which Way Does It Bend?" {

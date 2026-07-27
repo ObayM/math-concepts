@@ -1,5 +1,9 @@
-lesson "Integration II: Riemann Sums" {
+lesson "Riemann Sums" {
   course: "calculus"
+  unit: "Integration"
+  difficulty: "Intermediate"
+  icon: "Sigma"
+  summary: "Approximate the area under a curve with rectangles, live, and watch the estimate close in as they multiply and thin out."
   skills: ["int-riemann-sum", "int-definite-integral"]
 
   slide "Area, Approximated" {

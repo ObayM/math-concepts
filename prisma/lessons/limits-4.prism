@@ -1,5 +1,13 @@
-lesson "Limits IV: Limits at Infinity" {
+lesson "Limits at Infinity" {
   course: "calculus"
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Move"
+  summary: "What happens way out there: horizontal asymptotes, end behavior, and the degree-comparison shortcut for rational functions."
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Move"
+  summary: "What happens way out there: horizontal asymptotes, end behavior, and the degree-comparison shortcut for rational functions."
   skills: ["lim-at-infinity"]
 
   slide "What Happens Way Out There?" {

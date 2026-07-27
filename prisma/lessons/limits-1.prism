@@ -1,5 +1,13 @@
-lesson "Limits I: What a Limit Is" {
+lesson "What a Limit Is" {
   course: "calculus"
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Circle"
+  summary: "The core idea of calculus: what a function does near a point, not at it, numerically, graphically, and with proper notation."
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Circle"
+  summary: "The core idea of calculus: what a function does near a point, not at it, numerically, graphically, and with proper notation."
   skills: ["lim-notation", "lim-numerical"]
 
   slide "Approaching, Not Arriving" {

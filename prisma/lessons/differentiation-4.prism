@@ -1,5 +1,13 @@
-lesson "Differentiation IV — Trigonometric Functions" {
+lesson "Trigonometric Derivatives" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "Waves"
+  summary: "See why the slope of sine is cosine, then master the derivatives of tan, cot, sec, and csc."
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "Waves"
+  summary: "See why the slope of sine is cosine, then master the derivatives of tan, cot, sec, and csc."
   skills: ["deriv-trig-sin-cos", "deriv-trig-other"]
 
   slide "The Star Result" {

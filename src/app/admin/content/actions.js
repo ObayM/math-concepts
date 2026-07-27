@@ -9,7 +9,6 @@ import {
   deleteCourse,
   deleteLesson,
   publishLesson,
-  renameLesson,
   unpublishLesson,
 } from '@/lib/db/contentService';
 
@@ -54,15 +53,6 @@ export async function unpublishLessonAction(formData) {
   const id = formData.get('id')?.toString();
   if (!id) throw new Error('Lesson id is required');
   await unpublishLesson(id);
-  revalidatePath('/admin/content');
-}
-
-export async function renameLessonAction(formData) {
-  await requireContentPermission('update');
-  const id = formData.get('id')?.toString();
-  const title = formData.get('title')?.toString().trim();
-  if (!id || !title) throw new Error('Lesson id and title are required');
-  await renameLesson(id, title);
   revalidatePath('/admin/content');
 }
 

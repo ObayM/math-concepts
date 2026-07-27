@@ -1,5 +1,13 @@
-lesson "Differentiation I — The Derivative & the Power Rule" {
+lesson "The Derivative & the Power Rule" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "Build the derivative from the ground up — secant to tangent, the derivative as a function, the power rule, and differentiating polynomials term by term."
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "Build the derivative from the ground up — secant to tangent, the derivative as a function, the power rule, and differentiating polynomials term by term."
   skills: ["deriv-definition", "deriv-power-rule", "deriv-sum-rule"]
 
   slide "What Is a Derivative?" {

@@ -1,5 +1,9 @@
-lesson "Integration V: Area Between Curves" {
+lesson "Area Between Curves" {
   course: "calculus"
+  unit: "Integration"
+  difficulty: "Advanced"
+  icon: "Ruler"
+  summary: "Stack two regions and integrate the gap between them, from a line and a parabola to curves that cross midway."
   skills: ["int-area-between-curves"]
 
   slide "Stacking Two Regions" {

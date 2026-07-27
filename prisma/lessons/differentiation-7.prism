@@ -1,5 +1,13 @@
-lesson "Differentiation VII: Implicit Differentiation" {
+lesson "Implicit Differentiation" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "Circle"
+  summary: "Find dy/dx for curves that were never solved for y, from circles to the product rule in disguise."
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "Circle"
+  summary: "Find dy/dx for curves that were never solved for y, from circles to the product rule in disguise."
   skills: ["deriv-implicit"]
 
   slide "When y Isn't Alone" {

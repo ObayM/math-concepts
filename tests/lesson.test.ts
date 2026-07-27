@@ -16,7 +16,7 @@ const differentiation1 = compileLesson(
 describe('differentiation-1.prism (flagship)', () => {
   it('is a valid v2 lesson with 11 slides', () => {
     expect(differentiation1.version).toBe(2);
-    expect(differentiation1.title).toBe('Differentiation I — The Derivative & the Power Rule');
+    expect(differentiation1.title).toBe('The Derivative & the Power Rule');
     expect(differentiation1.course).toBe('calculus');
     expect(differentiation1.slides).toHaveLength(11);
   });

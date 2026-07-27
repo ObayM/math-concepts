@@ -1,5 +1,13 @@
-lesson "Differentiation II — Product & Quotient Rules" {
+lesson "Product & Quotient Rules" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "X"
+  summary: "Differentiate products and quotients — with the rectangle-area intuition, live tangents, and hands-on drills."
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "X"
+  summary: "Differentiate products and quotients — with the rectangle-area intuition, live tangents, and hands-on drills."
   skills: ["deriv-product-rule", "deriv-quotient-rule"]
 
   slide "The Tempting Trap" {

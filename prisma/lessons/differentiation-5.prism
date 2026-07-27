@@ -1,5 +1,13 @@
-lesson "Differentiation V: Mixed Drill" {
+lesson "Mixed Differentiation Drill" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Advanced"
+  icon: "Dumbbell"
+  summary: "Choose the right rule under pressure, a mixed workout spanning power, product, quotient, chain, trig, implicit, exponential, and log derivatives."
+  unit: "Derivatives & Rules"
+  difficulty: "Advanced"
+  icon: "Dumbbell"
+  summary: "Choose the right rule under pressure, a mixed workout spanning power, product, quotient, chain, trig, implicit, exponential, and log derivatives."
   skills: ["deriv-power-rule", "deriv-product-rule", "deriv-quotient-rule", "deriv-chain-rule", "deriv-trig-sin-cos", "deriv-implicit", "deriv-exp", "deriv-log"]
 
   slide "Read the Structure First" {

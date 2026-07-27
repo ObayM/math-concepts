@@ -1,5 +1,9 @@
-lesson "Integration IV: u-Substitution" {
+lesson "u-Substitution" {
   course: "calculus"
+  unit: "Integration"
+  difficulty: "Advanced"
+  icon: "Play"
+  summary: "Reverse the chain rule to simplify integrals that would otherwise be unmanageable, bounds and all."
   skills: ["int-u-sub"]
 
   slide "Undoing the Chain Rule" {

@@ -1,5 +1,9 @@
-lesson "Applications VI: Optimization" {
+lesson "Optimization" {
   course: "calculus"
+  unit: "Applications of the Derivative"
+  difficulty: "Advanced"
+  icon: "Star"
+  summary: "Turn a biggest-or-smallest word problem into a function, then let critical points find the real-world answer."
   skills: ["appderiv-optimization"]
 
   slide "Turning Words Into a Function" {

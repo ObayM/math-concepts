@@ -12,6 +12,18 @@ function starterSource(title) {
   return `lesson "${title}" {\n  slide "Slide 1" {\n    > Write something here.\n  }\n}`;
 }
 
+// the lesson source owns every content fact. these mirror into columns so the
+// catalog can query them without parsing IR on every page load.
+export function derivedMetadata(data) {
+  return {
+    title: data.title,
+    description: data.summary ?? null,
+    unit: data.unit ?? null,
+    difficulty: data.difficulty ?? null,
+    iconName: data.icon ?? null,
+  };
+}
+
 // the single server-side trust boundary: client-compiled IR is never accepted,
 // only source text, which gets recompiled here before it touches the DB.
 export function compileAndValidate(source) {
@@ -54,9 +66,9 @@ export async function createLesson({ courseId, title, source, authorId }) {
     data: {
       courseId,
       lessonKey,
-      title,
       source: src,
       data: compiled.data,
+      ...derivedMetadata(compiled.data),
       status: 'draft',
       authorId,
       sortOrder: (agg._max.sortOrder ?? 0) + 1,
@@ -69,13 +81,9 @@ export async function updateLessonSource(id, source) {
   if (compiled.error) return { lesson: null, error: compiled.error };
   const lesson = await prisma.lesson.update({
     where: { id },
-    data: { source, data: compiled.data },
+    data: { source, data: compiled.data, ...derivedMetadata(compiled.data) },
   });
   return { lesson, error: null };
-}
-
-export async function renameLesson(id, title) {
-  return prisma.lesson.update({ where: { id }, data: { title } });
 }
 
 export async function moveLessonToCourse(id, courseId) {
@@ -92,6 +100,7 @@ export async function publishLesson(id) {
     data: {
       publishedSource: lesson.source,
       publishedData: compiled.data,
+      ...derivedMetadata(compiled.data),
       status: 'published',
       publishedAt: new Date(),
     },

@@ -1,5 +1,13 @@
-lesson "Differentiation III — The Chain Rule" {
+lesson "The Chain Rule" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "Link"
+  summary: "Differentiate composite functions — the rates-multiply intuition, the outside-in recipe, and chain-rule drills under powers and roots."
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "Link"
+  summary: "Differentiate composite functions — the rates-multiply intuition, the outside-in recipe, and chain-rule drills under powers and roots."
   skills: ["deriv-chain-rule"]
 
   slide "Functions Inside Functions" {

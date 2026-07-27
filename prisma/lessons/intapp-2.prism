@@ -1,5 +1,9 @@
-lesson "Applications of Integration II: Average Value & Accumulation" {
+lesson "Average Value & Accumulation" {
   course: "calculus"
+  unit: "Applications of Integration"
+  difficulty: "Advanced"
+  icon: "ChevronRight"
+  summary: "Average infinitely many values with one integral, then meet the accumulation functions that tie the whole course together."
   skills: ["intapp-average-value", "intapp-accumulation"]
 
   slide "Averaging Infinitely Many Values" {

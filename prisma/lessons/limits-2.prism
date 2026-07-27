@@ -1,5 +1,13 @@
-lesson "Limits II: Computing Limits" {
+lesson "Computing Limits" {
   course: "calculus"
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Sigma"
+  summary: "Direct substitution, factor-and-cancel, rationalizing with a conjugate, and the squeeze theorem: the toolkit for evaluating limits by hand."
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Sigma"
+  summary: "Direct substitution, factor-and-cancel, rationalizing with a conjugate, and the squeeze theorem: the toolkit for evaluating limits by hand."
   skills: ["lim-algebraic", "lim-squeeze"]
 
   slide "The Easy Case: Direct Substitution" {

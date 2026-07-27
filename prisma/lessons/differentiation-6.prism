@@ -1,5 +1,13 @@
-lesson "Differentiation VI: Exponential & Logarithmic Derivatives" {
+lesson "Exponential & Logarithmic Derivatives" {
   course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "The function that is its own derivative, the clean 1/x that falls out of ln(x), and every chain rule built on top of them."
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "The function that is its own derivative, the clean 1/x that falls out of ln(x), and every chain rule built on top of them."
   skills: ["deriv-exp", "deriv-log"]
 
   slide "A Function Equal to Its Own Derivative" {

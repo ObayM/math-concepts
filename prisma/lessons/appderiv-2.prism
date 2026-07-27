@@ -1,5 +1,13 @@
-lesson "Applications II: Related Rates" {
+lesson "Related Rates" {
   course: "calculus"
+  unit: "Applications of the Derivative"
+  difficulty: "Intermediate"
+  icon: "Move"
+  summary: "Growing circles, sliding ladders, and every other problem where one rate of change is tied to another."
+  unit: "Applications of the Derivative"
+  difficulty: "Intermediate"
+  icon: "Move"
+  summary: "Growing circles, sliding ladders, and every other problem where one rate of change is tied to another."
   skills: ["appderiv-related-rates"]
 
   slide "When Two Rates Are Linked" {

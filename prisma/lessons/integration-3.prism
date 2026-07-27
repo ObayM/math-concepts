@@ -1,5 +1,9 @@
-lesson "Integration III: The Fundamental Theorem of Calculus" {
+lesson "The Fundamental Theorem of Calculus" {
   course: "calculus"
+  unit: "Integration"
+  difficulty: "Intermediate"
+  icon: "MapPin"
+  summary: "The result that ties the whole course together: exact area under a curve from nothing more than an antiderivative."
   skills: ["int-ftc"]
 
   slide "Derivatives and Integrals Are Opposites" {

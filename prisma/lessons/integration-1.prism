@@ -1,5 +1,9 @@
-lesson "Integration I: Antiderivatives" {
+lesson "Antiderivatives" {
   course: "calculus"
+  unit: "Integration"
+  difficulty: "Intermediate"
+  icon: "Undo2"
+  summary: "Run differentiation backward: the power rule in reverse, the mystery constant C, and finding it from an initial condition."
   skills: ["int-antiderivative", "int-power-rule"]
 
   slide "Running Differentiation Backward" {

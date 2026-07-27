@@ -1,5 +1,13 @@
-lesson "Limits V: Continuity & the Intermediate Value Theorem" {
+lesson "Continuity & the Intermediate Value Theorem" {
   course: "calculus"
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Check"
+  summary: "The three conditions behind continuity, the three ways a function can break them, and the guaranteed-root payoff of the Intermediate Value Theorem."
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "Check"
+  summary: "The three conditions behind continuity, the three ways a function can break them, and the guaranteed-root payoff of the Intermediate Value Theorem."
   skills: ["lim-continuity", "lim-ivt"]
 
   slide "Three Things Have to Line Up" {

@@ -1,5 +1,9 @@
-lesson "Applications III: Increasing, Decreasing & the First Derivative Test" {
+lesson "Increasing, Decreasing & the First Derivative Test" {
   course: "calculus"
+  unit: "Applications of the Derivative"
+  difficulty: "Advanced"
+  icon: "Triangle"
+  summary: "Read a function's rise and fall straight off the sign of its derivative, then classify every critical point."
   skills: ["appderiv-monotonicity", "appderiv-first-deriv-test"]
 
   slide "What the Sign of f' Tells You" {

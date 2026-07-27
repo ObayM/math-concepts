@@ -1,5 +1,13 @@
-lesson "Limits III: One-Sided & Infinite Limits" {
+lesson "One-Sided & Infinite Limits" {
   course: "calculus"
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "LineChart"
+  summary: "When left and right disagree, and when a function blows up entirely: jump discontinuities, vertical asymptotes, and reading both kinds off a graph."
+  unit: "Limits & Continuity"
+  difficulty: "Beginner"
+  icon: "LineChart"
+  summary: "When left and right disagree, and when a function blows up entirely: jump discontinuities, vertical asymptotes, and reading both kinds off a graph."
   skills: ["lim-one-sided", "lim-infinite"]
 
   slide "Approaching From Just One Side" {

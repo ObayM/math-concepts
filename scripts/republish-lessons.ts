@@ -1,20 +1,29 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { compileLesson } from '@/engine/lang';
 
 const prisma = new PrismaClient();
 
-const KEYS = process.argv.slice(2);
+const ARGS = process.argv.slice(2);
 const APPLY = process.env.APPLY === '1';
 
 async function main() {
-  if (KEYS.length === 0) {
-    console.error('usage: tsx scripts/republish-lessons.ts <lessonKey...>  (set APPLY=1 to write)');
+  if (ARGS.length === 0) {
+    console.error(
+      'usage: tsx scripts/republish-lessons.ts <lessonKey...|--all>  (set APPLY=1 to write)'
+    );
     process.exit(1);
   }
 
-  for (const key of KEYS) {
+  const keys = ARGS.includes('--all')
+    ? readdirSync(fileURLToPath(new URL('../prisma/lessons', import.meta.url)))
+        .filter((f) => f.endsWith('.prism'))
+        .map((f) => f.replace(/\.prism$/, ''))
+        .sort()
+    : ARGS;
+
+  for (const key of keys) {
     const path = fileURLToPath(new URL(`../prisma/lessons/${key}.prism`, import.meta.url));
     const source = readFileSync(path, 'utf8');
     const compiled = compileLesson(source);
@@ -39,6 +48,11 @@ async function main() {
           data,
           publishedSource: source,
           publishedData: data,
+          title: compiled.title,
+          description: compiled.summary ?? null,
+          unit: compiled.unit ?? null,
+          difficulty: compiled.difficulty ?? null,
+          iconName: compiled.icon ?? null,
           status: 'published',
           publishedAt: new Date(),
         },

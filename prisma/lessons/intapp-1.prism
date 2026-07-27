@@ -1,5 +1,9 @@
-lesson "Applications of Integration I: Volumes of Revolution" {
+lesson "Volumes of Revolution" {
   course: "calculus"
+  unit: "Applications of Integration"
+  difficulty: "Advanced"
+  icon: "Circle"
+  summary: "Spin a flat region around an axis and slice the resulting solid into disks or washers to find its volume."
   skills: ["intapp-volumes"]
 
   slide "Spinning a Region Into a Solid" {

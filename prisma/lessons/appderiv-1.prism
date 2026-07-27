@@ -1,5 +1,13 @@
-lesson "Applications I: Linear Approximation & Differentials" {
+lesson "Linear Approximation & Differentials" {
   course: "calculus"
+  unit: "Applications of the Derivative"
+  difficulty: "Intermediate"
+  icon: "Ruler"
+  summary: "Use the tangent line as a stand-in for a harder function nearby, plus the differential notation that goes with it."
+  unit: "Applications of the Derivative"
+  difficulty: "Intermediate"
+  icon: "Ruler"
+  summary: "Use the tangent line as a stand-in for a harder function nearby, plus the differential notation that goes with it."
   skills: ["appderiv-linearization", "appderiv-differentials"]
 
   slide "The Best Straight-Line Guess" {
