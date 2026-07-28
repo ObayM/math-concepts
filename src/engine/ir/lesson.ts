@@ -32,11 +32,14 @@ const buildToken = z.object({
   kind: z.enum(['operand', 'operator']).optional(),
 });
 
+const templateSeg = z.union([z.object({ text: z.string() }), z.object({ slot: z.literal(true) })]);
+
 const buildExercise = z.object({
   kind: z.literal('build'),
   bank: z.array(buildToken).min(1),
   answers: z.array(z.array(z.string())).min(1), // any listed sequence is accepted
   slots: z.number().int().positive(),
+  template: z.array(templateSeg).optional(),
   reusable: z.boolean().optional(),
   ...exerciseBase,
 });

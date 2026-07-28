@@ -26,6 +26,14 @@ export const PRISM_COOKBOOK: CookbookEntry[] = [
       'lesson "Build the Thing" {\n  slide "Factor it" {\n    > Assemble the factored form of $x^2 + 5x + 6$.\n    build {\n      ask "Factor x^2 + 5x + 6."\n      reusable\n      bank: ["(", ")", "x", "+", "2", "3"]\n      answer: ["(", "x", "+", "2", ")", "(", "x", "+", "3", ")"]\n      ! "2 × 3 = 6 and 2 + 3 = 5, so (x + 2)(x + 3)."\n    }\n  }\n}',
   },
   {
+    id: 'fill-in-the-definition',
+    title: 'Fill in the definition',
+    description:
+      'A `build` with a `template` turns a sentence into blanks the learner fills from a bank. Same kind as the token-bank builder above — the only difference is that the literal text around the slots is prose instead of math. Much harder to guess than the equivalent multiple choice, since the distractors sit in the bank rather than next to the answer.',
+    source:
+      'lesson "Fill in the Definition" {\n  slide "Continuity" {\n    > Three things have to line up for a function to be continuous at a point.\n    build {\n      ask "Finish the definition."\n      template: "$f$ is ___ at $a$ when $f(a)$ exists, the limit at $a$ exists, and the two are ___."\n      bank: ["continuous", "bounded", "differentiable", "equal", "opposite"]\n      answer: ["continuous", "equal"]\n      hint "The limit has to actually reach the value the function takes."\n      ! "Continuous at $a$ means $\\lim_{x \\to a} f(x) = f(a)$ — the limit exists and equals the value."\n    }\n  }\n}',
+  },
+  {
     id: 'step-through',
     title: 'Step through',
     description:

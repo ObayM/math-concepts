@@ -8,6 +8,7 @@ import { evalExpr, ExprError, BUILTINS, BUILTIN_NAMES, CONSTS } from '@/engine/e
 import { lex } from './lexer';
 import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
+import { splitTemplate, countSlots, type TemplateSeg } from './template';
 import { LESSON_DIFFICULTIES, LESSON_ICONS } from './icons';
 
 type CompileScope = Record<string, number | boolean>;
@@ -1092,14 +1093,38 @@ function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
   const bank = s.bank.map((label) => ({
     id: label,
     label,
-    kind: /^[a-zA-Z0-9]/.test(label) ? ('operand' as const) : ('operator' as const),
+    kind: /^[a-zA-Z0-9]/.test(label.replace(/\$/g, ''))
+      ? ('operand' as const)
+      : ('operator' as const),
   }));
+
+  let template: TemplateSeg[] | null = null;
+  let slots = s.slots ?? s.answers[0].length;
+  if (s.template !== null) {
+    template = splitTemplate(s.template, s.ln);
+    const templateSlots = countSlots(template);
+    if (templateSlots === 0) {
+      throw new CompileError(
+        'template has no slots — mark each blank with ___ (three or more underscores) outside any $...$ span',
+        s.ln
+      );
+    }
+    if (s.slots !== null && s.slots !== templateSlots) {
+      throw new CompileError(
+        `slots: ${s.slots} disagrees with the template, which has ${templateSlots} — drop slots: and let the template decide`,
+        s.ln
+      );
+    }
+    slots = templateSlots;
+  }
+
   return {
     kind: 'build' as const,
     prompt: s.common.ask,
     bank,
     answers: s.answers,
-    slots: s.slots ?? s.answers[0].length,
+    slots,
+    ...(template && { template }),
     ...(s.reusable && { reusable: true }),
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),

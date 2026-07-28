@@ -69,6 +69,7 @@ export type Stmt =
       bank: string[];
       answers: string[][];
       slots: number | null;
+      template: string | null;
       reusable: boolean;
       common: ExerciseCommon;
       ln: number;

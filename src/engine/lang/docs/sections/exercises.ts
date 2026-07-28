@@ -52,21 +52,26 @@ export const exercisesSection: DocSection = {
     {
       keyword: 'build',
       syntax:
-        'build {\n  ask "..."\n  bank: ["tok", "tok", ...]\n  answer: ["tok", ...]\n  [answer: ["...alt ordering..."]]\n  [slots: <n>]\n  [reusable]\n}',
+        'build {\n  ask "..."\n  bank: ["tok", "tok", ...]\n  answer: ["tok", ...]\n  [answer: ["...alt ordering..."]]\n  [template: "text with ___ blanks"]\n  [slots: <n>]\n  [reusable]\n}',
       description:
-        'Tap tokens from the bank into slots to assemble an expression. List multiple `answer:` lines to accept equivalent orderings (e.g. commutative forms). `slots` defaults to the length of the first answer. Add `reusable` when a token can be placed more than once.',
+        'Tap tokens from the bank into slots to assemble an answer. List multiple `answer:` lines to accept equivalent orderings (e.g. commutative forms). Add `reusable` when a token can be placed more than once. Bank tokens and slots render as rich text, so `"$f(a)$"` is a perfectly good token.\n\nWithout `template`, the slots are a bare row and `slots` defaults to the length of the first answer. With `template`, the slots sit inline in the text you write, which turns the same exercise into an expression builder or a fill-in-the-blank sentence. Mark each blank with `___` (three or more underscores). Underscores **inside** a `$...$` span are left alone, so `$x_1$` is safe — which also means a blank cannot go inside a math group like `x^{...}`; make the whole group a bank token instead. When a template is present it decides the slot count, so leave `slots` off.',
       props: [
         { name: 'bank', type: 'string[]', description: 'the tokens the learner can place' },
         { name: 'answer', type: 'string[]', description: 'an accepted sequence (repeatable)' },
         {
+          name: 'template',
+          type: 'string',
+          description: 'text the slots sit inside; each ___ outside math is a slot',
+        },
+        {
           name: 'slots',
           type: 'number',
-          description: 'number of slots (defaults to first answer length)',
+          description: 'number of slots (defaults to first answer length; unused with a template)',
         },
         { name: 'reusable', type: 'flag', description: 'allow a token to be used more than once' },
       ],
       example:
-        'build {\n  ask "Factor x² + 5x + 6."\n  reusable\n  bank: ["(", ")", "x", "+", "2", "3"]\n  answer: ["(", "x", "+", "2", ")", "(", "x", "+", "3", ")"]\n  ! "2 × 3 = 6 and 2 + 3 = 5, so (x + 2)(x + 3)."\n}',
+        'build {\n  ask "Complete the power rule."\n  template: "$\\frac{d}{dx}\\left[x^{3}\\right] =$ ___ $\\cdot$ ___"\n  bank: ["3", "2", "$x^{2}$", "$x^{3}$"]\n  answer: ["3", "$x^{2}$"]\n  hint "Bring the exponent down, then drop it by one."\n  ! "$3x^{2}$ — the 3 comes down and the power drops to 2."\n}',
     },
     {
       keyword: 'hotspot',

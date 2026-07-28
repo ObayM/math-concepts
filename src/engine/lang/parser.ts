@@ -626,6 +626,7 @@ function makeParser(tokens: Token[]) {
     const bank: string[] = [];
     const answers: string[][] = [];
     let slots: number | null = null;
+    let template: string | null = null;
     let reusable = false;
     const common: ExerciseCommon = { ask: '', hints: [] };
     while (!check('RC') && !check('EOF')) {
@@ -645,6 +646,11 @@ function makeParser(tokens: Token[]) {
         eat('COLON');
         slots = parseFloat(eat('NUM').raw);
         endStmt();
+      } else if (at('template')) {
+        pos++;
+        eat('COLON');
+        template = eatStr();
+        endStmt();
       } else if (at('reusable')) {
         pos++;
         reusable = true;
@@ -653,14 +659,14 @@ function makeParser(tokens: Token[]) {
         const t = peek();
         const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
         throw new CompileError(
-          `unexpected ${what} in build — use ask/bank/answer/slots/reusable/hint/!`,
+          `unexpected ${what} in build — use ask/bank/answer/slots/template/reusable/hint/!`,
           t.line,
           t.col
         );
       }
     }
     eat('RC');
-    return { k: 'build', bank, answers, slots, reusable, common, ln };
+    return { k: 'build', bank, answers, slots, template, reusable, common, ln };
   }
 
   function parseHotspot(ln: number): Stmt {
