@@ -389,7 +389,7 @@ export default function LessonPlayer({
           </div>
         </div>
 
-        <div className="flex-1 px-10 py-6 overflow-hidden relative">
+        <div className="relative flex-1 overflow-y-auto px-10 py-6">
           <div
             key={currentKey}
             className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}

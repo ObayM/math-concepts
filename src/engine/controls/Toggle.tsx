@@ -10,6 +10,9 @@ export default function Toggle({ control }: { control: ToggleControl }) {
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={control.label || control.bind}
       onClick={() => set(control.bind, !on)}
       className="w-full flex items-center justify-between bg-neutral-100 rounded-2xl p-4 text-left transition-colors hover:bg-neutral-200/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
     >

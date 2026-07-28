@@ -21,25 +21,28 @@ export default function Slider({ control }: { control: SliderControl }) {
   const val = Number(scope[control.bind] ?? min);
   const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
 
+  const name = control.label || control.bind;
+  const shown = Math.round(val * 100) / 100;
+
   return (
-    <div className="w-full bg-neutral-100 rounded-2xl p-4">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
-          {control.label || control.bind}
-        </span>
-        <span className="text-xs font-mono font-bold text-neutral-700">
-          {Math.round(val * 100) / 100}
+    <div className="w-full bg-neutral-100 rounded-2xl px-4 py-3">
+      <div className="mb-2 flex items-baseline justify-between gap-3">
+        <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">{name}</span>
+        <span className="font-mono text-lg font-bold tabular-nums leading-none text-primary-600">
+          {shown}
         </span>
       </div>
-      <div className="group relative h-5">
+      <div className="group relative h-6">
         <input
           type="range"
           min={min}
           max={max}
           step={step}
           value={val}
+          aria-label={name}
+          aria-valuetext={`${name} is ${shown}`}
           onChange={(e) => set(control.bind, Number(e.target.value))}
-          className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          className="peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
         />
         <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-neutral-200 rounded-full" />
         <div
@@ -47,9 +50,13 @@ export default function Slider({ control }: { control: SliderControl }) {
           style={{ width: `${pct}%` }}
         />
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-5 h-5 -ml-2.5 bg-white border-2 border-primary-500 rounded-full shadow-sm transition-transform group-hover:scale-110 peer-active:scale-125 peer-focus-visible:ring-2 peer-focus-visible:ring-primary-300"
+          className="pointer-events-none absolute top-1/2 -ml-3 h-6 w-6 -translate-y-1/2 rounded-full border-[3px] border-primary-500 bg-white transition-transform group-hover:scale-110 peer-active:scale-125 peer-focus-visible:ring-2 peer-focus-visible:ring-primary-300"
           style={{ left: `${pct}%` }}
         />
+      </div>
+      <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-neutral-400">
+        <span>{Math.round(min * 100) / 100}</span>
+        <span>{Math.round(max * 100) / 100}</span>
       </div>
     </div>
   );

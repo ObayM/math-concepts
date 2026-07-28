@@ -13,8 +13,10 @@ export function resolveColor(c?: string): string {
 }
 
 export const GRID_LINE = 'var(--color-neutral-100)';
-export const AXIS_LINE = 'var(--color-neutral-300)';
-export const AXIS_LABEL = 'var(--color-neutral-500)';
+export const AXIS_LINE = 'var(--color-neutral-400)';
+export const AXIS_LABEL = 'var(--color-neutral-600)';
+export const AXIS_LABEL_SIZE = 13.5;
+export const AXIS_LABEL_WEIGHT = 600;
 export const LABEL_HALO = 'white';
 
 export const STROKE = { hero: 3.5, data: 3, aux: 2.5, hairline: 1.5 };

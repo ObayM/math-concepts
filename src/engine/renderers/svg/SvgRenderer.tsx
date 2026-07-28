@@ -5,7 +5,15 @@ import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
-import { resolveColor, GRID_LINE, AXIS_LINE, AXIS_LABEL, LABEL_HALO } from '@/engine/colors';
+import {
+  resolveColor,
+  GRID_LINE,
+  AXIS_LINE,
+  AXIS_LABEL,
+  LABEL_HALO,
+  AXIS_LABEL_SIZE,
+  AXIS_LABEL_WEIGHT,
+} from '@/engine/colors';
 import { toDataCoords, PLOT_PAD } from './coords';
 import InputLayer, { type InputLayerConfig } from './InputLayer';
 import type { SceneIR } from '@/engine/ir/types';
@@ -13,6 +21,11 @@ import type { CoordSystem } from './types';
 
 const DEFAULT_W = 640; // used until the container is measured (also SSR)
 const ASPECT = 0.6; // height / width — comfortable landscape default
+const MAX_H = 460;
+const MIN_H = 220;
+// a scene that eats the whole viewport pushes its own sliders below the fold,
+// which is fatal when the prose says "drag the slider"
+const VIEWPORT_SHARE = 0.42;
 
 export default function SvgRenderer({
   ir,
@@ -34,19 +47,27 @@ export default function SvgRenderer({
   // measure the container so W/H are real pixels — text and touch targets stay
   // physically sized on any screen instead of scaling with a fixed viewBox
   const [measuredW, setMeasuredW] = useState<number | null>(null);
+  const [roomH, setRoomH] = useState<number | null>(null);
   useEffect(() => {
     const el = wrapRef.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
+    const measure = () => setRoomH(Math.round(window.innerHeight * VIEWPORT_SHARE));
     const ro = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect.width;
       if (w) setMeasuredW(w);
+      measure();
     });
     ro.observe(el);
-    return () => ro.disconnect();
+    measure();
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
   }, []);
 
   const W = Math.max(240, Math.round(measuredW ?? DEFAULT_W));
-  const H = Math.min(Math.round(W * ASPECT), 460);
+  const H = Math.max(MIN_H, Math.min(Math.round(W * ASPECT), MAX_H, roomH ?? MAX_H));
 
   if (!ir.space.yDomain) return null; // plane scenes must have yDomain
   const [xMin, xMax] = ir.space.xDomain;
@@ -143,7 +164,8 @@ export default function SvgRenderer({
             x={X}
             y={xLabelY}
             textAnchor="middle"
-            fontSize={13}
+            fontSize={AXIS_LABEL_SIZE}
+            fontWeight={AXIS_LABEL_WEIGHT}
             fill={AXIS_LABEL}
             stroke={LABEL_HALO}
             strokeWidth={3}
@@ -167,7 +189,8 @@ export default function SvgRenderer({
             y={Y}
             textAnchor={yLabelAnchor}
             dominantBaseline="central"
-            fontSize={13}
+            fontSize={AXIS_LABEL_SIZE}
+            fontWeight={AXIS_LABEL_WEIGHT}
             fill={AXIS_LABEL}
             stroke={LABEL_HALO}
             strokeWidth={3}
