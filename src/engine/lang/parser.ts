@@ -450,6 +450,8 @@ function makeParser(tokens: Token[]) {
         items.push(parseMatch(peek().line));
       } else if (at('order')) {
         items.push(parseOrder(peek().line));
+      } else if (at('sort')) {
+        items.push(parseSort(peek().line));
       } else if (at('table')) {
         items.push(parseTable(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
@@ -824,6 +826,30 @@ function makeParser(tokens: Token[]) {
     }
     eat('RC');
     return { k: 'order', items: orderItems, decoys, common, ln };
+  }
+
+  function parseSort(ln: number): Stmt {
+    eat('IDENT', 'sort');
+    eat('LC');
+    skipNL();
+    const bins: { label: string; items: string[] }[] = [];
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('bin')) {
+        pos++;
+        const label = eatStr();
+        eat('COLON');
+        bins.push({ label, items: parseStrList() });
+        endStmt();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(`unexpected ${what} in sort - use ask/bin/hint/!`, t.line, t.col);
+      }
+    }
+    eat('RC');
+    return { k: 'sort', bins, common, ln };
   }
 
   function parseTable(ln: number): Stmt {

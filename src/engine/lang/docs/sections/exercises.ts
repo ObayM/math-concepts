@@ -163,6 +163,22 @@ export const exercisesSection: DocSection = {
         'order {\n  ask "Order these steps of order of operations."\n  item "Parentheses"\n  item "Exponents"\n  item "Multiply / Divide"\n  item "Add / Subtract"\n  ! "PEMDAS, left to right within each tier."\n}',
     },
     {
+      keyword: 'sort',
+      syntax:
+        'sort {\n  ask "..."\n  bin "Label": ["item", "item", ...]\n  bin "Other label": ["item", ...]\n  [hint "..."]\n  [! "explanation"]\n}',
+      description:
+        'Drop each item into the bin it belongs to. Declare at least two `bin` groups; every item listed under a bin is shown in a shuffled tray and has to be put back. Reach for this when the lesson is about *telling cases apart* (which rule opens a derivative, which kind of discontinuity a function has), where a multiple choice only ever probes one case at a time. An item may appear in exactly one bin, or the compiler refuses to build, since there would be no single right answer. Items render as rich text, so `"$x^2\\sin x$"` is a fine item.',
+      props: [
+        {
+          name: 'bin',
+          type: 'string: string[]',
+          description: 'a labelled bin and the items belonging in it (repeatable, min 2)',
+        },
+      ],
+      example:
+        'sort {\n  ask "Which rule opens each derivative?"\n  bin "Product rule": ["$x^{2}\\sin x$", "$e^{x}\\ln x$"]\n  bin "Chain rule": ["$(x^{2}+1)^{3}$", "$\\sin(3x)$"]\n  bin "Quotient rule": ["$\\frac{\\sin x}{x}$"]\n  hint "Look at the outermost operation: a product, a composition, or a division?"\n  ! "Read the outermost operation first, and that names the rule you start with."\n}',
+    },
+    {
       keyword: 'table',
       syntax:
         'table {\n  ask "..."\n  [header: ["col", "col", ...]]\n  row: <value|blank(answer)>, <value|blank(answer)>, ...\n  [row: ...]\n  [tolerance: <n>]\n}',

@@ -2,33 +2,8 @@
 import { useMemo, useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
+import { hashStr, seededShuffle } from './shuffle';
 
-// deterministic shuffle so the right column doesn't reorder on every render,
-// but still varies per exercise (seeded off the pair texts, not Math.random)
-function hashStr(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
-  return h >>> 0;
-}
-
-function seededShuffle(items, seed) {
-  let s = seed || 1;
-  const rand = () => {
-    s = (s + 0x6d2b79f5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-  const out = [...items];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-// v2 match — tap a left item, then tap a right item to pair them. reads
-// slide.exercise (prompt, pairs[{left,right}], decoys?, explanation)
 export default function MatchExercise({ slide, value, checked, onChange }) {
   const ex = slide.exercise;
   const matches = Array.isArray(value) ? value : new Array(ex.pairs.length).fill(null);

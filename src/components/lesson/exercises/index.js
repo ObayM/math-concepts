@@ -15,6 +15,10 @@ const sameSequence = (a, b) => a.length === b.length && a.every((v, i) => v === 
 
 const flatBlanks = (ex) => ex.rows.flat().filter((cell) => cell.blank);
 
+// declared order, not display order: the tray shuffles, the value must not
+export const sortItems = (ex) =>
+  ex.bins.flatMap((b, bin) => b.items.map((text) => ({ text, bin })));
+
 export const exercises = {
   quiz: {
     initial: () => null,
@@ -80,6 +84,18 @@ export const exercises = {
         v.map((i) => bank[i]),
         slide.exercise.items
       );
+    },
+  },
+  sort: {
+    initial: (slide) => new Array(sortItems(slide.exercise).length).fill(null),
+    isComplete: (slide, v) => {
+      const items = sortItems(slide.exercise);
+      return Array.isArray(v) && v.length === items.length && v.every((b) => b != null);
+    },
+    check: (slide, v) => {
+      const items = sortItems(slide.exercise);
+      if (!Array.isArray(v) || v.length !== items.length) return false;
+      return items.every((it, i) => v[i] === it.bin);
     },
   },
   table: {

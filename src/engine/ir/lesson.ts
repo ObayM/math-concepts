@@ -81,6 +81,12 @@ const orderExercise = z.object({
   ...exerciseBase,
 });
 
+const sortExercise = z.object({
+  kind: z.literal('sort'),
+  bins: z.array(z.object({ label: z.string(), items: z.array(z.string()).min(1) })).min(2),
+  ...exerciseBase,
+});
+
 const tableCell = z.union([
   z.object({ value: z.number() }),
   z.object({ blank: z.literal(true), answer: z.number() }),
@@ -102,6 +108,7 @@ export const exercise = z.discriminatedUnion('kind', [
   sketchExercise,
   matchExercise,
   orderExercise,
+  sortExercise,
   tableExercise,
 ]);
 

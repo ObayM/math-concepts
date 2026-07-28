@@ -9,6 +9,7 @@ import HotspotExercise from './exercises/HotspotExercise';
 import SketchExercise from './exercises/SketchExercise';
 import MatchExercise from './exercises/MatchExercise';
 import OrderExercise from './exercises/OrderExercise';
+import SortExercise from './exercises/SortExercise';
 import TableExercise from './exercises/TableExercise';
 
 const exerciseRegistry = {
@@ -19,6 +20,7 @@ const exerciseRegistry = {
   sketch: SketchExercise,
   match: MatchExercise,
   order: OrderExercise,
+  sort: SortExercise,
   table: TableExercise,
 };
 

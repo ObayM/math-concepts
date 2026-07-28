@@ -107,6 +107,12 @@ export type Stmt =
       ln: number;
     }
   | {
+      k: 'sort';
+      bins: { label: string; items: string[] }[];
+      common: ExerciseCommon;
+      ln: number;
+    }
+  | {
       k: 'table';
       header: string[] | null;
       rows: Expr[][];

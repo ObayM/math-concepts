@@ -1286,6 +1286,41 @@ function emitOrder(s: Extract<Stmt, { k: 'order' }>) {
   };
 }
 
+function emitSort(s: Extract<Stmt, { k: 'sort' }>) {
+  if (!s.common.ask) throw new CompileError('sort needs an ask "..."', s.ln);
+  if (s.bins.length < 2) throw new CompileError('sort needs at least 2 bin "..." groups', s.ln);
+  const owner = new Map<string, string>();
+  for (const bin of s.bins) {
+    if (!bin.items.length) {
+      throw new CompileError(`bin "${bin.label}" has no items to sort into it`, s.ln);
+    }
+    for (const item of bin.items) {
+      const already = owner.get(item);
+      if (already !== undefined) {
+        throw new CompileError(
+          `"${item}" is in both "${already}" and "${bin.label}", so it has no single right bin`,
+          s.ln
+        );
+      }
+      owner.set(item, bin.label);
+    }
+  }
+  return {
+    kind: 'sort' as const,
+    prompt: s.common.ask,
+    bins: s.bins,
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && {
+      onwrong: {
+        slide: s.common.onwrong.slide,
+        ...(s.common.onwrong.retry && { retry: true }),
+      },
+    }),
+  };
+}
+
 function emitTable(s: Extract<Stmt, { k: 'table' }>) {
   if (!s.common.ask) throw new CompileError('table needs an ask "..."', s.ln);
   if (!s.rows.length) throw new CompileError('table needs at least one row: ...', s.ln);
@@ -1389,6 +1424,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
     | ReturnType<typeof emitSketch>
     | ReturnType<typeof emitMatch>
     | ReturnType<typeof emitOrder>
+    | ReturnType<typeof emitSort>
     | ReturnType<typeof emitTable>
     | undefined;
   const goalItems: Extract<Stmt, { k: 'goal' }>[] = [];
@@ -1426,6 +1462,9 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
     } else if (item.k === 'order') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitOrder(item);
+    } else if (item.k === 'sort') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitSort(item);
     } else if (item.k === 'table') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitTable(item);

@@ -185,6 +185,29 @@ function checkMatchOrder(slide: SlideIR, out: Finding[]) {
   }
 }
 
+function checkSort(slide: SlideIR, out: Finding[]) {
+  const ex = slide.exercise;
+  if (ex?.kind !== 'sort') return;
+
+  const labels = ex.bins.map((b) => b.label);
+  const dupe = labels.find((l, i) => labels.indexOf(l) !== i);
+  if (dupe !== undefined) {
+    out.push({
+      slideId: slide.id,
+      code: 'V_SORT_DUP_BIN',
+      message: `two bins are both labelled "${dupe}", so the learner can't tell them apart`,
+    });
+  }
+
+  if (ex.bins.length > 1 && ex.bins.every((b) => b.items.length === 1)) {
+    out.push({
+      slideId: slide.id,
+      code: 'V_SORT_THIN',
+      message: 'every bin holds exactly one item, so this is a matching exercise wearing a costume',
+    });
+  }
+}
+
 function checkBuild(slide: SlideIR, out: Finding[]) {
   const ex = slide.exercise;
   if (ex?.kind !== 'build') return;
@@ -250,6 +273,7 @@ export function verifyLesson(lesson: LessonIR): Finding[] {
     checkTable(slide, out);
     checkTargetsInDomain(slide, out);
     checkMatchOrder(slide, out);
+    checkSort(slide, out);
     checkBuild(slide, out);
   }
   checkDetourReachable(lesson, out);
