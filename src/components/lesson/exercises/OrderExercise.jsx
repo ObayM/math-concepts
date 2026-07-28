@@ -1,6 +1,7 @@
 'use client';
 import { RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
+import { useTokenDrag, DragGhost } from './dnd';
 
 export default function OrderExercise({ slide, value = [], checked, onChange }) {
   const ex = slide.exercise;
@@ -12,6 +13,36 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
     onChange([...placed, idx]);
   };
   const removeAt = (i) => onChange(placed.filter((_, idx) => idx !== i));
+
+  const insertAt = (idx, at) => {
+    if (placed.length >= ex.items.length || placed.includes(idx)) return;
+    const next = [...placed];
+    next.splice(Math.min(at, next.length), 0, idx);
+    onChange(next);
+  };
+
+  const moveTo = (from, at) => {
+    const next = [...placed];
+    const [idx] = next.splice(from, 1);
+    next.splice(Math.min(at, next.length), 0, idx);
+    onChange(next);
+  };
+
+  const { drag, sourceProps, targetProps } = useTokenDrag((id, key) => {
+    if (checked) return;
+    const from = id.startsWith('pos:') ? Number(id.slice(4)) : null;
+    if (key === 'bank') {
+      if (from !== null) removeAt(from);
+      return;
+    }
+    const at = Number(key.slice(4));
+    if (from !== null) moveTo(from, at);
+    else insertAt(Number(id.slice(5)), at);
+  });
+
+  const dragLabel =
+    drag &&
+    bank[drag.id.startsWith('pos:') ? placed[Number(drag.id.slice(4))] : Number(drag.id.slice(5))];
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -34,6 +65,8 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
           return (
             <button
               key={i}
+              {...targetProps(`pos:${i}`)}
+              {...(filled && !checked ? sourceProps(`pos:${i}`) : {})}
               onClick={() => filled && removeAt(i)}
               disabled={checked || !filled}
               aria-label={
@@ -48,15 +81,17 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
         })}
       </div>
       <div
+        {...targetProps('bank')}
         className="flex flex-wrap justify-center gap-2"
         role="group"
         aria-label="Available items"
       >
         {bank.map((label, idx) => {
-          const disabled = placed.length >= ex.items.length || placed.includes(idx);
+          const disabled = checked || placed.length >= ex.items.length || placed.includes(idx);
           return (
             <button
               key={idx}
+              {...(disabled ? {} : sourceProps(`bank:${idx}`))}
               onClick={() => place(idx)}
               disabled={disabled}
               className="px-4 h-12 rounded-xl border-2 border-neutral-300 bg-white text-neutral-800 font-bold transition-all active:scale-90 hover:border-primary-400 disabled:opacity-30"
@@ -69,10 +104,19 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
 
       <button
         onClick={() => onChange([])}
-        className="flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors"
+        disabled={checked || placed.length === 0}
+        className="flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
       >
         <RotateCcw className="w-4 h-4" /> Start over
       </button>
+
+      {drag && (
+        <DragGhost x={drag.x} y={drag.y}>
+          <span className="inline-flex items-center min-h-12 px-4 rounded-xl border-2 border-primary-400 bg-white font-bold text-neutral-800">
+            <RichText>{dragLabel}</RichText>
+          </span>
+        </DragGhost>
+      )}
 
       {checked && ex.explanation && (
         <RichText className="block text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed max-w-md text-center">

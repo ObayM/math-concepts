@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
 import { hashStr, seededShuffle } from './shuffle';
+import { useTokenDrag, DragGhost } from './dnd';
 
 export default function MatchExercise({ slide, value, checked, onChange }) {
   const ex = slide.exercise;
@@ -25,11 +26,20 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
 
   const pickRight = (text) => {
     if (checked || armed == null) return;
+    pair(armed, text);
+  };
+
+  const pair = (left, text) => {
     const next = matches.map((m) => (m === text ? null : m));
-    next[armed] = text;
+    next[left] = text;
     onChange(next);
     setArmed(null);
   };
+
+  const { drag, sourceProps, targetProps } = useTokenDrag((text, key) => {
+    if (checked) return;
+    pair(Number(key), text);
+  });
 
   return (
     <div className="flex flex-col">
@@ -51,6 +61,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
             return (
               <button
                 key={i}
+                {...targetProps(i)}
                 onClick={() => pickLeft(i)}
                 disabled={checked}
                 aria-pressed={armed === i}
@@ -78,6 +89,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
             return (
               <button
                 key={text}
+                {...(checked ? {} : sourceProps(text))}
                 onClick={() => pickRight(text)}
                 disabled={checked}
                 aria-pressed={used}
@@ -89,6 +101,14 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
           })}
         </div>
       </div>
+
+      {drag && (
+        <DragGhost x={drag.x} y={drag.y}>
+          <span className="inline-flex items-center p-4 rounded-2xl border-2 border-primary-400 bg-white font-bold text-neutral-800">
+            <RichText>{drag.id}</RichText>
+          </span>
+        </DragGhost>
+      )}
 
       {checked && ex.explanation && (
         <RichText className="mt-6 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">

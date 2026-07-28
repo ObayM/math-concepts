@@ -1,6 +1,7 @@
 'use client';
 import { RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
+import { useTokenDrag, DragGhost } from './dnd';
 
 export default function BuildExercise({ slide, value = [], checked, correct, onChange }) {
   const ex = slide.exercise;
@@ -15,6 +16,38 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
     onChange([...placed, id]);
   };
   const removeAt = (i) => onChange(placed.filter((_, idx) => idx !== i));
+
+  const insertAt = (id, at) => {
+    if (placed.length >= ex.slots) return;
+    if (!ex.reusable && usedCount(id) > 0) return;
+    const next = [...placed];
+    next.splice(Math.min(at, next.length), 0, id);
+    onChange(next);
+  };
+
+  const moveTo = (from, at) => {
+    const next = [...placed];
+    const [tok] = next.splice(from, 1);
+    next.splice(Math.min(at, next.length), 0, tok);
+    onChange(next);
+  };
+
+  const { drag, sourceProps, targetProps } = useTokenDrag((id, key) => {
+    if (checked) return;
+    const from = id.startsWith('slot:') ? Number(id.slice(5)) : null;
+    if (key === 'bank') {
+      if (from !== null) removeAt(from);
+      return;
+    }
+    if (!key.startsWith('slot:')) return;
+    const at = Number(key.slice(5));
+    if (from !== null) moveTo(from, at);
+    else insertAt(id.slice(5), at);
+  });
+
+  const dragLabel =
+    drag &&
+    labelOf(drag.id.startsWith('slot:') ? placed[Number(drag.id.slice(5))] : drag.id.slice(5));
 
   const slotClass = (i) => {
     const filled = placed[i] != null;
@@ -45,6 +78,8 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
           return (
             <button
               key={i}
+              {...targetProps(`slot:${at}`)}
+              {...(filled && !checked ? sourceProps(`slot:${at}`) : {})}
               onClick={() => filled && removeAt(at)}
               disabled={checked || !filled}
               aria-label={slotLabel(at)}
@@ -65,6 +100,8 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
         return (
           <button
             key={i}
+            {...targetProps(`slot:${i}`)}
+            {...(filled && !checked ? sourceProps(`slot:${i}`) : {})}
             onClick={() => filled && removeAt(i)}
             disabled={checked || !filled}
             aria-label={slotLabel(i)}
@@ -87,7 +124,12 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
 
       {ex.template ? renderTemplate() : renderSlotRow()}
 
-      <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Token bank">
+      <div
+        {...targetProps('bank')}
+        className="flex flex-wrap justify-center gap-2"
+        role="group"
+        aria-label="Token bank"
+      >
         {ex.bank.map((tok) => {
           const isOp = tok.kind === 'operator';
           const disabled =
@@ -95,6 +137,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
           return (
             <button
               key={tok.id}
+              {...(disabled ? {} : sourceProps(`bank:${tok.id}`))}
               onClick={() => place(tok.id)}
               disabled={disabled}
               className={`flex items-center justify-center text-lg font-bold transition-all active:scale-90 disabled:opacity-30 ${
@@ -116,6 +159,14 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
       >
         <RotateCcw className="w-4 h-4" /> Start over
       </button>
+
+      {drag && (
+        <DragGhost x={drag.x} y={drag.y}>
+          <span className="inline-flex items-center justify-center min-w-12 h-12 px-3 rounded-xl border-2 border-primary-400 bg-white text-lg font-bold text-neutral-800">
+            <RichText>{dragLabel}</RichText>
+          </span>
+        </DragGhost>
+      )}
 
       {checked && ex.explanation && (
         <RichText className="block text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed max-w-md text-center">

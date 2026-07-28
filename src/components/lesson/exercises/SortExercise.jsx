@@ -4,6 +4,7 @@ import { CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 import { hashStr, seededShuffle } from './shuffle';
 import { sortItems } from './index';
+import { useTokenDrag, DragGhost } from './dnd';
 
 export default function SortExercise({ slide, value, checked, onChange }) {
   const ex = slide.exercise;
@@ -41,6 +42,15 @@ export default function SortExercise({ slide, value, checked, onChange }) {
     setArmed(null);
   };
 
+  const { drag, sourceProps, targetProps } = useTokenDrag((id, key) => {
+    if (checked) return;
+    const i = Number(id);
+    const next = [...placed];
+    next[i] = key === 'tray' ? null : Number(key);
+    onChange(next);
+    setArmed(null);
+  });
+
   const chipClass = (i, inBin) => {
     if (checked && inBin) {
       return placed[i] === items[i].bin
@@ -60,6 +70,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
       )}
 
       <div
+        {...targetProps('tray')}
         className="flex flex-wrap justify-center gap-2 min-h-14"
         role="group"
         aria-label="Items left to sort"
@@ -67,6 +78,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
         {tray.map((i) => (
           <button
             key={i}
+            {...(checked ? {} : sourceProps(String(i)))}
             onClick={() => setArmed(armed === i ? null : i)}
             disabled={checked}
             aria-pressed={armed === i}
@@ -89,6 +101,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
           return (
             <div
               key={b}
+              {...targetProps(b)}
               onClick={() => put(b)}
               className={`rounded-2xl border-2 p-3 flex flex-col gap-2 transition-all ${
                 open
@@ -111,6 +124,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
                 {mine.map((i) => (
                   <button
                     key={i}
+                    {...(checked ? {} : sourceProps(String(i)))}
                     onClick={(e) => {
                       e.stopPropagation();
                       pull(i);
@@ -141,6 +155,14 @@ export default function SortExercise({ slide, value, checked, onChange }) {
       >
         <RotateCcw className="w-4 h-4" /> Start over
       </button>
+
+      {drag && (
+        <DragGhost x={drag.x} y={drag.y}>
+          <span className="inline-flex items-center min-h-12 px-4 rounded-xl border-2 border-primary-400 bg-white font-bold text-neutral-800">
+            <RichText>{items[Number(drag.id)].text}</RichText>
+          </span>
+        </DragGhost>
+      )}
 
       {checked && ex.explanation && (
         <RichText className="block text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed max-w-md mx-auto text-center">
