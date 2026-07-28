@@ -51,6 +51,8 @@ describe('the page gate', () => {
       '/terms',
       '/prism',
       '/prism/cookbook',
+      '/dsl-preview',
+      '/api/dsl-preview',
       '/robots.txt',
       '/sitemap.xml',
       '/u/obay',

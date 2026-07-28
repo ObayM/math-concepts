@@ -1,28 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { compile, CompileError, formatCompileError } from '@/engine/lang';
+import { compile, compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 
 const LESSONS_DIR = path.resolve(process.cwd(), 'prisma/lessons');
 
-function extractScenes(text: string) {
-  const scenes: { title: string; src: string }[] = [];
-  let i = 0;
-  const lines = text.split('\n');
-  while (i < lines.length) {
-    if (lines[i].startsWith('@scene')) {
-      const m = lines[i].match(/title="([^"]+)"/);
-      const title = m ? m[1] : `Scene ${scenes.length + 1}`;
-      const body: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].startsWith('@')) body.push(lines[i++]);
-      const src = body.filter((l) => !l.trim().startsWith('>')).join('\n');
-      scenes.push({ title, src });
-    } else {
-      i++;
-    }
-  }
-  return scenes;
+// lessons carry their scenes inside slides. the old @scene block format this
+// used to scan for has not existed since v2, which is why every lesson file
+// fell through to the bare-scene compiler and reported "missing scene declaration".
+function lessonScenes(text: string) {
+  const lesson = compileLesson(text);
+  return lesson.slides
+    .map((slide, i) => ({ title: slide.title ?? `Slide ${i + 1}`, scene: slide.scene }))
+    .filter((s): s is { title: string; scene: NonNullable<typeof s.scene> } => Boolean(s.scene));
 }
 
 export async function GET(req: NextRequest) {
@@ -46,7 +36,7 @@ export async function GET(req: NextRequest) {
   const stat = fs.statSync(filePath);
   const mtime = stat.mtimeMs;
   const text = fs.readFileSync(filePath, 'utf8');
-  const isLesson = text.includes('@scene');
+  const isLesson = /^\s*lesson\b/m.test(text);
 
   if (!isLesson) {
     try {
@@ -58,10 +48,17 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const scenes = extractScenes(text);
+  let scenes: ReturnType<typeof lessonScenes>;
+  try {
+    scenes = lessonScenes(text);
+  } catch (e) {
+    const error = e instanceof CompileError ? formatCompileError(text, e) : String(e);
+    return NextResponse.json({ file, sceneCount: 0, scene: 1, title: file, error, mtime });
+  }
+
   if (!scenes.length) {
     return NextResponse.json({
-      error: 'no @scene blocks found',
+      error: 'this lesson has no scenes to preview',
       file,
       sceneCount: 0,
       scene: 1,
@@ -70,20 +67,14 @@ export async function GET(req: NextRequest) {
   }
 
   const idx = Math.max(0, Math.min(sceneN - 1, scenes.length - 1));
-  const { title, src } = scenes[idx];
+  const { title, scene } = scenes[idx];
 
-  try {
-    const ir = compile(src);
-    return NextResponse.json({ file, sceneCount: scenes.length, scene: idx + 1, title, ir, mtime });
-  } catch (e) {
-    const error = e instanceof CompileError ? formatCompileError(src, e) : String(e);
-    return NextResponse.json({
-      file,
-      sceneCount: scenes.length,
-      scene: idx + 1,
-      title,
-      error,
-      mtime,
-    });
-  }
+  return NextResponse.json({
+    file,
+    sceneCount: scenes.length,
+    scene: idx + 1,
+    title,
+    ir: scene,
+    mtime,
+  });
 }

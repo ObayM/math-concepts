@@ -15,6 +15,8 @@ const PUBLIC_PATHS = [
   '/privacy',
   '/terms',
   '/prism',
+  '/dsl-preview',
+  '/api/dsl-preview',
   '/robots.txt',
   '/sitemap.xml',
   '/u/',

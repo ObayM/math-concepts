@@ -58,8 +58,8 @@ dsl-compile:
 	npx tsx scripts/dsl.ts compile $(f) $(or $(scene),1)
 
 dsl-preview:
-	@echo "open http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.prism)"
-	@xdg-open "http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.prism)" 2>/dev/null || open "http://localhost:3000/dsl-preview?file=$(or $(f),quadratics-1.prism)" 2>/dev/null || true
+	@echo "open http://localhost:3000/dsl-preview?file=$(or $(f),differentiation-1.prism)"
+	@xdg-open "http://localhost:3000/dsl-preview?file=$(or $(f),differentiation-1.prism)" 2>/dev/null || open "http://localhost:3000/dsl-preview?file=$(or $(f),differentiation-1.prism)" 2>/dev/null || true
 
 dsl-docs-check:
 	npx tsx scripts/dsl.ts docs-check
