@@ -35,9 +35,14 @@ test('a wrong answer sends you on a detour and brings you back', async ({
   await page.goto('/courses/calculus/differentiation-2');
   await expect(page.getByText(/pick the product rule/i)).toBeVisible({ timeout: 20_000 });
 
-  // pick a deliberately wrong option
-  const wrong = page.getByRole('radio').first();
-  await wrong.click();
+  // assemble a deliberately wrong answer: the u'v' trap, then uv
+  const token = (n: number) => page.locator('[aria-label="Token bank"] button').nth(n);
+  const assembleWrong = async () => {
+    await token(2).click();
+    await token(3).click();
+  };
+
+  await assembleWrong();
   await page.getByRole('button', { name: 'Check' }).click();
 
   // the player offers the scaffold rather than plain Continue
@@ -59,8 +64,11 @@ test('a wrong answer sends you on a detour and brings you back', async ({
 
   await expect(page.getByText(/quick detour/i)).toBeHidden();
 
+  // coming back resets the answer, so the slots are empty again
+  await expect(page.getByRole('button', { name: /^slot 1, empty/ })).toBeVisible();
+
   // a detour fires at most once per slide
-  await page.getByRole('radio').first().click();
+  await assembleWrong();
   await page.getByRole('button', { name: 'Check' }).click();
   await expect(page.getByRole('button', { name: "Let's back up" })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
@@ -86,9 +94,9 @@ test('answers are recorded server side, and a forged one does not count', async 
           title: 'Product rule',
           question: 'forged',
           slideId: 'd2-quiz-product',
-          kind: 'quiz',
+          kind: 'build',
           correct: true,
-          answer: 0,
+          answer: ["$u'v'$", '$uv$'],
         },
       ],
     },

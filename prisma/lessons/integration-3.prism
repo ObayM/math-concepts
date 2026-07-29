@@ -89,15 +89,14 @@ lesson "The Fundamental Theorem of Calculus" {
   slide "Pick the Right Evaluation" {
     id: "i3-quiz-notation"
     cat: "The Theorem"
-    quiz {
-      ask "Which expression correctly evaluates $\int_{a}^{b} f(x)\,dx$ using an antiderivative F?"
+    build {
+      ask "Finish the Fundamental Theorem, using an antiderivative $F$."
       skill: "int-ftc"
-      - "$F(a) - F(b)$" { why: "The bounds are swapped: it should be the upper bound minus the lower bound." }
-      * "$F(b) - F(a)$"
-      - "$F(a) + F(b)$" { why: "The two values are subtracted, not added." }
-      - "$F(b) \cdot F(a)$" { why: "The Fundamental Theorem is a subtraction, not a product." }
-      hint "Upper bound value minus lower bound value."
-      ! "∫ₐᵇ f(x)dx = F(b) - F(a): plug in the upper bound, plug in the lower bound, subtract."
+      template: "$\int_{a}^{b} f(x)\,dx =$ ___ $-$ ___"
+      bank: ["$F(b)$", "$F(a)$", "$f(b)$", "$f(a)$"]
+      answer: ["$F(b)$", "$F(a)$"]
+      hint "Upper bound value minus lower bound value, and it's $F$ you evaluate, not $f$."
+      ! "$\int_{a}^{b} f(x)\,dx = F(b) - F(a)$: plug in the upper bound, plug in the lower bound, subtract."
     }
   }
 

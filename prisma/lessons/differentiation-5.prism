@@ -42,15 +42,14 @@ lesson "Mixed Differentiation Drill" {
   slide "Which Rule?" {
     id: "d5-quiz-which"
     cat: "Strategy"
-    quiz {
-      ask "Which rule do you apply **first** to differentiate $f(x) = x^{2}\sin x$?"
+    sort {
+      ask "Which rule do you reach for **first** on each of these?"
       skill: "deriv-product-rule"
-      - "Chain rule" { why: "There's no function-inside-a-function here." }
-      * "Product rule" { why: "Correct: it's x² times sin x, a product." }
-      - "Quotient rule" { why: "Nothing is being divided." }
-      - "Power rule alone" { why: "Power rule handles x², but not the product with sin x." }
-      hint "It's one thing multiplied by another."
-      ! "$x^2 \sin x$ is a product, so start with the product rule."
+      bin "Product rule": ["$x^{2}\sin x$", "$\ln(x)\,e^{x}$"]
+      bin "Chain rule": ["$(x^{2}+1)^{3}$", "$\sin(3x)$"]
+      bin "Quotient rule": ["$\dfrac{\sin x}{x}$", "$\dfrac{x^{2}}{x+1}$"]
+      hint "Look at the outermost operation: is it a multiply, a divide, or one function stuffed inside another?"
+      ! "The outermost operation names the rule. Multiply gives the product rule, divide gives the quotient rule, and a function inside a function gives the chain rule."
     }
   }
 

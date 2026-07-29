@@ -59,16 +59,16 @@ lesson "Product & Quotient Rules" {
   slide "Pick the Product Rule" {
     id: "d2-quiz-product"
     cat: "Product Rule"
-    quiz {
-      ask "Which expression is $\frac{d}{dx}\left[u\,v\right]$?"
+    build {
+      ask "Assemble the product rule."
       skill: "deriv-product-rule"
-      - "$u'v'$" { why: "That's the trap — the derivative of a product is not the product of derivatives." }
-      * "$u'v + uv'$"
-      - "$u'v - uv'$" { why: "That's the numerator of the quotient rule, not the product rule." }
-      - "$u'v + u'v'$"
+      template: "$\frac{d}{dx}\left[u\,v\right] =$ ___ $+$ ___"
+      bank: ["$u'v$", "$uv'$", "$u'v'$", "$uv$"]
+      answer: ["$u'v$", "$uv'$"]
+      answer: ["$uv'$", "$u'v$"]
       hint "Differentiate one factor, keep the other, then swap and add."
       onwrong: "d2-why-a-sum" retry
-      ! "$[uv]' = u'v + uv'$."
+      ! "$[uv]' = u'v + uv'$. Two terms, each with exactly one prime."
     }
   }
 

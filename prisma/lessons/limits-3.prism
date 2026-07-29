@@ -190,15 +190,14 @@ lesson "One-Sided & Infinite Limits" {
   slide "Spot the Vertical Asymptote" {
     id: "l3-quiz-which"
     cat: "Infinite Limits"
-    quiz {
-      ask "Which function has a vertical asymptote at x = 3?"
+    sort {
+      ask "Sort each function by what it does at $x = 3$."
       skill: "lim-infinite"
-      - "$x - 3$" { why: "This is just a line: no denominator, no blow-up." }
-      * "$\dfrac{1}{x-3}$"
-      - "$\sqrt{x-3}$" { why: "This has a domain restriction at x = 3, not a blow-up: it starts there, it doesn't explode." }
-      - "$\dfrac{x-3}{x+1}$" { why: "The (x-3) here is in the numerator, so this is 0 at x = 3, not undefined." }
+      bin "Blows up": ["$\dfrac{1}{x-3}$", "$\dfrac{x+1}{x-3}$"]
+      bin "Equals zero": ["$x - 3$", "$\dfrac{x-3}{x+1}$"]
+      bin "Ordinary value": ["$\sqrt{x+1}$", "$x^{2}$"]
       hint "A vertical asymptote comes from a denominator that hits 0 while the numerator doesn't."
-      ! "1/(x-3) is undefined at x = 3 with a numerator that never cancels the zero, which is the signature of a vertical asymptote."
+      ! "Only a zero denominator with a numerator that doesn't cancel it blows up. An $(x-3)$ on top gives you zero instead, and everything else is just a number."
     }
   }
 }
