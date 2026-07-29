@@ -6,7 +6,7 @@ import {
   resetLessonProgress,
   replayMastery,
 } from '@/lib/db/progressService';
-import { XP_ATTEMPT, XP_CORRECT, XP_LESSON_COMPLETE } from '@/lib/xp';
+import { XP_ATTEMPT, XP_CORRECT, XP_LESSON_COMPLETE, lessonXpCap } from '@/lib/xp';
 import { makeCourse, makePublishedLesson, makeUser, NUMERIC_LESSON } from '../helpers/factories';
 
 const attempt = (overrides: Record<string, unknown> = {}) => ({
@@ -241,6 +241,59 @@ describe('resetting a lesson', () => {
     expect(mastery.attempts).toBe(expected.attempts);
     expect(mastery.correct).toBe(expected.correct);
     expect(mastery.score).toBeCloseTo(expected.score, 9);
+  });
+
+  it('caps a lesson at one perfect run no matter how often you restart it', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+    // NUMERIC_LESSON has two exercises, so a perfect run is worth this much
+    const cap = lessonXpCap(2);
+
+    const play = () =>
+      upsertLessonProgress(user.id, lesson.lessonKey, {
+        currentStep: 1,
+        isCompleted: true,
+        quizHistory: [attempt({ correct: true, answer: '12' })],
+      });
+
+    const first = await play();
+    expect(first!.xp).toBe(XP_CORRECT + XP_LESSON_COMPLETE);
+
+    // a replay can still top up the exercise that was never answered, but only
+    // up to the cap, and never a third time
+    await resetLessonProgress(user.id, lesson.lessonKey);
+    const second = await play();
+    expect(second!.xp).toBe(cap - (XP_CORRECT + XP_LESSON_COMPLETE));
+
+    for (let i = 0; i < 3; i++) {
+      await resetLessonProgress(user.id, lesson.lessonKey);
+      expect((await play())!.xp).toBe(0);
+    }
+
+    const row = await prisma.userLessonProgress.findFirstOrThrow({
+      where: { userId: user.id, lessonId: lesson.id },
+    });
+    expect(row.xpAwarded).toBe(cap);
+  });
+
+  it('keeps the xp ledger but clears the progress on reset', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 1,
+      isCompleted: true,
+      quizHistory: [attempt({ correct: true, answer: '12' })],
+    });
+    await resetLessonProgress(user.id, lesson.lessonKey);
+
+    const row = await prisma.userLessonProgress.findFirstOrThrow({
+      where: { userId: user.id, lessonId: lesson.id },
+    });
+    expect(row.completed).toBe(false);
+    expect(row.completedAt).toBeNull();
+    expect(row.currentStep).toBe(0);
+    expect(row.xpAwarded).toBeGreaterThan(0);
   });
 
   it('drops the mastery row entirely when nothing survives', async () => {

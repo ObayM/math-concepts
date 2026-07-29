@@ -11,6 +11,17 @@ export function xpForAttempts(attempts: XpAttempt[]): number {
   return attempts.reduce((sum, a) => sum + (a.correct ? XP_CORRECT : XP_ATTEMPT), 0);
 }
 
+// the most a lesson can ever pay out: every exercise answered right, once,
+// plus the completion bonus. replaying a lesson is worth doing, it just isn't
+// worth xp a second time.
+export function lessonXpCap(exerciseCount: number): number {
+  return Math.max(0, exerciseCount) * XP_CORRECT + XP_LESSON_COMPLETE;
+}
+
+export function xpStillOwed(earned: number, alreadyAwarded: number, cap: number): number {
+  return Math.max(0, Math.min(earned, cap - alreadyAwarded));
+}
+
 export function goalProgress(xp: number, goal = DAILY_GOAL_XP) {
   const safeGoal = goal > 0 ? goal : DAILY_GOAL_XP;
   const pct = Math.min(100, Math.round((xp / safeGoal) * 100));

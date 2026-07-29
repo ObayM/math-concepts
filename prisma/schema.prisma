@@ -154,6 +154,7 @@ model UserLessonProgress {
   currentStep  Int       @default(0) @map("current_step")
   lastPlayedAt DateTime  @default(now()) @map("last_played_at")
   quizHistory  Json?     @map("quiz_history")
+  xpAwarded    Int       @default(0) @map("xp_awarded")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
@@ -179,6 +180,7 @@ model LessonAttempt {
   @@index([userId])
   @@index([lessonId])
   @@index([userId, skill, createdAt])
+  @@index([userId, createdAt])
   @@map("lesson_attempts")
 }
 

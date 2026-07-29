@@ -1,15 +1,22 @@
 'use client';
 
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { compileAny } from '@/components/prism/compileAny';
 import MiniPlayer from '@/components/prism/MiniPlayer';
 import Button from '@/components/admin/ui/Button';
-import MonacoPrismEditor from './MonacoPrismEditor';
 import ProblemsPanel from './ProblemsPanel';
 import AiPanel from './AiPanel';
 import RecentLessonTabs from './RecentLessonTabs';
 import LessonSwitcher from './LessonSwitcher';
+
+// monaco-editor touches window at import time, and a 'use client' component is
+// still rendered on the server, so this has to stay off the SSR pass
+const MonacoPrismEditor = dynamic(() => import('./MonacoPrismEditor'), {
+  ssr: false,
+  loading: () => <div className="h-full bg-neutral-50" />,
+});
 import './mini-player-admin.css';
 
 const vSeparator =

@@ -1,7 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { lessonSchema } from '@/engine/ir/lesson';
 import { exercises } from '@/components/lesson/exercises';
-import { xpForAttempts, XP_LESSON_COMPLETE, XP_CORRECT, XP_ATTEMPT } from '@/lib/xp';
+import {
+  xpForAttempts,
+  lessonXpCap,
+  xpStillOwed,
+  XP_LESSON_COMPLETE,
+  XP_CORRECT,
+  XP_ATTEMPT,
+} from '@/lib/xp';
 import { awardXp } from '@/lib/db/activityService';
 import { getUserTimeZone } from '@/lib/db/userService';
 
@@ -11,6 +18,12 @@ export function buildSlideMap(publishedData) {
   if (!parsed.success) return map;
   for (const slide of parsed.data.slides) map.set(slide.id, slide);
   return map;
+}
+
+export function countExercises(publishedData) {
+  const parsed = lessonSchema.safeParse(publishedData);
+  if (!parsed.success) return 0;
+  return parsed.data.slides.filter((s) => s.exercise).length;
 }
 
 // never trust the client's `correct` — re-derive it from the published
@@ -172,7 +185,7 @@ export async function upsertLessonProgress(
 
     const existing = await tx.userLessonProgress.findUnique({
       where: { userId_lessonId: { userId, lessonId: lesson.id } },
-      select: { quizHistory: true, completed: true },
+      select: { quizHistory: true, completed: true, xpAwarded: true },
     });
 
     if (quizHistory !== undefined) {
@@ -214,11 +227,16 @@ export async function upsertLessonProgress(
 
     if (isCompleted && !existing?.completed) earnedXp += XP_LESSON_COMPLETE;
 
+    const alreadyAwarded = existing?.xpAwarded ?? 0;
+    const cap = lessonXpCap(countExercises(lesson.publishedData));
+    earnedXp = xpStillOwed(earnedXp, alreadyAwarded, cap);
+
     await tx.userLessonProgress.upsert({
       where: { userId_lessonId: { userId, lessonId: lesson.id } },
       update: {
         currentStep,
         lastPlayedAt: now,
+        xpAwarded: alreadyAwarded + earnedXp,
         ...(isCompleted && { completed: true, completedAt: now }),
         ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
       },
@@ -227,6 +245,7 @@ export async function upsertLessonProgress(
         lessonId: lesson.id,
         currentStep,
         lastPlayedAt: now,
+        xpAwarded: earnedXp,
         ...(isCompleted && { completed: true, completedAt: now }),
         ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
       },
@@ -253,7 +272,18 @@ export async function resetLessonProgress(userId, lessonKey) {
     });
 
     await tx.lessonAttempt.deleteMany({ where: { userId, lessonId: lesson.id } });
-    await tx.userLessonProgress.deleteMany({ where: { userId, lessonId: lesson.id } });
+    // the row survives the reset so xpAwarded does too, which is what stops a
+    // restart from paying out the same lesson twice
+    await tx.userLessonProgress.updateMany({
+      where: { userId, lessonId: lesson.id },
+      data: {
+        currentStep: 0,
+        completed: false,
+        completedAt: null,
+        quizHistory: [],
+        lastPlayedAt: new Date(),
+      },
+    });
 
     for (const { skill } of touched) await rebuildSkillMastery(tx, userId, skill);
   });
