@@ -4,8 +4,11 @@ import {
   reminderFor,
   pickReminders,
   reminderBody,
+  REMINDER_HOUR,
   type ReminderCandidate,
 } from '@/lib/reminders';
+
+const NOW = new Date('2026-07-29T19:00:00.000Z');
 
 const user = (over: Partial<ReminderCandidate> = {}): ReminderCandidate => ({
   id: 'u1',
@@ -15,6 +18,9 @@ const user = (over: Partial<ReminderCandidate> = {}): ReminderCandidate => ({
   reminderEmails: true,
   streak: 5,
   lastActiveDaysAgo: 1,
+  localHour: REMINDER_HOUR,
+  lastRemindedAt: null,
+  now: NOW,
   ...over,
 });
 
@@ -36,6 +42,30 @@ describe('eligibility', () => {
   it('never emails someone who has never done anything', () => {
     expect(isEligible(user({ lastActiveDaysAgo: null }))).toBe(false);
     expect(reminderFor(user({ lastActiveDaysAgo: null }))).toBeNull();
+  });
+});
+
+describe('the send window', () => {
+  it('only fires during the reader own evening hour', () => {
+    for (let hour = 0; hour < 24; hour++) {
+      expect(isEligible(user({ localHour: hour }))).toBe(hour === REMINDER_HOUR);
+    }
+  });
+
+  it('mails two users in different zones on the same run only if it is evening for both', () => {
+    const sydney = user({ id: 'syd', email: 's@b.com', localHour: REMINDER_HOUR });
+    const london = user({ id: 'lon', email: 'l@b.com', localHour: 9 });
+    expect(pickReminders([sydney, london]).map((r) => r.userId)).toEqual(['syd']);
+  });
+
+  it('does not send twice when the cron is run again the same evening', () => {
+    const justSent = user({ lastRemindedAt: new Date(NOW.getTime() - 60 * 60 * 1000) });
+    expect(isEligible(justSent)).toBe(false);
+  });
+
+  it('sends again the next day', () => {
+    const yesterday = user({ lastRemindedAt: new Date(NOW.getTime() - 24 * 60 * 60 * 1000) });
+    expect(isEligible(yesterday)).toBe(true);
   });
 });
 

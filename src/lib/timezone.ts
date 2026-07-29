@@ -23,6 +23,16 @@ export function localDayKey(timezone?: string | null, at: Date = new Date()): st
   }).format(at);
 }
 
+export function localHour(timezone?: string | null, at: Date = new Date()): number {
+  const hour = new Intl.DateTimeFormat('en-GB', {
+    timeZone: normalizeTimeZone(timezone),
+    hour: '2-digit',
+    hour12: false,
+  }).format(at);
+  // en-GB renders midnight as 24 in some ICU versions
+  return Number(hour) % 24;
+}
+
 export function dayKeyOf(date: Date): string {
   return date.toISOString().slice(0, 10);
 }

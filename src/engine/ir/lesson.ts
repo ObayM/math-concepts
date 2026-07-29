@@ -3,6 +3,15 @@ import { sceneSchema } from './schema';
 import { exprIRSchema } from '@/engine/expr';
 import { LESSON_DIFFICULTIES, LESSON_ICONS } from '@/engine/lang/icons';
 
+// the stored IR is a cache of the compiled source, never the record. anything
+// older than this gets recompiled on read rather than migrated. see issue #7.
+export const LESSON_IR_VERSION = 2;
+
+export function irNeedsRecompile(ir: unknown): boolean {
+  if (!ir || typeof ir !== 'object') return false;
+  return (ir as { version?: unknown }).version !== LESSON_IR_VERSION;
+}
+
 const exerciseBase = {
   prompt: z.string(),
   hints: z.array(z.string()).default([]),
@@ -131,7 +140,7 @@ const slide = z.object({
 });
 
 export const lessonSchema = z.object({
-  version: z.literal(2),
+  version: z.literal(LESSON_IR_VERSION),
   title: z.string(),
   course: z.string().optional(),
   skills: z.array(z.string()).optional(),

@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { getStreak } from '@/lib/db/activityService';
-import { pickReminders, reminderBody } from '@/lib/reminders';
+import { pickReminders, reminderBody, REMINDER_HOUR } from '@/lib/reminders';
 
-import { dayKeyOf, daysBetween, localDayKey } from '@/lib/timezone';
+import { dayKeyOf, daysBetween, localDayKey, localHour } from '@/lib/timezone';
 
 export async function POST(request) {
   const secret = process.env.CRON_SECRET;
@@ -22,12 +22,18 @@ export async function POST(request) {
       name: true,
       emailVerified: true,
       reminderEmails: true,
+      lastRemindedAt: true,
       timezone: true,
     },
   });
 
+  const now = new Date();
+  // only the users whose own evening it is right now, so the per-user work
+  // below stays proportional to who could actually be mailed this hour
+  const dueNow = users.filter((u) => localHour(u.timezone, now) === REMINDER_HOUR);
+
   const candidates = [];
-  for (const u of users) {
+  for (const u of dueNow) {
     const [lastActivity, streak] = await Promise.all([
       prisma.userDailyActivity.findFirst({
         where: { userId: u.id },
@@ -39,8 +45,10 @@ export async function POST(request) {
     candidates.push({
       ...u,
       streak,
+      localHour: REMINDER_HOUR,
+      now,
       lastActiveDaysAgo: lastActivity
-        ? daysBetween(dayKeyOf(lastActivity.activityDate), localDayKey(u.timezone))
+        ? daysBetween(dayKeyOf(lastActivity.activityDate), localDayKey(u.timezone, now))
         : null,
     });
   }
@@ -59,11 +67,18 @@ export async function POST(request) {
         subject: r.subject,
         html: reminderBody(r, firstName, appUrl),
       });
+      await prisma.user.update({ where: { id: r.userId }, data: { lastRemindedAt: now } });
       sent++;
     } catch {
       failed.push(r.userId);
     }
   }
 
-  return Response.json({ considered: candidates.length, matched: reminders.length, sent, failed });
+  return Response.json({
+    considered: candidates.length,
+    dueThisHour: dueNow.length,
+    matched: reminders.length,
+    sent,
+    failed,
+  });
 }

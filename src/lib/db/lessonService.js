@@ -1,12 +1,41 @@
 import { prisma } from '@/lib/prisma';
-import { lessonSchema } from '@/engine/ir/lesson';
+import { compileLesson } from '@/engine/lang';
+import { lessonSchema, irNeedsRecompile } from '@/engine/ir/lesson';
+
+// the source is the record and the IR is a cache, so a lesson compiled by an
+// older engine gets rebuilt on read instead of migrated. a recompile that
+// throws leaves the old IR in place: a stale lesson beats a 500 mid-lesson.
+export function refreshLessonIr(lesson) {
+  if (!lesson) return lesson;
+  const patch = {};
+  if (lesson.source && irNeedsRecompile(lesson.data)) {
+    try {
+      patch.data = compileLesson(lesson.source);
+    } catch {
+      /* keep the stale IR */
+    }
+  }
+  if (lesson.publishedSource && irNeedsRecompile(lesson.publishedData)) {
+    try {
+      patch.publishedData = compileLesson(lesson.publishedSource);
+    } catch {
+      /* keep the stale IR */
+    }
+  }
+  if (!Object.keys(patch).length) return lesson;
+
+  // the write-back is an optimisation, not the point, and two readers racing it
+  // just write the same bytes twice
+  prisma.lesson.update({ where: { id: lesson.id }, data: patch }).catch(() => {});
+  return { ...lesson, ...patch };
+}
 
 export async function getLessonByKey(lessonKey) {
-  return prisma.lesson.findUnique({ where: { lessonKey } });
+  return refreshLessonIr(await prisma.lesson.findUnique({ where: { lessonKey } }));
 }
 
 export async function getLessonById(id) {
-  return prisma.lesson.findUnique({ where: { id } });
+  return refreshLessonIr(await prisma.lesson.findUnique({ where: { id } }));
 }
 
 export async function getNextLessonKey(courseId, sortOrder) {

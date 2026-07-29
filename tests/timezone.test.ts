@@ -8,6 +8,7 @@ import {
   isValidTimeZone,
   localDayKey,
   localDayStart,
+  localHour,
   normalizeTimeZone,
 } from '@/lib/timezone';
 
@@ -104,5 +105,24 @@ describe('day arithmetic', () => {
 
   it('round trips a key through dayStart', () => {
     expect(dayKeyOf(dayStart('2026-07-26'))).toBe('2026-07-26');
+  });
+});
+
+describe('localHour', () => {
+  const at = new Date('2026-07-29T12:00:00.000Z');
+
+  it('reads the wall-clock hour in the given zone', () => {
+    expect(localHour('UTC', at)).toBe(12);
+    expect(localHour('Europe/London', at)).toBe(13);
+    expect(localHour('Africa/Cairo', at)).toBe(15);
+    expect(localHour('America/New_York', at)).toBe(8);
+  });
+
+  it('wraps midnight to 0, never 24', () => {
+    expect(localHour('UTC', new Date('2026-07-29T00:30:00.000Z'))).toBe(0);
+  });
+
+  it('falls back to the default zone for junk input', () => {
+    expect(localHour('Not/AZone', at)).toBe(localHour(undefined, at));
   });
 });
