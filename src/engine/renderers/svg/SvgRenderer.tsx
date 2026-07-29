@@ -15,7 +15,14 @@ import {
   AXIS_LABEL_WEIGHT,
 } from '@/engine/colors';
 import { toDataCoords, PLOT_PAD } from './coords';
+import {
+  centerCursor,
+  moveCursor,
+  isCommitKey,
+  type Cursor,
+} from '@/engine/runtime/keyboardCursor';
 import InputLayer, { type InputLayerConfig } from './InputLayer';
+import KeyboardCrosshair from './KeyboardCrosshair';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 
@@ -48,6 +55,7 @@ export default function SvgRenderer({
   // physically sized on any screen instead of scaling with a fixed viewBox
   const [measuredW, setMeasuredW] = useState<number | null>(null);
   const [roomH, setRoomH] = useState<number | null>(null);
+  const [keyCursor, setKeyCursor] = useState<Cursor | null>(null);
   useEffect(() => {
     const el = wrapRef.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
@@ -128,6 +136,22 @@ export default function SvgRenderer({
       PLOT_PAD
     );
     onTap(dataX, dataY);
+    setKeyCursor(null);
+  };
+
+  const handleTapKey = (e: React.KeyboardEvent<SVGRectElement>) => {
+    if (!onTap) return;
+    const here = keyCursor ?? centerCursor([xMin, xMax], [yMin, yMax]);
+    if (isCommitKey(e.key)) {
+      e.preventDefault();
+      setKeyCursor(here);
+      onTap(here.x, here.y);
+      return;
+    }
+    const next = moveCursor(here, e.key, [xMin, xMax], [yMin, yMax], e.shiftKey);
+    if (!next) return;
+    e.preventDefault();
+    setKeyCursor(next);
   };
 
   // pick a "nice" tick spacing (1/2/5 × 10^k) so grid + numbers aren't cramped
@@ -241,7 +265,7 @@ export default function SvgRenderer({
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full select-none"
+        className="w-full select-none [&_[role=application]:focus-visible]:outline-2 [&_[role=application]:focus-visible]:outline-offset-[-3px] [&_[role=application]:focus-visible]:outline-primary-500"
         style={{ touchAction: 'none' }}
       >
         <defs>
@@ -268,7 +292,11 @@ export default function SvgRenderer({
             height={H}
             fill="transparent"
             style={{ cursor: 'crosshair' }}
+            tabIndex={0}
+            role="application"
+            aria-label="Tap the diagram to answer, or use the arrow keys to move the crosshair and Enter to drop it. Hold shift to move faster."
             onPointerDown={handleTap}
+            onKeyDown={handleTapKey}
           />
         )}
         {objects.map((obj, i) => {
@@ -310,6 +338,7 @@ export default function SvgRenderer({
             />
           </g>
         )}
+        {keyCursor && !marker && <KeyboardCrosshair cx={cx} x={keyCursor.x} y={keyCursor.y} />}
         {inputLayer && <InputLayer cx={cx} svgRef={svgRef} {...inputLayer} />}
       </svg>
     </div>

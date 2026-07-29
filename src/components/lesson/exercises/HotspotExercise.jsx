@@ -15,7 +15,9 @@ export default function HotspotExercise({ slide, value, checked, correct }) {
       {!checked && (
         <div className="flex items-center gap-2 text-neutral-400 font-medium text-sm">
           <Crosshair className="w-4 h-4 shrink-0" />
-          {tapped ? "Tapped — hit Check when you're ready." : 'Tap the scene above to answer.'}
+          {tapped
+            ? "Marked. Hit Check when you're ready."
+            : 'Tap the scene above, or tab to it and aim with the arrow keys.'}
         </div>
       )}
 

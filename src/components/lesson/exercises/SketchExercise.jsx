@@ -3,9 +3,9 @@ import { CheckCircle2, XCircle, Pencil, RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 
 const PROMPT_BY_MODE = {
-  curve: 'Draw on the scene above.',
-  points: 'Tap the scene above to place points.',
-  line: 'Drag on the scene above to draw a line.',
+  curve: 'Draw on the scene above, or tab to it and use the arrow keys.',
+  points: 'Tap the scene above to place points, or tab to it and use the arrow keys.',
+  line: 'Drag on the scene above to draw a line, or tab to it and use the arrow keys.',
 };
 
 export default function SketchExercise({ slide, value, checked, correct, onChange }) {
