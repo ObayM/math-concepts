@@ -289,7 +289,7 @@ export default function LessonPlayer({
   if (!path.length) {
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
-        <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
+        <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] max-md:min-h-0 flex flex-col items-center justify-center p-8 text-center">
           <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">Loading lesson...</h2>
           <p className="text-neutral-500 mt-2">Hang tight while we get things ready.</p>
           <Button onClick={handleBackToCourse} variant="ghost" className="mt-6">
@@ -303,7 +303,7 @@ export default function LessonPlayer({
   if (isComplete) {
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
-        <Card className="card-hero animate-fade-in-up w-full max-w-4xl min-h-[500px] rounded-3xl flex items-center justify-center">
+        <Card className="card-hero animate-fade-in-up w-full max-w-4xl min-h-[500px] max-md:min-h-0 rounded-3xl flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
             onBack={handleBackToCourse}
@@ -333,36 +333,57 @@ export default function LessonPlayer({
         ? 'Complete!'
         : 'Continue';
 
+  const restartButton = (
+    <button
+      onClick={handleReset}
+      className="bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors"
+      title="Restart lesson"
+      aria-label="Restart lesson"
+    >
+      <RotateCcw className="w-4 h-4" />
+    </button>
+  );
+
+  const lessonChrome = (
+    <>
+      {streak !== null && (
+        <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 card-soft">
+          🔥 {streak} Day Streak
+        </div>
+      )}
+      {restartButton}
+    </>
+  );
+
+  const mobileChrome = (
+    <div className="flex shrink-0 items-center gap-2 md:hidden">
+      {streak !== null && (
+        <div className="flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-sm font-bold text-orange-500">
+          🔥 {streak}
+        </div>
+      )}
+      {restartButton}
+    </div>
+  );
+
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden max-md:px-0 max-md:pb-0 max-md:items-stretch max-md:overflow-visible">
       {saveError && (
-        <div className="absolute left-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10">
+        <div className="absolute left-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10 max-md:left-0 max-md:right-0 max-md:top-[var(--nav-h)] max-md:justify-center max-md:rounded-none">
           Couldn&apos;t save your progress.
           <button onClick={handleRetrySave} className="underline hover:no-underline">
             Retry
           </button>
         </div>
       )}
-      <div className="absolute right-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10">
-        {streak !== null && (
-          <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 card-soft">
-            🔥 {streak} Day Streak
-          </div>
-        )}
-        <button
-          onClick={handleReset}
-          className="bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors"
-          title="Restart lesson"
-          aria-label="Restart lesson"
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
+      <div className="absolute right-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10 max-md:hidden">
+        {lessonChrome}
       </div>
 
-      <div className="card-hero animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex flex-col relative">
-        <div className="pt-8 px-10 pb-2 flex items-center justify-between">
+      <div className="card-hero animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex flex-col relative max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]">
+        <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
           <div
-            className="flex-1 mx-8 flex space-x-1 h-2"
+            className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
             role="progressbar"
             aria-label="Lesson progress"
             aria-valuemin={1}
@@ -387,9 +408,10 @@ export default function LessonPlayer({
               />
             ))}
           </div>
+          {mobileChrome}
         </div>
 
-        <div className="relative flex-1 overflow-y-auto px-10 py-6">
+        <div className="relative flex-1 overflow-y-auto px-10 py-6 max-md:px-4 max-md:py-4">
           <div
             key={currentKey}
             className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
@@ -424,7 +446,7 @@ export default function LessonPlayer({
           </div>
         </div>
 
-        <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4">
+        <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4 max-md:px-4 max-md:py-3 max-md:pb-[calc(0.75rem+var(--safe-b))]">
           <Button onClick={handleBack} variant="ghost" disabled={!canGoBack(flow)}>
             Back
           </Button>
@@ -458,7 +480,7 @@ export default function LessonPlayer({
         <div
           className={`border-t border-neutral-100 bg-neutral-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
         >
-          <div className="p-6">
+          <div className="p-6 max-md:p-4">
             <div className="mb-3 flex items-center justify-between">
               <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
                 <Sparkles className="h-4 w-4" />
@@ -525,7 +547,7 @@ export default function LessonPlayer({
                 disabled={tutorStreaming}
                 placeholder={tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'}
                 aria-label="Ask the tutor"
-                className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
+                className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
               />
               <Button
                 onClick={handleTutorAsk}
