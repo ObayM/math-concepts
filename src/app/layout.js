@@ -7,6 +7,7 @@ import { getUserInfo } from '@/components/auth/getUserInfo';
 import ImpersonationBanner from '@/components/admin/ImpersonationBanner';
 import Footer from '@/components/layout/Footer';
 import BottomNav from '@/components/layout/BottomNav';
+import ServiceWorker from '@/components/layout/ServiceWorker';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -76,6 +77,7 @@ export default async function RootLayout({ children }) {
         className={`${nunito.variable} ${fraunces.variable} font-[family-name:var(--font-nunito)] antialiased`}
       >
         <AuthProvider initialUser={userInfo}>
+          <ServiceWorker />
           <ImpersonationBanner />
           {chromeless ? (
             children

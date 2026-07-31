@@ -20,6 +20,11 @@ const PUBLIC_PATHS = [
   '/robots.txt',
   '/sitemap.xml',
   '/u/',
+  // a logged-out browser fetches these before it can install the app, and the
+  // matcher's extension list does not cover .js or .webmanifest
+  '/manifest.webmanifest',
+  '/sw.js',
+  '/offline',
 ];
 
 const CROSS_ORIGIN_EXEMPT = ['/api/auth', '/api/cron/'];
