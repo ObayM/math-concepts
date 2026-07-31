@@ -80,7 +80,7 @@ const ActivityGraph = ({
       <div className="flex justify-end mt-2">
         <button
           onClick={() => setView(view === 'week' ? 'month' : 'week')}
-          className="p-1 rounded-lg text-neutral-300/60 hover:text-neutral-400 transition-colors cursor-pointer"
+          className="tap-target flex items-center justify-center p-1 rounded-lg text-neutral-300/60 hover:text-neutral-400 transition-colors cursor-pointer"
           title={view === 'week' ? 'Monthly' : 'Weekly'}
           aria-label="Toggle view"
         >
