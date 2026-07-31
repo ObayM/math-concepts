@@ -21,7 +21,7 @@ export default async function PracticePage({ params }) {
 
   if (!pool.length) {
     return (
-      <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center p-4">
+      <div className="min-h-[calc(100dvh-var(--nav-h))] bg-surface flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <h1 className="text-2xl font-extrabold text-neutral-900 mb-2">No practice yet</h1>
           <p className="text-neutral-500 mb-6">

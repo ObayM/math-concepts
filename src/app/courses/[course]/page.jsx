@@ -73,7 +73,7 @@ export default async function CoursePage({ params }) {
   }
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)]">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
       <main className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <Link
           href="/courses"

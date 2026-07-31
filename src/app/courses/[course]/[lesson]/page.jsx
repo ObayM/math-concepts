@@ -49,7 +49,7 @@ export default async function LessonPage({ params, searchParams }) {
 // exist" sends the student looking for a typo in the url instead of telling us.
 function BrokenLesson({ course }) {
   return (
-    <div className="bg-app -mt-[var(--nav-h)] flex min-h-screen items-center justify-center px-4 pt-[var(--nav-h)]">
+    <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center px-4 pt-[var(--nav-h)]">
       <div className="max-w-md text-center">
         <p className="font-mono text-4xl text-neutral-300">f(x) = ?</p>
         <h1 className="font-display mt-6 text-3xl font-bold tracking-tight text-neutral-900">

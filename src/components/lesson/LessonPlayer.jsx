@@ -288,7 +288,7 @@ export default function LessonPlayer({
 
   if (!path.length) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] flex flex-col items-center justify-center p-8 text-center">
           <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">Loading lesson...</h2>
           <p className="text-neutral-500 mt-2">Hang tight while we get things ready.</p>
@@ -302,7 +302,7 @@ export default function LessonPlayer({
 
   if (isComplete) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="card-hero animate-fade-in-up w-full max-w-4xl min-h-[500px] rounded-3xl flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
@@ -334,7 +334,7 @@ export default function LessonPlayer({
         : 'Continue';
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
       {saveError && (
         <div className="absolute left-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10">
           Couldn&apos;t save your progress.

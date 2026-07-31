@@ -26,7 +26,7 @@ export default async function CoursesPage() {
   }
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)]">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
       <main className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <header className="animate-fade-in-up">
           <h1 className="font-display text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">

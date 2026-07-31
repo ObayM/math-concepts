@@ -109,6 +109,28 @@
 
 :root {
   --nav-h: 73px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --nav-h: 70px;
+  }
+}
+
+@media (max-width: 639px) {
+  :root {
+    --nav-h: 66px;
+  }
+}
+
+.pb-safe {
+  padding-bottom: var(--safe-b);
+}
+
+.mb-safe {
+  margin-bottom: var(--safe-b);
 }
 
 .font-display {

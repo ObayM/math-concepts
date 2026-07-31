@@ -22,7 +22,7 @@ export default function Home() {
     <div
       ref={heroRef}
       onMouseMove={handleMouseMove}
-      className="bg-grid-interactive min-h-[calc(100vh-var(--nav-h))] text-neutral-900"
+      className="bg-grid-interactive min-h-[calc(100dvh-var(--nav-h))] text-neutral-900"
     >
       <main className="relative z-10">
         <section className="container mx-auto px-6 pt-32 pb-20 md:pt-48 md:pb-32">

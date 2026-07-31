@@ -16,7 +16,18 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /.*\.mobile\.spec\.ts/,
+    },
+    {
+      name: 'mobile',
+      use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' },
+      testMatch: /.*\.mobile\.spec\.ts/,
+    },
+  ],
   webServer: {
     command: 'npm run build && npm start',
     url: `${baseURL}/login`,

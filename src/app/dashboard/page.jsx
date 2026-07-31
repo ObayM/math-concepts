@@ -106,7 +106,7 @@ const DashboardPage = async () => {
   const firstName = (user.name || user.displayUsername || user.username || 'there').split(' ')[0];
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)]">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <header className="animate-fade-in-up">
           <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-neutral-900">

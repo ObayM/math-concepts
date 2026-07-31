@@ -24,6 +24,13 @@ const fraunces = Fraunces({
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#ffffff',
+};
+
 export const metadata = {
   metadataBase: new URL(appUrl),
   title: {
@@ -72,7 +79,7 @@ export default async function RootLayout({ children }) {
           {chromeless ? (
             children
           ) : (
-            <div className="flex min-h-screen flex-col">
+            <div className="flex min-h-dvh flex-col">
               <Navbar />
               <div className="flex-1">{children}</div>
               {!pathname.startsWith('/admin') && <Footer />}

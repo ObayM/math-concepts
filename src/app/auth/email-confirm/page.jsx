@@ -8,7 +8,7 @@ export default function AuthConfirmPage() {
   const email = searchParams.get('email');
 
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] flex items-center justify-center p-4">
+    <div className="min-h-[calc(100dvh-var(--nav-h))] flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center bg-white border border-neutral-200 rounded-lg p-8 shadow-lg">
         <div className="flex justify-center mb-6">
           <div className="bg-primary-50 p-4 rounded-full">

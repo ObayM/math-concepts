@@ -17,9 +17,7 @@ const playable = (slide) => (slide && exercises[slide.exercise?.kind] ? slide : 
 
 export default function PracticeRunner({ pool, mastery = {}, coursePath, courseName }) {
   const router = useRouter();
-  // picked client-side only — picking during the render that also runs on
-  // the server would make the server and client disagree on Math.random()
-  // and trigger a hydration mismatch
+
   const [slide, setSlide] = useState(null);
   const [value, setValue] = useState(null);
   const [checked, setChecked] = useState(false);
@@ -44,7 +42,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
 
   if (empty) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="card-soft p-8 text-center">
           <h1 className="font-display text-2xl font-bold text-neutral-900">Nothing to practice</h1>
           <p className="mt-2 text-neutral-500">
@@ -60,7 +58,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
 
   if (!slide) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-screen pt-[var(--nav-h)] flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="card-soft p-8">
           <p className="text-neutral-500 animate-pulse">Loading practice...</p>
         </Card>
@@ -154,7 +152,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   if (done) {
     const pct = stats.attempted ? Math.round((stats.correct / stats.attempted) * 100) : 0;
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
+      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
         <Card className="card-hero animate-fade-in-up rounded-3xl p-10 w-full max-w-lg text-center">
           <p className="text-primary-500 font-bold text-sm tracking-wider uppercase mb-3">
             Session done
@@ -188,7 +186,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   }
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-screen px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
+    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="flex items-center justify-between mb-4">
           <button

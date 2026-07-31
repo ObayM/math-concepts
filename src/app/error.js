@@ -10,7 +10,7 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <div className="min-h-[calc(100vh-var(--nav-h))] bg-surface flex items-center justify-center px-6">
+    <div className="min-h-[calc(100dvh-var(--nav-h))] bg-surface flex items-center justify-center px-6">
       <div className="animate-fade-in-up max-w-md w-full text-center">
         <p className="text-xs font-bold tracking-widest text-neutral-400 uppercase mb-6">Error</p>
 
