@@ -47,7 +47,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
         {ex.prompt}
       </RichText>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           {ex.pairs.map((p, i) => {
             const matched = matches[i] != null;
@@ -77,6 +77,9 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
         </div>
 
         <div className="flex flex-col gap-2">
+          <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 sm:hidden">
+            Match with
+          </p>
           {rightItems.map((text) => {
             const owner = matches.findIndex((m) => m === text);
             const used = owner !== -1;

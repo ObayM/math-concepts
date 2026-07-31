@@ -10,9 +10,21 @@ export default function Label({ obj, scope, cx }: PrimProps) {
 
   if (obj.tex) {
     const fontSize = obj.fontSize ?? 18;
-    const html = katex.renderToString(interpolate(obj.text, scope), { throwOnError: false });
+    const raw = interpolate(obj.text, scope);
+    const html = katex.renderToString(raw, { throwOnError: false });
+
+    const narrow = cx.W < 420;
+    const estW = raw.replace(/\\[a-zA-Z]+|[{}\s]/g, '').length * fontSize * 0.62 + 12;
+    const boxW = narrow ? Math.max(60, Math.min(360, cx.W)) : 360;
+    const boxX = narrow ? Math.max(0, Math.min(px, cx.W - Math.min(estW, cx.W))) : px;
     return (
-      <foreignObject x={px} y={py - fontSize} width={360} height={fontSize * 3} overflow="visible">
+      <foreignObject
+        x={boxX}
+        y={py - fontSize}
+        width={boxW}
+        height={fontSize * 3}
+        overflow="visible"
+      >
         <div
           style={{
             fontSize,

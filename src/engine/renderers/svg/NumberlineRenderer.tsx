@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool, interpolate } from '@/engine/runtime/eval';
 import { expandObjects } from '@/engine/runtime/expand';
@@ -8,7 +8,7 @@ import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 import type { InputLayerConfig } from './InputLayer';
 
-const W = 640;
+const DEFAULT_W = 640;
 const H = 120;
 const Y_MID = H / 2;
 
@@ -24,6 +24,21 @@ export default function NumberlineRenderer({
 }) {
   const { scope, set } = useScene();
   const svgRef = useRef<SVGSVGElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const [measuredW, setMeasuredW] = useState<number | null>(null);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setMeasuredW(w);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const W = Math.max(240, Math.round(measuredW ?? DEFAULT_W));
 
   if (!ir.space.xDomain) return null;
   const [xMin, xMax] = ir.space.xDomain;
@@ -47,7 +62,7 @@ export default function NumberlineRenderer({
   const fmt = (v: number) => String(Math.round(v * 1000) / 1000);
 
   const ticks: React.ReactNode[] = [];
-  const step = niceStep(xMax - xMin, 8);
+  const step = niceStep(xMax - xMin, Math.max(3, Math.min(8, Math.floor(W / 120))));
   for (let t = Math.ceil(xMin / step) * step, k = 0; t <= xMax + 1e-9; t += step, k++) {
     const X = cx.toX(t);
     ticks.push(
@@ -87,7 +102,10 @@ export default function NumberlineRenderer({
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-neutral-100 overflow-hidden">
+    <div
+      ref={wrapRef}
+      className="w-full bg-white rounded-2xl border border-neutral-100 overflow-hidden"
+    >
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
