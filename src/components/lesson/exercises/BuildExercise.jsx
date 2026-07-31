@@ -155,7 +155,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
       <button
         onClick={() => onChange([])}
         disabled={checked || placed.length === 0}
-        className="flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
+        className="tap-target-h flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
       >
         <RotateCcw className="w-4 h-4" /> Start over
       </button>

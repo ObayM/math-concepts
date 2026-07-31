@@ -151,7 +151,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
       <button
         onClick={() => onChange(new Array(items.length).fill(null))}
         disabled={checked || tray.length === items.length}
-        className="flex items-center gap-2 mx-auto text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
+        className="tap-target-h flex items-center gap-2 mx-auto text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
       >
         <RotateCcw className="w-4 h-4" /> Start over
       </button>

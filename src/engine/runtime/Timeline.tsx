@@ -95,7 +95,7 @@ export default function Timeline({ ir }: { ir: SceneIR }) {
           type="button"
           onClick={() => goto(idx - 1)}
           disabled={idx === 0}
-          className="p-2 rounded-xl text-neutral-500 hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+          className="tap-target p-2 rounded-xl text-neutral-500 hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
           title="Previous step"
         >
           <ChevronLeft className="w-5 h-5" />

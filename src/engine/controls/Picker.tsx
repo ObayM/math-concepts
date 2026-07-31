@@ -21,7 +21,7 @@ export default function Picker({ control }: { control: PickerControl }) {
             role="radio"
             aria-checked={opt === current}
             onClick={() => set(control.bind, opt)}
-            className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 ${
+            className={`tap-target-h px-4 py-2 rounded-xl text-sm font-bold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 ${
               opt === current
                 ? 'bg-primary-500 text-white'
                 : 'bg-white text-neutral-600 border border-neutral-200 hover:border-primary-400'

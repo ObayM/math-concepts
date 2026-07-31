@@ -11,7 +11,11 @@ export function toDataCoords(
   const rect = svg.getBoundingClientRect();
   const [xMin, xMax] = xDomain;
   const [yMin, yMax] = yDomain;
-  const dataX = xMin + ((clientX - rect.left - pad) / (rect.width - 2 * pad)) * (xMax - xMin);
-  const dataY = yMax - ((clientY - rect.top - pad) / (rect.height - 2 * pad)) * (yMax - yMin);
+
+  const box = svg.viewBox?.baseVal;
+  const padX = box?.width ? (pad * rect.width) / box.width : pad;
+  const padY = box?.height ? (pad * rect.height) / box.height : pad;
+  const dataX = xMin + ((clientX - rect.left - padX) / (rect.width - 2 * padX)) * (xMax - xMin);
+  const dataY = yMax - ((clientY - rect.top - padY) / (rect.height - 2 * padY)) * (yMax - yMin);
   return [dataX, dataY];
 }

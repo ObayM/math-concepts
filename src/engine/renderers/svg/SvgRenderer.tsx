@@ -30,6 +30,9 @@ const DEFAULT_W = 640; // used until the container is measured (also SSR)
 const ASPECT = 0.6; // height / width — comfortable landscape default
 const MAX_H = 460;
 const MIN_H = 220;
+// a landscape phone is shorter than MIN_H allows for, and the fold guard has to
+// win there or the scene buries its own controls
+const ABS_MIN_H = 150;
 // a scene that eats the whole viewport pushes its own sliders below the fold,
 // which is fatal when the prose says "drag the slider"
 const VIEWPORT_SHARE = 0.42;
@@ -75,7 +78,10 @@ export default function SvgRenderer({
   }, []);
 
   const W = Math.max(240, Math.round(measuredW ?? DEFAULT_W));
-  const H = Math.max(MIN_H, Math.min(Math.round(W * ASPECT), MAX_H, roomH ?? MAX_H));
+  const H = Math.max(
+    ABS_MIN_H,
+    Math.min(Math.max(MIN_H, Math.min(Math.round(W * ASPECT), MAX_H)), roomH ?? MAX_H)
+  );
 
   if (!ir.space.yDomain) return null; // plane scenes must have yDomain
   const [xMin, xMax] = ir.space.xDomain;
@@ -119,9 +125,11 @@ export default function SvgRenderer({
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
   };
 
   const handleTap = (e: React.PointerEvent<SVGRectElement>) => {

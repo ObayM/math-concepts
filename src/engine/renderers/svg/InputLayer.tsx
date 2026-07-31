@@ -78,6 +78,7 @@ export default function InputLayer({
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
       const raw = draftRef.current;
       draftRef.current = [];
       setDraft([]);
@@ -88,6 +89,7 @@ export default function InputLayer({
 
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
   };
 
   const [keyCursor, setKeyCursor] = useState<Cursor | null>(null);

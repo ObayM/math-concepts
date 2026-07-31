@@ -125,6 +125,22 @@
   }
 }
 
+[data-drop-over='true'] {
+  outline: 2px dashed var(--color-primary-400);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .tap-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .tap-target-h {
+    min-height: 44px;
+  }
+}
+
 .pb-safe {
   padding-bottom: var(--safe-b);
 }

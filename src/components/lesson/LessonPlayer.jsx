@@ -336,7 +336,7 @@ export default function LessonPlayer({
   const restartButton = (
     <button
       onClick={handleReset}
-      className="bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors"
+      className="tap-target bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors flex items-center justify-center"
       title="Restart lesson"
       aria-label="Restart lesson"
     >

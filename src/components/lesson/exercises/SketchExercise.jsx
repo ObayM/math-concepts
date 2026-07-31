@@ -27,7 +27,7 @@ export default function SketchExercise({ slide, value, checked, correct, onChang
           {hasDrawn && (
             <button
               onClick={() => onChange(null)}
-              className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-neutral-700 transition-colors"
+              className="tap-target-h flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-neutral-700 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" /> Clear
             </button>

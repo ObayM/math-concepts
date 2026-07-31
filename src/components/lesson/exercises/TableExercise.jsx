@@ -79,7 +79,7 @@ export default function TableExercise({ slide, value, checked, onChange }) {
                           value={filled}
                           disabled={checked}
                           onChange={(e) => setBlank(idx, e.target.value)}
-                          className={`w-16 px-2 py-1 rounded-lg border-2 text-center font-bold outline-none transition-all ${cls}`}
+                          className={`tap-target-h w-16 px-2 py-1 rounded-lg border-2 text-center font-bold outline-none transition-all ${cls}`}
                         />
                       </td>
                     );
