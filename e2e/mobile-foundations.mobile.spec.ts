@@ -4,6 +4,7 @@ import { authenticate, createUser, disconnect, prisma } from './helpers';
 const student = `e2e-mobile-${Date.now()}@mathly.local`;
 
 test.beforeAll(async ({ request, baseURL }) => {
+  test.setTimeout(180_000);
   await createUser(request, baseURL!, student);
 });
 

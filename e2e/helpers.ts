@@ -25,12 +25,22 @@ export async function createUser(
   email: string,
   role = 'student'
 ) {
-  await throttleAuth(() =>
-    request.post(`${baseURL}/api/auth/sign-up/email`, {
-      data: { email, password: PASSWORD, name: 'E2E User' },
-      headers: { origin: baseURL },
-    })
-  );
+  // sign-up is capped at 5 per minute (src/lib/auth.js). the suite outgrew that
+  // budget, so wait the window out rather than loosening the limit for tests.
+  let res;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    res = await throttleAuth(() =>
+      request.post(`${baseURL}/api/auth/sign-up/email`, {
+        data: { email, password: PASSWORD, name: 'E2E User' },
+        headers: { origin: baseURL },
+      })
+    );
+    if (res.status() !== 429) break;
+    await new Promise((r) => setTimeout(r, 20_000));
+  }
+  if (!res!.ok()) {
+    throw new Error(`sign-up failed (${res!.status()}): ${await res!.text()}`);
+  }
   const username = `e${Math.random().toString(36).slice(2, 10)}`;
   await prisma.user.update({
     where: { email },
