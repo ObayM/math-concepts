@@ -153,7 +153,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
     const pct = stats.attempted ? Math.round((stats.correct / stats.attempted) * 100) : 0;
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
-        <Card className="card-hero animate-fade-in-up rounded-3xl p-10 w-full max-w-lg text-center">
+        <Card className="card-hero animate-fade-in-up rounded-3xl p-10 max-md:p-6 w-full max-w-lg text-center">
           <p className="text-primary-500 font-bold text-sm tracking-wider uppercase mb-3">
             Session done
           </p>
@@ -191,13 +191,14 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => router.push(`/courses/${coursePath}`)}
+            aria-label={`Back to ${courseName}`}
             className="flex items-center gap-1.5 text-neutral-500 hover:text-neutral-700 font-bold text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to {courseName}
+            <span className="max-sm:hidden">Back to {courseName}</span>
           </button>
           <div className="flex items-center gap-3">
-            <div className="flex gap-1">
+            <div className="flex gap-1 max-sm:hidden">
               {Array.from({ length: SESSION_LENGTH }, (_, i) => (
                 <div
                   key={i}

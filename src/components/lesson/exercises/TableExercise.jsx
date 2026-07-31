@@ -28,64 +28,67 @@ export default function TableExercise({ slide, value, checked, onChange }) {
         {ex.prompt}
       </RichText>
 
-      <div className="overflow-x-auto">
-        <table className="border-collapse">
-          {ex.header && (
-            <thead>
-              <tr>
-                {ex.header.map((h, i) => (
-                  <th
-                    key={i}
-                    className="px-4 py-2 text-sm font-bold text-neutral-500 border-b border-neutral-200 text-left"
-                  >
-                    <RichText>{h}</RichText>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-          )}
-          <tbody>
-            {ex.rows.map((row, r) => (
-              <tr key={r}>
-                {row.map((cell, c) => {
-                  if (!cell.blank) {
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden" />
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            {ex.header && (
+              <thead>
+                <tr>
+                  {ex.header.map((h, i) => (
+                    <th
+                      key={i}
+                      className="px-4 py-2 text-sm font-bold text-neutral-500 border-b border-neutral-200 text-left"
+                    >
+                      <RichText>{h}</RichText>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody>
+              {ex.rows.map((row, r) => (
+                <tr key={r}>
+                  {row.map((cell, c) => {
+                    if (!cell.blank) {
+                      return (
+                        <td
+                          key={c}
+                          className="px-4 py-2 border-b border-neutral-100 font-bold text-neutral-700"
+                        >
+                          {cell.value}
+                        </td>
+                      );
+                    }
+                    blankIdx++;
+                    const idx = blankIdx;
+                    const filled = v[idx] ?? '';
+                    const isCorrect =
+                      checked &&
+                      filled !== '' &&
+                      Math.abs(Number(filled) - cell.answer) <= ex.tolerance;
+                    const isWrong = checked && filled !== '' && !isCorrect;
+                    let cls = 'border-neutral-300 focus:border-primary-400';
+                    if (isCorrect) cls = 'border-success-500 bg-success-50 text-success-700';
+                    if (isWrong) cls = 'border-danger-500 bg-danger-50 text-danger-700';
                     return (
-                      <td
-                        key={c}
-                        className="px-4 py-2 border-b border-neutral-100 font-bold text-neutral-700"
-                      >
-                        {cell.value}
+                      <td key={c} className="px-4 py-2 border-b border-neutral-100">
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={filled}
+                          disabled={checked}
+                          onChange={(e) => setBlank(idx, e.target.value)}
+                          className={`w-16 px-2 py-1 rounded-lg border-2 text-center font-bold outline-none transition-all ${cls}`}
+                        />
                       </td>
                     );
-                  }
-                  blankIdx++;
-                  const idx = blankIdx;
-                  const filled = v[idx] ?? '';
-                  const isCorrect =
-                    checked &&
-                    filled !== '' &&
-                    Math.abs(Number(filled) - cell.answer) <= ex.tolerance;
-                  const isWrong = checked && filled !== '' && !isCorrect;
-                  let cls = 'border-neutral-300 focus:border-primary-400';
-                  if (isCorrect) cls = 'border-success-500 bg-success-50 text-success-700';
-                  if (isWrong) cls = 'border-danger-500 bg-danger-50 text-danger-700';
-                  return (
-                    <td key={c} className="px-4 py-2 border-b border-neutral-100">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={filled}
-                        disabled={checked}
-                        onChange={(e) => setBlank(idx, e.target.value)}
-                        className={`w-16 px-2 py-1 rounded-lg border-2 text-center font-bold outline-none transition-all ${cls}`}
-                      />
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {checked && (

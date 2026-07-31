@@ -23,8 +23,6 @@ function foldTo(ir: SceneIR, i: number): Record<string, number | boolean> {
   return s;
 }
 
-// keyed by step index in the parent, so switching steps remounts this with
-// fresh (hidden) state instead of needing an effect to reset it
 function StepHint({ hint }: { hint: string }) {
   const [shown, setShown] = useState(false);
   if (shown) return <p className="text-neutral-400 text-xs leading-relaxed">{hint}</p>;
@@ -92,7 +90,7 @@ export default function Timeline({ ir }: { ir: SceneIR }) {
 
       {current?.hint && <StepHint key={idx} hint={current.hint} />}
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 max-md:flex-wrap max-md:gap-y-2">
         <button
           type="button"
           onClick={() => goto(idx - 1)}

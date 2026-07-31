@@ -63,7 +63,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
   const renderTemplate = () => {
     let slotIndex = -1;
     return (
-      <div className="flex flex-wrap items-baseline gap-y-3 w-fit mx-auto max-w-[42rem] text-xl leading-[2] text-neutral-800">
+      <div className="flex flex-wrap items-baseline gap-y-3 w-fit mx-auto max-w-[42rem] text-xl leading-[2] text-neutral-800 max-md:text-lg max-md:w-full max-md:justify-center">
         {ex.template.map((seg, i) => {
           if (!('slot' in seg)) {
             return (
@@ -83,7 +83,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
               onClick={() => filled && removeAt(at)}
               disabled={checked || !filled}
               aria-label={slotLabel(at)}
-              className={`inline-flex items-center justify-center align-baseline min-w-16 h-11 px-3 mx-1 rounded-xl border-2 font-bold text-neutral-800 transition-all disabled:cursor-default ${slotClass(at)}`}
+              className={`inline-flex items-center justify-center align-baseline min-w-16 h-11 px-3 mx-1 rounded-xl border-2 font-bold text-neutral-800 transition-all disabled:cursor-default max-md:min-w-12 max-md:px-2 max-md:mx-0.5 ${slotClass(at)}`}
             >
               {filled && <RichText>{labelOf(placed[at])}</RichText>}
             </button>
@@ -94,7 +94,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
   };
 
   const renderSlotRow = () => (
-    <div className="flex flex-wrap justify-center gap-2 bg-neutral-50 border border-neutral-200 rounded-2xl p-4 min-w-[200px]">
+    <div className="flex flex-wrap justify-center gap-2 bg-neutral-50 border border-neutral-200 rounded-2xl p-4 min-w-[200px] max-md:min-w-0 max-md:p-3">
       {Array.from({ length: ex.slots }).map((_, i) => {
         const filled = placed[i] != null;
         return (

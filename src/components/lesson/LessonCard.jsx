@@ -75,7 +75,7 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
 
           <div className="flex items-center gap-2 shrink-0">
             {isDraft && (
-              <Badge variant="warning" className="text-xs whitespace-nowrap">
+              <Badge variant="warning" className="text-xs whitespace-nowrap max-sm:hidden">
                 Draft
               </Badge>
             )}

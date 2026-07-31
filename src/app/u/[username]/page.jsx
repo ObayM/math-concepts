@@ -30,7 +30,7 @@ export default async function ProfilePage({ params }) {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
         <ProfileHeaderCard profile={profile} isOwn={isOwn} />
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
             icon={<Flame className="w-5 h-5 text-orange-500" />}
             value={profile.streak}
