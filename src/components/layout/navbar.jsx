@@ -44,7 +44,41 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const drawerRef = useRef(null);
+  const closeRef = useRef(null);
   useOutsideClick(profileRef, () => setIsProfileOpen(false));
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const focusable = drawerRef.current?.querySelectorAll(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [isMobileMenuOpen]);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
@@ -176,8 +210,11 @@ export default function Navbar() {
       </header>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 z-50 bg-black/30" />
+        <div className="lg:hidden" role="dialog" aria-modal="true" ref={drawerRef}>
+          <div
+            className="fixed inset-0 z-50 bg-black/30"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
           <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-black/5">
             <div className="flex items-center justify-between">
               <Link href="/" className="-m-1.5 p-1.5" onClick={() => setIsMobileMenuOpen(false)}>
@@ -187,6 +224,7 @@ export default function Navbar() {
               </Link>
               <button
                 type="button"
+                ref={closeRef}
                 className="-m-2.5 rounded-md p-2.5 text-neutral-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

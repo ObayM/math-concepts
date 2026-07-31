@@ -6,6 +6,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import { getUserInfo } from '@/components/auth/getUserInfo';
 import ImpersonationBanner from '@/components/admin/ImpersonationBanner';
 import Footer from '@/components/layout/Footer';
+import BottomNav from '@/components/layout/BottomNav';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -83,6 +84,7 @@ export default async function RootLayout({ children }) {
               <Navbar />
               <div className="flex-1">{children}</div>
               {!pathname.startsWith('/admin') && <Footer />}
+              {!pathname.startsWith('/admin') && <BottomNav />}
             </div>
           )}
         </AuthProvider>
