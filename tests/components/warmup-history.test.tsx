@@ -223,3 +223,34 @@ describe('HistoryView', () => {
     expect(screen.getByText(/needs a few attempts/i)).toBeInTheDocument();
   });
 });
+
+describe('SpeedChart column layout', () => {
+  const at = (n: number) => Array.from({ length: n }, (_, i) => session(i, 2000 + i * 100));
+
+  const barXs = (container: HTMLElement) =>
+    [...container.querySelectorAll('path')].map((p) =>
+      Number(p.getAttribute('d')!.match(/-?\d+\.?\d*/g)![0])
+    );
+
+  it('keeps two sessions together instead of spreading them across the plot', () => {
+    const { container } = render(<SpeedChart trend={at(2)} />);
+    const [first, second] = barXs(container);
+    expect(second - first).toBeLessThanOrEqual(44);
+  });
+
+  it('centres a short run in the plot', () => {
+    const { container } = render(<SpeedChart trend={at(2)} />);
+    const xs = barXs(container);
+    const midpoint = (xs[0] + xs[xs.length - 1]) / 2;
+    expect(midpoint).toBeGreaterThan(250);
+    expect(midpoint).toBeLessThan(390);
+  });
+
+  it('still fits a long run inside the plot', () => {
+    const { container } = render(<SpeedChart trend={at(24)} />);
+    const xs = barXs(container);
+    expect(xs[0]).toBeGreaterThanOrEqual(34);
+    expect(xs[xs.length - 1]).toBeLessThan(640);
+    for (let i = 1; i < xs.length; i++) expect(xs[i]).toBeGreaterThan(xs[i - 1]);
+  });
+});

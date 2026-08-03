@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  factLabel,
   accuracyPct,
   paceMs,
   median,
@@ -159,5 +160,39 @@ describe('formatDuration', () => {
 
   it('does not go negative', () => {
     expect(formatDuration(-100)).toBe('0:00');
+  });
+});
+
+describe('factLabel', () => {
+  it('shows the exact fact when the key already is one', () => {
+    expect(factLabel('mul:7x8', '7 × 8')).toBe('7 × 8');
+    expect(factLabel('add:5+8', '8 + 5')).toBe('8 + 5');
+    expect(factLabel('div:56/7', '56 ÷ 7')).toBe('56 ÷ 7');
+    expect(factLabel('neg:-7×3', '-7 × 3')).toBe('-7 × 3');
+  });
+
+  it('shows a pattern for keys that cover many questions, not one misleading sample', () => {
+    expect(factLabel('mix:mul-add', '9 × 4 + 9')).toBe('a × b + c');
+    expect(factLabel('mix:mul-sub', '7 × 8 - 3')).toBe('a × b - c');
+    expect(factLabel('mix:add-mul', '4 + 7 × 3')).toBe('a + b × c');
+    expect(factLabel('mix:div-add', '56 ÷ 8 + 5')).toBe('a ÷ b + c');
+  });
+
+  it('generalises fractions and percents over the number they act on', () => {
+    expect(factLabel('frac:1/4', '1/4 of 20')).toBe('1/4 of n');
+    expect(factLabel('pct:25%', '25% of 36')).toBe('25% of n');
+  });
+
+  it('generalises equations over their right hand side', () => {
+    expect(factLabel('eq1:x+7', 'x + 7 = 12')).toBe('x + 7 = n');
+    expect(factLabel('eq1:3x', '3x = 12')).toBe('3x = n');
+    expect(factLabel('eq1:x÷3', 'x ÷ 3 = 4')).toBe('x ÷ 3 = n');
+    expect(factLabel('eq2:3x-4', '3x - 4 = 11')).toBe('3x - 4 = n');
+  });
+
+  it('falls back to something readable when there is no prompt', () => {
+    expect(factLabel('mul:7x8')).toBe('mul:7x8');
+    expect(factLabel('nonsense')).toBe('nonsense');
+    expect(factLabel('mix:unknown', '1 + 1')).toBe('unknown');
   });
 });

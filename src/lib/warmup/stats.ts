@@ -72,6 +72,31 @@ export function rankWeakSpots(
     .slice(0, limit);
 }
 
+const PATTERNS: Record<string, string> = {
+  'mix:mul-add': 'a × b + c',
+  'mix:mul-sub': 'a × b - c',
+  'mix:add-mul': 'a + b × c',
+  'mix:div-add': 'a ÷ b + c',
+};
+
+const spaced = (text: string) =>
+  text
+    .replace(/([+\-÷×])/g, ' $1 ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+export function factLabel(factKey: string, prompt?: string | null): string {
+  const divider = factKey.indexOf(':');
+  if (divider < 0) return prompt || factKey;
+  const kind = factKey.slice(0, divider);
+  const rest = factKey.slice(divider + 1);
+
+  if (kind === 'mix') return PATTERNS[factKey] ?? rest;
+  if (kind === 'frac' || kind === 'pct') return `${rest} of n`;
+  if (kind === 'eq1' || kind === 'eq2') return `${spaced(rest)} = n`;
+  return prompt || factKey;
+}
+
 export function formatPace(ms: number): string {
   if (ms <= 0) return '--';
   return `${(Math.round(ms / 100) / 10).toFixed(1)}s`;

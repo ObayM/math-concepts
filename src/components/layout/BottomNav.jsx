@@ -1,12 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, User } from 'lucide-react';
+import { Home, BookOpen, User, Zap } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 function ownsTheBottom(pathname) {
-  return /^\/courses\/[^/]+\/[^/]+/.test(pathname);
+  return /^\/courses\/[^/]+\/[^/]+/.test(pathname) || /^\/warmup\/\d+$/.test(pathname);
 }
 
 export default function BottomNav() {
@@ -18,6 +18,7 @@ export default function BottomNav() {
   const tabs = [
     { name: 'Learn', href: '/dashboard', icon: Home },
     { name: 'Courses', href: '/courses', icon: BookOpen },
+    { name: 'Warm up', href: '/warmup', icon: Zap },
     {
       name: 'You',
       href: user.username ? `/@${user.username}` : '/settings',

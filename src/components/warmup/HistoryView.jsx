@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Download, TrendingDown, Target } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import SpeedChart from '@/components/warmup/SpeedChart';
-import { formatPace, formatDuration } from '@/lib/warmup/stats';
+import { formatPace, formatDuration, factLabel } from '@/lib/warmup/stats';
 
 const eyebrow = 'text-xs font-bold uppercase tracking-[0.12em] text-neutral-400';
 
@@ -116,7 +116,7 @@ export default function HistoryView({ level, levels, totals, trend, weakSpots, s
                   {weakSpots.map((fact) => (
                     <li key={fact.factKey} className="flex items-center gap-4 py-2.5">
                       <span className="font-display flex-1 truncate text-lg font-bold text-neutral-900">
-                        {fact.prompt}
+                        {factLabel(fact.factKey, fact.prompt)}
                       </span>
                       <span className="text-sm font-bold tabular-nums text-neutral-700">
                         {formatPace(fact.avgMs)}
@@ -141,7 +141,7 @@ export default function HistoryView({ level, levels, totals, trend, weakSpots, s
                       <th className="py-2 pr-4 font-bold">Lvl</th>
                       <th className="py-2 pr-4 font-bold">Answered</th>
                       <th className="py-2 pr-4 font-bold">Right</th>
-                      <th className="py-2 pr-4 font-bold">Run</th>
+                      <th className="py-2 pr-4 font-bold">Streak</th>
                       <th className="py-2 pr-4 font-bold">Sat for</th>
                       <th className="py-2 pr-4 font-bold">Answering</th>
                       <th className="py-2 font-bold">Each</th>

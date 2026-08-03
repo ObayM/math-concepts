@@ -6,6 +6,7 @@ const W = 640;
 const H = 190;
 const PAD = { top: 20, right: 10, bottom: 26, left: 34 };
 const MAX_BAR = 22;
+const MAX_BAND = 44;
 const GAP = 2;
 const STEPS = [0.25, 0.5, 1, 2, 5, 10];
 
@@ -35,8 +36,9 @@ export default function SpeedChart({ trend }) {
   const { top, step } = niceScale(Math.max(...seconds));
   const plotW = W - PAD.left - PAD.right;
   const plotH = H - PAD.top - PAD.bottom;
-  const band = plotW / trend.length;
+  const band = Math.min(plotW / trend.length, MAX_BAND);
   const barW = Math.min(MAX_BAR, Math.max(3, band - GAP));
+  const left = PAD.left + (plotW - band * trend.length) / 2;
   const y = (value) => PAD.top + plotH - (value / top) * plotH;
 
   const ticks = [];
@@ -52,7 +54,7 @@ export default function SpeedChart({ trend }) {
           <div
             className="pointer-events-none absolute -top-1 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xl border border-neutral-200 bg-white px-3 py-2 text-left text-xs shadow-[0_4px_12px_-4px_rgba(15,23,42,0.15)]"
             style={{
-              left: `${Math.min(88, Math.max(12, ((active + 0.5) / trend.length) * 100))}%`,
+              left: `${Math.min(88, Math.max(12, ((left + (active + 0.5) * band) / W) * 100))}%`,
             }}
           >
             <p className="font-bold text-neutral-900">{formatPace(hovered.pace)} per question</p>
@@ -94,7 +96,7 @@ export default function SpeedChart({ trend }) {
 
           {trend.map((session, i) => {
             const height = Math.max(2, PAD.top + plotH - y(session.pace / 1000));
-            const x = PAD.left + i * band + (band - barW) / 2;
+            const x = left + i * band + (band - barW) / 2;
             const lit = i === newest || active === i;
             return (
               <g
@@ -103,7 +105,7 @@ export default function SpeedChart({ trend }) {
                 onPointerLeave={() => setActive(null)}
               >
                 <rect
-                  x={PAD.left + i * band}
+                  x={left + i * band}
                   y={PAD.top}
                   width={band}
                   height={plotH}
@@ -127,7 +129,7 @@ export default function SpeedChart({ trend }) {
           />
 
           <text
-            x={PAD.left + newest * band + band / 2}
+            x={left + newest * band + band / 2}
             y={y(seconds[newest]) - 7}
             textAnchor="middle"
             className="fill-neutral-900 text-[11px] font-bold"
@@ -135,11 +137,11 @@ export default function SpeedChart({ trend }) {
             {formatPace(trend[newest].pace)}
           </text>
 
-          <text x={PAD.left} y={H - 8} className="fill-neutral-400 text-[10px]">
+          <text x={left} y={H - 8} className="fill-neutral-400 text-[10px]">
             older
           </text>
           <text
-            x={W - PAD.right}
+            x={left + band * trend.length}
             y={H - 8}
             textAnchor="end"
             className="fill-neutral-400 text-[10px]"

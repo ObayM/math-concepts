@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import clsx from 'clsx';
-import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle, Target } from 'lucide-react';
+import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle, Target, Zap } from 'lucide-react';
 
 import { requireUser } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
@@ -141,6 +141,7 @@ const DashboardPage = async () => {
               timezone={timezone}
             />
             <PracticeCard course={currentCourse} />
+            <WarmupCard />
           </div>
         </div>
       </div>
@@ -344,6 +345,26 @@ const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp, timezon
     </section>
   );
 };
+
+const WarmupCard = () => (
+  <Link
+    href="/warmup"
+    className="group mt-4 block animate-fade-in-up [animation-delay:320ms] opacity-0"
+  >
+    <Card className="card-soft p-5 transition-colors hover:border-neutral-300">
+      <div className="flex items-center gap-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-500">
+          <Zap className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold text-neutral-800">Warm up</p>
+          <p className="text-sm text-neutral-500">Fast arithmetic, as long as you feel like it.</p>
+        </div>
+        <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-neutral-600" />
+      </div>
+    </Card>
+  </Link>
+);
 
 const PracticeCard = ({ course }) => {
   if (!course) return null;

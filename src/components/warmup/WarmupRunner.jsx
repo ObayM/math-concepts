@@ -283,7 +283,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
 
   if (status === 'stopped') {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
+      <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center px-4 pb-[calc(1rem+var(--safe-b))] pt-[calc(var(--nav-h)+1rem)] md:px-6">
         <StopScreen
           stats={{ ...stats, sittingMs: elapsed }}
           xpEarned={xpEarned}
@@ -310,9 +310,9 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
       : 'border-danger-500 bg-danger-50 text-danger-600';
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh flex-col pt-[var(--nav-h)]">
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pb-[calc(1rem+var(--safe-b))] md:px-6 md:pb-6">
-        <div className="flex items-center justify-between py-3">
+    <div className="bg-app -mt-[var(--nav-h)] flex h-dvh justify-center overflow-hidden pt-[var(--nav-h)] md:items-center md:px-6 md:pb-6 md:pt-[calc(var(--nav-h)+1.5rem)]">
+      <Card className="card-hero flex w-full max-w-lg flex-1 flex-col rounded-3xl px-4 pb-[calc(0.5rem+var(--safe-b))] max-md:rounded-none max-md:border-0 max-md:bg-transparent max-md:shadow-none md:max-h-full md:flex-none md:min-h-[27rem] md:px-8 md:pb-7 md:pt-4">
+        <div className="flex shrink-0 items-center justify-between py-2.5">
           <Link
             href="/warmup"
             className="tap-target-h flex items-center gap-1.5 text-sm font-bold text-neutral-500 transition-colors hover:text-neutral-700"
@@ -330,7 +330,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
           </button>
         </div>
 
-        <div className="flex items-center justify-center gap-4 text-sm font-bold tabular-nums text-neutral-500">
+        <div className="flex shrink-0 items-center justify-center gap-4 text-sm font-bold tabular-nums text-neutral-500">
           <span
             className={clsx('flex items-center gap-1', stats.streak >= 3 && 'text-warning-600')}
           >
@@ -357,17 +357,17 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
           <span>{formatDuration(elapsed)}</span>
         </div>
 
-        <div className="flex flex-1 flex-col items-center justify-center py-8">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center py-2 md:py-8">
           <p
             key={question.prompt + idx}
-            className="font-display animate-pop-in text-center text-5xl font-bold tracking-tight text-neutral-900 sm:text-6xl"
+            className="font-display animate-pop-in text-center text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl md:text-6xl"
           >
             {question.prompt}
           </p>
 
           <div
             className={clsx(
-              'mt-8 flex h-20 w-full max-w-[16rem] items-center justify-center rounded-2xl border-2 text-4xl font-extrabold tabular-nums transition-colors',
+              'mt-6 flex h-16 w-full max-w-[15rem] items-center justify-center rounded-2xl border-2 text-4xl font-extrabold tabular-nums transition-colors sm:h-20',
               boxTone
             )}
           >
@@ -385,7 +385,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
             />
           </div>
 
-          <div className="mt-4 flex h-6 items-center justify-center">
+          <div className="mt-3 flex h-6 shrink-0 items-center justify-center">
             {verdict?.correct && (
               <span className="flex items-center gap-1.5 font-bold text-success-600">
                 <Check className="h-5 w-5" aria-hidden />
@@ -402,9 +402,11 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
         </div>
 
         {touch ? (
-          <Keypad onPress={press} submitLabel={verdict && !verdict.correct ? 'Next' : 'Check'} />
+          <div className="shrink-0">
+            <Keypad onPress={press} submitLabel={verdict && !verdict.correct ? 'Next' : 'Check'} />
+          </div>
         ) : (
-          <div>
+          <div className="shrink-0">
             {verdict && !verdict.correct ? (
               <Button onClick={advance} variant="primary" fullWidth>
                 Next
@@ -426,7 +428,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
             returns.
           </p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

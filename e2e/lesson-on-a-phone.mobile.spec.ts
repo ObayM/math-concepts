@@ -95,7 +95,7 @@ test('the tab bar carries navigation, and steps aside inside a lesson', async ({
   await page.goto('/dashboard');
   const tabs = page.locator('nav[aria-label="Primary"]');
   await expect(tabs).toBeVisible();
-  await expect(tabs.getByRole('link')).toHaveCount(3);
+  await expect(tabs.getByRole('link')).toHaveCount(4);
 
   await tabs.getByRole('link', { name: 'Courses' }).tap();
   await expect(page).toHaveURL(/\/courses$/);

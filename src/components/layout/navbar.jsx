@@ -85,6 +85,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Courses', href: '/courses' },
+    { name: 'Warm up', href: '/warmup' },
     { name: 'Sandbox', href: '/prism/play' },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
