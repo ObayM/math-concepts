@@ -2,6 +2,8 @@ export const XP_CORRECT = 10;
 export const XP_ATTEMPT = 2;
 export const XP_LESSON_COMPLETE = 25;
 export const DAILY_GOAL_XP = 50;
+export const XP_WARMUP_CORRECT = 1;
+export const WARMUP_DAILY_XP_CAP = 30;
 
 export interface XpAttempt {
   correct: boolean;
@@ -20,6 +22,14 @@ export function lessonXpCap(exerciseCount: number): number {
 
 export function xpStillOwed(earned: number, alreadyAwarded: number, cap: number): number {
   return Math.max(0, Math.min(earned, cap - alreadyAwarded));
+}
+
+export function warmupXp(correctCount: number, awardedToday: number): number {
+  return xpStillOwed(
+    Math.max(0, correctCount) * XP_WARMUP_CORRECT,
+    awardedToday,
+    WARMUP_DAILY_XP_CAP
+  );
 }
 
 export function goalProgress(xp: number, goal = DAILY_GOAL_XP) {

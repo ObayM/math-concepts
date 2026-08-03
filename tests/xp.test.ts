@@ -2,10 +2,13 @@ import { describe, it, expect } from 'vitest';
 import {
   xpForAttempts,
   goalProgress,
+  warmupXp,
   XP_CORRECT,
   XP_ATTEMPT,
   XP_LESSON_COMPLETE,
   DAILY_GOAL_XP,
+  XP_WARMUP_CORRECT,
+  WARMUP_DAILY_XP_CAP,
 } from '@/lib/xp';
 
 describe('xpForAttempts', () => {
@@ -32,6 +35,47 @@ describe('xpForAttempts', () => {
   it('a full lesson of correct answers plus the bonus clears the daily goal', () => {
     const lesson = Array.from({ length: 5 }, () => ({ correct: true }));
     expect(xpForAttempts(lesson) + XP_LESSON_COMPLETE).toBeGreaterThanOrEqual(DAILY_GOAL_XP);
+  });
+});
+
+describe('warmupXp', () => {
+  it('pays nothing for nothing', () => {
+    expect(warmupXp(0, 0)).toBe(0);
+  });
+
+  it('pays a fraction of what a real question pays', () => {
+    expect(XP_WARMUP_CORRECT).toBeGreaterThan(0);
+    expect(XP_WARMUP_CORRECT).toBeLessThan(XP_ATTEMPT);
+    expect(warmupXp(1, 0)).toBe(XP_WARMUP_CORRECT);
+  });
+
+  it('pays per correct answer up to the daily cap', () => {
+    expect(warmupXp(10, 0)).toBe(10);
+    expect(warmupXp(WARMUP_DAILY_XP_CAP, 0)).toBe(WARMUP_DAILY_XP_CAP);
+  });
+
+  it('stops paying once the day is capped, however many more they answer', () => {
+    expect(warmupXp(WARMUP_DAILY_XP_CAP + 1, 0)).toBe(WARMUP_DAILY_XP_CAP);
+    expect(warmupXp(500, 0)).toBe(WARMUP_DAILY_XP_CAP);
+    expect(warmupXp(1, WARMUP_DAILY_XP_CAP)).toBe(0);
+    expect(warmupXp(50, WARMUP_DAILY_XP_CAP)).toBe(0);
+  });
+
+  it('pays only the remainder when a later session crosses the cap', () => {
+    expect(warmupXp(20, 25)).toBe(WARMUP_DAILY_XP_CAP - 25);
+  });
+
+  it('never goes negative if more was somehow already awarded than the cap', () => {
+    expect(warmupXp(10, 999)).toBe(0);
+  });
+
+  it('ignores a negative count rather than clawing xp back', () => {
+    expect(warmupXp(-5, 0)).toBe(0);
+  });
+
+  it('cannot clear the daily goal on its own', () => {
+    expect(warmupXp(10_000, 0)).toBeLessThan(DAILY_GOAL_XP);
+    expect(goalProgress(warmupXp(10_000, 0)).met).toBe(false);
   });
 });
 
