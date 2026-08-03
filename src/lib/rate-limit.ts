@@ -16,6 +16,8 @@ export const TIERS = {
   'generate-lesson': { max: 2, perMin: 2 },
   'content-save': { max: 30, perMin: 30 },
   practice: { max: 60, perMin: 60 },
+  warmup: { max: 60, perMin: 60 },
+  'warmup-export': { max: 5, perMin: 5 },
   progress: { max: 60, perMin: 60 },
   activity: { max: 60, perMin: 60 },
   profile: { max: 10, perMin: 10 },
