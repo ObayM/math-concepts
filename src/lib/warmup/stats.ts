@@ -15,6 +15,26 @@ export interface FactRow {
 export const MIN_FACT_ATTEMPTS = 3;
 export const MIN_PACE_SAMPLE = 20;
 
+export function rollUpSession(
+  rows: readonly { correct: boolean; elapsedMs: number }[]
+): WarmupTotals & { bestStreak: number } {
+  let correct = 0;
+  let totalMs = 0;
+  let streak = 0;
+  let bestStreak = 0;
+  for (const row of rows) {
+    totalMs += row.elapsedMs;
+    if (row.correct) {
+      correct++;
+      streak++;
+      if (streak > bestStreak) bestStreak = streak;
+    } else {
+      streak = 0;
+    }
+  }
+  return { answered: rows.length, correct, totalMs, bestStreak };
+}
+
 export function accuracyPct(correct: number, answered: number): number {
   if (answered <= 0) return 0;
   return Math.round((correct / answered) * 100);

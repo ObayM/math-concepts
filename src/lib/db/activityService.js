@@ -20,6 +20,24 @@ export async function awardXp(tx, userId, amount, timezone) {
   });
 }
 
+export async function getWarmupXpToday(client, userId, timezone) {
+  const row = await client.userDailyActivity.findUnique({
+    where: { userId_activityDate: { userId, activityDate: localDayStart(timezone) } },
+    select: { warmupXp: true },
+  });
+  return row?.warmupXp ?? 0;
+}
+
+export async function awardWarmupXp(tx, userId, amount, timezone) {
+  if (!amount) return;
+  const today = localDayStart(timezone);
+  await tx.userDailyActivity.upsert({
+    where: { userId_activityDate: { userId, activityDate: today } },
+    update: { xp: { increment: amount }, warmupXp: { increment: amount } },
+    create: { userId, activityDate: today, xp: amount, warmupXp: amount },
+  });
+}
+
 export async function getTodayXp(userId, timezone) {
   const row = await prisma.userDailyActivity.findUnique({
     where: { userId_activityDate: { userId, activityDate: localDayStart(timezone) } },

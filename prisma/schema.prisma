@@ -33,6 +33,8 @@ model User {
   authoredLessons Lesson[]
   skillMastery    UserSkillMastery[]
   auditEntries    AuditLog[]
+  warmupSessions  WarmupSession[]
+  warmupAnswers   WarmupAnswer[]
 
   @@map("user")
 }
@@ -139,6 +141,7 @@ model UserDailyActivity {
   userId       String   @map("user_id")
   activityDate DateTime @map("activity_date") @db.Date
   xp           Int      @default(0)
+  warmupXp     Int      @default(0) @map("warmup_xp")
   createdAt    DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -208,6 +211,50 @@ model AuditLog {
   @@index([actorId, createdAt])
   @@index([targetType, targetId])
   @@map("audit_log")
+}
+
+model WarmupSession {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  level      Int
+  seed       String
+  startedAt  DateTime  @default(now()) @map("started_at")
+  endedAt    DateTime? @map("ended_at")
+  answered   Int       @default(0)
+  correct    Int       @default(0)
+  bestStreak Int       @default(0) @map("best_streak")
+  totalMs    Int       @default(0) @map("total_ms")
+  xpAwarded  Int       @default(0) @map("xp_awarded")
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers WarmupAnswer[]
+
+  @@index([userId, startedAt])
+  @@index([userId, level, startedAt])
+  @@map("warmup_sessions")
+}
+
+model WarmupAnswer {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  userId    String   @map("user_id")
+  level     Int
+  idx       Int
+  factKey   String   @map("fact_key")
+  prompt    String
+  answer    String
+  given     String?
+  correct   Boolean
+  elapsedMs Int      @map("elapsed_ms")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  session WarmupSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, idx])
+  @@index([userId, factKey, createdAt])
+  @@index([userId, level, createdAt])
+  @@map("warmup_answers")
 }
 
 model UserSkillMastery {
