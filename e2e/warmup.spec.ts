@@ -14,6 +14,28 @@ test.afterAll(async () => {
 });
 
 function solve(prompt: string): number {
+  const squared = /^(\d+)²$/.exec(prompt);
+  if (squared) return Number(squared[1]) ** 2;
+
+  const bracket = /^\((\d+) \+ (\d+)\) × (\d+) - (\d+)$/.exec(prompt);
+  if (bracket) {
+    const [, a, b, c, d] = bracket;
+    return (Number(a) + Number(b)) * Number(c) - Number(d);
+  }
+
+  const factored = /^(\d+)\(x ([+-]) (\d+)\) = (-?\d+)$/.exec(prompt);
+  if (factored) {
+    const [, a, sign, b, rhs] = factored;
+    const inner = Number(rhs) / Number(a);
+    return sign === '+' ? inner - Number(b) : inner + Number(b);
+  }
+
+  const bothSides = /^(\d+)x \+ (\d+) = (\d+)x \+ (\d+)$/.exec(prompt);
+  if (bothSides) {
+    const [, a, b, c, d] = bothSides;
+    return (Number(d) - Number(b)) / (Number(a) - Number(c));
+  }
+
   const equation = /^(\d*)x\s*([+-])?\s*(\d+)?\s*=\s*(-?\d+)$/.exec(prompt);
   if (equation) {
     const [, coefficient, sign, constant, rhs] = equation;
@@ -73,7 +95,7 @@ test('a student picks a level, drills, stops and finds the session in their hist
   await page.goto('/warmup');
   await expect(page.getByRole('heading', { name: /Get fast at the easy stuff/i })).toBeVisible();
 
-  await page.locator('a[href="/warmup/3"]').click();
+  await page.getByRole('link', { name: /^3 Times tables/ }).click();
   await expect(page).toHaveURL(/\/warmup\/3$/);
   await expect(box(page)).toBeVisible();
 
@@ -164,7 +186,7 @@ test('the level ladder is entirely unlocked and every level is reachable', async
   const hrefs = await links.evaluateAll((nodes) =>
     nodes.map((n) => n.getAttribute('href')).filter((h) => /^\/warmup\/\d+$/.test(h ?? ''))
   );
-  for (let level = 1; level <= 8; level++) {
+  for (let level = 1; level <= 10; level++) {
     expect(hrefs).toContain(`/warmup/${level}`);
   }
 });
@@ -175,7 +197,7 @@ test('a level off the ladder shows not found instead of a broken drill', async (
   baseURL,
 }) => {
   await authenticate(page.context(), request, baseURL!, student);
-  for (const path of ['/warmup/0', '/warmup/9', '/warmup/abc', '/warmup/2.5']) {
+  for (const path of ['/warmup/0', '/warmup/11', '/warmup/abc', '/warmup/2.5']) {
     await page.goto(path);
     await expect(page.getByText(/This page doesn/i), path).toBeVisible();
     await expect(page.getByLabel(/^Answer for /)).toHaveCount(0);

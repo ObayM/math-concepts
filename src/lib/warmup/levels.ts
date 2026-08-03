@@ -1,20 +1,22 @@
-import { intBetween, pick } from './rng';
-
 export interface Question {
   prompt: string;
   answer: string;
   factKey: string;
 }
 
-export type Generator = (rng: () => number) => Question;
+export interface Variant {
+  size: number;
+  at(n: number): Question;
+}
 
 export interface Level {
   id: number;
   name: string;
   blurb: string;
   example: string;
-  variants: readonly Generator[];
-  generate: Generator;
+  size: number;
+  variants: readonly Variant[];
+  at(n: number): Question;
 }
 
 const q = (prompt: string, answer: number, factKey: string): Question => ({
@@ -26,160 +28,266 @@ const q = (prompt: string, answer: number, factKey: string): Question => ({
 const unordered = (a: number, b: number, glue: string): string =>
   a <= b ? `${a}${glue}${b}` : `${b}${glue}${a}`;
 
-const addToTwenty: Generator = (rng) => {
-  const a = intBetween(rng, 2, 17);
-  const b = intBetween(rng, 2, 20 - a);
-  return q(`${a} + ${b}`, a + b, `add:${unordered(a, b, '+')}`);
-};
+function space(build: (emit: (...values: number[]) => void) => void): number[][] {
+  const rows: number[][] = [];
+  build((...values) => rows.push(values));
+  return rows;
+}
 
-const subToTwenty: Generator = (rng) => {
-  const a = intBetween(rng, 5, 20);
-  const b = intBetween(rng, 2, a - 2);
-  return q(`${a} - ${b}`, a - b, `sub:${a}-${b}`);
-};
+const variant = (rows: number[][], make: (row: number[]) => Question): Variant => ({
+  size: rows.length,
+  at: (n) => make(rows[n]),
+});
 
-const addToHundred: Generator = (rng) => {
-  const a = intBetween(rng, 11, 88);
-  const b = intBetween(rng, 11, 99 - a);
-  return q(`${a} + ${b}`, a + b, `add:${unordered(a, b, '+')}`);
-};
+function ladder(variants: readonly Variant[]): { size: number; at(n: number): Question } {
+  const size = variants.reduce((total, v) => total + v.size, 0);
+  return {
+    size,
+    at(n) {
+      let offset = ((n % size) + size) % size;
+      for (const v of variants) {
+        if (offset < v.size) return v.at(offset);
+        offset -= v.size;
+      }
+      return variants[0].at(0);
+    },
+  };
+}
 
-const subToHundred: Generator = (rng) => {
-  const a = intBetween(rng, 25, 99);
-  const b = intBetween(rng, 11, a - 11);
-  return q(`${a} - ${b}`, a - b, `sub:${a}-${b}`);
-};
+const addToTwenty = variant(
+  space((emit) => {
+    for (let a = 2; a <= 17; a++) for (let b = 2; b <= 20 - a; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} + ${b}`, a + b, `add:${unordered(a, b, '+')}`)
+);
 
-const timesTable: Generator = (rng) => {
-  const a = intBetween(rng, 2, 12);
-  const b = intBetween(rng, 2, 12);
-  return q(`${a} × ${b}`, a * b, `mul:${unordered(a, b, 'x')}`);
-};
+const subToTwenty = variant(
+  space((emit) => {
+    for (let a = 5; a <= 20; a++) for (let b = 2; b <= a - 2; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} - ${b}`, a - b, `sub:${a}-${b}`)
+);
 
-const divisionFact: Generator = (rng) => {
-  const divisor = intBetween(rng, 2, 12);
-  const quotient = intBetween(rng, 2, 12);
-  return q(`${divisor * quotient} ÷ ${divisor}`, quotient, `div:${divisor * quotient}/${divisor}`);
-};
+const addToHundred = variant(
+  space((emit) => {
+    for (let a = 11; a <= 88; a++) for (let b = 11; b <= 99 - a; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} + ${b}`, a + b, `add:${unordered(a, b, '+')}`)
+);
 
-const mulThenAdd: Generator = (rng) => {
-  const a = intBetween(rng, 2, 9);
-  const b = intBetween(rng, 2, 9);
-  const c = intBetween(rng, 2, 20);
-  return q(`${a} × ${b} + ${c}`, a * b + c, 'mix:mul-add');
-};
+const subToHundred = variant(
+  space((emit) => {
+    for (let a = 25; a <= 99; a++) for (let b = 11; b <= a - 11; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} - ${b}`, a - b, `sub:${a}-${b}`)
+);
 
-const mulThenSub: Generator = (rng) => {
-  const a = intBetween(rng, 3, 9);
-  const b = intBetween(rng, 3, 9);
-  const c = intBetween(rng, 2, a * b - 1);
-  return q(`${a} × ${b} - ${c}`, a * b - c, 'mix:mul-sub');
-};
+const timesTable = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let b = 2; b <= 12; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} × ${b}`, a * b, `mul:${unordered(a, b, 'x')}`)
+);
 
-const addThenMul: Generator = (rng) => {
-  const a = intBetween(rng, 2, 20);
-  const b = intBetween(rng, 2, 9);
-  const c = intBetween(rng, 2, 9);
-  return q(`${a} + ${b} × ${c}`, a + b * c, 'mix:add-mul');
-};
+const divisionFact = variant(
+  space((emit) => {
+    for (let d = 2; d <= 12; d++)
+      for (let quotient = 2; quotient <= 12; quotient++) emit(d, quotient);
+  }),
+  ([d, quotient]) => q(`${d * quotient} ÷ ${d}`, quotient, `div:${d * quotient}/${d}`)
+);
 
-const divThenAdd: Generator = (rng) => {
-  const divisor = intBetween(rng, 2, 9);
-  const quotient = intBetween(rng, 2, 9);
-  const c = intBetween(rng, 2, 20);
-  return q(`${divisor * quotient} ÷ ${divisor} + ${c}`, quotient + c, 'mix:div-add');
-};
+const mulThenAdd = variant(
+  space((emit) => {
+    for (let a = 2; a <= 9; a++)
+      for (let b = 2; b <= 9; b++) for (let c = 2; c <= 20; c++) emit(a, b, c);
+  }),
+  ([a, b, c]) => q(`${a} × ${b} + ${c}`, a * b + c, 'mix:mul-add')
+);
 
-const addEquation: Generator = (rng) => {
-  const root = intBetween(rng, 1, 20);
-  const a = intBetween(rng, 2, 20);
-  return q(`x + ${a} = ${root + a}`, root, `eq1:x+${a}`);
-};
+const mulThenSub = variant(
+  space((emit) => {
+    for (let a = 3; a <= 9; a++)
+      for (let b = 3; b <= 9; b++) for (let c = 2; c <= Math.min(20, a * b - 1); c++) emit(a, b, c);
+  }),
+  ([a, b, c]) => q(`${a} × ${b} - ${c}`, a * b - c, 'mix:mul-sub')
+);
 
-const subEquation: Generator = (rng) => {
-  const a = intBetween(rng, 2, 15);
-  const root = intBetween(rng, a + 1, a + 20);
-  return q(`x - ${a} = ${root - a}`, root, `eq1:x-${a}`);
-};
+const addThenMul = variant(
+  space((emit) => {
+    for (let a = 2; a <= 20; a++)
+      for (let b = 2; b <= 9; b++) for (let c = 2; c <= 9; c++) emit(a, b, c);
+  }),
+  ([a, b, c]) => q(`${a} + ${b} × ${c}`, a + b * c, 'mix:add-mul')
+);
 
-const mulEquation: Generator = (rng) => {
-  const a = intBetween(rng, 2, 12);
-  const root = intBetween(rng, 2, 12);
-  return q(`${a}x = ${a * root}`, root, `eq1:${a}x`);
-};
+const divThenAdd = variant(
+  space((emit) => {
+    for (let d = 2; d <= 9; d++)
+      for (let quotient = 2; quotient <= 9; quotient++)
+        for (let c = 2; c <= 20; c++) emit(d, quotient, c);
+  }),
+  ([d, quotient, c]) => q(`${d * quotient} ÷ ${d} + ${c}`, quotient + c, 'mix:div-add')
+);
 
-const divEquation: Generator = (rng) => {
-  const a = intBetween(rng, 2, 9);
-  const rhs = intBetween(rng, 2, 12);
-  return q(`x ÷ ${a} = ${rhs}`, a * rhs, `eq1:x÷${a}`);
-};
+const addEquation = variant(
+  space((emit) => {
+    for (let root = 1; root <= 15; root++) for (let a = 2; a <= 15; a++) emit(root, a);
+  }),
+  ([root, a]) => q(`x + ${a} = ${root + a}`, root, `eq1:x+${a}`)
+);
 
-const twoStepAdd: Generator = (rng) => {
-  const a = intBetween(rng, 2, 9);
-  const root = intBetween(rng, 1, 12);
-  const b = intBetween(rng, 1, 20);
-  return q(`${a}x + ${b} = ${a * root + b}`, root, `eq2:${a}x+${b}`);
-};
+const subEquation = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let root = a + 1; root <= a + 20; root++) emit(a, root);
+  }),
+  ([a, root]) => q(`x - ${a} = ${root - a}`, root, `eq1:x-${a}`)
+);
 
-const twoStepSub: Generator = (rng) => {
-  const a = intBetween(rng, 2, 9);
-  const root = intBetween(rng, 2, 12);
-  const b = intBetween(rng, 1, Math.min(20, a * root - 1));
-  return q(`${a}x - ${b} = ${a * root - b}`, root, `eq2:${a}x-${b}`);
-};
+const mulEquation = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let root = 2; root <= 20; root++) emit(a, root);
+  }),
+  ([a, root]) => q(`${a}x = ${a * root}`, root, `eq1:${a}x`)
+);
 
-const negativeAdd: Generator = (rng) => {
-  const a = intBetween(rng, 2, 20);
-  const b = intBetween(rng, 2, 30);
-  return q(`-${a} + ${b}`, b - a, `neg:-${a}+${b}`);
-};
+const divEquation = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let rhs = 2; rhs <= 15; rhs++) emit(a, rhs);
+  }),
+  ([a, rhs]) => q(`x ÷ ${a} = ${rhs}`, a * rhs, `eq1:x÷${a}`)
+);
 
-const negativeSub: Generator = (rng) => {
-  const a = intBetween(rng, 2, 20);
-  const b = intBetween(rng, 2, 20);
-  return q(`-${a} - ${b}`, -a - b, `neg:-${a}-${b}`);
-};
+const twoStepAdd = variant(
+  space((emit) => {
+    for (let a = 2; a <= 9; a++)
+      for (let root = 1; root <= 12; root++) for (let b = 1; b <= 20; b++) emit(a, root, b);
+  }),
+  ([a, root, b]) => q(`${a}x + ${b} = ${a * root + b}`, root, `eq2:${a}x+${b}`)
+);
 
-const negativeMul: Generator = (rng) => {
-  const a = intBetween(rng, 2, 12);
-  const b = intBetween(rng, 2, 9);
-  return q(`-${a} × ${b}`, -a * b, `neg:-${a}×${b}`);
-};
+const twoStepSub = variant(
+  space((emit) => {
+    for (let a = 2; a <= 9; a++)
+      for (let root = 2; root <= 12; root++)
+        for (let b = 1; b <= Math.min(20, a * root - 1); b++) emit(a, root, b);
+  }),
+  ([a, root, b]) => q(`${a}x - ${b} = ${a * root - b}`, root, `eq2:${a}x-${b}`)
+);
 
-const unitFraction: Generator = (rng) => {
-  const n = intBetween(rng, 2, 10);
-  const k = intBetween(rng, 2, 12);
-  return q(`1/${n} of ${n * k}`, k, `frac:1/${n}`);
-};
+const negativeAdd = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let b = 2; b <= 20; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`-${a} + ${b}`, b - a, `neg:-${a}+${b}`)
+);
+
+const negativeSub = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let b = 2; b <= 12; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`-${a} - ${b}`, -a - b, `neg:-${a}-${b}`)
+);
+
+const negativeMul = variant(
+  space((emit) => {
+    for (let a = 2; a <= 12; a++) for (let b = 2; b <= 12; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`-${a} × ${b}`, -a * b, `neg:-${a}×${b}`)
+);
+
+const unitFraction = variant(
+  space((emit) => {
+    for (let n = 2; n <= 10; n++) for (let k = 2; k <= 20; k++) emit(n, k);
+  }),
+  ([n, k]) => q(`1/${n} of ${n * k}`, k, `frac:1/${n}`)
+);
 
 const PERCENTS = [
-  { pct: 10, step: 10 },
-  { pct: 20, step: 5 },
-  { pct: 25, step: 4 },
-  { pct: 50, step: 2 },
-  { pct: 75, step: 4 },
-] as const;
+  [10, 10],
+  [20, 5],
+  [25, 4],
+  [30, 10],
+  [40, 5],
+  [50, 2],
+  [60, 5],
+  [75, 4],
+  [80, 5],
+];
 
-const percentOf: Generator = (rng) => {
-  const { pct, step } = pick(rng, PERCENTS);
-  const whole = step * intBetween(rng, 2, 12);
-  return q(`${pct}% of ${whole}`, (pct * whole) / 100, `pct:${pct}%`);
-};
+const percentOf = variant(
+  space((emit) => {
+    for (const [pct, step] of PERCENTS) for (let k = 2; k <= 20; k++) emit(pct, step * k);
+  }),
+  ([pct, whole]) => q(`${pct}% of ${whole}`, (pct * whole) / 100, `pct:${pct}%`)
+);
+
+const bigProduct = variant(
+  space((emit) => {
+    for (let a = 12; a <= 25; a++) for (let b = 12; b <= 19; b++) if (a !== b) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} × ${b}`, a * b, `big:${unordered(a, b, 'x')}`)
+);
+
+const square = variant(
+  space((emit) => {
+    for (let n = 11; n <= 30; n++) emit(n);
+  }),
+  ([n]) => q(`${n}²`, n * n, `sq:${n}`)
+);
+
+const twoByOne = variant(
+  space((emit) => {
+    for (let a = 13; a <= 39; a++) for (let b = 6; b <= 9; b++) emit(a, b);
+  }),
+  ([a, b]) => q(`${a} × ${b}`, a * b, `big:${unordered(a, b, 'x')}`)
+);
+
+const bracketFirst = variant(
+  space((emit) => {
+    for (let a = 2; a <= 9; a++)
+      for (let b = 2; b <= 9; b++)
+        for (let c = 2; c <= 5; c++)
+          for (let d = 2; d <= Math.min(12, (a + b) * c - 1); d++) emit(a, b, c, d);
+  }),
+  ([a, b, c, d]) => q(`(${a} + ${b}) × ${c} - ${d}`, (a + b) * c - d, 'brk:(a+b)×c-d')
+);
+
+const factoredAdd = variant(
+  space((emit) => {
+    for (let a = 2; a <= 9; a++)
+      for (let b = 1; b <= 12; b++) for (let root = 1; root <= 20; root++) emit(a, b, root);
+  }),
+  ([a, b, root]) => q(`${a}(x + ${b}) = ${a * (root + b)}`, root, `eq3:${a}(x+${b})`)
+);
+
+const factoredSub = variant(
+  space((emit) => {
+    for (let a = 2; a <= 9; a++)
+      for (let b = 1; b <= 12; b++) for (let root = b + 1; root <= b + 20; root++) emit(a, b, root);
+  }),
+  ([a, b, root]) => q(`${a}(x - ${b}) = ${a * (root - b)}`, root, `eq3:${a}(x-${b})`)
+);
+
+const bothSides = variant(
+  space((emit) => {
+    for (let a = 3; a <= 9; a++)
+      for (let c = 2; c < a; c++)
+        for (let root = 1; root <= 12; root++) for (let b = 1; b <= 8; b++) emit(a, c, root, b);
+  }),
+  ([a, c, root, b]) => q(`${a}x + ${b} = ${c}x + ${(a - c) * root + b}`, root, `eq4:${a}x-${c}x`)
+);
 
 const level = (
   id: number,
   name: string,
   blurb: string,
   example: string,
-  variants: readonly Generator[]
-): Level => ({
-  id,
-  name,
-  blurb,
-  example,
-  variants,
-  generate: (rng) => pick(rng, variants)(rng),
-});
+  variants: readonly Variant[]
+): Level => {
+  const combined = ladder(variants);
+  return { id, name, blurb, example, size: combined.size, variants, at: combined.at };
+};
 
 export const LEVELS: readonly Level[] = [
   level(1, 'Add and subtract to 20', 'The stuff that should be reflex.', '8 + 5', [
@@ -214,5 +322,16 @@ export const LEVELS: readonly Level[] = [
     negativeMul,
     unitFraction,
     percentOf,
+  ]),
+  level(9, 'Two-digit multiplication', 'Big products, no paper.', '23 × 17', [
+    bigProduct,
+    square,
+    twoByOne,
+  ]),
+  level(10, 'Brackets and both sides', 'Unpack it first, then hunt down x.', '5x + 3 = 2x + 18', [
+    bracketFirst,
+    factoredAdd,
+    factoredSub,
+    bothSides,
   ]),
 ];

@@ -84,7 +84,7 @@ describe('POST /api/warmup/session', () => {
   });
 
   it('rejects a level outside the ladder before touching the database', async () => {
-    for (const level of [0, 9, -3, 2.5, '3', null]) {
+    for (const level of [0, 11, -3, 2.5, '3', null]) {
       const res = await startSession(post({ level }));
       expect(res.status, String(level)).toBe(400);
     }
@@ -113,7 +113,7 @@ describe('POST /api/warmup/session', () => {
 
   it('reports a level the service rejects as a bad request', async () => {
     startWarmupSession.mockResolvedValue(null);
-    expect((await startSession(post({ level: 8 }))).status).toBe(400);
+    expect((await startSession(post({ level: 10 }))).status).toBe(400);
   });
 
   it('runs out of tokens after the tier allows', async () => {

@@ -62,7 +62,7 @@ describe('starting a warm up session', () => {
 
   it('refuses a level outside the ladder', async () => {
     const user = await makeUser();
-    for (const level of [0, 9, -1, 2.5, NaN]) {
+    for (const level of [0, 11, -1, 2.5, NaN]) {
       expect(await startWarmupSession(user.id, level, TZ)).toBeNull();
     }
     expect(await prisma.warmupSession.count()).toBe(0);
@@ -413,7 +413,7 @@ describe('the level picker overview', () => {
   it('reports every level even before anything is answered', async () => {
     const user = await makeUser();
     const overview = await getWarmupOverview(user.id);
-    expect(overview.levels).toHaveLength(8);
+    expect(overview.levels).toHaveLength(10);
     expect(overview.lastLevel).toBeNull();
     for (const level of overview.levels) {
       expect(level.answered).toBe(0);

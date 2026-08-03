@@ -27,17 +27,16 @@ export function mulberry32(a: number): () => number {
   };
 }
 
-export function rngFor(seed: string, index: number): () => number {
-  return mulberry32(hashSeed(seed, index));
-}
-
-export function intBetween(rng: () => number, min: number, max: number): number {
-  if (max <= min) return min;
-  return min + Math.floor(rng() * (max - min + 1));
-}
-
-export function pick<T>(rng: () => number, items: readonly T[]): T {
-  return items[Math.min(items.length - 1, Math.floor(rng() * items.length))];
+export function shuffled(size: number, seed: string): number[] {
+  const order = Array.from({ length: Math.max(0, size) }, (_, i) => i);
+  const rng = mulberry32(hashSeed(seed, 0));
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const swap = order[i];
+    order[i] = order[j];
+    order[j] = swap;
+  }
+  return order;
 }
 
 export function newSeed(): string {

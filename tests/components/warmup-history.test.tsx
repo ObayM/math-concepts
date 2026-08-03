@@ -22,7 +22,7 @@ const session = (i: number, pace: number, over: Record<string, unknown> = {}) =>
   ...over,
 });
 
-const LEVELS = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, name: `Level ${i + 1}` }));
+const LEVELS = Array.from({ length: 10 }, (_, i) => ({ id: i + 1, name: `Level ${i + 1}` }));
 
 const TOTALS = {
   sessions: 4,

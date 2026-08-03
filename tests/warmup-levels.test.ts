@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { LEVELS } from '@/lib/warmup/levels';
 import { questionAt, levelById, isValidLevel, MAX_LEVEL } from '@/lib/warmup/questions';
-import { rngFor, intBetween, pick, hashSeed } from '@/lib/warmup/rng';
+import { shuffled, hashSeed } from '@/lib/warmup/rng';
 
 const SEEDS = ['a1b2c3d4', 'deadbeef', '0000', 'ffffffff', 'warmup-seed-9', 'z'];
 const PER_SEED = 120;
@@ -28,6 +28,12 @@ function arithmetic(expr: string): number {
 
 function solveForX(prompt: string): number {
   const [lhs, rhs] = prompt.split(' = ');
+  const bothSides = /^(\d+)x \+ (\d+)$/.exec(lhs) && /^(\d+)x \+ (\d+)$/.exec(rhs);
+  if (bothSides) {
+    const [, a, b] = /^(\d+)x \+ (\d+)$/.exec(lhs)!;
+    const [, c, d] = /^(\d+)x \+ (\d+)$/.exec(rhs)!;
+    return (Number(d) - Number(b)) / (Number(a) - Number(c));
+  }
   const target = Number(rhs);
   const shapes: [RegExp, (m: RegExpExecArray) => number][] = [
     [/^x \+ (\d+)$/, (m) => target - Number(m[1])],
@@ -36,6 +42,8 @@ function solveForX(prompt: string): number {
     [/^(\d+)x$/, (m) => target / Number(m[1])],
     [/^(\d+)x \+ (\d+)$/, (m) => (target - Number(m[2])) / Number(m[1])],
     [/^(\d+)x - (\d+)$/, (m) => (target + Number(m[2])) / Number(m[1])],
+    [/^(\d+)\(x \+ (\d+)\)$/, (m) => target / Number(m[1]) - Number(m[2])],
+    [/^(\d+)\(x - (\d+)\)$/, (m) => target / Number(m[1]) + Number(m[2])],
   ];
   for (const [re, solve] of shapes) {
     const m = re.exec(lhs);
@@ -46,6 +54,13 @@ function solveForX(prompt: string): number {
 
 function evaluateFromPromptTextAlone(prompt: string): number {
   if (prompt.includes('=')) return solveForX(prompt);
+  const squared = /^(\d+)²$/.exec(prompt);
+  if (squared) return Number(squared[1]) ** 2;
+  const bracket = /^\((\d+) \+ (\d+)\) × (\d+) - (\d+)$/.exec(prompt);
+  if (bracket) {
+    const [, a, b, c, d] = bracket;
+    return (Number(a) + Number(b)) * Number(c) - Number(d);
+  }
   const of = /^(.+) of (-?\d+)$/.exec(prompt);
   if (of) {
     const whole = Number(of[2]);
@@ -101,9 +116,10 @@ describe('warmup question generators', () => {
   });
 
   it('keeps answers inside a range a student can hold in their head', () => {
+    const ceiling: Record<number, number> = { 9: 1000, 10: 200 };
     for (const { question, level } of all) {
       const n = Math.abs(Number(question.answer));
-      expect(n, `L${level} "${question.prompt}"`).toBeLessThanOrEqual(200);
+      expect(n, `L${level} "${question.prompt}"`).toBeLessThanOrEqual(ceiling[level] ?? 200);
     }
   });
 });
@@ -180,13 +196,62 @@ describe('warmup level ranges', () => {
     expect(answers.some((n) => n > 0)).toBe(true);
   });
 
-  it('exercises every variant of every level', () => {
+  it('every question in the whole space of every level is valid', () => {
     for (const level of LEVELS) {
-      const keys = new Set(byLevel(level.id).map((q) => q.factKey.split(':')[0]));
-      const expected = new Set(
-        level.variants.map((v) => v(rngFor('probe', 0)).factKey.split(':')[0])
+      for (let n = 0; n < level.size; n++) {
+        const question = level.at(n);
+        expect(Number.isInteger(Number(question.answer)), `L${level.id} #${n}`).toBe(true);
+        expect(
+          evaluateFromPromptTextAlone(question.prompt),
+          `L${level.id} "${question.prompt}"`
+        ).toBe(Number(question.answer));
+      }
+    }
+  });
+
+  it('deals every question in the space before repeating any of them', () => {
+    for (const level of LEVELS) {
+      const window = Math.min(level.size, 200);
+      const prompts = Array.from(
+        { length: window },
+        (_, i) => questionAt(level.id, 'no-repeats', i)!.prompt
       );
-      for (const key of expected) expect(keys, `level ${level.id}`).toContain(key);
+      expect(new Set(prompts).size, `level ${level.id} repeats within ${window}`).toBe(window);
+    }
+  });
+
+  it('reshuffles rather than stalling once the space runs out', () => {
+    const small = LEVELS[2];
+    const first = Array.from(
+      { length: small.size },
+      (_, i) => questionAt(small.id, 'wrap', i)!.prompt
+    );
+    const second = Array.from(
+      { length: small.size },
+      (_, i) => questionAt(small.id, 'wrap', small.size + i)!.prompt
+    );
+    expect(new Set(second).size).toBe(small.size);
+    expect(second).not.toEqual(first);
+    expect(new Set(second)).toEqual(new Set(first));
+  });
+
+  it('gives no shape of a level so little room that it barely shows up', () => {
+    for (const level of LEVELS) {
+      if (level.variants.length < 2) continue;
+      for (const v of level.variants) {
+        const share = v.size / level.size;
+        expect(share, `level ${level.id} shape ${v.at(0).factKey}`).toBeGreaterThan(0.08);
+        expect(share, `level ${level.id} shape ${v.at(0).factKey}`).toBeLessThan(0.6);
+      }
+    }
+  });
+
+  it('reaches every variant of every level', () => {
+    for (const level of LEVELS) {
+      const reached = new Set<string>();
+      for (let n = 0; n < level.size; n++) reached.add(level.at(n).factKey.split(':')[0]);
+      const expected = new Set(level.variants.map((v) => v.at(0).factKey.split(':')[0]));
+      for (const key of expected) expect(reached, `level ${level.id}`).toContain(key);
     }
   });
 });
@@ -207,8 +272,8 @@ describe('factKey', () => {
   it('is stable for the same underlying fact regardless of operand order', () => {
     const times = LEVELS[2].variants[0];
     const seen = new Map<string, number>();
-    for (let i = 0; i < 2000; i++) {
-      const q = times(rngFor('order', i));
+    for (let n = 0; n < times.size; n++) {
+      const q = times.at(n);
       const [a, b] = q.prompt.split(' × ').map(Number);
       seen.set(q.factKey, a * b);
     }
@@ -281,7 +346,7 @@ describe('questionAt addressing', () => {
 describe('level metadata', () => {
   it('numbers the ladder 1..N with no gaps', () => {
     expect(LEVELS.map((l) => l.id)).toEqual(Array.from({ length: LEVELS.length }, (_, i) => i + 1));
-    expect(MAX_LEVEL).toBe(8);
+    expect(MAX_LEVEL).toBe(10);
   });
 
   it('gives every level a name, a blurb and a worked example', () => {
@@ -300,9 +365,9 @@ describe('level metadata', () => {
 
   it('validates levels the way a route param would arrive', () => {
     expect(isValidLevel(1)).toBe(true);
-    expect(isValidLevel(8)).toBe(true);
+    expect(isValidLevel(10)).toBe(true);
     expect(isValidLevel(0)).toBe(false);
-    expect(isValidLevel(9)).toBe(false);
+    expect(isValidLevel(11)).toBe(false);
     expect(isValidLevel(2.5)).toBe(false);
     expect(isValidLevel('3')).toBe(false);
     expect(isValidLevel(null)).toBe(false);
@@ -310,39 +375,42 @@ describe('level metadata', () => {
   });
 });
 
-describe('rng', () => {
-  it('stays inside the unit interval', () => {
-    const rng = rngFor('bounds', 0);
-    for (let i = 0; i < 5000; i++) {
-      const n = rng();
-      expect(n).toBeGreaterThanOrEqual(0);
-      expect(n).toBeLessThan(1);
+describe('shuffled', () => {
+  it('is a true permutation, every index exactly once', () => {
+    for (const size of [1, 2, 5, 66, 121, 1000]) {
+      const deck = shuffled(size, `seed-${size}`);
+      expect(deck).toHaveLength(size);
+      expect([...deck].sort((a, b) => a - b)).toEqual(Array.from({ length: size }, (_, i) => i));
     }
   });
 
-  it('spreads intBetween across the whole inclusive range', () => {
-    const rng = rngFor('spread', 1);
-    const seen = new Set<number>();
-    for (let i = 0; i < 4000; i++) seen.add(intBetween(rng, 2, 12));
-    expect(seen.size).toBe(11);
-    expect(Math.min(...seen)).toBe(2);
-    expect(Math.max(...seen)).toBe(12);
+  it('is deterministic for the same seed', () => {
+    expect(shuffled(121, 'same')).toEqual(shuffled(121, 'same'));
   });
 
-  it('collapses a degenerate range instead of returning NaN', () => {
-    const rng = rngFor('degenerate', 0);
-    expect(intBetween(rng, 7, 7)).toBe(7);
-    expect(intBetween(rng, 7, 3)).toBe(7);
+  it('differs between seeds', () => {
+    expect(shuffled(121, 'one')).not.toEqual(shuffled(121, 'two'));
   });
 
-  it('never picks past the end of the list', () => {
-    const items = ['a', 'b', 'c'];
-    for (let i = 0; i < 2000; i++) {
-      expect(items).toContain(pick(rngFor('picks', i), items));
-    }
+  it('actually mixes rather than nudging the identity order', () => {
+    const deck = shuffled(200, 'mix');
+    const fixed = deck.filter((value, i) => value === i).length;
+    expect(fixed).toBeLessThan(10);
   });
 
-  it('hashes adjacent indexes to unrelated seeds', () => {
+  it('leaves no constant stride a student could learn', () => {
+    const deck = shuffled(200, 'stride');
+    const strides = new Set(deck.slice(1).map((value, i) => value - deck[i]));
+    expect(strides.size).toBeGreaterThan(50);
+  });
+
+  it('handles a degenerate size without throwing', () => {
+    expect(shuffled(0, 'x')).toEqual([]);
+    expect(shuffled(-5, 'x')).toEqual([]);
+    expect(shuffled(1, 'x')).toEqual([0]);
+  });
+
+  it('hashes adjacent seeds to unrelated orders', () => {
     const hashes = Array.from({ length: 500 }, (_, i) => hashSeed('adjacent', i));
     expect(new Set(hashes).size).toBe(500);
   });
