@@ -61,6 +61,16 @@ export function SceneProvider({
     onScopeChangeRef.current = onScopeChange;
   }, [onScopeChange]);
 
+  // a live preview swaps a freshly compiled ir into a mounted provider, so the
+  // scope has to follow the declarations. keyed on the decls rather than the ir
+  // so dragging a slider survives an edit that leaves the params alone.
+  const stateSig = JSON.stringify(Object.entries(ir.state).map(([k, d]) => [k, d.init]));
+  const [seenSig, setSeenSig] = useState(stateSig);
+  if (seenSig !== stateSig) {
+    setSeenSig(stateSig);
+    setScope(initScope(ir));
+  }
+
   useEffect(() => {
     scopeRef.current = scope;
     onScopeChangeRef.current?.(scope);
