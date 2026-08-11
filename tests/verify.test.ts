@@ -230,8 +230,8 @@ describe('the real content', () => {
   const dir = fileURLToPath(new URL('../prisma/lessons', import.meta.url));
   const files = readdirSync(dir).filter((f) => f.endsWith('.prism'));
 
-  it('has 25 lessons to check', () => {
-    expect(files.length).toBe(25);
+  it('found the real lessons, not an empty glob', () => {
+    expect(files.length).toBeGreaterThanOrEqual(25);
   });
 
   for (const f of files) {

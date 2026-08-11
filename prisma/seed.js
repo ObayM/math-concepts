@@ -9,73 +9,97 @@ const prisma = new PrismaClient();
 // compiled Prism, so this file only owns placement: which course, in what order.
 // build the .json first with `npm run build:lessons` (db:seed does this for you).
 
-const ORDER = [
-  'limits-1',
-  'limits-2',
-  'limits-3',
-  'limits-4',
-  'limits-5',
-  'differentiation-1',
-  'differentiation-2',
-  'differentiation-3',
-  'differentiation-7',
-  'differentiation-4',
-  'differentiation-6',
-  'differentiation-5',
-  'appderiv-1',
-  'appderiv-2',
-  'appderiv-3',
-  'appderiv-4',
-  'appderiv-5',
-  'appderiv-6',
-  'integration-1',
-  'integration-2',
-  'integration-3',
-  'integration-4',
-  'integration-5',
-  'intapp-1',
-  'intapp-2',
+// lessons sharing a unit must stay adjacent here: the course page groups by
+// consecutive run, so a split unit renders its heading twice.
+const COURSES = [
+  {
+    name: 'Calculus',
+    slug: 'calculus',
+    sortOrder: 0,
+    description:
+      'A complete single-variable course: limits and continuity, derivatives and their applications, then integration and what it builds.',
+    lessons: [
+      'limits-1',
+      'limits-2',
+      'limits-3',
+      'limits-4',
+      'limits-5',
+      'differentiation-1',
+      'differentiation-2',
+      'differentiation-3',
+      'differentiation-7',
+      'differentiation-4',
+      'differentiation-6',
+      'differentiation-5',
+      'appderiv-1',
+      'appderiv-2',
+      'appderiv-3',
+      'appderiv-4',
+      'appderiv-5',
+      'appderiv-6',
+      'integration-1',
+      'integration-2',
+      'integration-3',
+      'integration-4',
+      'integration-5',
+      'intapp-1',
+      'intapp-2',
+    ],
+  },
+  {
+    name: 'Pure Maths',
+    slug: 'pure-maths',
+    sortOrder: 1,
+    description:
+      'Algebra, counting, trigonometry, coordinate geometry, complex numbers, logs and vectors, finishing with the calculus you need to go further.',
+    lessons: ['trig-2'],
+  },
+  {
+    name: 'Mechanics',
+    slug: 'mechanics',
+    sortOrder: 2,
+    description:
+      'Forces, friction, the three laws of motion, and motion under constant acceleration. Bring vectors and a little trigonometry.',
+    lessons: ['force-2'],
+  },
 ];
 
 async function main() {
-  const course = await prisma.course.upsert({
-    where: { name: 'Calculus' },
-    update: {},
-    create: {
-      name: 'Calculus',
-      slug: 'calculus',
-      description:
-        'A complete single-variable course: limits and continuity, derivatives and their applications, then integration and what it builds.',
-    },
-  });
-
   const dir = path.join(__dirname, 'lessons');
 
-  for (const [i, lessonKey] of ORDER.entries()) {
-    const source = fs.readFileSync(path.join(dir, `${lessonKey}.prism`), 'utf8');
-    const data = JSON.parse(fs.readFileSync(path.join(dir, `${lessonKey}.json`), 'utf8'));
-
-    await prisma.lesson.upsert({
-      where: { lessonKey },
+  for (const { name, slug, description, sortOrder, lessons } of COURSES) {
+    const course = await prisma.course.upsert({
+      where: { name },
       update: {},
-      create: {
-        courseId: course.id,
-        lessonKey,
-        source,
-        data,
-        title: data.title,
-        description: data.summary ?? null,
-        unit: data.unit ?? null,
-        difficulty: data.difficulty ?? null,
-        iconName: data.icon ?? null,
-        sortOrder: i + 1,
-        publishedSource: source,
-        publishedData: data,
-        status: 'published',
-        publishedAt: new Date(),
-      },
+      create: { name, slug, description, sortOrder },
     });
-    console.log('seeded:', lessonKey);
+
+    for (const [i, lessonKey] of lessons.entries()) {
+      const source = fs.readFileSync(path.join(dir, `${lessonKey}.prism`), 'utf8');
+      const data = JSON.parse(fs.readFileSync(path.join(dir, `${lessonKey}.json`), 'utf8'));
+
+      await prisma.lesson.upsert({
+        where: { lessonKey },
+        update: {},
+        create: {
+          courseId: course.id,
+          lessonKey,
+          source,
+          data,
+          title: data.title,
+          description: data.summary ?? null,
+          unit: data.unit ?? null,
+          difficulty: data.difficulty ?? null,
+          iconName: data.icon ?? null,
+          sortOrder: i + 1,
+          publishedSource: source,
+          publishedData: data,
+          status: 'published',
+          publishedAt: new Date(),
+        },
+      });
+      console.log('seeded:', slug, '/', lessonKey);
+    }
   }
 }
 

@@ -1,0 +1,394 @@
+lesson "Resolving a Force into Components" {
+  course: "mechanics"
+  unit: "Forces & Equilibrium"
+  difficulty: "Intermediate"
+  icon: "Move"
+  summary: "Split any push or pull into an across and an up. Where the sine and cosine really go, why tilting your axes is allowed, and why a shallow rope pulls so hard."
+  skills: ["force-components", "force-resolve-tilted", "force-resultant"]
+
+  slide "A Diagonal Pull Does Two Jobs" {
+    id: "f2-hook"
+    cat: "Splitting a Force"
+    > Drag a sledge with a rope held at an angle and you are doing two things at
+    > once. Part of your pull drives the sledge **forward**. Part of it lifts the
+    > sledge **upward**, doing nothing for your progress at all.
+    >
+    > Nobody chose to split it. The split is already there — the rope simply cannot
+    > pull forward without also pulling up.
+    >
+    > Swing the rope angle below. The force stays $100$ N the whole time; only how
+    > it is *spent* changes. Watch the orange forward part and the green upward
+    > part trade against each other.
+
+    scene plane {
+      x: [-0.6, 6.4]
+      y: [-1.0, 4.0]
+      aspect: equal
+      axes: false
+      param a = 40 { range: [0, 90], step: 1 }
+      line ground = (-0.4, 0) -> (6.2, 0) { color: neutral, width: 3 }
+      rect sledge = (0, 0) { w: 1.4, h: 0.6, color: neutral, opacity: 0.35 }
+      vector pull = (1.4, 0.6) -> (1.4 + 3*cos(rad(a)), 0.6 + 3*sin(rad(a))) { color: primary, width: 4 }
+      vector fwd = (1.4, 0.6) -> (1.4 + 3*cos(rad(a)), 0.6) { color: warning, width: 3, style: dashed }
+      vector upp = (1.4 + 3*cos(rad(a)), 0.6) -> (1.4 + 3*cos(rad(a)), 0.6 + 3*sin(rad(a))) { color: success, width: 3, style: dashed }
+      arc sweep = (1.4, 0.6) { r: 0.8, from: 0, to: a, color: primary }
+      label at (3.2, 3.7) = "pull = 100 N at ${a}°" { anchor: middle, color: primary }
+      label at (2.9, 0.28) = "forward = ${100*cos(rad(a))} N" { anchor: middle, color: warning }
+      label at (1.6 + 3*cos(rad(a)), 0.6 + 1.5*sin(rad(a))) = "up = ${100*sin(rad(a))} N" { color: success }
+      slider a { label: "rope angle above the ground" }
+    }
+
+    goal "Find the angle that wastes almost everything on lifting and barely pulls forward" {
+      when: a > 75
+      hint: "Push the angle up towards vertical and watch the forward number collapse."
+    }
+  }
+
+  slide "Across and Up" {
+    id: "f2-define"
+    cat: "Splitting a Force"
+    > The two dashed arrows and the real one form a right triangle, with the force
+    > $F$ as the hypotenuse. So the two parts, called **components**, are exactly
+    > what SOHCAHTOA always said they were:
+    >
+    > $$F_x = F\cos\theta \qquad F_y = F\sin\theta$$
+    >
+    > Note what $\theta$ is measured from. Here it is the angle from the
+    > **horizontal**, so the horizontal component is the *adjacent* side and takes
+    > the cosine. That is the whole rule, and it is worth saying out loud:
+    > **cosine goes with the side the angle is measured from.**
+    >
+    > For the $100$ N rope at $40°$: $F_x = 100\cos 40° \approx 76.6$ N and
+    > $F_y = 100\sin 40° \approx 64.3$ N.
+
+    scene plane {
+      x: [-0.7, 4.6]
+      y: [-0.7, 3.4]
+      aspect: equal
+      axes: false
+      polygon tri = [(0, 0), (3.83, 0), (3.83, 3.21)] { color: primary, opacity: 0.12 }
+      vector F = (0, 0) -> (3.83, 3.21) { color: primary, width: 4 }
+      vector fx = (0, 0) -> (3.83, 0) { color: warning, width: 4 }
+      vector fy = (3.83, 0) -> (3.83, 3.21) { color: success, width: 4 }
+      arc sweep = (0, 0) { r: 0.7, from: 0, to: 40, color: neutral }
+      label at (0.85, 0.24) = "40°" { color: neutral }
+      label at (1.7, 2.1) = "F = 100 N" { color: primary }
+      label at (1.9, -0.42) = "Fx = F cos 40° = 76.6 N" { anchor: middle, color: warning }
+      label at (3.95, 1.6) = "Fy = 64.3 N" { color: success }
+    }
+  }
+
+  slide "Build the Components" {
+    id: "f2-build"
+    cat: "Splitting a Force"
+    build {
+      ask "A force $F$ is held at angle $\theta$ **above the horizontal**. Assemble its two components."
+      skill: "force-components"
+      template: "$F_x =$ ___ $\qquad F_y =$ ___"
+      bank: ["$F\cos\theta$", "$F\sin\theta$", "$F\tan\theta$", "$\dfrac{F}{\cos\theta}$"]
+      answer: ["$F\cos\theta$", "$F\sin\theta$"]
+      hint "The angle sits between the force and the horizontal, so the horizontal component is the adjacent side."
+      onwrong: "f2-not-always-cos" retry
+      ! "$F_x = F\cos\theta$ and $F_y = F\sin\theta$ — when $\theta$ is measured from the horizontal."
+    }
+  }
+
+  slide "Cosine Is Not Glued to x" {
+    id: "f2-not-always-cos"
+    hidden: true
+    cat: "Splitting a Force"
+    > This is the trap that catches nearly everyone, so it is worth slowing down.
+    >
+    > "Horizontal takes cosine" is **not** a law. It only held on the last slide
+    > because the angle happened to be measured from the horizontal. Here the angle
+    > $\phi$ is measured from the **vertical** instead, like a pendulum hanging from
+    > a ceiling.
+    >
+    > Drag $\phi$ down towards $0°$, so the force hangs straight down. Its
+    > horizontal component must vanish — and watch which function goes to zero with
+    > it. It is the **sine** now.
+    >
+    > The reliable rule is not about $x$ and $y$ at all: **the component hugging the
+    > angle takes the cosine, the component across from it takes the sine.**
+
+    scene plane {
+      x: [-2.8, 2.8]
+      y: [-3.6, 0.9]
+      aspect: equal
+      axes: false
+      param ph = 35 { range: [0, 80], step: 1 }
+      line ceiling = (-2.4, 0) -> (2.4, 0) { color: neutral, width: 3 }
+      vector F = (0, 0) -> (3*sin(rad(ph)), 0 - 3*cos(rad(ph))) { color: primary, width: 4 }
+      vector fx = (0, 0 - 3*cos(rad(ph))) -> (3*sin(rad(ph)), 0 - 3*cos(rad(ph))) { color: warning, width: 3, style: dashed }
+      vector fy = (0, 0) -> (0, 0 - 3*cos(rad(ph))) { color: success, width: 3, style: dashed }
+      arc sweep = (0, 0) { r: 0.75, from: 270, to: 270 + ph, color: neutral }
+      label at (0, -3.35) = "angle from vertical = ${ph}°" { anchor: middle, color: neutral }
+      label at (0, 0.55) = "horizontal part = ${sin(rad(ph))} × F   (that is F sin φ)" { anchor: middle, color: warning }
+      slider ph { label: "angle from the vertical" }
+    }
+
+    goal "Bring the force almost vertical and watch the horizontal part die away" {
+      when: ph < 8
+      hint: "Slide it down towards 0°."
+    }
+
+    quiz {
+      ask "With $\phi$ measured from the **vertical**, the horizontal component is:"
+      skill: "force-components"
+      - "$F\cos\phi$" { why: "That is the vertical part here. At $\phi = 0°$ it would give the full force horizontally, but a vertically hanging force has no horizontal part at all." }
+      * "$F\sin\phi$"
+      - "always $F\cos\phi$, whatever the angle is measured from" { why: "This is exactly the habit to break — which function you use depends on where the angle is measured from, not on which axis you want." }
+      hint "Which one is zero when $\phi$ is zero?"
+      ! "$F\sin\phi$. At $\phi = 0°$ the force hangs straight down and $\sin 0° = 0$, so there is no horizontal part. Cosine goes with the side the angle is measured from."
+    }
+  }
+
+  slide "The Dog on the Leash" {
+    id: "f2-dog"
+    cat: "Using the Components"
+    > A dog pulls on its leash with a force of $50$ N, and the leash runs up to
+    > your hand at $40°$ above the horizontal.
+
+    numeric {
+      ask "How hard is the leash pulling **upward** on the dog's collar, in newtons?"
+      skill: "force-components"
+      answer: 32.1
+      expect: 50*sin(rad(40))
+      tolerance: 0.3
+      hint "Upward is the vertical component, and the angle is measured from the horizontal."
+      ! "$F_y = 50\sin 40° \approx 32.1$ N lifting the collar. The horizontal part, $50\cos 40° \approx 38.3$ N, pulls the collar back towards you. Keep track of *which body* you are talking about: by Newton's third law the leash hauls your hand forwards with that same $38.3$ N, and that is the bit you actually feel."
+    }
+  }
+
+  slide "Which Component Is Bigger?" {
+    id: "f2-compare"
+    cat: "Using the Components"
+    > Before reaching for a calculator, it is worth being able to tell at a glance
+    > which way a force is mostly spent.
+
+    sort {
+      ask "Each force is held at the given angle **above the horizontal**. Sort by which component is larger."
+      skill: "force-components"
+      bin "mostly horizontal": ["$20$ N at $15°$", "$60$ N at $30°$"]
+      bin "mostly vertical": ["$20$ N at $70°$", "$60$ N at $80°$"]
+      hint "The tipping point is $45°$, where the across and the up are equal. Below that, horizontal wins."
+      ! "Below $45°$ the cosine beats the sine, so the horizontal part is bigger. Above $45°$ it flips. The magnitude of the force never affects which one wins, only the angle does."
+    }
+  }
+
+  slide "Tilt Your Head, Tilt Your Axes" {
+    id: "f2-tilted"
+    cat: "Tilted Axes"
+    > Axes are not physics. They are bookkeeping, and you may point them wherever
+    > makes the sums easiest.
+    >
+    > A block on a ramp is the classic case. Gravity still pulls **straight down** —
+    > that never changes. But horizontal and vertical are now awkward directions,
+    > because the block cannot move that way. It can only slide *along* the ramp.
+    >
+    > So tilt the axes to match the ramp: one along the slope, one perpendicular to
+    > it. Gravity now splits into a part that drags the block **down the slope** and
+    > a part that presses it **into the slope**.
+    >
+    > Change the ramp angle and watch the split move.
+
+    scene plane {
+      x: [-3.6, 3.6]
+      y: [-2.6, 2.6]
+      aspect: equal
+      axes: false
+      param a = 30 { range: [5, 60], step: 1 }
+      polygon ramp = [(-3, -2), (3, -2), (3, -2 + 6*tan(rad(a)))] { color: neutral, opacity: 0.25 }
+      rect block = (-3 + 3.2*cos(rad(a)), -2 + 3.2*sin(rad(a))) { w: 1.1, h: 0.6, rotate: a, color: primary }
+      vector weight = (-3 + 3.2*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3.2*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a))) -> (-3 + 3.2*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3.2*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a)) - 1.8) { color: danger, width: 4 }
+      vector downslope = (-3 + 3.2*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3.2*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a))) -> (-3 + 3.2*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)) - 1.8*sin(rad(a))*cos(rad(a)), -2 + 3.2*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a)) - 1.8*sin(rad(a))*sin(rad(a))) { color: warning, width: 3, style: dashed }
+      vector intoslope = (-3 + 3.2*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3.2*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a))) -> (-3 + 3.2*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)) + 1.8*cos(rad(a))*sin(rad(a)), -2 + 3.2*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a)) - 1.8*cos(rad(a))*cos(rad(a))) { color: success, width: 3, style: dashed }
+      arc sweep = (-3, -2) { r: 1.1, from: 0, to: a, color: accent }
+      label at (-1.55, -1.82) = "${a}°" { color: accent }
+      label at (0, 2.3) = "down the slope = ${sin(rad(a))} of the weight" { anchor: middle, color: warning }
+      label at (0, -2.35) = "into the slope = ${cos(rad(a))} of the weight" { anchor: middle, color: success }
+      slider a { label: "ramp angle" }
+    }
+
+    goal "Steepen the ramp until more than half the weight is dragging the block downhill" {
+      when: sin(rad(a)) > 0.5
+      hint: "Past 30° the down-slope share climbs above a half."
+    }
+  }
+
+  slide "Down the Slope or Into It?" {
+    id: "f2-mgsin"
+    cat: "Tilted Axes"
+    quiz {
+      ask "A block of weight $W$ rests on a ramp inclined at $\theta$. Which component drags it **down the slope**?"
+      skill: "force-resolve-tilted"
+      * "$W\sin\theta$"
+      - "$W\cos\theta$" { why: "That is the part pressing into the ramp, the one the surface pushes back against. Check it at $\theta = 0°$: on flat ground $W\cos 0° = W$ presses down, and nothing drags you sideways." }
+      - "$W\tan\theta$" { why: "Components come from a right triangle with $W$ as the hypotenuse, so they are never larger than $W$. Tangent would exceed it past $45°$." }
+      hint "Test it at the extremes. On flat ground ($\theta = 0°$) nothing should drag the block along. On a vertical cliff ($\theta = 90°$) the whole weight should."
+      onwrong: "f2-check-the-extremes" retry
+      ! "$W\sin\theta$ drags it down the slope, and $W\cos\theta$ presses it in. At $\theta = 0°$, $\sin 0° = 0$: flat ground drags nothing."
+    }
+  }
+
+  slide "When in Doubt, Go to the Extremes" {
+    id: "f2-check-the-extremes"
+    hidden: true
+    cat: "Tilted Axes"
+    > Do not memorise which one is sine. **Test it at an angle you already know.**
+    > This trick works for the rest of your life and costs about five seconds.
+    >
+    > Slide the ramp all the way down to flat. On flat ground nothing drags the
+    > block sideways, so the down-slope component has to be **zero** — and the only
+    > function that is zero at $0°$ is the sine. Done. That is the answer, derived
+    > rather than recalled.
+    >
+    > Now slide it up to nearly vertical. In free fall the whole weight goes into
+    > falling, so the down-slope part must approach the **full weight**, and
+    > $\sin 90° = 1$. It checks out at both ends.
+
+    scene plane {
+      x: [-3.6, 3.6]
+      y: [-2.6, 2.6]
+      aspect: equal
+      axes: false
+      param a = 8 { range: [0, 85], step: 1 }
+      polygon ramp = [(-3, -2), (3, -2), (3, -2 + 6*tan(rad(a)))] { color: neutral, opacity: 0.25 }
+      rect block = (-3 + 3.2*cos(rad(a)), -2 + 3.2*sin(rad(a))) { w: 1.1, h: 0.6, rotate: a, color: primary }
+      label at (0, 2.3) = "sin ${a}° = ${sin(rad(a))}  of the weight goes down the slope" { anchor: middle, color: warning }
+      label at (0, -2.35) = "cos ${a}° = ${cos(rad(a))}  presses into the slope" { anchor: middle, color: success }
+      slider a { label: "flatten it, then steepen it" }
+    }
+
+    numeric {
+      ask "On perfectly flat ground ($\theta = 0°$), what fraction of the weight drags the block along the ground?"
+      skill: "force-resolve-tilted"
+      answer: 0
+      expect: sin(rad(0))
+      tolerance: 0.001
+      hint "Put a book on a flat table. Does it slide off on its own?"
+      ! "Zero — and $\sin 0° = 0$, which is exactly why the down-slope component is the sine one."
+    }
+  }
+
+  slide "The Sagging Zip Line" {
+    id: "f2-zipline"
+    cat: "Putting It to Work"
+    > Now for the reason engineers respect shallow angles.
+    >
+    > A person weighing $500$ N hangs stationary in the middle of a zip line. The
+    > cable sags just enough to make an angle of $5°$ with the horizontal on
+    > **both** sides. Each half of the cable carries the same tension $T$.
+    >
+    > The cable is nearly horizontal, and the weight is straight down. Work out for
+    > yourself what has to be true for the person to hang there without moving, then
+    > put a number on $T$. Guess first — is it more or less than $500$ N?
+
+    scene plane {
+      x: [-5.5, 5.5]
+      y: [-2.6, 1.6]
+      aspect: equal
+      axes: false
+      line postL = (-5, 1.2) -> (-5, -0.6) { color: neutral, width: 3 }
+      line postR = (5, 1.2) -> (5, -0.6) { color: neutral, width: 3 }
+      line cableL = (-5, 1.2) -> (0, 0.76) { color: primary, width: 3 }
+      line cableR = (0, 0.76) -> (5, 1.2) { color: primary, width: 3 }
+      point rider = (0, 0.76) { color: accent, r: 9 }
+      vector w = (0, 0.76) -> (0, -0.9) { color: danger, width: 4 }
+      label at (0, -1.35) = "500 N" { anchor: middle, color: danger }
+      label at (-2.4, 1.35) = "T at 5°" { anchor: middle, color: primary }
+      label at (2.4, 1.35) = "T at 5°" { anchor: middle, color: primary }
+    }
+
+    numeric {
+      ask "What is the tension $T$ in the cable, in newtons?"
+      skill: "force-resultant"
+      answer: 2868
+      expect: 250/sin(rad(5))
+      tolerance: 15
+      hint "Nothing is accelerating, so the upward pull has to total exactly $500$ N. Only the *vertical component* of each half of the cable points upward."
+      hint "Two halves share the load, so each supplies $250$ N upward: $T\sin 5° = 250$."
+      ! "$2T\sin 5° = 500$, so $T = \dfrac{250}{\sin 5°} \approx 2868$ N — nearly **six times** the person's weight. At $5°$ only a sliver of the tension points upward, so the tension has to be enormous to make up the difference. This is why a washing line pulled tight can snap under a light towel."
+    }
+  }
+
+  slide "The Whole Picture" {
+    id: "f2-synth"
+    cat: "Putting It to Work"
+    > Two ropes pull horizontally on a ring: $100$ N due north and $50$ N due east.
+    > A third rope is added so the ring sits perfectly still.
+
+    scene plane {
+      x: [-3.4, 3.4]
+      y: [-3.2, 3.2]
+      aspect: equal
+      grid
+      axes
+      vector north = (0, 0) -> (0, 2) { color: primary, width: 4 }
+      vector east = (0, 0) -> (1, 0) { color: success, width: 4 }
+      point ring = (0, 0) { color: accent, r: 9 }
+      label at (0.16, 2.2) = "100 N north" { color: primary }
+      label at (1.15, -0.32) = "50 N east" { color: success }
+      reveal {
+        vector third = (0, 0) -> (-1, -2) { color: danger, width: 4, style: dashed }
+        label at (-1.15, -2.35) = "the third rope" { anchor: middle, color: danger }
+      }
+    }
+
+    numeric {
+      ask "What is the magnitude of the third force, in newtons?"
+      skill: "force-resultant"
+      answer: 111.8
+      expect: sqrt(100^2 + 50^2)
+      tolerance: 0.5
+      hint "For the ring to sit still, the third force must cancel the other two exactly — so it matches their combined pull in size and points the opposite way."
+      hint "The other two are at right angles, so combine them with Pythagoras."
+      ! "The first two combine to $\sqrt{100^2 + 50^2} \approx 111.8$ N, pointing mostly north and a little east (about $63°$ up from due east). The third rope must pull $111.8$ N in exactly the opposite direction, so everything sums to zero."
+    }
+  }
+
+  slide "One Force, Not Three" {
+    id: "f2-ghosts"
+    cat: "Putting It to Work"
+    > One last thing, and it quietly ruins more free-body diagrams than anything
+    > else.
+    >
+    > When you split a force into $F_x$ and $F_y$, you have **not** discovered two
+    > new forces. There is still exactly one rope, pulling once. The components are
+    > a description — a convenient way of saying "this pull is worth $76.6$ N of
+    > forward and $64.3$ N of upward."
+    >
+    > Both crates below are being pulled by **one** $100$ N rope. On the left it is
+    > drawn once. On the right somebody drew the rope *and* its two components, and
+    > the diagram now claims $200$ N of pull on a crate nobody pulled any harder.
+    >
+    > Draw the force **or** its components. Never both.
+
+    scene plane {
+      x: [-5.6, 5.6]
+      y: [-1.6, 3.6]
+      aspect: equal
+      axes: false
+      line groundL = (-5.2, 0) -> (-0.6, 0) { color: neutral, width: 3 }
+      line groundR = (0.6, 0) -> (5.2, 0) { color: neutral, width: 3 }
+      rect crateL = (-4.8, 0) { w: 1.2, h: 0.6, color: neutral, opacity: 0.35 }
+      rect crateR = (1.0, 0) { w: 1.2, h: 0.6, color: neutral, opacity: 0.35 }
+      vector pullL = (-3.6, 0.6) -> (-3.6 + 2.3*cos(rad(40)), 0.6 + 2.3*sin(rad(40))) { color: primary, width: 4 }
+      vector pullR = (2.2, 0.6) -> (2.2 + 2.3*cos(rad(40)), 0.6 + 2.3*sin(rad(40))) { color: primary, width: 4 }
+      vector extraX = (2.2, 0.6) -> (2.2 + 2.3*cos(rad(40)), 0.6) { color: danger, width: 3, style: dashed }
+      vector extraY = (2.2 + 2.3*cos(rad(40)), 0.6) -> (2.2 + 2.3*cos(rad(40)), 0.6 + 2.3*sin(rad(40))) { color: danger, width: 3, style: dashed }
+      label at (-3.0, 3.15) = "right: 100 N" { anchor: middle, color: success }
+      label at (2.8, 3.15) = "wrong: claims 200 N" { anchor: middle, color: danger }
+    }
+
+    quiz {
+      ask "A single rope pulls a crate with $100$ N at $40°$. How many forces from that rope belong on the free-body diagram?"
+      skill: "force-components"
+      * "One — either the $100$ N arrow, or its two components in its place"
+      - "Three — the $100$ N force plus both components" { why: "That counts the same pull twice over. The components *are* the force, rewritten." }
+      - "Two — always both components, and never the original" { why: "Both components is fine, but so is the single $100$ N arrow. Whichever makes the sums easier; they describe the same pull." }
+      hint "Are the components extra ropes, or a different way of writing the one rope you already have?"
+      ! "One pull, one entry. Components replace the force, they never join it."
+    }
+  }
+}

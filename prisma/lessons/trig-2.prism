@@ -1,0 +1,435 @@
+lesson "The Unit Circle" {
+  course: "pure-maths"
+  unit: "Trigonometry"
+  difficulty: "Intermediate"
+  icon: "Circle"
+  summary: "Break sin and cos out of the right triangle — one circle, every angle, and the moment the sine wave turns out to be the circle unrolled."
+  skills: ["trig-unit-circle", "trig-quadrant-signs", "trig-reference-angle"]
+
+  slide "The Triangle Runs Out of Road" {
+    id: "t2-hook"
+    cat: "Beyond the Triangle"
+    > SOHCAHTOA is a deal you made with a right triangle. It works beautifully, and
+    > it has a hard limit: **a right triangle cannot contain an angle of $150°$.**
+    > The other two angles have to fit inside the remaining $90°$.
+    >
+    > So what is $\sin 150°$? The triangle has no answer. The circle does.
+    >
+    > Below is a circle of radius $1$ centred on the origin. Drag the blue point
+    > around it and watch its two coordinates. Get it into the second and third
+    > quadrants — nothing breaks.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-1.45, 1.45]
+      aspect: equal
+      grid
+      axes
+      param th = 0.9 { range: [-3.14, 3.14], step: 0.01 }
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (0, 0) -> (cos(th), sin(th)) { color: warning, width: 2 }
+      arc sweep = (0, 0) { r: 0.3, from: 0, to: mod(deg(th), 360), color: warning, width: 2 }
+      point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 9 }
+      label at (0, 1.28) = "angle = ${mod(deg(th), 360)}°" { anchor: middle, color: warning }
+      label at (0, -1.3) = "x = ${cos(th)}   ·   y = ${sin(th)}" { anchor: middle, color: primary }
+      slider th { label: "drag me, or drag the point" }
+    }
+
+    goal "Put the point in the second quadrant, where x has gone negative but y is still positive" {
+      when: cos(th) < 0 and sin(th) > 0
+      hint: "Grab the blue point itself and swing it up and to the left, past the top."
+    }
+    goal "Now reach the third quadrant, where both coordinates are negative" {
+      when: cos(th) < 0 and sin(th) < 0
+      hint: "Drag the point below the axis, round to the bottom left."
+    }
+  }
+
+  slide "The Coordinates Are the Trig" {
+    id: "t2-define"
+    cat: "Beyond the Triangle"
+    > Here is the whole idea, and it is smaller than you expect. On a circle of
+    > radius $1$, the point at angle $\theta$ has coordinates
+    >
+    > $$P = (\cos\theta,\ \sin\theta)$$
+    >
+    > That is not a new fact bolted onto the old one. In the first quadrant the
+    > dashed green drop *is* the opposite side and the solid orange one *is* the
+    > adjacent side, over a hypotenuse of $1$ — so $\sin\theta = \frac{y}{1} = y$.
+    > The definition simply keeps working when the triangle stops existing.
+    >
+    > **cos is the across, sin is the up.** Drag it and watch which dashed line
+    > tracks which number.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-1.45, 1.45]
+      aspect: equal
+      grid
+      axes
+      param th = 0.6 { range: [-3.14, 3.14], step: 0.01 }
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (0, 0) -> (cos(th), sin(th)) { color: neutral, width: 2 }
+      line acrossx = (0, 0) -> (cos(th), 0) { color: warning, width: 4 }
+      line dropy = (cos(th), sin(th)) -> (cos(th), 0) { color: success, style: dashed, width: 2 }
+      point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 9 }
+      label at (0, 1.28) = "cos = ${cos(th)}" { anchor: middle, color: warning }
+      label at (0, -1.32) = "sin = ${sin(th)}" { anchor: middle, color: success }
+      slider th { label: "angle" }
+    }
+  }
+
+  slide "Build the Point" {
+    id: "t2-build"
+    cat: "Beyond the Triangle"
+    build {
+      ask "On the unit circle, the point at angle $\theta$ sits at which coordinates?"
+      skill: "trig-unit-circle"
+      template: "$P = ($ ___ $,$ ___ $)$"
+      bank: ["$\cos\theta$", "$\sin\theta$", "$\tan\theta$", "$1$"]
+      answer: ["$\cos\theta$", "$\sin\theta$"]
+      hint "Across before up — the same order as every coordinate pair you have ever written."
+      onwrong: "t2-which-is-which" retry
+      ! "$P = (\cos\theta,\ \sin\theta)$. The x-coordinate is the cosine, the y-coordinate is the sine."
+    }
+  }
+
+  slide "Across Before Up" {
+    id: "t2-which-is-which"
+    hidden: true
+    cat: "Beyond the Triangle"
+    > Swapping these two is the single most common slip, so let's make it
+    > impossible to forget.
+    >
+    > The point below sits at $\theta = 30°$. Look how *unequal* the two numbers
+    > are: the across is long, the up is short. A $30°$ angle is a shallow one, so
+    > it has barely climbed — its **sine is the small number**.
+    >
+    > $\cos 30° \approx 0.87$ (the long orange across) and $\sin 30° = 0.5$
+    > exactly (the short green up). If you ever catch yourself with
+    > $\sin 30° = 0.87$, picture this shallow angle and ask whether it really
+    > climbed that far.
+
+    scene plane {
+      x: [-0.35, 1.5]
+      y: [-0.35, 1.15]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (0, 0) -> (cos(rad(30)), sin(rad(30))) { color: neutral, width: 2 }
+      line across = (0, 0) -> (cos(rad(30)), 0) { color: warning, width: 5 }
+      line up = (cos(rad(30)), 0) -> (cos(rad(30)), sin(rad(30))) { color: success, width: 5 }
+      point P = (cos(rad(30)), sin(rad(30))) { color: primary, r: 9 }
+      arc sweep = (0, 0) { r: 0.26, from: 0, to: 30, color: neutral }
+      label at (0.42, -0.16) = "cos 30° = 0.87" { color: warning }
+      label at (0.93, 0.22) = "sin 30° = 0.5" { color: success }
+    }
+
+    quiz {
+      ask "A different angle, $\theta$, turns out to have $\sin\theta = 0.94$ and $\cos\theta = 0.34$. Is it a shallow angle like $30°$, or a steep one?"
+      skill: "trig-unit-circle"
+      * "Steep — it has climbed a lot and travelled across very little"
+      - "Shallow, like $30°$" { why: "A shallow angle has a big across and a small up, the other way round. Here the up is much bigger." }
+      - "You cannot tell without knowing $\theta$" { why: "You can: the two coordinates tell you the shape of the lean directly. A big up and a small across is a steep angle." }
+      hint "Which is bigger here, the across or the up? Compare it with the picture, where the across was the long one."
+      ! "Big up, small across, so it is steep — about $70°$. Shallow angles have the long across; steep ones have the long up. That alone tells you which number is which."
+    }
+  }
+
+  slide "All the Way Round" {
+    id: "t2-cos180"
+    cat: "Every Angle"
+    > At $180°$ the point has walked exactly halfway round and landed on the
+    > negative x-axis, at $(-1, 0)$. No triangle survives out here, but the
+    > coordinates are perfectly well behaved.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-1.45, 1.45]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      point A = (1, 0) { color: neutral, r: 7, label: "0°" }
+      point B = (0, 1) { color: neutral, r: 7, label: "90°" }
+      point C = (-1, 0) { color: primary, r: 9, label: "180°" }
+      point D = (0, -1) { color: neutral, r: 7, label: "270°" }
+      arc sweep = (0, 0) { r: 0.3, from: 0, to: 180, color: warning, width: 2 }
+    }
+
+    table {
+      ask "Fill in the coordinates of each of these four quarter-turn points. Cosine is the across, sine is the up."
+      skill: "trig-unit-circle"
+      header: ["angle", "cos", "sin"]
+      row: 0, blank(1), blank(0)
+      row: 90, blank(0), blank(1)
+      row: 180, blank(-1), blank(0)
+      row: 270, blank(0), blank(-1)
+      hint "Walk anticlockwise from $(1, 0)$ and just read off where each quarter turn lands."
+      ! "$(1,0)$, $(0,1)$, $(-1,0)$, $(0,-1)$. These four are worth knowing cold — and you never have to memorise them, you just picture where the point sits."
+    }
+  }
+
+  slide "Signs, Quadrant by Quadrant" {
+    id: "t2-signs"
+    cat: "Every Angle"
+    > You never have to memorise a sign table. The signs *are* the signs of the
+    > coordinates, and you already know which quadrant has negative $x$.
+
+    sort {
+      ask "Sort each angle into the right quadrant by the signs of its coordinates."
+      skill: "trig-quadrant-signs"
+      bin "cos > 0, sin > 0": ["$45°$", "$80°$"]
+      bin "cos < 0, sin > 0": ["$120°$", "$170°$"]
+      bin "cos < 0, sin < 0": ["$200°$", "$250°$"]
+      bin "cos > 0, sin < 0": ["$300°$", "$350°$"]
+      hint "Sketch where the point lands. Left of the y-axis means cos is negative; below the x-axis means sin is negative."
+      ! "Anticlockwise from the positive x-axis: both positive, then cos turns negative, then both negative, then cos comes back positive. It is just which side of each axis the point is on."
+    }
+  }
+
+  slide "Land on 135°" {
+    id: "t2-hotspot"
+    cat: "Every Angle"
+    > $135°$ is $45°$ past the vertical, so it sits in the second quadrant, the
+    > same height up as $45°$ but the same distance to the *left*.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-1.45, 1.45]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+    }
+
+    hotspot {
+      ask "Tap the point on the circle at an angle of $135°$."
+      skill: "trig-quadrant-signs"
+      target circle (-0.707, 0.707) { r: 0.3 }
+      miss "Second quadrant: up and to the left. Both coordinates have size $0.71$, but which one is negative?"
+      hint "$135°$ is past $90°$ but short of $180°$, so it is up and to the left."
+      ! "At $135°$ the point is $(-0.71,\ 0.71)$: $\cos 135° = -\frac{\sqrt2}{2}$ and $\sin 135° = +\frac{\sqrt2}{2}$."
+    }
+  }
+
+  slide "The Sine Wave Is This Circle, Unrolled" {
+    id: "t2-unroll"
+    cat: "The Wave"
+    > Here is the payoff. On the left is the circle. On the right, the angle is
+    > stretched out along a horizontal axis, and the height plotted against it.
+    >
+    > The dotted line carries the point's **height** across. That height is
+    > $\sin\theta$, and tracing it as the angle grows draws the sine wave. The
+    > wave is not a separate object to memorise — it is this circle, unrolled.
+
+    scene plane {
+      x: [-5.9, 3.5]
+      y: [-1.8, 1.8]
+      aspect: equal
+      axes
+      param th = 0.7 { range: [-3.14, 3.14], step: 0.01 }
+      curve wave = sin(x) { where: x > -3.15, color: success, width: 3 }
+      circle unit = (-4.6, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (-4.6, 0) -> (-4.6 + cos(th), sin(th)) { color: neutral, width: 2 }
+      point P = (-4.6 + cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 8 }
+      line carry = (-4.6 + cos(th), sin(th)) -> (th, sin(th)) { color: accent, style: dotted, width: 2 }
+      point W = (th, sin(th)) { color: success, r: 8 }
+      label at (0, 1.55) = "height = sin = ${sin(th)}" { anchor: middle, color: success }
+      slider th { label: "angle" }
+    }
+
+    goal "Walk the point up past the top of the circle and watch the wave crest" {
+      when: th > 1.9
+      hint: "Drag the point anticlockwise past 90°, where the height is biggest."
+    }
+    goal "Now take it below the axis and watch the wave dip under" {
+      when: th < -0.6
+      hint: "Drag the point down into the bottom half of the circle."
+    }
+  }
+
+  slide "Reference Angles" {
+    id: "t2-reference"
+    cat: "The Wave"
+    > The circle is symmetric, so nothing new is really happening here.
+    >
+    > $150°$ sits at exactly the same **height** as $30°$, just mirrored across to
+    > the other side of the y-axis. Look at the dashed green line: the two points
+    > are level. Since sine *is* that height, $\sin 150°$ and $\sin 30°$ have to be
+    > the same number. Their across values, meanwhile, are mirror images, so their
+    > cosines come out equal and opposite.
+    >
+    > The angle you have left over after mirroring — here $180° - 150° = 30°$ — has
+    > a name, the **reference angle**. It is a label for the symmetry you can
+    > already see, not a rule to memorise.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-0.6, 1.35]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line r30 = (0, 0) -> (cos(rad(30)), sin(rad(30))) { color: neutral, width: 2 }
+      line r150 = (0, 0) -> (cos(rad(150)), sin(rad(150))) { color: primary, width: 2 }
+      point A = (cos(rad(30)), sin(rad(30))) { color: neutral, r: 8, label: "30°" }
+      point B = (cos(rad(150)), sin(rad(150))) { color: primary, r: 8, label: "150°" }
+      line height = (cos(rad(150)), sin(rad(150))) -> (cos(rad(30)), sin(rad(30))) { color: success, style: dashed, width: 2 }
+      label at (0, 0.62) = "same height" { anchor: middle, color: success }
+    }
+
+    numeric {
+      ask "What is $\sin 150°$?"
+      skill: "trig-reference-angle"
+      answer: 0.5
+      expect: sin(rad(150))
+      tolerance: 0.001
+      hint "Reference angle $30°$ sets the size. Second quadrant means sine is positive."
+      onwrong: "t2-sign-vs-size" retry
+      ! "$\sin 150° = \sin 30° = 0.5$. Same height as $30°$, and the second quadrant keeps it positive."
+    }
+  }
+
+  slide "Size and Sign Are Two Questions" {
+    id: "t2-sign-vs-size"
+    hidden: true
+    cat: "The Wave"
+    > It is worth slowing down here, because $150°$ answers to two different
+    > things at once.
+    >
+    > **Size** comes from how far the angle leans off the horizontal — the
+    > reference angle, $180° - 150° = 30°$. **Sign** comes from the quadrant.
+    > $150°$ is in the second, where $x$ is negative but $y$ is still positive.
+    >
+    > So sine, which reads the height, stays **positive**: $\sin 150° = +0.5$.
+    > Cosine, which reads the across, goes **negative**: $\cos 150° \approx -0.87$.
+    > Same reference angle, two different signs, because they read two different
+    > coordinates.
+
+    scene plane {
+      x: [-1.5, 0.4]
+      y: [-0.35, 1.2]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (0, 0) -> (cos(rad(150)), sin(rad(150))) { color: neutral, width: 2 }
+      line across = (0, 0) -> (cos(rad(150)), 0) { color: danger, width: 5 }
+      line up = (cos(rad(150)), 0) -> (cos(rad(150)), sin(rad(150))) { color: success, width: 5 }
+      point B = (cos(rad(150)), sin(rad(150))) { color: primary, r: 9 }
+      label at (-0.43, -0.18) = "cos = -0.87" { anchor: middle, color: danger }
+      label at (-0.86, 0.68) = "sin = +0.5" { color: success }
+    }
+
+    numeric {
+      ask "Still at $150°$: what is $\cos 150°$, to 2 decimal places?"
+      skill: "trig-reference-angle"
+      answer: -0.87
+      expect: cos(rad(150))
+      tolerance: 0.01
+      hint "Same size as $\cos 30°$, but the point has moved left of the y-axis."
+      ! "$\cos 150° \approx -0.87$. The size comes from the $30°$ reference angle; the minus sign comes from the quadrant."
+    }
+  }
+
+  slide "Put It Together" {
+    id: "t2-synth"
+    cat: "The Wave"
+    quiz {
+      ask "An angle $\theta$ has $\sin\theta = -0.5$ and $\cos\theta > 0$. Where is it?"
+      skill: "trig-quadrant-signs"
+      - "$210°$" { why: "At $210°$ the sine is $-0.5$, but the cosine is negative too — that is the third quadrant, down and to the *left*." }
+      * "$330°$"
+      - "$150°$" { why: "Second quadrant, so the sine there is $+0.5$, not negative." }
+      - "$30°$" { why: "First quadrant — both coordinates are positive, so the sine cannot be negative." }
+      hint "Negative sine puts it below the axis; positive cosine keeps it to the right. Only one quadrant does both."
+      ! "Below the axis and to the right is the fourth quadrant. Reference angle $30°$ gives the size, so $\theta = 360° - 30° = 330°$."
+    }
+  }
+
+  slide "One Last Reach" {
+    id: "t2-tan"
+    cat: "The Wave"
+    > Tangent falls out of the same picture. Since
+    > $\tan\theta = \dfrac{\sin\theta}{\cos\theta}$, it is the height divided by the
+    > across — the **gradient of the ray** from the origin out to the point.
+    >
+    > Swing the point up towards $90°$ and watch the readout: the across shrinks
+    > towards $0$, so the gradient runs away to enormous numbers. At exactly $90°$
+    > the across *is* $0$ and the ray stands straight up. That is why $\tan 90°$ is
+    > undefined rather than merely big — vertical lines have no gradient at all.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-1.45, 1.45]
+      aspect: equal
+      grid
+      axes
+      param th = 0.5 { range: [-3.14, 3.14], step: 0.01 }
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (0, 0) -> (cos(th), sin(th)) { color: primary, width: 3 }
+      point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 9 }
+      label at (0, 1.28) = "gradient = tan = ${tan(th)}" { anchor: middle, color: primary }
+      slider th { label: "angle" }
+    }
+
+    match {
+      ask "Match each angle to the value of its tangent."
+      skill: "trig-unit-circle"
+      pair "$0°$" -> "$0$"
+      pair "$45°$" -> "$1$"
+      pair "$90°$" -> "undefined"
+      pair "$135°$" -> "$-1$"
+      hint "Gradient of the ray. At $45°$ the across and the up are equal, so the ratio is 1."
+      ! "$\tan$ is the gradient of the ray: flat at $0°$, exactly $1$ at $45°$, vertical (undefined) at $90°$, and $-1$ at $135°$ where the ray leans back the other way."
+    }
+  }
+
+  slide "The Identity You Already Own" {
+    id: "t2-identity"
+    cat: "The Wave"
+    > One last gift, and you get it for nothing. Every point on this circle is a
+    > distance $1$ from the origin, so by Pythagoras its coordinates always satisfy
+    >
+    > $$x^2 + y^2 = 1$$
+    >
+    > But we spent this whole lesson establishing that $x = \cos\theta$ and
+    > $y = \sin\theta$. Substitute them in:
+    >
+    > $$\cos^2\theta + \sin^2\theta = 1$$
+    >
+    > That is the most-used identity in all of trigonometry, and it is not a
+    > separate thing to memorise. It is the **equation of the circle**, wearing
+    > different clothes. Drag the point: the two squares always total $1$.
+
+    scene plane {
+      x: [-1.75, 1.75]
+      y: [-1.45, 1.45]
+      aspect: equal
+      grid
+      axes
+      param th = 0.9 { range: [-3.14, 3.14], step: 0.01 }
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line ray = (0, 0) -> (cos(th), sin(th)) { color: primary, width: 3 }
+      line across = (0, 0) -> (cos(th), 0) { color: warning, width: 4 }
+      line up = (cos(th), 0) -> (cos(th), sin(th)) { color: success, width: 4 }
+      point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 9 }
+      label at (0, 1.3) = "cos² = ${cos(th)^2}   ·   sin² = ${sin(th)^2}" { anchor: middle, color: neutral }
+      label at (0, -1.34) = "total = ${cos(th)^2 + sin(th)^2}" { anchor: middle, color: primary }
+      slider th { label: "angle" }
+    }
+
+    numeric {
+      ask "An angle has $\cos\theta = -0.28$, and $\tan\theta$ is **positive**. What is $\sin\theta$?"
+      skill: "trig-quadrant-signs"
+      answer: -0.96
+      expect: 0 - sqrt(1 - 0.28^2)
+      tolerance: 0.005
+      hint "The identity gives you the size. Then ask: if cosine is negative and the ratio $\sin/\cos$ is positive, what sign must sine have?"
+      hint "A positive tangent with a negative cosine puts you in the third quadrant, where both coordinates are negative."
+      ! "$\sin^2\theta = 1 - 0.28^2 = 0.9216$, so the size is $0.96$. Positive tangent with negative cosine means the third quadrant, where sine is negative too: $\sin\theta = -0.96$."
+    }
+  }
+}
