@@ -1,0 +1,194 @@
+lesson "The Coefficient of Friction" {
+  course: "mechanics"
+  unit: "Friction"
+  difficulty: "Intermediate"
+  icon: "Ruler"
+  summary: "One number, no units, describing a pair of surfaces. What mu really measures, and the two things everyone wrongly thinks it depends on."
+  skills: ["fric-coefficient", "fric-limiting", "fric-normal"]
+
+  slide "What Sets the Ceiling?" {
+    id: "fr2-hook"
+    cat: "Where mu Comes From"
+    > Last lesson the crate broke free at $60$ N. Why $60$, and not $6$ or $600$?
+    >
+    > Only two things decide it. **How hard the surfaces are squeezed together**,
+    > which is the normal reaction $R$. And **what the two surfaces are**, which is
+    > everything else: rubber on tarmac grips, steel on ice does not.
+    >
+    > All of that second part gets bundled into a single number, $\mu$, and the
+    > whole of friction reduces to:
+    >
+    > $$F_{\max} = \mu R$$
+    >
+    > Change either one and watch the ceiling move.
+
+    scene plane {
+      x: [-5.6, 5.6]
+      y: [-3.2, 4.4]
+      aspect: equal
+      axes: false
+      param mu = 0.4 { range: [0.05, 1.2], step: 0.05 }
+      param R = 50 { range: [10, 120], step: 5 }
+      line ground = (-5.2, 0) -> (5.2, 0) { color: neutral, width: 4 }
+      rect box = (-1.1, 0) { w: 2.2, h: 1.5, color: primary, opacity: 0.35 }
+      vector down = (0, 1.5) -> (0, 0.15) { color: danger, width: 4 }
+      vector up = (0, 0) -> (0, 1.35) { color: success, width: 4 }
+      vector limit = (1.1, 0.4) -> (1.1 + mu*R/22, 0.4) { color: warning, width: 5 }
+      label at (0, 3.9) = "pressed down with R = ${R} N" { anchor: middle, color: success }
+      label at (0, -1.5) = "mu = ${mu}, so the ceiling is ${mu*R} N" { anchor: middle, color: warning }
+      slider mu { label: "mu, how grippy the pair of surfaces is" }
+      slider R { label: "R, how hard they are pressed together" }
+    }
+
+    goal "Find a combination where friction cannot exceed 10 N" {
+      when: mu*R < 10
+      hint: "Slippery surfaces and a light press. Push both sliders low."
+    }
+    goal "Now build a ceiling above 100 N" {
+      when: mu*R > 100
+      hint: "Grippy and heavily loaded. Both sliders high."
+    }
+  }
+
+  slide "A Number With No Units" {
+    id: "fr2-dimensionless"
+    cat: "Where mu Comes From"
+    > Rearranged, $\mu$ is a ratio of two forces:
+    >
+    > $$\mu = \frac{F_{\max}}{R}$$
+    >
+    > Newtons on the top, newtons on the bottom. They cancel, and $\mu$ comes out
+    > as a **bare number** with no units at all. It is not measured in newtons, or
+    > kilograms, or anything else.
+    >
+    > That is worth holding on to, because it tells you what $\mu$ actually means:
+    > *the fraction of the squeeze that comes back as grip.* A $\mu$ of $0.4$ says
+    > press two surfaces together with $100$ N and you can get at most $40$ N of
+    > friction out of them.
+
+    build {
+      ask "Assemble the coefficient of friction from the two forces."
+      skill: "fric-coefficient"
+      template: "$\mu =$ ___"
+      bank: ["$\dfrac{F_{\max}}{R}$", "$F_{\max} \times R$", "$\dfrac{R}{F_{\max}}$", "$F_{\max} - R$"]
+      answer: ["$\dfrac{F_{\max}}{R}$"]
+      hint "Start from $F_{\max} = \mu R$ and get $\mu$ on its own."
+      ! "$\mu = F_{\max}/R$. Friction over normal reaction, so the units cancel and $\mu$ is just a number."
+    }
+  }
+
+  slide "It Belongs to the Pair, Not the Object" {
+    id: "fr2-pairs"
+    cat: "Where mu Comes From"
+    > There is no such thing as "the friction of rubber". $\mu$ is a property of
+    > **two surfaces meeting**, and rubber on dry tarmac behaves nothing like
+    > rubber on wet ice.
+    >
+    > So $\mu$ always comes with two materials attached, never one.
+
+    match {
+      ask "Match each pair of surfaces to its rough coefficient of friction."
+      skill: "fric-coefficient"
+      pair "rubber on dry tarmac" -> "about $0.9$"
+      pair "wood on wood" -> "about $0.4$"
+      pair "steel on steel, oiled" -> "about $0.1$"
+      pair "steel on ice" -> "about $0.03$"
+      hint "Bigger $\mu$ means grippier. Which pair would you least like to brake on?"
+      ! "Tyres are engineered to sit near the top of that range, and ice sits near the bottom. Same steel, wildly different $\mu$ depending on what it is touching."
+    }
+  }
+
+  slide "Heavier? Wider? Neither." {
+    id: "fr2-independence"
+    cat: "What mu Ignores"
+    quiz {
+      ask "Two identical pine blocks sit on the same steel table. Block A weighs $5$ kg.wt, block B weighs $15$ kg.wt. For block A, $\mu = 0.35$. What is $\mu$ for block B?"
+      skill: "fric-coefficient"
+      * "$0.35$, exactly the same"
+      - "$1.05$, three times as much" { why: "The *friction force* is three times bigger, because $R$ is three times bigger. But $\mu$ is the ratio between them, and the ratio has not changed at all." }
+      - "$0.117$, a third as much" { why: "Backwards, and also not how it works. $\mu$ is fixed by the materials, so a heavier block of the same wood on the same table has the same $\mu$." }
+      hint "$\mu$ describes pine-on-steel. Did the block stop being pine, or the table stop being steel?"
+      onwrong: "fr2-what-mu-ignores" retry
+      ! "$0.35$. Weight changes $R$, which changes the friction *force*. It never changes $\mu$, which is set by what the surfaces are made of."
+    }
+  }
+
+  slide "What mu Genuinely Does Not Care About" {
+    id: "fr2-what-mu-ignores"
+    hidden: true
+    cat: "What mu Ignores"
+    > Two things feel like they should matter and do not.
+    >
+    > **Weight.** Heavier does mean more friction, but only through $R$. Double the
+    > weight and you double $R$, so $F_{\max} = \mu R$ doubles too — while $\mu$
+    > sits there unchanged. It is the ratio, not the force.
+    >
+    > **Contact area.** This one is genuinely surprising. Lay a brick on its wide
+    > face or stand it on its narrow end and the maximum friction is the same. A
+    > bigger area spreads the same load more thinly, so you get more patches of
+    > contact each gripping more weakly. The two effects cancel almost exactly.
+    >
+    > Both blocks below are the same brick on the same floor. Same $\mu$, same $R$,
+    > same friction, despite one looking like it has far more contact.
+
+    scene plane {
+      x: [-6.0, 6.0]
+      y: [-2.8, 4.2]
+      aspect: equal
+      axes: false
+      line ground = (-5.6, 0) -> (5.6, 0) { color: neutral, width: 4 }
+      rect flat = (-4.6, 0) { w: 3.2, h: 0.9, color: primary, opacity: 0.35 }
+      rect tall = (1.8, 0) { w: 0.9, h: 3.2, color: primary, opacity: 0.35 }
+      vector fFlat = (-1.4, 0.45) -> (-0.2, 0.45) { color: warning, width: 4 }
+      vector fTall = (2.7, 0.45) -> (3.9, 0.45) { color: warning, width: 4 }
+      label at (-3.0, 2.2) = "lying flat" { anchor: middle, color: neutral }
+      label at (2.25, 4.0) = "on its end" { anchor: middle, color: neutral }
+      label at (0, -1.4) = "same brick, same floor, same maximum friction" { anchor: middle, color: warning }
+      label at (0, -2.2) = "mu = 0.35 in both cases" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "A $15$ kg.wt block rests on a horizontal floor with $\mu = 0.35$. What is the maximum friction available, in kg.wt?"
+      skill: "fric-limiting"
+      answer: 5.25
+      expect: 0.35*15
+      tolerance: 0.01
+      hint "On a flat floor with nothing else pressing or lifting, $R$ equals the weight."
+      ! "$F_{\max} = \mu R = 0.35 \times 15 = 5.25$ kg.wt. Note the units: $\mu$ has none, so the answer comes out in whatever unit $R$ was in."
+    }
+  }
+
+  slide "Measure It Yourself" {
+    id: "fr2-measure"
+    cat: "What mu Ignores"
+    > You never look $\mu$ up in real life, you measure it. Press two surfaces
+    > together with a known $R$, pull until the thing just slips, and take the
+    > ratio.
+
+    table {
+      ask "An experiment presses a block onto a surface with different loads and records the pull needed to just start it moving. Work out $\mu$ for each row."
+      skill: "fric-coefficient"
+      header: ["R in N", "pull to slip in N", "mu"]
+      row: 20, 9, blank(0.45)
+      row: 40, 18, blank(0.45)
+      row: 60, 27, blank(0.45)
+      hint "$\mu$ is the pull divided by the load, each row on its own."
+      ! "$0.45$ every time. That is the whole point of $\mu$: the force changes with the load, but the *ratio* stays put, which is what makes it a useful property of the surfaces."
+    }
+  }
+
+  slide "From mu to a Force" {
+    id: "fr2-synth"
+    cat: "What mu Ignores"
+    numeric {
+      ask "A crate of mass $40$ kg sits on a level floor, $\mu = 0.3$. Taking $g = 9.8$ m/s², what is the smallest horizontal push, in newtons, that will just get it moving?"
+      skill: "fric-limiting"
+      answer: 117.6
+      expect: 0.3*40*9.8
+      tolerance: 0.5
+      hint "Find $R$ first. On a level floor with nothing pushing down or lifting, $R$ is just the weight, $mg$."
+      hint "$R = 40 \times 9.8 = 392$ N, then $F_{\max} = \mu R$."
+      ! "$R = 392$ N, so $F_{\max} = 0.3 \times 392 = 117.6$ N. Anything less and friction quietly matches it; anything more and the crate goes."
+    }
+  }
+}

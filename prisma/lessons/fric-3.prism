@@ -1,0 +1,243 @@
+lesson "Friction on a Horizontal Plane" {
+  course: "mechanics"
+  unit: "Friction"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "Why the normal reaction is almost never just the weight, and why tilting your rope upwards makes a heavy crate easier to shift."
+  skills: ["fric-normal", "fric-limiting", "fric-resolve"]
+
+  slide "R Is Not Automatically the Weight" {
+    id: "fr3-hook"
+    cat: "Finding R"
+    > Every friction question starts with $R$, the normal reaction. On a bare
+    > horizontal floor with nothing else going on, $R$ does equal the weight — and
+    > that is exactly why people stop thinking about it.
+    >
+    > The moment anything else pushes or pulls vertically, $R$ changes. Tie a rope
+    > to the crate and haul upwards at an angle: part of your pull now helps hold
+    > the crate up, so the floor has less to do.
+    >
+    > $$R = W - P\sin\theta$$
+    >
+    > Raise the rope angle and watch the green arrow shrink. The crate is not
+    > getting lighter — the floor is just carrying less of it.
+
+    scene plane {
+      x: [-5.4, 5.4]
+      y: [-3.0, 4.6]
+      aspect: equal
+      axes: false
+      param a = 0 { range: [0, 80], step: 1 }
+      line ground = (-5.0, 0) -> (5.0, 0) { color: neutral, width: 4 }
+      rect crate = (-1.2, 0) { w: 2.4, h: 1.5, color: primary, opacity: 0.35 }
+      vector pull = (1.2, 0.75) -> (1.2 + 2.4*cos(rad(a)), 0.75 + 2.4*sin(rad(a))) { color: accent, width: 4 }
+      vector weight = (0, 0.75) -> (0, 0.75 - 2.4) { color: danger, width: 4 }
+      vector normal = (0, 0) -> (0, (100 - 40*sin(rad(a)))/42) { color: success, width: 5 }
+      label at (0, 4.2) = "pull 40 N at ${a}°" { anchor: middle, color: accent }
+      label at (0, -1.9) = "weight 100 N, but R = ${100 - 40*sin(rad(a))} N" { anchor: middle, color: success }
+      slider a { label: "angle of the rope above the floor" }
+    }
+
+    goal "Tilt the rope until the floor is carrying less than 80 N" {
+      when: 100 - 40*sin(rad(a)) < 80
+      hint: "Lift the rope past about 30° and watch R drop."
+    }
+  }
+
+  slide "Two Equations, Every Time" {
+    id: "fr3-method"
+    cat: "Finding R"
+    > Every horizontal-plane friction problem is the same two lines. Resolve
+    > vertically to find $R$, then use it horizontally.
+    >
+    > **Up and down** (nothing is lifting off or sinking in, so this always
+    > balances):
+    >
+    > $$R + P\sin\theta = W$$
+    >
+    > **Along the floor** (compare what you are applying with what friction can
+    > muster):
+    >
+    > $$P\cos\theta \quad \text{against} \quad \mu R$$
+    >
+    > If the pull wins, it moves. If not, friction quietly matches it and nothing
+    > happens.
+
+    order {
+      ask "Put the steps in order for deciding whether an angled pull will shift a crate."
+      skill: "fric-resolve"
+      item "Resolve the pull into its horizontal and vertical parts"
+      item "Resolve vertically to find $R = W - P\sin\theta$"
+      item "Work out the friction ceiling, $\mu R$"
+      item "Compare the horizontal pull $P\cos\theta$ with that ceiling"
+      item "It moves only if $P\cos\theta$ is the bigger one"
+      decoy "Assume $R$ equals the weight"
+      ! "Vertical first, always. You cannot know the friction ceiling until you know how hard the floor is being pressed."
+    }
+  }
+
+  slide "Will It Budge?" {
+    id: "fr3-budge"
+    cat: "Finding R"
+    > A block of weight $12$ kg.wt rests on a floor with $\mu = 0.4$. You pull with
+    > $4$ kg.wt at $30°$ above the horizontal.
+
+    numeric {
+      ask "First find the normal reaction $R$, in kg.wt."
+      skill: "fric-normal"
+      answer: 10
+      expect: 12 - 4*sin(rad(30))
+      tolerance: 0.02
+      hint "Vertically: the floor's push plus the upward part of your pull must together hold up the $12$ kg.wt."
+      onwrong: "fr3-r-is-not-w" retry
+      ! "$R = 12 - 4\sin 30° = 12 - 2 = 10$ kg.wt. Your rope is taking $2$ kg.wt of the load off the floor."
+    }
+  }
+
+  slide "The Floor Only Carries What Is Left" {
+    id: "fr3-r-is-not-w"
+    hidden: true
+    cat: "Finding R"
+    > $R$ is not a property of the block. It is however much the **floor happens to
+    > be pushing**, and the floor pushes exactly enough to stop the block sinking
+    > into it. No more.
+    >
+    > So the floor's job depends on what else is helping. Pull upwards and you take
+    > some of the load; press downwards and you add to it.
+    >
+    > Compare the three below. Same $100$ N block every time.
+    >
+    > The last one is the one people forget: push *down* at an angle and $R$ goes
+    > **above** the weight, which makes friction harder to beat, not easier. That is
+    > why pushing a lawnmower is heavier going than pulling it.
+
+    scene plane {
+      x: [-1.2, 15.0]
+      y: [-3.6, 4.2]
+      aspect: equal
+      axes: false
+      line ground = (-0.8, 0) -> (14.6, 0) { color: neutral, width: 4 }
+      rect b1 = (0.4, 0) { w: 1.8, h: 1.2, color: primary, opacity: 0.3 }
+      rect b2 = (5.8, 0) { w: 1.8, h: 1.2, color: primary, opacity: 0.3 }
+      rect b3 = (11.2, 0) { w: 1.8, h: 1.2, color: primary, opacity: 0.3 }
+      vector n1 = (1.3, 0) -> (1.3, 2.0) { color: success, width: 4 }
+      vector n2 = (6.7, 0) -> (6.7, 1.4) { color: success, width: 4 }
+      vector n3 = (12.1, 0) -> (12.1, 2.6) { color: success, width: 4 }
+      vector p2 = (7.6, 0.6) -> (9.2, 1.5) { color: accent, width: 3 }
+      vector p3 = (11.2, 1.8) -> (12.5, 0.9) { color: accent, width: 3 }
+      label at (1.3, 3.3) = "nothing else" { anchor: middle, color: neutral }
+      label at (1.3, -1.2) = "R = 100 N" { anchor: middle, color: success }
+      label at (6.7, 3.3) = "pulled upwards" { anchor: middle, color: neutral }
+      label at (6.7, -1.2) = "R = 70 N" { anchor: middle, color: success }
+      label at (12.1, 3.3) = "pushed downwards" { anchor: middle, color: neutral }
+      label at (12.1, -1.2) = "R = 130 N" { anchor: middle, color: danger }
+      label at (7.0, -2.7) = "same block every time. R is whatever the floor has left to carry." { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "A $100$ N block is pushed with a force whose downward component is $25$ N. What is $R$, in newtons?"
+      skill: "fric-normal"
+      answer: 125
+      expect: 100 + 25
+      tolerance: 0.01
+      hint "Pushing down adds to what the floor must hold, rather than taking it away."
+      ! "$R = 100 + 25 = 125$ N. Pushing down makes friction *stronger*, which is the opposite of what you usually want."
+    }
+  }
+
+  slide "Now Decide" {
+    id: "fr3-decide"
+    cat: "Finding R"
+    quiz {
+      ask "Same block: $W = 12$ kg.wt, $\mu = 0.4$, pulled with $4$ kg.wt at $30°$, so $R = 10$ kg.wt. Does it move? Take $\cos 30° \approx 0.866$."
+      skill: "fric-limiting"
+      * "No — the pull along the floor is $3.46$ kg.wt but friction can supply up to $4$"
+      - "Yes, because $4 > 0.4 \times 12$" { why: "Two slips at once: only part of the $4$ kg.wt acts along the floor, and $R$ is $10$, not $12$. Both errors push you towards the wrong verdict." }
+      - "Yes, because the pull is bigger than $\mu$" { why: "Comparing a force with $\mu$ is comparing newtons with a bare number. The pull has to be measured against $\mu R$, which is a force." }
+      hint "Work out $4\cos 30°$, then work out $0.4 \times 10$, then see which is bigger."
+      ! "Horizontal pull $= 4\cos 30° \approx 3.46$ kg.wt. Ceiling $= 0.4 \times 10 = 4$ kg.wt. $3.46 < 4$, so it stays put and friction sits at $3.46$."
+    }
+  }
+
+  slide "The Best Angle to Pull At" {
+    id: "fr3-optimal"
+    cat: "The Clever Bit"
+    > Now something genuinely lovely.
+    >
+    > Raising the rope pulls in two directions at once. It **wastes** some of your
+    > pull on lifting rather than dragging — but it also **lightens the load on the
+    > floor**, which lowers the friction you have to beat.
+    >
+    > Those two effects fight each other, so there is a best angle in between.
+    > Pull flat and you face the full friction; pull steeply and hardly any of your
+    > effort goes sideways. Somewhere in the middle sits the least effort you can
+    > get away with.
+    >
+    > Hunt for it below. The bar shows how much force you need at each angle.
+
+    scene plane {
+      x: [-1.0, 9.5]
+      y: [-2.6, 5.4]
+      aspect: equal
+      axes: false
+      param a = 0 { range: [0, 70], step: 1 }
+      curve need = 100*0.4/(cos(rad(x*70/8)) + 0.4*sin(rad(x*70/8)))/12 { where: x > 0 and x < 8.05, color: neutral, width: 2, style: dashed }
+      line base = (0, 0) -> (8.6, 0) { color: neutral, width: 3 }
+      rect bar = (a*8/70 - 0.16, 0) { w: 0.32, h: 100*0.4/(cos(rad(a)) + 0.4*sin(rad(a)))/12, color: primary, opacity: 0.5 }
+      point marker = (a*8/70, 100*0.4/(cos(rad(a)) + 0.4*sin(rad(a)))/12) { color: accent, r: 7 }
+      label at (4.3, 5.0) = "pulling at ${a}° needs ${100*0.4/(cos(rad(a)) + 0.4*sin(rad(a)))} N" { anchor: middle, color: primary }
+      label at (4.3, -1.6) = "rope angle, 0° on the left to 70° on the right" { anchor: middle, color: neutral }
+      slider a { label: "rope angle" }
+    }
+
+    goal "Find the angle that needs the least force of all" {
+      when: a > 19 and a < 25
+      hint: "Somewhere in the low twenties. Watch the number bottom out."
+    }
+  }
+
+  slide "Why That Angle" {
+    id: "fr3-optimal-why"
+    cat: "The Clever Bit"
+    > The cheapest angle turns out to satisfy
+    >
+    > $$\tan\theta = \mu$$
+    >
+    > With $\mu = 0.4$ that is $\theta = \arctan(0.4) \approx 21.8°$, which is
+    > exactly where the bar bottomed out.
+    >
+    > Pulling flat would have cost you $\mu W = 40$ N. Pulling at $21.8°$ costs
+    > about $37.1$ N. Not a huge saving, but it comes for free, and removal firms
+    > have known it for a very long time.
+    >
+    > That angle is going to turn up again next lesson with a name of its own: the
+    > **angle of friction**.
+
+    numeric {
+      ask "A surface has $\mu = 0.75$. At what angle above the horizontal should you pull to shift a crate with the least possible force? Give it in degrees."
+      skill: "fric-resolve"
+      answer: 36.87
+      expect: deg(atan(0.75))
+      tolerance: 0.3
+      hint "The cheapest angle is the one where $\tan\theta = \mu$."
+      ! "$\theta = \arctan(0.75) \approx 36.9°$. Grippier surfaces want a steeper pull, because there is more friction worth escaping."
+    }
+  }
+
+  slide "All Together" {
+    id: "fr3-synth"
+    cat: "The Clever Bit"
+    > A $50$ kg.wt crate sits on a floor with $\mu = 0.5$. You pull with a force
+    > $P$ at $60°$ above the horizontal, and the crate is on the point of sliding.
+
+    build {
+      ask "Assemble the two equations that pin this down."
+      skill: "fric-resolve"
+      template: "vertically: $R =$ ___ $\qquad$ on the point of sliding: $P\cos 60° =$ ___"
+      bank: ["$50 - P\sin 60°$", "$0.5R$", "$50 + P\sin 60°$", "$0.5 \times 50$"]
+      answer: ["$50 - P\sin 60°$", "$0.5R$"]
+      hint "The upward part of $P$ helps hold the crate up, so it comes off the weight. And *on the point of sliding* is the one moment friction really is at its ceiling."
+      ! "$R = 50 - P\sin 60°$ and $P\cos 60° = 0.5R$. Substitute one into the other and you can solve for $P$. Note that $0.5 \times 50$ would assume $R$ is still the weight, which the rope has already made false."
+    }
+  }
+}

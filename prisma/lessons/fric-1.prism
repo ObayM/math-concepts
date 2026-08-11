@@ -1,0 +1,221 @@
+lesson "Static and Kinetic Friction" {
+  course: "mechanics"
+  unit: "Friction"
+  difficulty: "Intermediate"
+  icon: "Undo2"
+  summary: "Friction is not one number, it is a negotiation. Why a still box pushes back with exactly as much as you give it, right up until it suddenly does not."
+  skills: ["fric-static", "fric-kinetic", "fric-limiting", "fric-direction"]
+
+  slide "Push a Heavy Box. Nothing Happens." {
+    id: "fr1-hook"
+    cat: "Friction Adjusts"
+    > Lean on a heavy crate with $20$ N. It does not budge.
+    >
+    > So where did your $20$ N go? The crate is in equilibrium, so something must
+    > be pushing back with exactly $20$ N. That something is **friction**, and this
+    > is the strangest thing about it: it produced precisely the number needed.
+    > Not more, not less.
+    >
+    > Push with $40$ N and it pushes back with $40$. Push with $59$ and it matches
+    > that too. But friction has a limit, and past it the crate breaks free.
+    >
+    > Wind your push up slowly and watch the orange arrow track you.
+
+    scene plane {
+      x: [-5.4, 5.4]
+      y: [-2.6, 4.0]
+      aspect: equal
+      axes: false
+      param P = 20 { range: [0, 100], step: 1 }
+      line ground = (-5.0, 0) -> (5.0, 0) { color: neutral, width: 4 }
+      rect crate = (-0.9, 0) { w: 1.8, h: 1.3, color: primary, opacity: 0.35 }
+      vector push = (-0.9 - P/26, 0.65) -> (-0.9, 0.65) { color: primary, width: 4 }
+      vector fric = (0.9 + (min(P, 60)*(P <= 60) + 50*(P > 60))/26, 0.65) -> (0.9, 0.65) { color: warning, width: 4 }
+      label at (0, 3.5) = "you push with ${P} N" { anchor: middle, color: primary }
+      label at (0, 2.8) = "friction pushes back with ${min(P, 60)*(P <= 60) + 50*(P > 60)} N" { anchor: middle, color: warning }
+      label at (0, -1.6) = "still stuck" { anchor: middle, color: neutral, show: P <= 60 }
+      label at (0, -1.6) = "SLIDING" { anchor: middle, color: danger, show: P > 60 }
+      slider P { label: "how hard you push" }
+    }
+
+    goal "Push hard enough to break the crate free" {
+      when: P > 60
+      hint: "Keep winding it up. Somewhere past 60 N the friction gives out."
+    }
+  }
+
+  slide "Two Different Frictions" {
+    id: "fr1-two-kinds"
+    cat: "Friction Adjusts"
+    > What you just watched was two separate things wearing the same coat.
+    >
+    > **Static friction** acts while the surfaces are still gripping. It is not a
+    > fixed number at all: it grows to match whatever you apply, up to a ceiling
+    > called the **limiting friction**. That is why it gets written with a $\le$:
+    >
+    > $$F_{\text{static}} \le \mu_s R$$
+    >
+    > **Kinetic friction** takes over once things are actually sliding. It is
+    > roughly constant, and slightly *smaller* than the limiting value:
+    >
+    > $$F_{\text{kinetic}} = \mu_k R$$
+    >
+    > That drop is why a stuck drawer flies open the moment it yields. You were
+    > pushing hard enough to beat the static limit, and suddenly only the smaller
+    > kinetic friction is fighting you.
+
+    scene plane {
+      x: [-0.8, 8.4]
+      y: [-1.2, 5.2]
+      aspect: equal
+      grid
+      axes
+      curve rising = x { where: x < 3.4, color: warning, width: 3 }
+      curve sliding = 2.8 { where: x > 3.4, color: danger, width: 3 }
+      point peak = (3.4, 3.4) { color: warning, r: 7, label: "limit" }
+      point drop = (3.4, 2.8) { open, color: danger, r: 7 }
+      label at (1.3, 2.6) = "static: matches you" { color: warning }
+      label at (5.2, 3.4) = "kinetic: steady, and lower" { color: danger }
+      label at (4.2, -0.85) = "how hard you push" { anchor: middle, color: neutral }
+    }
+  }
+
+  slide "The Sentence That Costs Marks" {
+    id: "fr1-le-quiz"
+    cat: "Friction Adjusts"
+    quiz {
+      ask "A crate needs $60$ N to get moving. You push it with $25$ N and it stays put. What is the friction force?"
+      skill: "fric-static"
+      * "$25$ N"
+      - "$60$ N" { why: "If friction were $60$ N against your $25$ N, there would be a net $35$ N shoving the crate backwards, towards you. It would slide the wrong way. Friction only reaches $60$ N when you actually demand that much." }
+      - "$35$ N" { why: "That is the gap between your push and the limit, but friction is not the leftover. The crate is in equilibrium, so friction exactly matches what you applied." }
+      - "Zero, because nothing is moving" { why: "Nothing moving is exactly what tells you friction is present. With no friction, $25$ N would send the crate sliding." }
+      hint "The crate is not moving, so the forces on it must total zero. What has to balance your $25$ N?"
+      onwrong: "fr1-not-always-max" retry
+      ! "$25$ N. Static friction gives back exactly what it receives, right up to its ceiling of $60$ N."
+    }
+  }
+
+  slide "Friction Is Not Always at Its Maximum" {
+    id: "fr1-not-always-max"
+    hidden: true
+    cat: "Friction Adjusts"
+    > This is the single most expensive mistake in the whole topic, so it is worth
+    > a slide of its own.
+    >
+    > $\mu R$ is a **ceiling**, not a value. Writing $F = \mu R$ when the object is
+    > sitting still is like saying that because a lift can carry $600$ kg, everyone
+    > inside it weighs $600$ kg.
+    >
+    > Look at the three crates below. Same surface, same limiting friction of
+    > $60$ N. Only the third one has friction anywhere near its maximum, because
+    > only the third one is being asked for it.
+    >
+    > **If it is not moving and not on the verge of moving, friction equals whatever
+    > balances the other forces.** Reach for $\mu R$ only when the problem says
+    > "on the point of sliding" or the thing is already sliding.
+
+    scene plane {
+      x: [-1.0, 11.0]
+      y: [-2.2, 3.4]
+      aspect: equal
+      axes: false
+      line ground = (-0.6, 0) -> (10.6, 0) { color: neutral, width: 4 }
+      rect c1 = (0.4, 0) { w: 1.6, h: 1.1, color: primary, opacity: 0.3 }
+      rect c2 = (4.2, 0) { w: 1.6, h: 1.1, color: primary, opacity: 0.3 }
+      rect c3 = (8.0, 0) { w: 1.6, h: 1.1, color: primary, opacity: 0.3 }
+      vector p1 = (0.4, 0.55) -> (0.0, 0.55) { color: primary, width: 3 }
+      vector f1 = (2.0, 0.35) -> (2.4, 0.35) { color: warning, width: 3 }
+      vector p2 = (4.2, 0.55) -> (3.2, 0.55) { color: primary, width: 3 }
+      vector f2 = (5.8, 0.35) -> (6.8, 0.35) { color: warning, width: 3 }
+      vector p3 = (8.0, 0.55) -> (6.5, 0.55) { color: primary, width: 3 }
+      vector f3 = (9.6, 0.35) -> (11.1, 0.35) { color: warning, width: 3 }
+      label at (1.2, 2.4) = "push 10 N" { anchor: middle, color: primary }
+      label at (1.2, 1.7) = "friction 10 N" { anchor: middle, color: warning }
+      label at (5.0, 2.4) = "push 35 N" { anchor: middle, color: primary }
+      label at (5.0, 1.7) = "friction 35 N" { anchor: middle, color: warning }
+      label at (8.8, 2.4) = "push 60 N" { anchor: middle, color: primary }
+      label at (8.8, 1.7) = "friction 60 N, maxed" { anchor: middle, color: danger }
+      label at (5.0, -1.5) = "same surfaces, same 60 N ceiling, three different frictions" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "Same crate, limiting friction still $60$ N. Now you push with only $12$ N and it does not move. What is the friction force, in newtons?"
+      skill: "fric-static"
+      answer: 12
+      expect: 12
+      tolerance: 0.01
+      hint "Not moving means the forces balance. Friction supplies exactly what is needed and no more."
+      ! "$12$ N. Friction is a responder, not a fixed tax."
+    }
+  }
+
+  slide "Sort the Situations" {
+    id: "fr1-sort"
+    cat: "Static or Kinetic"
+    sort {
+      ask "In each case, which kind of friction is acting?"
+      skill: "fric-kinetic"
+      bin "Static": ["a book resting on a tilted desk, not slipping", "your shoe gripping the pavement as you walk", "a car tyre rolling without skidding"]
+      bin "Kinetic": ["a hockey puck sliding to a stop", "a crate being dragged across a floor", "a car skidding with locked wheels"]
+      hint "Ask whether the two surfaces in contact are actually sliding *past each other* at the point of contact."
+      ! "The rolling tyre is the interesting one: the car is moving, but the patch of rubber touching the road is momentarily at rest against it, so that is static friction. It is exactly why anti-lock brakes exist, since a skidding tyre gets the weaker kinetic friction instead."
+    }
+  }
+
+  slide "Friction Opposes Sliding, Not Motion" {
+    id: "fr1-direction"
+    cat: "Static or Kinetic"
+    > A sentence you will hear often, and it is wrong: "friction opposes motion".
+    >
+    > Friction opposes **relative sliding between the surfaces**. Usually that
+    > amounts to the same thing, and then one day it does not, and the exception is
+    > how you walk.
+    >
+    > When you step forward, your shoe pushes *backwards* on the pavement. Friction
+    > answers by pushing your shoe *forwards*. That forward push is the only thing
+    > propelling you. On perfectly slippery ice you would go nowhere at all — not
+    > because friction is holding you back, but because it is not there to push you
+    > along.
+
+    scene plane {
+      x: [-4.6, 4.6]
+      y: [-2.4, 3.2]
+      aspect: equal
+      axes: false
+      line pavement = (-4.2, 0) -> (4.2, 0) { color: neutral, width: 4 }
+      polygon shoe = [(-1.6, 0), (1.2, 0), (1.2, 0.5), (-1.0, 0.75), (-1.6, 0.4)] { color: primary, opacity: 0.4 }
+      vector shoeOnGround = (-0.4, 0.18) -> (-2.2, 0.18) { color: neutral, width: 3, style: dashed }
+      vector frictionOnShoe = (-0.4, 0.9) -> (1.6, 0.9) { color: success, width: 4 }
+      label at (-2.4, -0.85) = "shoe pushes the ground backwards" { anchor: middle, color: neutral }
+      label at (1.9, 1.5) = "friction pushes you forwards" { color: success }
+    }
+
+    quiz {
+      ask "You are walking forwards at a steady pace. Which way does friction act on your shoe?"
+      skill: "fric-direction"
+      * "Forwards, the way you are travelling"
+      - "Backwards, opposing your motion" { why: "Then nothing would be driving you forwards and you could never start walking at all. Friction opposes the *sliding* your shoe tries to do, and your shoe tries to slide backwards." }
+      - "There is no friction, since you are moving steadily" { why: "Steady motion means the forces balance, not that they are absent. Without friction your foot would just slip, as it does on ice." }
+      hint "Which way does the sole of your shoe try to scuff the pavement as you push off?"
+      ! "Forwards. Your shoe tries to slide backwards, so friction opposes *that* and shoves you forwards. Friction is what makes walking possible, not what makes it hard."
+    }
+  }
+
+  slide "The Drawer That Flies Open" {
+    id: "fr1-synth"
+    cat: "Static or Kinetic"
+    > A stuck drawer needs $70$ N to break free. Once it is moving, kinetic
+    > friction is only $55$ N. You pull steadily with $70$ N throughout.
+
+    numeric {
+      ask "The instant after it breaks free, what is the net force on the drawer, in newtons?"
+      skill: "fric-kinetic"
+      answer: 15
+      expect: 70 - 55
+      tolerance: 0.01
+      hint "You are still pulling with $70$ N, but the friction fighting you has dropped to the kinetic value."
+      ! "$70 - 55 = 15$ N of unopposed pull, which is why the drawer leaps out and your socks end up on the floor. The static ceiling is higher than the kinetic value, so breaking free always comes with a jolt."
+    }
+  }
+}

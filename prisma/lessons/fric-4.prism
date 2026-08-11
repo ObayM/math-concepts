@@ -1,0 +1,262 @@
+lesson "Inclined Planes and the Angle of Friction" {
+  course: "mechanics"
+  unit: "Friction"
+  difficulty: "Advanced"
+  icon: "Triangle"
+  summary: "Tilt a board until things slide and you have measured mu without a single instrument. The angle of friction, and the day friction points downhill."
+  skills: ["fric-incline", "fric-angle-of-friction", "fric-direction", "fric-limiting"]
+
+  slide "Tilt It Until It Goes" {
+    id: "fr4-hook"
+    cat: "The Slipping Point"
+    > Put something on a board and slowly lift one end. For a while nothing
+    > happens. Then, at one particular angle, it lets go.
+    >
+    > Two things are moving against each other as you tilt. The pull dragging the
+    > block **down the slope** is $W\sin\theta$, and it grows. The friction
+    > available to hold it, $\mu W\cos\theta$, **shrinks**, because the block is
+    > pressing into the surface less and less.
+    >
+    > It slips the instant the growing one overtakes the shrinking one. Find that
+    > angle.
+
+    scene plane {
+      x: [-4.4, 4.4]
+      y: [-3.8, 4.6]
+      aspect: equal
+      axes: false
+      param a = 15 { range: [5, 55], step: 1 }
+      param mu = 0.5 { range: [0.15, 1.2], step: 0.05 }
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(a)), -2), (-3 + 6*cos(rad(a)), -2 + 6*sin(rad(a)))] { color: neutral, opacity: 0.22 }
+      rect block = (-3 + 3.4*cos(rad(a)), -2 + 3.4*sin(rad(a))) { w: 1.2, h: 0.65, rotate: a, color: primary }
+      vector down = (-3 + 3.4*cos(rad(a)) + 0.6*cos(rad(a)) - 0.33*sin(rad(a)), -2 + 3.4*sin(rad(a)) + 0.6*sin(rad(a)) + 0.33*cos(rad(a))) -> (-3 + 3.4*cos(rad(a)) + 0.6*cos(rad(a)) - 0.33*sin(rad(a)) - 2.6*sin(rad(a))*cos(rad(a)), -2 + 3.4*sin(rad(a)) + 0.6*sin(rad(a)) + 0.33*cos(rad(a)) - 2.6*sin(rad(a))*sin(rad(a))) { color: danger, width: 4 }
+      vector grip = (-3 + 3.4*cos(rad(a)) + 0.6*cos(rad(a)) - 0.33*sin(rad(a)), -2 + 3.4*sin(rad(a)) + 0.6*sin(rad(a)) + 0.33*cos(rad(a))) -> (-3 + 3.4*cos(rad(a)) + 0.6*cos(rad(a)) - 0.33*sin(rad(a)) + 2.6*mu*cos(rad(a))*cos(rad(a)), -2 + 3.4*sin(rad(a)) + 0.6*sin(rad(a)) + 0.33*cos(rad(a)) + 2.6*mu*cos(rad(a))*sin(rad(a))) { color: success, width: 4 }
+      arc sweep = (-3, -2) { r: 1.1, from: 0, to: a, color: accent }
+      label at (-1.55, -1.75) = "${a}°" { color: accent }
+      label at (0, 4.2) = "still holding" { anchor: middle, color: neutral, show: tan(rad(a)) <= mu }
+      label at (0, 4.2) = "IT SLIPS" { anchor: middle, color: danger, show: tan(rad(a)) > mu }
+      label at (0, -2.7) = "dragging it down: ${sin(rad(a))} W" { anchor: middle, color: danger }
+      label at (0, -3.4) = "grip available: ${mu*cos(rad(a))} W" { anchor: middle, color: success }
+      slider a { label: "tilt of the board" }
+      slider mu { label: "mu, how grippy the surfaces are" }
+    }
+
+    goal "Tilt it far enough to make the block let go" {
+      when: tan(rad(a)) > mu
+      hint: "Keep lifting until the red number passes the green one."
+    }
+    goal "Now make it grip again at that same angle, without lowering the board" {
+      when: tan(rad(a)) <= mu and a > 20
+      hint: "Leave the tilt alone and push mu up instead. Grippier surfaces hold on longer."
+    }
+  }
+
+  slide "The Angle Is the Measurement" {
+    id: "fr4-angle"
+    cat: "The Slipping Point"
+    > At the exact moment it lets go, the two are equal:
+    >
+    > $$W\sin\theta = \mu W\cos\theta$$
+    >
+    > The weight cancels off both sides completely — which is why a heavy block and
+    > a light one of the same material slip at the *same* angle. Divide through and
+    > you are left with something remarkable:
+    >
+    > $$\tan\theta = \mu$$
+    >
+    > So you can measure $\mu$ with a plank and a protractor. No force meters, no
+    > weighing, and it does not matter what the object weighs. That slipping angle
+    > has a name: the **angle of friction**, written $\lambda$.
+    >
+    > $$\mu = \tan\lambda$$
+    >
+    > And notice where you have met it before — it is exactly the best angle to
+    > pull a crate at, from last lesson. The same $\lambda$ both times, because both
+    > are asking the same question about how grip trades against direction.
+
+    numeric {
+      ask "A block on a plank stays put until the plank reaches exactly $45°$, then slides. What is $\mu$?"
+      skill: "fric-angle-of-friction"
+      answer: 1
+      expect: tan(rad(45))
+      tolerance: 0.01
+      hint "$\mu = \tan\lambda$, and $\lambda$ is the angle where it let go."
+      ! "$\mu = \tan 45° = 1$. A $\mu$ of $1$ means the grip can be as strong as the whole normal reaction, which is very grippy indeed — think rubber on dry tarmac."
+    }
+  }
+
+  slide "Does the Weight Matter?" {
+    id: "fr4-weight-quiz"
+    cat: "The Slipping Point"
+    quiz {
+      ask "Two blocks of the same material sit on the same board. One weighs $2$ kg.wt, the other $20$ kg.wt. You slowly tilt the board. Which slips first?"
+      skill: "fric-angle-of-friction"
+      * "Neither — they let go at exactly the same angle"
+      - "The heavy one, since gravity pulls it harder" { why: "It is pulled down the slope harder, true, but it also presses into the board harder, so it gets proportionally more grip. The two effects cancel exactly." }
+      - "The light one, since it has less grip" { why: "Less grip, but also less to drag it down. Same cancellation, opposite direction." }
+      hint "Look at $W\sin\theta = \mu W\cos\theta$ again. What happens to $W$?"
+      ! "Same angle. $W$ cancels off both sides, leaving $\tan\theta = \mu$ with no weight in it at all. This is exactly why the slipping angle is a clean way to measure $\mu$."
+    }
+  }
+
+  slide "Slip or Stick?" {
+    id: "fr4-decide"
+    cat: "The Slipping Point"
+    > A $20$ kg.wt block sits on a plane inclined at $30°$, with $\mu = 0.75$.
+
+    quiz {
+      ask "Is the block slipping? Take $\tan 30° \approx 0.577$."
+      skill: "fric-incline"
+      * "No — $\tan 30°$ is $0.577$, which is less than $\mu = 0.75$"
+      - "Yes, because $30°$ is a steep angle" { why: "Steepness on its own decides nothing. What matters is whether $\tan\theta$ has got past $\mu$, and here it has not." }
+      - "You cannot tell without the weight" { why: "The weight cancels out. $\tan\theta$ against $\mu$ is the whole test, whatever the block weighs." }
+      hint "Compare $\tan\theta$ with $\mu$ directly. Slipping needs $\tan\theta > \mu$."
+      ! "$0.577 < 0.75$, so it holds. The angle of friction here is $\arctan(0.75) \approx 36.9°$, so the board would need another $7°$ of tilt before anything happened."
+    }
+  }
+
+  slide "Friction Does Not Always Point Uphill" {
+    id: "fr4-downhill"
+    cat: "Which Way Is Friction?"
+    > On a ramp problem friction usually points **up** the slope, because the block
+    > is trying to slide down and friction opposes that.
+    >
+    > Usually. Not always.
+    >
+    > Winch the block **up** the ramp and it is now sliding upwards, so friction
+    > turns around and drags it back **down** — teaming up with the weight instead
+    > of fighting it. The winch has to beat both.
+    >
+    > Friction always opposes the sliding, so it always points opposite to whichever
+    > way the block is actually going. Work out the direction of travel first, then
+    > point friction the other way. Never the reverse.
+
+    scene plane {
+      x: [-4.6, 9.4]
+      y: [-2.8, 4.4]
+      aspect: equal
+      axes: false
+      polygon rampL = [(-4, -2), (-0.5, -2), (-0.5, 0.02)] { color: neutral, opacity: 0.22 }
+      polygon rampR = [(1.4, -2), (4.9, -2), (4.9, 0.02)] { color: neutral, opacity: 0.22 }
+      rect blockL = (-2.6, -1.19) { w: 1.1, h: 0.6, rotate: 30, color: primary }
+      rect blockR = (2.8, -1.19) { w: 1.1, h: 0.6, rotate: 30, color: primary }
+      vector slideL = (-2.0, -0.6) -> (-2.9, -1.12) { color: neutral, width: 3, style: dashed }
+      vector fricL = (-2.0, -0.6) -> (-1.1, -0.08) { color: success, width: 4 }
+      vector slideR = (3.4, -0.6) -> (4.3, -0.08) { color: neutral, width: 3, style: dashed }
+      vector fricR = (3.4, -0.6) -> (2.5, -1.12) { color: danger, width: 4 }
+      label at (-2.2, 2.6) = "sliding down" { anchor: middle, color: neutral }
+      label at (-2.2, 1.9) = "friction acts up" { anchor: middle, color: success }
+      label at (3.2, 2.6) = "winched up" { anchor: middle, color: neutral }
+      label at (3.2, 1.9) = "friction acts down" { anchor: middle, color: danger }
+    }
+
+    quiz {
+      ask "A winch drags a crate steadily **up** a rough ramp. Which forces does the winch have to overcome?"
+      skill: "fric-direction"
+      * "The down-slope part of the weight **and** friction, both pulling it back"
+      - "Only the down-slope part of the weight, since friction helps things move" { why: "Friction never helps something slide. It opposes the sliding, and here the sliding is upwards, so friction points down the slope." }
+      - "Only friction, since the ramp supports the weight" { why: "The ramp only supports the part of the weight perpendicular to it. The part along the slope still has to be beaten." }
+      hint "Which way is the crate actually sliding? Friction points the other way."
+      ! "Both. Going up, the weight component and friction both act down the slope, so the winch fights $W\sin\theta + \mu W\cos\theta$. Coming back down, friction flips and helps hold it, which is why lowering is gentler than lifting."
+    }
+  }
+
+  slide "The Force the Surface Really Exerts" {
+    id: "fr4-resultant-reaction"
+    cat: "Which Way Is Friction?"
+    > A last idea that tidies everything up.
+    >
+    > We keep talking about two forces from the surface: the normal reaction $R$
+    > pushing out, and friction $F$ acting along it. But the surface is one object
+    > and it exerts **one** force. $R$ and $F$ are components we invented, exactly
+    > as we split any other force into across and up.
+    >
+    > Combine them and you get the **resultant reaction** — the real push from the
+    > surface. And the angle it leans away from the normal is:
+    >
+    > $$\tan\lambda = \frac{F}{R} = \mu \quad \text{at the limit}$$
+    >
+    > There is $\lambda$ again, the same angle of friction. It is the furthest the
+    > surface's push can ever lean before the thing slides. Every friction result in
+    > this unit is that one geometric fact wearing a different hat.
+
+    scene plane {
+      x: [-3.6, 3.6]
+      y: [-1.4, 4.2]
+      aspect: equal
+      axes: false
+      line ground = (-3.2, 0) -> (3.2, 0) { color: neutral, width: 4 }
+      rect block = (-0.8, 0) { w: 1.6, h: 1.0, color: primary, opacity: 0.3 }
+      vector normal = (0, 0) -> (0, 2.6) { color: success, width: 4, style: dashed }
+      vector fric = (0, 0) -> (1.3, 0) { color: warning, width: 4, style: dashed }
+      vector resultant = (0, 0) -> (1.3, 2.6) { color: danger, width: 5 }
+      arc lam = (0, 0) { r: 1.5, from: 63.43, to: 90, color: danger }
+      label at (0.75, 1.85) = "λ" { color: danger }
+      label at (0, 3.6) = "the surface's one real push" { anchor: middle, color: danger }
+      label at (2.0, -0.7) = "friction F" { anchor: middle, color: warning }
+      label at (-1.1, 2.4) = "normal R" { anchor: middle, color: success }
+    }
+  }
+
+  slide "Put It All on One Ramp" {
+    id: "fr4-synth"
+    cat: "Which Way Is Friction?"
+    > A crate of weight $40$ kg.wt rests on a ramp at $25°$, with $\mu = 0.3$.
+
+    numeric {
+      ask "What is the friction force acting on the crate, in kg.wt?"
+      skill: "fric-limiting"
+      answer: 10.88
+      expect: 0.3*40*cos(rad(25))
+      tolerance: 0.12
+      hint "Two checks before you calculate. Is it sliding? And on a ramp, what is $R$?"
+      hint "$\tan 25° \approx 0.466$, bigger than $\mu = 0.3$, so it is sliding and friction is at its ceiling. And on a ramp $R = W\cos\theta$."
+      onwrong: "fr4-check-first" retry
+      ! "$\tan 25° \approx 0.466 > 0.3$, so it slides and friction sits at $\mu R$. On a ramp $R = 40\cos 25° \approx 36.25$ kg.wt, so friction $\approx 0.3 \times 36.25 \approx 10.9$ kg.wt. The two traps here are using $R = 40$ (giving $12$) and grabbing the down-slope weight $40\sin 25° \approx 16.9$ instead."
+    }
+  }
+
+  slide "Sliding, So Check Which Number You Want" {
+    id: "fr4-check-first"
+    hidden: true
+    cat: "Which Way Is Friction?"
+    > Almost everyone who misses that one does it for the same reason: they use
+    > $R = W$. On a **ramp that is never true.**
+    >
+    > The block does not press straight into a tilted surface. Only the part of the
+    > weight perpendicular to the ramp does any pressing, and that part is
+    > $W\cos\theta$. The rest of the weight is busy trying to drag the block
+    > downhill.
+    >
+    > $$R = W\cos\theta \qquad \text{never just } W$$
+    >
+    > Tilt the board below and watch $R$ fall away while the down-slope pull climbs.
+    > At $0°$ they are the familiar flat-floor case, $R = W$. By $90°$ the surface is
+    > vertical, presses on nothing, and offers no grip whatsoever.
+
+    scene plane {
+      x: [-4.4, 4.4]
+      y: [-3.0, 4.4]
+      aspect: equal
+      axes: false
+      param a = 25 { range: [0, 75], step: 1 }
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(a)), -2), (-3 + 6*cos(rad(a)), -2 + 6*sin(rad(a)))] { color: neutral, opacity: 0.22 }
+      rect block = (-3 + 3.4*cos(rad(a)), -2 + 3.4*sin(rad(a))) { w: 1.2, h: 0.65, rotate: a, color: primary }
+      vector normal = (-3 + 3.4*cos(rad(a)) + 0.6*cos(rad(a)) - 0.33*sin(rad(a)), -2 + 3.4*sin(rad(a)) + 0.6*sin(rad(a)) + 0.33*cos(rad(a))) -> (-3 + 3.4*cos(rad(a)) + 0.6*cos(rad(a)) - 0.33*sin(rad(a)) - 2.4*cos(rad(a))*sin(rad(a)), -2 + 3.4*sin(rad(a)) + 0.6*sin(rad(a)) + 0.33*cos(rad(a)) + 2.4*cos(rad(a))*cos(rad(a))) { color: success, width: 4 }
+      arc sweep = (-3, -2) { r: 1.0, from: 0, to: a, color: accent }
+      label at (0, 4.0) = "R = ${cos(rad(a))} W, not W" { anchor: middle, color: success }
+      label at (0, -2.5) = "at ${a}° the surface only feels ${100*cos(rad(a))}% of the weight" { anchor: middle, color: neutral }
+      slider a { label: "tilt" }
+    }
+
+    numeric {
+      ask "A crate of weight $40$ kg.wt sits on a ramp at $25°$. What is the normal reaction $R$, in kg.wt?"
+      skill: "fric-incline"
+      answer: 36.25
+      expect: 40*cos(rad(25))
+      tolerance: 0.1
+      hint "Only the perpendicular slice of the weight presses into the ramp, and that is $W\cos\theta$."
+      ! "$R = 40\cos 25° \approx 36.25$ kg.wt. Get this wrong and every friction number after it is wrong too, because they all run through $R$."
+    }
+  }
+}
