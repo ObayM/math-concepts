@@ -1,0 +1,220 @@
+lesson "The Second Law: F = ma" {
+  course: "mechanics"
+  unit: "Newton's Laws"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "The equation the whole subject runs on. What the F really stands for, why mass is on the bottom, and why a newton was defined the way it was."
+  skills: ["newton-second-law", "newton-net-force", "newton-units"]
+
+  slide "Same Push, Different Answer" {
+    id: "n2-hook"
+    cat: "Force, Mass, Acceleration"
+    > The first law told you what happens with **no** resultant force. The second
+    > law handles everything else, and it is only one line long.
+    >
+    > Push harder and a thing speeds up faster. Load it heavier and the same push
+    > achieves less. That is the entire content, and it fits in:
+    >
+    > $$a = \frac{F}{m}$$
+    >
+    > Push and mass pull in opposite directions, which is exactly why $F$ is on the
+    > top and $m$ is on the bottom. Try both sliders.
+
+    scene plane {
+      x: [-1.0, 11.4]
+      y: [-3.0, 3.6]
+      aspect: equal
+      axes: false
+      param F = 40 { range: [5, 100], step: 5 }
+      param m = 8 { range: [1, 20], step: 1 }
+      line floor = (-0.6, 0) -> (11.0, 0) { color: neutral, width: 3 }
+      rect trolley = (1.0, 0) { w: 0.5 + m*0.16, h: 0.5 + m*0.1, color: primary, opacity: 0.35 }
+      vector push = (1.0 - F/24, 0.5) -> (1.0, 0.5) { color: accent, width: 4 }
+      vector accel = (3.6, 2.2) -> (3.6 + F/m*0.6, 2.2) { color: success, width: 5 }
+      label at (5.2, 3.2) = "acceleration = ${F/m} m/s²" { anchor: middle, color: success }
+      label at (5.2, -1.6) = "push ${F} N on a mass of ${m} kg" { anchor: middle, color: primary }
+      slider F { label: "how hard you push, in newtons" }
+      slider m { label: "mass, in kilograms" }
+    }
+
+    goal "Get the acceleration above 10 m/s²" {
+      when: F/m > 10
+      hint: "Big push, small mass."
+    }
+    goal "Now make the very same push produce almost nothing" {
+      when: F/m < 1
+      hint: "Leave the push alone and pile on the mass instead."
+    }
+  }
+
+  slide "Which F?" {
+    id: "n2-which-f"
+    cat: "Force, Mass, Acceleration"
+    > Rearranged the usual way round, the law reads:
+    >
+    > $$F = ma$$
+    >
+    > and there is exactly one trap in it. **$F$ is the resultant force, not the
+    > force you happen to be applying.**
+    >
+    > Shove a crate with $100$ N while friction drags back with $70$ N and the crate
+    > does not accelerate as though it had $100$ N on it. It has $30$ N of leftover,
+    > and $30$ is the number that goes in the equation.
+    >
+    > So $F = ma$ is always the *last* step. Find every force, add them up as
+    > vectors, and only then divide by the mass.
+
+    scene plane {
+      x: [-5.6, 5.6]
+      y: [-2.6, 3.6]
+      aspect: equal
+      axes: false
+      line floor = (-5.2, 0) -> (5.2, 0) { color: neutral, width: 3 }
+      rect crate = (-1.1, 0) { w: 2.2, h: 1.3, color: primary, opacity: 0.35 }
+      vector push = (-3.6, 0.9) -> (-1.1, 0.9) { color: accent, width: 4 }
+      vector fric = (2.85, 0.35) -> (1.1, 0.35) { color: warning, width: 4 }
+      vector net = (-0.5, 2.4) -> (0.25, 2.4) { color: success, width: 5 }
+      label at (-3.9, 0.9) = "100 N" { anchor: end, color: accent }
+      label at (3.15, 0.35) = "70 N" { color: warning }
+      label at (0, 3.2) = "resultant: 30 N, and that is the F in F = ma" { anchor: middle, color: success }
+    }
+
+    numeric {
+      ask "That crate has a mass of $15$ kg. What is its acceleration, in m/s²?"
+      skill: "newton-net-force"
+      answer: 2
+      expect: (100 - 70)/15
+      tolerance: 0.01
+      hint "Use the leftover force, not the $100$ N."
+      onwrong: "n2-resultant-only" retry
+      ! "$a = 30/15 = 2$ m/s². Using $100$ N would have given $6.67$ m/s², more than three times too big."
+    }
+  }
+
+  slide "Add Up First, Divide Second" {
+    id: "n2-resultant-only"
+    hidden: true
+    cat: "Force, Mass, Acceleration"
+    > If you reached for $100 \div 15$, you are in excellent company, and the fix is
+    > a habit rather than a formula.
+    >
+    > $F = ma$ describes the **whole situation**, not one contribution to it. The
+    > object cannot tell which force came from you and which came from the floor. It
+    > only ever responds to the total.
+    >
+    > So the running order is always:
+    >
+    > **one, list every force. two, add them as vectors to get the resultant. three,
+    > and only then, divide by the mass.**
+    >
+    > Below is the same crate under three different frictions. Same $100$ N push
+    > every time, three completely different accelerations.
+
+    scene plane {
+      x: [-1.2, 14.6]
+      y: [-3.2, 3.2]
+      aspect: equal
+      axes: false
+      line f1 = (-0.8, 0) -> (4.2, 0) { color: neutral, width: 3 }
+      line f2 = (5.2, 0) -> (9.4, 0) { color: neutral, width: 3 }
+      line f3 = (10.4, 0) -> (14.2, 0) { color: neutral, width: 3 }
+      rect c1 = (0.6, 0) { w: 1.6, h: 1.0, color: primary, opacity: 0.3 }
+      rect c2 = (6.2, 0) { w: 1.6, h: 1.0, color: primary, opacity: 0.3 }
+      rect c3 = (11.4, 0) { w: 1.6, h: 1.0, color: primary, opacity: 0.3 }
+      vector p1 = (-0.4, 0.7) -> (0.6, 0.7) { color: accent, width: 3 }
+      vector p2 = (5.2, 0.7) -> (6.2, 0.7) { color: accent, width: 3 }
+      vector p3 = (10.4, 0.7) -> (11.4, 0.7) { color: accent, width: 3 }
+      vector r1 = (2.2, 0.3) -> (3.2, 0.3) { color: warning, width: 3 }
+      vector r2 = (7.8, 0.3) -> (8.5, 0.3) { color: warning, width: 3 }
+      vector r3 = (13.0, 0.3) -> (13.1, 0.3) { color: warning, width: 3 }
+      label at (1.4, 2.4) = "friction 0 N" { anchor: middle, color: neutral }
+      label at (7.0, 2.4) = "friction 70 N" { anchor: middle, color: neutral }
+      label at (12.2, 2.4) = "friction 100 N" { anchor: middle, color: neutral }
+      label at (1.4, -1.4) = "a = 6.67 m/s²" { anchor: middle, color: success }
+      label at (7.0, -1.4) = "a = 2 m/s²" { anchor: middle, color: success }
+      label at (12.2, -1.4) = "a = 0" { anchor: middle, color: danger }
+      label at (6.7, -2.6) = "same 100 N push in all three. only the resultant differs." { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "Same $15$ kg crate, same $100$ N push, but now friction is $40$ N. What is the acceleration, in m/s²?"
+      skill: "newton-net-force"
+      answer: 4
+      expect: (100 - 40)/15
+      tolerance: 0.01
+      hint "Resultant first: $100 - 40$."
+      ! "$a = 60/15 = 4$ m/s². Subtract, then divide. Every time."
+    }
+  }
+
+  slide "Where the Newton Came From" {
+    id: "n2-units"
+    cat: "Units and Weight"
+    > Now the definition from the very first lesson stops looking arbitrary.
+    >
+    > $$1\ \text{N} = 1\ \text{kg} \times 1\ \text{m/s}^2$$
+    >
+    > The newton was **defined** to make $F = ma$ come out with no fudge factor. One
+    > newton is simply whatever it takes to accelerate one kilogram at one metre per
+    > second squared. Not a coincidence, a design decision.
+    >
+    > It also explains a unit trap. If a problem gives you mass in kilograms, your
+    > forces must be in newtons. Feed it kg.wt and the arithmetic will quietly hand
+    > you an answer $9.8$ times too small.
+
+    table {
+      ask "Fill in the missing quantity in each row, using $F = ma$."
+      skill: "newton-second-law"
+      header: ["force in N", "mass in kg", "acceleration in m/s²"]
+      row: 12, 4, blank(3)
+      row: 50, blank(10), 5
+      row: blank(63), 9, 7
+      row: 30, 12, blank(2.5)
+      hint "Rearrange as needed: $a = F/m$, or $m = F/a$, or $F = ma$."
+      ! "$3$, $10$, $63$, $2.5$. One equation, three ways round, depending on which corner is missing."
+    }
+  }
+
+  slide "Weight Is Just This Law Again" {
+    id: "n2-weight"
+    cat: "Units and Weight"
+    > Drop something and the only force on it is its weight. Put that into $F = ma$:
+    >
+    > $$W = ma \quad \Rightarrow \quad mg = ma \quad \Rightarrow \quad a = g$$
+    >
+    > The mass cancels off both sides completely. So **everything falls with the
+    > same acceleration**, whatever it weighs, which is the result Galileo is
+    > supposed to have dropped things off a tower to demonstrate.
+    >
+    > Heavier things are pulled harder, yes. But they are also correspondingly more
+    > reluctant to be accelerated, and the two effects cancel exactly. That is not a
+    > coincidence either, though explaining *why* took Einstein.
+
+    quiz {
+      ask "A $10$ kg ball and a $1$ kg ball are dropped together in a vacuum. Which hits the ground first?"
+      skill: "newton-second-law"
+      * "Neither — they land together"
+      - "The $10$ kg ball, since gravity pulls it ten times harder" { why: "It is pulled ten times harder, but it also has ten times the inertia to overcome. $a = mg/m = g$ either way." }
+      - "The $1$ kg ball, since it is easier to move" { why: "Easier to accelerate, but also pulled ten times less. The two cancel exactly." }
+      hint "Write $F = ma$ with $F = mg$ and see what survives."
+      ! "Together. $mg = ma$ gives $a = g$ with the mass gone from both sides. In air a feather loses to a hammer, but that is drag, not gravity."
+    }
+  }
+
+  slide "Put It to Work" {
+    id: "n2-synth"
+    cat: "Units and Weight"
+    > A $1200$ kg car is travelling along a level road. Its engine drives it with
+    > $4500$ N while drag and friction resist with $1500$ N.
+
+    build {
+      ask "Assemble the calculation for the car's acceleration."
+      skill: "newton-net-force"
+      template: "$a =$ ___ $\div$ ___ $= 2.5\ \text{m/s}^2$"
+      bank: ["$4500 - 1500$", "$1200$", "$4500$", "$4500 + 1500$"]
+      answer: ["$4500 - 1500$", "$1200$"]
+      hint "Resultant on the top, mass on the bottom."
+      ! "$a = (4500 - 1500)/1200 = 3000/1200 = 2.5$ m/s². Resultant first, mass second, and never the driving force on its own."
+    }
+  }
+}

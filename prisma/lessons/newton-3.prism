@@ -1,0 +1,207 @@
+lesson "The Third Law: Action and Reaction" {
+  course: "mechanics"
+  unit: "Newton's Laws"
+  difficulty: "Intermediate"
+  icon: "Link"
+  summary: "Forces come in pairs, and the pair always lands on two different objects. The naming trick that makes third-law questions trivial, and why a book on a table is not an example."
+  skills: ["newton-third-law", "newton-pairs", "newton-second-law"]
+
+  slide "You Cannot Push Without Being Pushed" {
+    id: "n3-hook"
+    cat: "Forces Come in Pairs"
+    > Two skaters face each other on smooth ice. One shoves the other. Both slide
+    > away.
+    >
+    > That second part is the surprise. The one doing the pushing did not ask to
+    > move. But you cannot push on something without it pushing back on you, by
+    > exactly as much. Forces are never something one object does to another; they
+    > are always an **interaction between two things**.
+    >
+    > Equal pushes, though, do not mean equal results. Change the masses below and
+    > watch: the arrows stay identical while the accelerations come apart.
+
+    scene plane {
+      x: [-7.0, 7.0]
+      y: [-3.4, 3.6]
+      aspect: equal
+      axes: false
+      param mA = 100 { range: [40, 160], step: 10 }
+      param mB = 50 { range: [40, 160], step: 10 }
+      line ice = (-6.6, -1.4) -> (6.6, -1.4) { color: neutral, width: 3 }
+      rect skaterA = (-2.6, -1.4) { w: 1.2, h: 0.6 + mA*0.012, color: primary, opacity: 0.4 }
+      rect skaterB = (1.4, -1.4) { w: 1.2, h: 0.6 + mB*0.012, color: accent, opacity: 0.4 }
+      vector onA = (-1.4, 0.4) -> (-3.4, 0.4) { color: danger, width: 5 }
+      vector onB = (1.4, 0.4) -> (3.4, 0.4) { color: danger, width: 5 }
+      label at (0, 1.4) = "both forces are 100 N, always" { anchor: middle, color: danger }
+      label at (-2.0, 2.6) = "a = ${100/mA} m/s²" { anchor: middle, color: primary }
+      label at (2.0, 2.6) = "a = ${100/mB} m/s²" { anchor: middle, color: accent }
+      label at (-2.0, -2.4) = "${mA} kg" { anchor: middle, color: neutral }
+      label at (2.0, -2.4) = "${mB} kg" { anchor: middle, color: neutral }
+      slider mA { label: "mass of the left skater" }
+      slider mB { label: "mass of the right skater" }
+    }
+
+    goal "Make one skater fly off at more than three times the other's acceleration" {
+      when: mA > 3*mB or mB > 3*mA
+      hint: "Make one of them very heavy and the other very light. The forces will not budge."
+    }
+  }
+
+  slide "Name Them Properly and It Becomes Easy" {
+    id: "n3-naming"
+    cat: "Forces Come in Pairs"
+    > The law itself:
+    >
+    > **If A exerts a force on B, then B exerts an equal and opposite force on A.**
+    >
+    > Most people meet it as "every action has an equal and opposite reaction",
+    > which is catchy and leaves out the only part that matters: *what the forces
+    > act on*.
+    >
+    > So use this naming rule and third-law questions stop being confusing:
+    >
+    > $$\text{force of } \mathbf{A} \text{ on } \mathbf{B} \quad \longleftrightarrow \quad \text{force of } \mathbf{B} \text{ on } \mathbf{A}$$
+    >
+    > Write the pair out with both nouns in it and swap them. That is the whole
+    > method. If your two forces do not have the same two nouns swapped round, they
+    > are not a pair.
+
+    match {
+      ask "Match each force to its third-law partner."
+      skill: "newton-pairs"
+      pair "Earth pulls the Moon" -> "the Moon pulls the Earth"
+      pair "the bat hits the ball" -> "the ball hits the bat"
+      pair "your shoe pushes the pavement back" -> "the pavement pushes your shoe forwards"
+      pair "the rocket pushes gas downwards" -> "the gas pushes the rocket upwards"
+      hint "Swap the two nouns round and keep everything else the same."
+      ! "Every one is the same two objects with the roles reversed. That is the only test there is."
+    }
+  }
+
+  slide "The Book on the Table" {
+    id: "n3-book"
+    cat: "The Classic Trap"
+    > Now the question that catches almost everyone.
+    >
+    > A book lies on a table. Gravity pulls it down with $8$ N. The table pushes it
+    > up with $8$ N. Equal, opposite, and **not a third-law pair**.
+
+    scene plane {
+      x: [-4.6, 4.6]
+      y: [-2.8, 4.0]
+      aspect: equal
+      axes: false
+      line table = (-3.8, 0) -> (3.8, 0) { color: neutral, width: 4 }
+      rect book = (-1.2, 0) { w: 2.4, h: 0.7, color: primary, opacity: 0.35 }
+      vector wt = (0, 0.35) -> (0, -1.3) { color: danger, width: 4 }
+      vector norm = (0, 0.35) -> (0, 2.0) { color: success, width: 4 }
+      label at (0.35, 2.3) = "table pushes book up, 8 N" { color: success }
+      label at (0.35, -1.7) = "Earth pulls book down, 8 N" { color: danger }
+      label at (0, 3.6) = "both act on the BOOK, so they cannot be a pair" { anchor: middle, color: neutral }
+    }
+
+    quiz {
+      ask "What is the third-law partner of *the Earth pulls the book down*?"
+      skill: "newton-third-law"
+      * "The book pulls the Earth up"
+      - "The table pushes the book up" { why: "That force acts on the *book*, and so does the Earth's pull. A third-law pair never lands on the same object, so these two cannot be partners." }
+      - "The book pushes the table down" { why: "That is a genuine third-law force, but its partner is *the table pushes the book up*. The Earth is not involved in it at all." }
+      hint "Apply the naming rule. 'Earth pulls book' swaps to what?"
+      onwrong: "n3-why-not-a-pair" retry
+      ! "*Earth pulls book* swaps to *book pulls Earth*. That partner is a force on the **Earth**, and it really exists: the book tugs the planet upwards with $8$ N. The Earth is simply too massive for anyone to notice."
+    }
+  }
+
+  slide "Two Pairs, Four Forces" {
+    id: "n3-why-not-a-pair"
+    hidden: true
+    cat: "The Classic Trap"
+    > There are actually **two separate pairs** hiding in the book-on-table picture,
+    > and the trap is mixing one member of each.
+    >
+    > **Pair one, gravity:** Earth pulls book down / book pulls Earth up.
+    >
+    > **Pair two, contact:** table pushes book up / book pushes table down.
+    >
+    > The two forces you normally draw on the book, its weight and the normal
+    > reaction, are one member of *each* pair. They happen to be equal here only
+    > because the book is in equilibrium. Put the book in a lift that is
+    > accelerating upwards and they stop being equal at once, while both third-law
+    > pairs stay perfectly matched, because the third law never depends on motion.
+    >
+    > Two tests, and a pair must pass both:
+    >
+    > **Same two objects, roles swapped. Acting on different bodies.**
+
+    scene plane {
+      x: [-6.4, 6.4]
+      y: [-3.6, 3.8]
+      aspect: equal
+      axes: false
+      line tableL = (-6.0, 0) -> (-0.6, 0) { color: neutral, width: 4 }
+      line tableR = (0.6, 0) -> (6.0, 0) { color: neutral, width: 4 }
+      rect bookL = (-4.2, 0) { w: 2.0, h: 0.6, color: primary, opacity: 0.35 }
+      rect bookR = (2.2, 0) { w: 2.0, h: 0.6, color: primary, opacity: 0.35 }
+      vector g1 = (-3.2, 0.3) -> (-3.2, -1.4) { color: danger, width: 4 }
+      vector g2 = (-3.2, 0.3) -> (-3.2, 2.0) { color: danger, width: 3, style: dashed }
+      vector c1 = (3.2, 0.3) -> (3.2, 2.0) { color: success, width: 4 }
+      vector c2 = (3.2, 0.3) -> (3.2, -1.4) { color: success, width: 3, style: dashed }
+      label at (-3.2, 3.2) = "pair one: gravity" { anchor: middle, color: danger }
+      label at (3.2, 3.2) = "pair two: contact" { anchor: middle, color: success }
+      label at (-3.2, -2.2) = "Earth on book, book on Earth" { anchor: middle, color: neutral }
+      label at (3.2, -2.2) = "table on book, book on table" { anchor: middle, color: neutral }
+      label at (0, -3.2) = "each pair splits across two bodies. never both on the book." { anchor: middle, color: neutral }
+    }
+
+    quiz {
+      ask "The book is now in a lift accelerating **upwards**. What happens to the two third-law pairs?"
+      skill: "newton-third-law"
+      * "Both pairs stay exactly matched, even though the weight and the normal force are no longer equal to each other"
+      - "The pairs stop being equal, since the book is accelerating" { why: "The third law has no exceptions and does not care about acceleration. Each pair is always equal and opposite, however the objects are moving." }
+      - "The pairs stay matched and so do the weight and normal force" { why: "The pairs stay matched, but the normal force must now *exceed* the weight to accelerate the book upwards. Those two were only equal while it was in equilibrium." }
+      ! "Third-law pairs are always equal, no matter what. The weight and the normal force being equal was never the third law at work, it was just equilibrium, and accelerating breaks it."
+    }
+  }
+
+  slide "Why Nothing Cancels" {
+    id: "n3-no-cancel"
+    cat: "The Classic Trap"
+    > One more objection worth killing off. If every force has an equal and opposite
+    > partner, why does anything ever move? Should it not all cancel?
+    >
+    > It would, if both landed on the same object. They never do. **Forces only
+    > cancel when they act on the same body**, and a third-law pair by definition
+    > splits across two.
+    >
+    > Add up the forces on the *ball* and the bat's whack has nothing to cancel it,
+    > so the ball flies off. Add up the forces on the *bat* and the ball's push back
+    > is what stings your hands. Two separate sums, one per object.
+
+    quiz {
+      ask "A truck collides head-on with a bicycle. Which experiences the bigger force?"
+      skill: "newton-third-law"
+      * "Neither — the forces on each are identical in size"
+      - "The bicycle, obviously" { why: "The bicycle comes off far worse, but that is about acceleration, not force. $a = F/m$, and the bicycle's tiny mass turns the same force into an enormous acceleration." }
+      - "The truck, since it is heavier and moving faster" { why: "Mass and speed decide the damage, not the force. The interaction hands both vehicles exactly the same size of force." }
+      hint "It is one interaction between two objects, so the naming rule applies as usual."
+      ! "Identical forces, wildly different outcomes. The truck might see $2$ m/s² and the bicycle $200$ m/s², from the very same force, purely because of $a = F/m$."
+    }
+  }
+
+  slide "Both Laws at Once" {
+    id: "n3-synth"
+    cat: "The Classic Trap"
+    > A $100$ kg skater pushes a $50$ kg skater on smooth ice, with a force of
+    > $10$ kg.wt.
+
+    numeric {
+      ask "What force does the $50$ kg skater exert back on the $100$ kg one, in kg.wt?"
+      skill: "newton-third-law"
+      answer: 10
+      expect: 10
+      tolerance: 0.01
+      hint "One interaction, two objects. The masses are there to tempt you."
+      ! "$10$ kg.wt, identical. The masses change nothing about the *forces* — they only decide who ends up moving faster, and the lighter skater will accelerate twice as hard."
+    }
+  }
+}

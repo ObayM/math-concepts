@@ -1,0 +1,251 @@
+lesson "Solving F = ma Problems" {
+  course: "mechanics"
+  unit: "Newton's Laws"
+  difficulty: "Advanced"
+  icon: "Sigma"
+  summary: "The method that cracks every one of them: one free-body diagram per object, one equation each, then link them. Lifts, connected blocks and pulleys."
+  skills: ["newton-second-law", "newton-connected", "newton-tension"]
+
+  slide "One Object, One Equation" {
+    id: "n4-method"
+    cat: "The Method"
+    > Every problem from here on is the same five moves. Learn the moves and you
+    > never need a special formula for lifts, or for pulleys, or for anything else.
+    >
+    > **One.** Pick one object and draw only the forces acting **on it**.
+    >
+    > **Two.** Choose a positive direction, ideally the way it is accelerating.
+    >
+    > **Three.** Write $\sum F = ma$ along that direction.
+    >
+    > **Four.** Repeat for the next object.
+    >
+    > **Five.** Link the equations. Connected objects share the same $a$, and the
+    > tension in a light string over a smooth pulley is the same throughout.
+    >
+    > That last step is where the problem is actually solved: two equations, two
+    > unknowns, usually $a$ and $T$.
+
+    order {
+      ask "Put the method in order for a two-block pulley problem."
+      skill: "newton-connected"
+      item "Draw a free-body diagram for each block on its own"
+      item "Write $\sum F = ma$ for the first block"
+      item "Write $\sum F = ma$ for the second block"
+      item "Add the two equations so the tension cancels, and solve for $a$"
+      item "Put $a$ back into either equation to get the tension"
+      decoy "Look up the formula for pulley acceleration"
+      ! "Adding the equations is the trick: the tension appears with opposite signs in the two, so it vanishes and leaves you with $a$ alone. Memorised pulley formulas break the moment the question adds friction or a slope; the method never does."
+    }
+  }
+
+  slide "The Lift" {
+    id: "n4-lift"
+    cat: "Tension"
+    > Stand on scales in a lift and watch the reading change as it starts moving.
+    > Your mass has not budged, so what is going on?
+    >
+    > The scales read the **normal reaction**, and that has to do two jobs at once:
+    > hold you up against gravity, *and* supply whatever leftover force is
+    > accelerating you.
+    >
+    > $$R - mg = ma$$
+    >
+    > Accelerating upwards means $R > mg$, and you feel heavy. Accelerating
+    > downwards means $R < mg$, and you feel light. In free fall $R = 0$ and you
+    > feel nothing at all, which is exactly what astronauts are experiencing.
+
+    scene plane {
+      x: [-4.6, 4.6]
+      y: [-3.4, 3.8]
+      aspect: equal
+      axes: false
+      param acc = 2 { range: [-9.8, 6], step: 0.2 }
+      polygon shaftL = [(-2.6, -2.6), (-2.4, -2.6), (-2.4, 3.2), (-2.6, 3.2)] { color: neutral, opacity: 0.3 }
+      polygon shaftR = [(2.4, -2.6), (2.6, -2.6), (2.6, 3.2), (2.4, 3.2)] { color: neutral, opacity: 0.3 }
+      rect lift = (-2.2, -2.2) { w: 4.4, h: 4.0, color: neutral, opacity: 0.12 }
+      rect person = (-0.5, -2.2) { w: 1.0, h: 1.8, color: primary, opacity: 0.4 }
+      vector weight = (0.3, -1.3) -> (0.3, -1.3 - 70*9.8/500) { color: danger, width: 4 }
+      vector normal = (-0.3, -1.3) -> (-0.3, -1.3 + max(0, 70*9.8 + 70*acc)/500) { color: success, width: 4 }
+      label at (0.62, -2.4) = "weight 686 N" { color: danger }
+      label at (0, 3.5) = "accelerating at ${acc} m/s²" { anchor: middle, color: accent }
+      label at (0, -3.1) = "scales read ${70*9.8 + 70*acc} N   (still 70 kg of you)" { anchor: middle, color: success }
+      slider acc { label: "lift acceleration, negative is downwards" }
+    }
+
+    goal "Make the scales read less than your true weight" {
+      when: acc < 0
+      hint: "Accelerate downwards. Push the slider below zero."
+    }
+    goal "Now find the acceleration that makes the scales read zero" {
+      when: acc < -9.5
+      hint: "All the way down, to -9.8. That is free fall, and it is why astronauts float."
+    }
+  }
+
+  slide "Tension Is Not the Weight" {
+    id: "n4-tension-quiz"
+    cat: "Tension"
+    quiz {
+      ask "A $5$ kg mass hangs from a string inside a lift accelerating **upwards** at $2$ m/s². Taking $g = 9.8$, what is the tension?"
+      skill: "newton-tension"
+      * "$59$ N — more than its weight"
+      - "$49$ N, the same as its weight" { why: "That is the answer for a lift at rest or at constant speed. Accelerating upwards needs a resultant upwards, so the string must pull harder than gravity pulls down." }
+      - "$39$ N, less than its weight" { why: "That would give a resultant downwards, so the mass would be accelerating down, not up." }
+      hint "$T - mg = ma$. Rearranged, $T = m(g + a)$."
+      onwrong: "n4-tension-detour" retry
+      ! "$T = 5(9.8 + 2) = 5 \times 11.8 = 59$ N. Tension only equals the weight when there is no acceleration."
+    }
+  }
+
+  slide "The String Pulls Whatever Is Needed" {
+    id: "n4-tension-detour"
+    hidden: true
+    cat: "Tension"
+    > "Tension equals weight" is another rule that is only true in the special case
+    > everyone meets first: nothing accelerating.
+    >
+    > The string does whatever the equation demands:
+    >
+    > $$T = m(g + a)$$
+    >
+    > Accelerating **up** ($a$ positive) means $T > mg$. Hanging still or moving at
+    > constant speed ($a = 0$) means $T = mg$. Accelerating **down** means $T < mg$.
+    > And in free fall, $a = -g$, so $T = 0$: a string in a falling lift goes
+    > completely slack, because nothing needs holding up when everything falls
+    > together.
+    >
+    > Notice that constant *speed* gives $T = mg$ just like being at rest. It is
+    > acceleration that changes things, never speed.
+
+    scene plane {
+      x: [-7.2, 7.2]
+      y: [-3.0, 3.4]
+      aspect: equal
+      axes: false
+      line ceilA = (-6.4, 2.4) -> (-3.6, 2.4) { color: neutral, width: 3 }
+      line ceilB = (-1.4, 2.4) -> (1.4, 2.4) { color: neutral, width: 3 }
+      line ceilC = (3.6, 2.4) -> (6.4, 2.4) { color: neutral, width: 3 }
+      line strA = (-5, 2.4) -> (-5, 0.4) { color: primary, width: 4 }
+      line strB = (0, 2.4) -> (0, 0.4) { color: primary, width: 3 }
+      line strC = (5, 2.4) -> (5, 0.4) { color: primary, width: 2, style: dashed }
+      rect mA = (-5.6, -0.8) { w: 1.2, h: 1.2, color: accent, opacity: 0.4 }
+      rect mB = (-0.6, -0.8) { w: 1.2, h: 1.2, color: accent, opacity: 0.4 }
+      rect mC = (4.4, -0.8) { w: 1.2, h: 1.2, color: accent, opacity: 0.4 }
+      label at (-5, 3.1) = "accelerating up" { anchor: middle, color: neutral }
+      label at (0, 3.1) = "still, or steady speed" { anchor: middle, color: neutral }
+      label at (5, 3.1) = "in free fall" { anchor: middle, color: neutral }
+      label at (-5, -1.6) = "T > mg" { anchor: middle, color: danger }
+      label at (0, -1.6) = "T = mg" { anchor: middle, color: success }
+      label at (5, -1.6) = "T = 0" { anchor: middle, color: warning }
+      label at (0, -2.6) = "same mass in all three. only the acceleration differs." { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "The same $5$ kg mass, now in a lift accelerating **downwards** at $2$ m/s². What is the tension, in newtons?"
+      skill: "newton-tension"
+      answer: 39
+      expect: 5*(9.8 - 2)
+      tolerance: 0.1
+      hint "$T = m(g + a)$, and $a$ is negative when the acceleration points down."
+      ! "$T = 5(9.8 - 2) = 39$ N. Less than the $49$ N weight, because gravity is now doing some of the accelerating rather than being entirely resisted."
+    }
+  }
+
+  slide "Connected Blocks Share an Acceleration" {
+    id: "n4-pulley"
+    cat: "Connected Particles"
+    > Two blocks joined by a light string over a smooth pulley. A $3$ kg block sits
+    > on a smooth table; a $2$ kg block hangs off the edge.
+    >
+    > The string does not stretch, so whatever the hanging block does, the table
+    > block copies exactly. **Same acceleration for both.** And a light string over a
+    > smooth pulley has the **same tension** throughout.
+    >
+    > Now write one equation each, taking the direction of motion as positive.
+    >
+    > Hanging block: $\quad 2g - T = 2a$
+    >
+    > Table block: $\quad T = 3a$
+    >
+    > Add them and $T$ disappears: $2g = 5a$.
+
+    scene plane {
+      x: [-5.4, 5.4]
+      y: [-4.6, 3.0]
+      aspect: equal
+      axes: false
+      line table = (-5.0, 1.4) -> (1.6, 1.4) { color: neutral, width: 4 }
+      line legT = (-3.0, 1.4) -> (-3.0, -3.4) { color: neutral, width: 3 }
+      circle pulley = (1.9, 1.7) { r: 0.35, color: neutral }
+      rect blockA = (-2.4, 1.4) { w: 1.4, h: 0.9, color: primary, opacity: 0.4 }
+      rect blockB = (1.35, -1.4) { w: 1.1, h: 1.1, color: accent, opacity: 0.4 }
+      line stringH = (-1.0, 1.85) -> (1.9, 1.85) { color: warning, width: 3 }
+      line stringV = (2.25, 1.7) -> (2.25, -0.3) { color: warning, width: 3 }
+      vector aA = (-1.7, 2.7) -> (-0.5, 2.7) { color: success, width: 4 }
+      vector aB = (0.6, -0.9) -> (0.6, -2.1) { color: success, width: 4 }
+      label at (-1.7, 0.75) = "3 kg, smooth table" { anchor: middle, color: primary }
+      label at (2.6, -1.9) = "2 kg" { color: accent }
+      label at (0.05, 2.7) = "same a" { color: success }
+      label at (0, -4.0) = "one string, one tension, one acceleration" { anchor: middle, color: warning }
+    }
+
+    numeric {
+      ask "Find the acceleration of the system, in m/s². Take $g = 9.8$."
+      skill: "newton-connected"
+      answer: 3.92
+      expect: 2*9.8/(3 + 2)
+      tolerance: 0.02
+      hint "Adding the two equations gives $2g = 5a$."
+      ! "$a = 19.6/5 = 3.92$ m/s². Notice the total mass being accelerated is $5$ kg, but only the $2$ kg block's weight is doing the driving."
+    }
+  }
+
+  slide "Now the Tension" {
+    id: "n4-tension-value"
+    cat: "Connected Particles"
+    > With $a = 3.92$ m/s² in hand, put it back into whichever equation is simpler.
+    > The table block's is easiest, since it has only one force along the motion.
+
+    numeric {
+      ask "Using $T = 3a$, what is the tension in the string, in newtons?"
+      skill: "newton-tension"
+      answer: 11.76
+      expect: 3*(2*9.8/(3 + 2))
+      tolerance: 0.05
+      hint "$T = 3 \times 3.92$."
+      ! "$T = 11.76$ N. Sanity-check it: the tension is less than the hanging block's weight of $19.6$ N, which it must be, or the $2$ kg block could never accelerate downwards. It is also more than zero, or the $3$ kg block would never move. Answers that fail those two checks are wrong."
+    }
+  }
+
+  slide "Why Not Just Add the Masses?" {
+    id: "n4-system-quiz"
+    cat: "Connected Particles"
+    quiz {
+      ask "Someone solves that pulley problem in one line: $a = \dfrac{2 \times 9.8}{3 + 2} = 3.92$. Is treating both blocks as one object legitimate?"
+      skill: "newton-connected"
+      * "Yes, and it is a good shortcut — but it can never give you the tension"
+      - "No, it is a coincidence that it worked" { why: "It is not a coincidence. Treated as one system, the tension is an internal force appearing twice with opposite signs, so it cancels. That is exactly what adding the two equations does." }
+      - "Yes, and it works for the tension too" { why: "Tension is internal to the combined system, so it never appears in the system equation. To find it you have to look at one block on its own." }
+      hint "What happened to $T$ when you added the two equations?"
+      ! "Perfectly legitimate. Treating them as one object silently cancels the internal tension, which is why it gets $a$ so quickly. The price is that the tension has vanished from view, so you still need a single-block equation to recover it."
+    }
+  }
+
+  slide "One More, With Friction" {
+    id: "n4-synth"
+    cat: "Connected Particles"
+    > Same setup, but now the table is **rough**: the $3$ kg block meets a friction
+    > force of $5.8$ N as it slides.
+
+    build {
+      ask "Assemble the two equations for this system, taking the direction of motion as positive."
+      skill: "newton-connected"
+      template: "hanging: $2g - T = 2a \qquad$ table: ___ $=$ ___"
+      bank: ["$T - 5.8$", "$3a$", "$T + 5.8$", "$2a$"]
+      answer: ["$T - 5.8$", "$3a$"]
+      hint "On the table block, tension pulls it forwards and friction drags backwards. The resultant is what equals $ma$."
+      ! "$T - 5.8 = 3a$. Friction subtracts because it opposes the motion. Add the two equations and you get $2g - 5.8 = 5a$, so $a = (19.6 - 5.8)/5 = 2.76$ m/s², slower than before, exactly as friction should make it."
+    }
+  }
+}

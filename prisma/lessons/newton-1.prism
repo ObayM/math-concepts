@@ -1,0 +1,199 @@
+lesson "The First Law and Inertia" {
+  course: "mechanics"
+  unit: "Newton's Laws"
+  difficulty: "Beginner"
+  icon: "Play"
+  summary: "Things keep doing what they were doing. Why a moving object needs no force at all, and why everyday life spends so much effort hiding that from you."
+  skills: ["newton-first-law", "newton-inertia", "newton-net-force"]
+
+  slide "Why Does a Rolling Ball Stop?" {
+    id: "n1-hook"
+    cat: "Left Alone"
+    > Roll a ball across a carpet and it stops. Roll it across polished wood and it
+    > goes further. On smooth ice, further still.
+    >
+    > Every time you take away more friction, the ball travels further. So follow
+    > that all the way: take friction away **completely**, and the ball never stops
+    > at all.
+    >
+    > This is the bit that feels wrong, because nothing in your daily life is
+    > frictionless. Everything you have ever pushed has eventually stopped, and so
+    > the idea that motion needs a constant push feels obviously true. It is not
+    > true. It is friction, quietly doing its work, that made it look that way.
+    >
+    > Slide the friction down and watch how far the puck gets.
+
+    scene plane {
+      x: [-0.6, 11.6]
+      y: [-2.4, 3.4]
+      aspect: equal
+      axes: false
+      param f = 6 { range: [0, 10], step: 1 }
+      line ice = (-0.2, 0) -> (11.2, 0) { color: neutral, width: 4 }
+      rect puck = (0.2 + (10 - f)*0.95, 0) { w: 0.9, h: 0.5, color: primary, opacity: 0.45 }
+      vector travel = (0.5, 1.4) -> (0.5 + (10 - f)*0.95 + 0.4, 1.4) { color: accent, width: 3, style: dashed }
+      label at (5.5, 2.6) = "how far it gets before stopping" { anchor: middle, color: accent }
+      label at (5.5, -1.5) = "friction setting: ${f}" { anchor: middle, color: neutral }
+      label at (5.5, -2.1) = "with no friction at all, it simply never stops" { anchor: middle, color: primary, show: f == 0 }
+      slider f { label: "friction, 10 is carpet and 0 is perfect ice" }
+    }
+
+    goal "Take the friction all the way to zero" {
+      when: f == 0
+      hint: "Drag the slider to the far left."
+    }
+  }
+
+  slide "The First Law" {
+    id: "n1-law"
+    cat: "Left Alone"
+    > Newton wrote it down like this:
+    >
+    > **An object stays at rest, or keeps moving in a straight line at a constant
+    > speed, unless a resultant force acts on it.**
+    >
+    > Read the two halves carefully, because they are the same statement. "Staying
+    > at rest" is just "moving at a constant speed" where the speed happens to be
+    > zero. Nature does not distinguish between them, and neither should you.
+    >
+    > The important word is **resultant**. Not "unless a force acts" — forces can be
+    > all over an object without changing a thing, as long as they cancel. It is
+    > only the leftover that matters.
+    >
+    > This is why the last lesson called a cruising car and a parked car the same
+    > situation. Both have zero resultant force, so both keep doing exactly what
+    > they were already doing.
+
+    sort {
+      ask "Which of these have a resultant force acting, and which do not?"
+      skill: "newton-net-force"
+      bin "Zero resultant force": ["a book lying on a table", "a car cruising at a steady 60 km/h in a straight line", "a skydiver falling at terminal velocity"]
+      bin "There is a resultant force": ["a ball at the very top of its bounce", "a car going round a roundabout at a steady speed", "a train pulling out of a station"]
+      hint "Ask whether the velocity is changing. Changing *direction* counts, even at a steady speed."
+      ! "The skydiver at terminal velocity is the surprising one: falling fast, but no longer speeding up, so drag has grown to match the weight exactly. The ball at the top of its bounce is the other way round: momentarily not moving at all, yet gravity is very much acting and it is about to accelerate downwards."
+    }
+  }
+
+  slide "Motion Is Not the Question" {
+    id: "n1-quiz"
+    cat: "Left Alone"
+    quiz {
+      ask "A spacecraft is coasting between stars with its engines switched off, far from any planet. What force keeps it moving?"
+      skill: "newton-first-law"
+      * "None at all — nothing is needed to keep it moving"
+      - "The force from its engines, still pushing it along" { why: "The engines are off. Whatever push they gave is long finished, yet the craft carries on regardless, which is exactly the point." }
+      - "Its momentum pushes it forwards" { why: "Momentum is a way of describing motion, not a force acting on the craft. Nothing has to push for the motion to continue." }
+      hint "The law says motion needs no cause. Only a *change* in motion needs one."
+      onwrong: "n1-nothing-needed" retry
+      ! "Nothing. Constant velocity is the natural state of an undisturbed object. It is stopping that needs explaining, not carrying on."
+    }
+  }
+
+  slide "Nothing Is Needed to Keep Going" {
+    id: "n1-nothing-needed"
+    hidden: true
+    cat: "Left Alone"
+    > It is worth naming the instinct, because it is a very old one. Aristotle
+    > believed exactly this: that motion requires a continuous cause. It took about
+    > two thousand years to shake off, so you are in respectable company.
+    >
+    > Here is the fix. On Earth, whenever you stop pushing something, it stops. So
+    > the push looks like the *cause* of the motion. But the reason it stops is that
+    > friction and drag are still there when your push goes away, and they are now
+    > the only forces left.
+    >
+    > Remove them and there is nothing to slow it down, so nothing does.
+    >
+    > **A force is what changes motion, never what maintains it.** Look at the two
+    > pucks: identical, both drifting right at the same steady speed. One has a
+    > forward push on it; one has nothing at all. Neither is speeding up or slowing
+    > down, so neither needs anything.
+
+    scene plane {
+      x: [-1.0, 12.4]
+      y: [-2.8, 3.6]
+      aspect: equal
+      axes: false
+      line iceL = (-0.6, 0) -> (5.2, 0) { color: neutral, width: 3 }
+      line iceR = (6.2, 0) -> (12.0, 0) { color: neutral, width: 3 }
+      rect puckL = (1.8, 0) { w: 1.1, h: 0.6, color: primary, opacity: 0.4 }
+      rect puckR = (8.6, 0) { w: 1.1, h: 0.6, color: primary, opacity: 0.4 }
+      vector vL = (2.35, 1.5) -> (3.85, 1.5) { color: accent, width: 3 }
+      vector vR = (9.15, 1.5) -> (10.65, 1.5) { color: accent, width: 3 }
+      label at (2.3, 2.5) = "drifting right" { anchor: middle, color: accent }
+      label at (9.1, 2.5) = "drifting right" { anchor: middle, color: accent }
+      label at (2.3, -1.4) = "no force on it at all" { anchor: middle, color: neutral }
+      label at (9.1, -1.4) = "and neither has this one" { anchor: middle, color: neutral }
+      label at (5.7, -2.4) = "both keep the exact same velocity forever" { anchor: middle, color: primary }
+    }
+
+    quiz {
+      ask "So what would it take to make a coasting spacecraft **slow down**?"
+      skill: "newton-first-law"
+      * "A resultant force pointing backwards, against its motion"
+      - "Switching off the engines" { why: "They are already off, and it is still going. Removing a force cannot slow anything; only adding one can." }
+      - "Running out of momentum over time" { why: "Motion does not drain away on its own. Without a force there is nothing to reduce it." }
+      ! "Something has to push back. Fire a retro thruster, hit some dust, graze an atmosphere. No backwards force, no slowing down."
+    }
+  }
+
+  slide "Inertia" {
+    id: "n1-inertia"
+    cat: "Resisting Change"
+    > The tendency to carry on unchanged has a name: **inertia**. And there is a
+    > single number that measures how much of it something has — its **mass**.
+    >
+    > This is a second, quite different job for mass. Earlier it told you how hard
+    > gravity pulls. Here it tells you how stubbornly a thing resists having its
+    > motion changed at all, gravity or no gravity.
+    >
+    > A loaded shopping trolley is hard to get moving and hard to stop, and it would
+    > be exactly as awkward on the Moon, where it weighs a sixth as much. The weight
+    > changed; the reluctance did not.
+    >
+    > It is also why you lurch forward when a bus brakes. The bus slows down. You,
+    > having no force acting on you yet, keep going at the old speed until the seat
+    > belt gets round to changing your mind.
+
+    quiz {
+      ask "A bus brakes sharply and the standing passengers lurch **forwards**. Why?"
+      skill: "newton-inertia"
+      * "No backwards force acted on them yet, so they kept moving at the old speed while the bus slowed"
+      - "A forward force threw them towards the front" { why: "Nothing pushed them forwards. Look for the force and you will not find one, because there is not one. They simply carried on while the floor beneath them slowed." }
+      - "Their inertia pushed them forwards" { why: "Inertia is not a force and does not push. It is the name for the fact that no force is needed to keep going." }
+      hint "What force acted on the passengers at the moment the brakes went on?"
+      ! "They kept their velocity because nothing had changed it yet. From inside the bus it feels like being thrown forwards; from the pavement outside you would just see people carrying on at the old speed while the bus slowed underneath them."
+    }
+  }
+
+  slide "Same Idea, Written Down" {
+    id: "n1-synth"
+    cat: "Resisting Change"
+    > A $5$ kg box sits on a frictionless horizontal surface. Two ropes pull it:
+    > $30$ N to the right and $30$ N to the left.
+
+    scene plane {
+      x: [-5.4, 5.4]
+      y: [-2.2, 3.0]
+      aspect: equal
+      axes: false
+      line floor = (-5.0, 0) -> (5.0, 0) { color: neutral, width: 3 }
+      rect box = (-0.9, 0) { w: 1.8, h: 1.1, color: primary, opacity: 0.35 }
+      vector right = (0.9, 0.55) -> (3.3, 0.55) { color: success, width: 4 }
+      vector left = (-0.9, 0.55) -> (-3.3, 0.55) { color: success, width: 4 }
+      label at (3.6, 0.55) = "30 N" { color: success }
+      label at (-3.6, 0.55) = "30 N" { anchor: end, color: success }
+      label at (0, 2.5) = "resultant = 0 N" { anchor: middle, color: primary }
+    }
+
+    quiz {
+      ask "The box was already sliding right at $2$ m/s when the ropes were attached. What happens next?"
+      skill: "newton-first-law"
+      * "It keeps sliding right at exactly $2$ m/s"
+      - "It slows down and stops, since the ropes are holding it" { why: "The ropes cancel each other exactly. A zero resultant cannot slow anything down; it leaves the motion completely alone." }
+      - "It stays still, because the forces are balanced" { why: "Balanced forces mean the velocity does not *change*. It was already $2$ m/s, so it stays $2$ m/s, not zero." }
+      hint "Work out the resultant first. Then ask what a zero resultant does to an existing velocity."
+      ! "Zero resultant means no change, and the change is what forces control. It was doing $2$ m/s to the right, so it carries on doing $2$ m/s to the right indefinitely."
+    }
+  }
+}
