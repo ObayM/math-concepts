@@ -1,0 +1,186 @@
+lesson "Exponent Rules" {
+  course: "pure-maths"
+  unit: "Algebra Foundations"
+  difficulty: "Beginner"
+  icon: "Sigma"
+  summary: "Every index law is just counting how many copies you are multiplying. Where the negative and fractional powers come from, and why anything to the zero is one."
+  skills: ["alg-index-laws", "alg-negative-powers", "alg-fractional-powers"]
+
+  slide "It Is All Counting" {
+    id: "a2-hook"
+    cat: "Counting Copies"
+    > $a^5$ means five copies of $a$ multiplied together. Keep hold of that and you
+    > never have to memorise an index law again — you can rebuild each one in about
+    > four seconds.
+    >
+    > **Multiplying?** Three copies next to four copies is seven copies:
+    >
+    > $$a^3 \times a^4 = (aaa)(aaaa) = a^7$$
+    >
+    > **Dividing?** Five copies with two cancelled off leaves three:
+    >
+    > $$\frac{a^5}{a^2} = \frac{aaaaa}{aa} = a^3$$
+    >
+    > **A power of a power?** Three lots of two copies is six copies:
+    >
+    > $$(a^2)^3 = (aa)(aa)(aa) = a^6$$
+    >
+    > So the rules are add, subtract, multiply — and which one you use is decided by
+    > what you were doing to the copies.
+
+    match {
+      ask "Match each index law to what it does to the powers."
+      skill: "alg-index-laws"
+      pair "$a^m \times a^n$" -> "$a^{m+n}$"
+      pair "$a^m \div a^n$" -> "$a^{m-n}$"
+      pair "$(a^m)^n$" -> "$a^{mn}$"
+      pair "$(ab)^m$" -> "$a^m b^m$"
+      hint "Count the copies in each case rather than recalling the rule."
+      ! "Multiplying adds, dividing subtracts, a power of a power multiplies. Notice the operations step down a level each time, which is not a coincidence."
+    }
+  }
+
+  slide "Why Anything to the Zero Is One" {
+    id: "a2-zero"
+    cat: "Counting Copies"
+    > "Zero copies multiplied together equals one" sounds like nonsense, so here is
+    > the argument that makes it inevitable.
+    >
+    > The division rule says $\dfrac{a^m}{a^n} = a^{m-n}$. Put $m = n$:
+    >
+    > $$\frac{a^3}{a^3} = a^{3-3} = a^0$$
+    >
+    > But anything divided by itself is $1$. So $a^0$ has to be $1$, or the division
+    > rule would contradict basic arithmetic.
+    >
+    > This is how mathematics decides what a notation *should* mean when the
+    > original picture runs out. Zero copies has no obvious meaning, so we pick the
+    > value that keeps every existing rule working. The same argument is about to
+    > hand you negative and fractional powers for free.
+
+    quiz {
+      ask "Why does $7^0 = 1$?"
+      skill: "alg-index-laws"
+      * "Because $7^3 \div 7^3$ is both $7^0$ and $1$, so they must be equal"
+      - "Because multiplying by nothing gives nothing, so it is zero" { why: "That would give $7^0 = 0$, which breaks the division rule: $7^3 \div 7^3$ is plainly $1$, not $0$." }
+      - "It is just a convention with no reason behind it" { why: "It is a definition, but not an arbitrary one. It is the only value that keeps the index laws consistent." }
+      hint "Divide something by itself, using the index law and using common sense, and compare."
+      ! "Forced, not chosen. Any other value would break $a^m \div a^n = a^{m-n}$."
+    }
+  }
+
+  slide "Negative Powers Mean One Over" {
+    id: "a2-negative"
+    cat: "Beyond Whole Numbers"
+    > Keep going down. Each time you drop the power by one you divide by $a$:
+    >
+    > $$a^3 = aaa \quad a^2 = aa \quad a^1 = a \quad a^0 = 1 \quad a^{-1} = \frac{1}{a} \quad a^{-2} = \frac{1}{a^2}$$
+    >
+    > So a **negative power is a reciprocal**, and nothing more sinister. $2^{-3}$ is
+    > not negative, it is $\tfrac18$. Powers control how many times you multiply;
+    > the minus sign only says which side of the fraction line you end up on.
+    >
+    > Step the power down below and watch the value halve each time.
+
+    scene plane {
+      x: [-4.5, 4.5]
+      y: [-1.5, 9.5]
+      grid
+      axes
+      param n = 2 { range: [-3, 3], step: 1 }
+      curve f = 2^x { color: primary, width: 3 }
+      point p = (n, 2^n) { color: accent, r: 8 }
+      line drop = (n, 2^n) -> (n, 0) { color: accent, style: dashed, width: 2 }
+      label at (-4.2, 8.6) = "2^${n} = ${2^n}" { color: accent }
+      label at (-4.2, 7.4) = "still positive, however negative the power" { color: neutral }
+      stepper n { label: "the power", step: 1 }
+    }
+
+    goal "Take the power negative and check the value stays above the axis" {
+      when: n < 0
+      hint: "Step it down past zero."
+    }
+  }
+
+  slide "Not the Same Thing at All" {
+    id: "a2-negative-quiz"
+    cat: "Beyond Whole Numbers"
+    quiz {
+      ask "What is $3^{-2}$?"
+      skill: "alg-negative-powers"
+      * "$\dfrac{1}{9}$"
+      - "$-9$" { why: "The minus is on the *power*, not on the answer. It flips the number into a fraction; it never makes it negative." }
+      - "$-6$" { why: "That is $3 \times (-2)$. A power is repeated multiplication, not multiplication by the power." }
+      - "$\dfrac{1}{6}$" { why: "Close, but $3^2 = 9$, not $6$. Square first, then reciprocate." }
+      hint "$a^{-n} = 1/a^n$. Work out $3^2$ first, then flip it."
+      ! "$3^{-2} = 1/3^2 = 1/9$. A positive number raised to any power at all stays positive."
+    }
+  }
+
+  slide "Fractional Powers Are Roots" {
+    id: "a2-fractional"
+    cat: "Beyond Whole Numbers"
+    > One more gap to fill. What could $a^{1/2}$ possibly mean?
+    >
+    > Whatever it is, the power-of-a-power rule must survive:
+    >
+    > $$\left(a^{1/2}\right)^2 = a^{(1/2) \times 2} = a^1 = a$$
+    >
+    > So $a^{1/2}$ is the thing that gives $a$ when squared. That is the **square
+    > root**. Same reasoning gives $a^{1/3}$ as the cube root, and in general:
+    >
+    > $$a^{m/n} = \sqrt[n]{a^m}$$
+    >
+    > Every extension of powers came from the same demand: whatever the new notation
+    > means, the old rules must not break.
+
+    match {
+      ask "Match each power to its value."
+      skill: "alg-fractional-powers"
+      pair "$5^0$" -> "$1$"
+      pair "$2^{-2}$" -> "$\tfrac14$"
+      pair "$9^{1/2}$" -> "$3$"
+      pair "$4^{3/2}$" -> "$8$"
+      decoy "$-4$"
+      hint "Zero power gives one, negative flips it over, and a half is a square root."
+      ! "$5^0 = 1$, $2^{-2} = \tfrac14$, $9^{1/2} = 3$, and $4^{3/2} = (\sqrt4)^3 = 2^3 = 8$. For that last one take the root first and the numbers stay small."
+    }
+  }
+
+  slide "Simplify Something Ugly" {
+    id: "a2-simplify"
+    cat: "Putting Them Together"
+    > Big expressions are just several rules applied in turn. Take them one at a
+    > time and nothing gets frightening:
+    >
+    > $$\frac{(2x^3)^2 \cdot x^4}{4x^5}$$
+    >
+    > The bracket first: $(2x^3)^2 = 4x^6$. Then the top becomes $4x^6 \cdot x^4 = 4x^{10}$.
+    > Then divide: $\dfrac{4x^{10}}{4x^5} = x^5$.
+
+    build {
+      ask "Simplify $\dfrac{x^7 \cdot x^2}{x^4}$."
+      skill: "alg-index-laws"
+      template: "$\dfrac{x^7 \cdot x^2}{x^4} =$ ___"
+      bank: ["$x^5$", "$x^9$", "$x^{13}$", "$x^{3.5}$"]
+      answer: ["$x^5$"]
+      hint "Add the powers on the top, then subtract the one underneath."
+      ! "$7 + 2 - 4 = 5$, so $x^5$. Multiplying adds, dividing subtracts, and that is the entire calculation."
+    }
+  }
+
+  slide "The Trap Worth Naming" {
+    id: "a2-trap"
+    cat: "Putting Them Together"
+    quiz {
+      ask "Simplify $(3x^2)^3$."
+      skill: "alg-index-laws"
+      * "$27x^6$"
+      - "$3x^6$" { why: "The $3$ is inside the bracket, so it gets cubed too: $3^3 = 27$. Everything inside a bracket takes the outside power." }
+      - "$9x^6$" { why: "That is $3^2$. The outer power is $3$, so it is $3^3 = 27$." }
+      - "$27x^5$" { why: "Powers of powers multiply, not add: $2 \times 3 = 6$." }
+      hint "Two things are inside that bracket. Both of them get cubed."
+      ! "$(3x^2)^3 = 3^3 \times x^{2 \times 3} = 27x^6$. Forgetting to raise the number out front is the most common slip in the whole topic."
+    }
+  }
+}

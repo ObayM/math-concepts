@@ -1,0 +1,203 @@
+lesson "Quadratics and Factoring" {
+  course: "pure-maths"
+  unit: "Algebra Foundations"
+  difficulty: "Beginner"
+  icon: "FunctionSquare"
+  summary: "Roots are where the curve crosses, and factors are how you write them down. Drag the roots, watch the equation rewrite itself, then factor things that fight back."
+  skills: ["alg-roots", "alg-factoring", "alg-sum-product", "alg-quadratic-formula"]
+
+  slide "The Roots Are the Whole Story" {
+    id: "a1-hook"
+    cat: "Roots and Factors"
+    > A quadratic that factors is really just a statement about **where it crosses
+    > the x-axis**.
+    >
+    > If a curve crosses at $x = 2$, then $(x - 2)$ has to be one of its factors,
+    > because plugging in $x = 2$ makes that bracket zero and drags the whole
+    > product to zero with it. That is all a root is: a number that switches one of
+    > the brackets off.
+    >
+    > Drag the two red crossings below and watch both forms of the equation rewrite
+    > themselves to keep up.
+
+    scene plane {
+      x: [-6.5, 6.5]
+      y: [-9, 11]
+      grid
+      axes
+      param r1 = -2 { range: [-5, 5], step: 1 }
+      param r2 = 3 { range: [-5, 5], step: 1 }
+      curve f = (x - r1)*(x - r2) { color: primary, width: 3 }
+      point p1 = (r1, 0) { drag: x -> r1, color: danger, r: 8, snap: 1 }
+      point p2 = (r2, 0) { drag: x -> r2, color: danger, r: 8, snap: 1 }
+      point vertex = ((r1 + r2)/2, 0 - (r2 - r1)*(r2 - r1)/4) { color: accent, r: 6 }
+      label at (-6.2, 9.6) = "(x - ${r1})(x - ${r2})" { color: primary, show: r1 >= 0 and r2 >= 0 }
+      label at (-6.2, 9.6) = "(x + ${0 - r1})(x - ${r2})" { color: primary, show: r1 < 0 and r2 >= 0 }
+      label at (-6.2, 9.6) = "(x - ${r1})(x + ${0 - r2})" { color: primary, show: r1 >= 0 and r2 < 0 }
+      label at (-6.2, 9.6) = "(x + ${0 - r1})(x + ${0 - r2})" { color: primary, show: r1 < 0 and r2 < 0 }
+      label at (-6.2, 8.2) = "roots add to ${r1 + r2} and multiply to ${r1*r2}" { color: success }
+      slider r1 { label: "first root" }
+      slider r2 { label: "second root" }
+    }
+
+    goal "Put both roots on the negative side" {
+      when: r1 < 0 and r2 < 0
+      hint: "Drag both red points to the left of the origin."
+    }
+    goal "Now make the two roots land on top of each other" {
+      when: r1 == r2
+      hint: "A repeated root, where the curve just touches the axis instead of crossing it."
+    }
+  }
+
+  slide "Sum and Product" {
+    id: "a1-sum-product"
+    cat: "Roots and Factors"
+    > Look again at what the expanded form did while you were dragging. Multiply out
+    > $(x - p)(x - q)$ and you get
+    >
+    > $$x^2 - (p + q)x + pq$$
+    >
+    > So in any quadratic $x^2 + bx + c$, the two roots **add** to $-b$ and
+    > **multiply** to $c$. That is the actual mechanism behind "find two numbers that
+    > multiply to give $c$ and add to give $b$", which you may have been doing by
+    > feel.
+    >
+    > It also tells you where to look first. Start with the **product**, because a
+    > number has only so many factor pairs, and then check which pair adds up right.
+
+    numeric {
+      ask "The quadratic $x^2 - 7x + 12$ factors as $(x - p)(x - q)$. What is $p \times q$?"
+      skill: "alg-sum-product"
+      answer: 12
+      expect: 12
+      tolerance: 0.01
+      hint "The product of the roots is the constant term, sitting right there at the end."
+      ! "$12$, and the sum is $7$. The pair that does both is $3$ and $4$, so it factors as $(x-3)(x-4)$."
+    }
+  }
+
+  slide "Factor It" {
+    id: "a1-build"
+    cat: "Roots and Factors"
+    build {
+      ask "Factor $x^2 + 5x + 6$."
+      skill: "alg-factoring"
+      reusable
+      bank: ["(", ")", "x", "+", "2", "3", "-"]
+      answer: ["(", "x", "+", "2", ")", "(", "x", "+", "3", ")"]
+      hint "Which two numbers multiply to $6$ and add to $5$?"
+      ! "$2 \times 3 = 6$ and $2 + 3 = 5$, so $(x+2)(x+3)$. The roots are $-2$ and $-3$: the signs flip when you read them out of the brackets."
+    }
+  }
+
+  slide "Watch the Signs" {
+    id: "a1-signs"
+    cat: "Roots and Factors"
+    quiz {
+      ask "What are the roots of $(x + 4)(x - 7) = 0$?"
+      skill: "alg-roots"
+      * "$x = -4$ and $x = 7$"
+      - "$x = 4$ and $x = -7$" { why: "The signs flip when you read roots off brackets. $(x+4)$ is zero when $x = -4$, not $+4$." }
+      - "$x = 4$ and $x = 7$" { why: "Only the second one. $(x+4)$ needs $x = -4$ to vanish." }
+      hint "Ask what value of $x$ makes each bracket equal zero."
+      ! "Set each bracket to zero on its own. $x + 4 = 0$ gives $x = -4$; $x - 7 = 0$ gives $x = 7$."
+    }
+  }
+
+  slide "When the x² Has a Coefficient" {
+    id: "a1-harder"
+    cat: "Harder Polynomials"
+    > Everything so far assumed the $x^2$ came alone. Once there is a number in
+    > front, like $2x^2 + 7x + 3$, the trick has to grow slightly.
+    >
+    > Now you need two numbers that multiply to $a \times c$ — here $2 \times 3 = 6$
+    > — and still add to $b = 7$. That pair is $6$ and $1$. Split the middle term
+    > with them and factor in pairs:
+    >
+    > $$2x^2 + 7x + 3 = 2x^2 + 6x + x + 3 = 2x(x + 3) + 1(x + 3) = (2x + 1)(x + 3)$$
+    >
+    > The $(x+3)$ appearing in both halves is the signal that it has worked. If your
+    > two halves do not share a bracket, you split the middle term with the wrong
+    > pair.
+
+    order {
+      ask "Put the steps in order for factoring $3x^2 + 10x + 8$."
+      skill: "alg-factoring"
+      item "Multiply $a \times c$: $3 \times 8 = 24$"
+      item "Find two numbers multiplying to $24$ and adding to $10$: that is $6$ and $4$"
+      item "Split the middle: $3x^2 + 6x + 4x + 8$"
+      item "Factor each pair: $3x(x + 2) + 4(x + 2)$"
+      item "Collect the shared bracket: $(3x + 4)(x + 2)$"
+      decoy "Find two numbers multiplying to $8$ and adding to $10$"
+      ! "The decoy is the old method, and with a coefficient on $x^2$ it simply fails: nothing multiplies to $8$ and adds to $10$. You have to use $a \times c$."
+    }
+  }
+
+  slide "When Nothing Factors" {
+    id: "a1-formula"
+    cat: "Harder Polynomials"
+    > Plenty of quadratics have perfectly good roots that are not whole numbers, and
+    > no amount of staring will factor them. For those, the formula always works:
+    >
+    > $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+    >
+    > The interesting part is under the square root. $b^2 - 4ac$ is called the
+    > **discriminant**, and it tells you the shape of the answer before you finish:
+    >
+    > **Positive** means two distinct roots and the curve cuts the axis twice.
+    > **Zero** means one repeated root and the curve just touches. **Negative** means
+    > no real roots at all and the curve misses the axis completely.
+    >
+    > Slide the curve up and down and watch the discriminant decide.
+
+    scene plane {
+      x: [-5.5, 5.5]
+      y: [-6, 10]
+      grid
+      axes
+      param c = -3 { range: [-4, 6], step: 0.5 }
+      curve f = x*x - 2*x + c { color: primary, width: 3 }
+      label at (-5.2, 8.6) = "x² - 2x + ${c}" { color: primary }
+      label at (-5.2, 7.2) = "discriminant = ${4 - 4*c}" { color: accent }
+      label at (-5.2, 5.8) = "two roots" { color: success, show: 4 - 4*c > 0 }
+      label at (-5.2, 5.8) = "one repeated root" { color: warning, show: 4 - 4*c == 0 }
+      label at (-5.2, 5.8) = "no real roots" { color: danger, show: 4 - 4*c < 0 }
+      slider c { label: "constant term c" }
+    }
+
+    goal "Lift the curve until it has no real roots at all" {
+      when: 4 - 4*c < 0
+      hint: "Raise c until the whole parabola clears the x-axis."
+    }
+  }
+
+  slide "Read the Discriminant" {
+    id: "a1-discriminant"
+    cat: "Harder Polynomials"
+    sort {
+      ask "Sort each quadratic by how many real roots it has."
+      skill: "alg-quadratic-formula"
+      bin "Two real roots": ["$x^2 - 5x + 6$", "$x^2 - 4$"]
+      bin "One repeated root": ["$x^2 - 6x + 9$", "$x^2 + 4x + 4$"]
+      bin "No real roots": ["$x^2 + x + 5$", "$x^2 + 9$"]
+      hint "Work out $b^2 - 4ac$ for each and look only at its sign."
+      ! "The discriminants are $1$, $16$, $0$, $0$, $-19$ and $-36$. You never had to find a single root to sort them, which is exactly what the discriminant is for."
+    }
+  }
+
+  slide "All Together" {
+    id: "a1-synth"
+    cat: "Harder Polynomials"
+    numeric {
+      ask "Solve $2x^2 - 7x + 3 = 0$ and give the **larger** root."
+      skill: "alg-quadratic-formula"
+      answer: 3
+      expect: (7 + sqrt(49 - 24))/4
+      tolerance: 0.01
+      hint "Try factoring first: you need two numbers multiplying to $2 \times 3 = 6$ and adding to $-7$."
+      hint "That pair is $-6$ and $-1$, giving $(2x - 1)(x - 3)$."
+      ! "$(2x-1)(x-3) = 0$, so $x = \tfrac12$ or $x = 3$. The formula agrees: $b^2-4ac = 49-24 = 25$, and $\sqrt{25} = 5$ is a whole number, which is precisely why it factored."
+    }
+  }
+}

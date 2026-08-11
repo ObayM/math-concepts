@@ -1,0 +1,230 @@
+lesson "Composition and Inverses" {
+  course: "pure-maths"
+  unit: "Algebra Foundations"
+  difficulty: "Intermediate"
+  icon: "Link"
+  summary: "Functions as machines you can chain, and the machine that undoes another. Why fg is not gf, and why an inverse is a reflection in the line y = x."
+  skills: ["alg-composition", "alg-inverse", "alg-function-machine"]
+
+  slide "Machines in a Row" {
+    id: "a3-hook"
+    cat: "Composing"
+    > A function is a machine: put a number in, get one out. **Composition** is
+    > simply bolting two machines together so the output of one becomes the input of
+    > the next.
+    >
+    > $$fg(x) \quad \text{means} \quad f(g(x))$$
+    >
+    > Read it **right to left**, because the one nearest $x$ touches it first. In
+    > $fg(x)$, $g$ runs first and hands its answer to $f$. That ordering catches
+    > people out constantly, and the reason is just that we write functions on the
+    > left of what they act on.
+    >
+    > Push a number through the chain below.
+
+    scene plane {
+      x: [-1.0, 11.5]
+      y: [-3.2, 3.4]
+      aspect: equal
+      axes: false
+      param n = 3 { range: [-4, 6], step: 1 }
+      rect boxG = (2.4, -0.9) { w: 2.2, h: 1.8, color: primary, opacity: 0.3 }
+      rect boxF = (6.6, -0.9) { w: 2.2, h: 1.8, color: accent, opacity: 0.3 }
+      vector inArrow = (0.2, 0) -> (2.3, 0) { color: neutral, width: 3 }
+      vector midArrow = (4.7, 0) -> (6.5, 0) { color: neutral, width: 3 }
+      vector outArrow = (8.9, 0) -> (11.0, 0) { color: neutral, width: 3 }
+      label at (3.5, -0.2) = "g: double it" { anchor: middle, color: primary }
+      label at (7.7, -0.2) = "f: add 5" { anchor: middle, color: accent }
+      label at (1.2, 0.55) = "${n}" { anchor: middle, color: neutral }
+      label at (5.6, 0.55) = "${2*n}" { anchor: middle, color: primary }
+      label at (10.0, 0.55) = "${2*n + 5}" { anchor: middle, color: accent }
+      label at (5.6, 2.6) = "fg(${n}) = ${2*n + 5}" { anchor: middle, color: success }
+      label at (5.6, -2.4) = "g runs first, even though f is written first" { anchor: middle, color: neutral }
+      slider n { label: "the number going in" }
+    }
+  }
+
+  slide "Order Matters" {
+    id: "a3-order"
+    cat: "Composing"
+    > Swap the machines and you generally get a different answer. With
+    > $f(x) = x + 5$ and $g(x) = 2x$:
+    >
+    > $$fg(x) = f(2x) = 2x + 5$$
+    >
+    > $$gf(x) = g(x + 5) = 2(x+5) = 2x + 10$$
+    >
+    > Doubling then adding five is not the same as adding five then doubling, which
+    > is obvious with a concrete number and easy to lose in the notation. Composition
+    > is **not commutative**, so $fg$ and $gf$ are two different functions and you
+    > must keep track of which one was asked for.
+
+    numeric {
+      ask "With $f(x) = x + 5$ and $g(x) = 2x$, what is $gf(4)$?"
+      skill: "alg-composition"
+      answer: 18
+      expect: 2*(4 + 5)
+      tolerance: 0.01
+      hint "$gf$ means $g(f(4))$, so $f$ goes first: add five, then double."
+      onwrong: "a3-which-first" retry
+      ! "$f(4) = 9$, then $g(9) = 18$. Doing it the other way round gives $fg(4) = 13$, which is a different function entirely."
+    }
+  }
+
+  slide "The One Nearest x Goes First" {
+    id: "a3-which-first"
+    hidden: true
+    cat: "Composing"
+    > The notation genuinely is back to front, so do not feel bad about it.
+    >
+    > $$gf(x) = g(\,f(x)\,)$$
+    >
+    > Put the brackets in and it becomes obvious: $f$ is wrapped **inside**, so it
+    > has to be evaluated first. The inner one always goes first, exactly as with
+    > any nested brackets in arithmetic.
+    >
+    > A trick that helps: read the composition **backwards, right to left**, like
+    > following the arrows on a flow chart. $gf$ reads as "$f$, then $g$".
+    >
+    > With $f(x) = x+5$ and $g(x) = 2x$, at $x = 4$:
+    >
+    > $gf(4)$: add five to get $9$, then double to get $\mathbf{18}$.
+    >
+    > $fg(4)$: double to get $8$, then add five to get $\mathbf{13}$.
+
+    scene plane {
+      x: [-1.0, 12.0]
+      y: [-4.6, 3.0]
+      aspect: equal
+      axes: false
+      rect g1 = (2.6, 1.0) { w: 2.0, h: 1.4, color: primary, opacity: 0.3 }
+      rect f1 = (6.4, 1.0) { w: 2.0, h: 1.4, color: accent, opacity: 0.3 }
+      rect f2 = (2.6, -2.6) { w: 2.0, h: 1.4, color: accent, opacity: 0.3 }
+      rect g2 = (6.4, -2.6) { w: 2.0, h: 1.4, color: primary, opacity: 0.3 }
+      vector a1 = (0.6, 1.7) -> (2.5, 1.7) { color: neutral, width: 3 }
+      vector a2 = (4.7, 1.7) -> (6.3, 1.7) { color: neutral, width: 3 }
+      vector a3 = (8.5, 1.7) -> (10.4, 1.7) { color: neutral, width: 3 }
+      vector b1 = (0.6, -1.9) -> (2.5, -1.9) { color: neutral, width: 3 }
+      vector b2 = (4.7, -1.9) -> (6.3, -1.9) { color: neutral, width: 3 }
+      vector b3 = (8.5, -1.9) -> (10.4, -1.9) { color: neutral, width: 3 }
+      label at (3.6, 1.55) = "double" { anchor: middle, color: primary }
+      label at (7.4, 1.55) = "add 5" { anchor: middle, color: accent }
+      label at (3.6, -2.05) = "add 5" { anchor: middle, color: accent }
+      label at (7.4, -2.05) = "double" { anchor: middle, color: primary }
+      label at (1.5, 2.3) = "4" { anchor: middle, color: neutral }
+      label at (5.5, 2.3) = "8" { anchor: middle, color: neutral }
+      label at (11.2, 1.7) = "13" { anchor: middle, color: success }
+      label at (1.5, -1.3) = "4" { anchor: middle, color: neutral }
+      label at (5.5, -1.3) = "9" { anchor: middle, color: neutral }
+      label at (11.2, -1.9) = "18" { anchor: middle, color: success }
+      label at (5.5, 2.9) = "fg: g first" { anchor: middle, color: neutral }
+      label at (5.5, -3.5) = "gf: f first" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "Same two functions. What is $fg(4)$ this time?"
+      skill: "alg-composition"
+      answer: 13
+      expect: 2*4 + 5
+      tolerance: 0.01
+      hint "$fg$ means $g$ runs first: double, then add five."
+      ! "$g(4) = 8$, then $f(8) = 13$. Same functions, same input, different order, different answer."
+    }
+  }
+
+  slide "Undoing a Machine" {
+    id: "a3-inverse"
+    cat: "Inverses"
+    > The **inverse** $f^{-1}$ is the machine that puts things back. Feed it $f$'s
+    > output and it hands you the original input:
+    >
+    > $$f^{-1}f(x) = x$$
+    >
+    > Finding it is a matter of undoing each step in reverse order, like taking off
+    > your shoes and socks. If $f$ adds five then doubles, $f^{-1}$ halves then
+    > subtracts five.
+    >
+    > The reliable method is mechanical: write $y = f(x)$, swap $x$ and $y$, then
+    > solve for $y$.
+    >
+    > For $f(x) = 3x - 4$: $\; y = 3x - 4 \;\to\; x = 3y - 4 \;\to\; y = \dfrac{x+4}{3}$.
+
+    order {
+      ask "Put the steps in order for finding the inverse of $f(x) = 3x - 4$."
+      skill: "alg-inverse"
+      item "Write it as $y = 3x - 4$"
+      item "Swap the letters: $x = 3y - 4$"
+      item "Add $4$ to both sides: $x + 4 = 3y$"
+      item "Divide by $3$: $y = \dfrac{x+4}{3}$"
+      item "So $f^{-1}(x) = \dfrac{x+4}{3}$"
+      decoy "Take the reciprocal: $\dfrac{1}{3x-4}$"
+      ! "The decoy is the classic trap. The $-1$ in $f^{-1}$ is not a power, and an inverse function is nothing to do with one over the function."
+    }
+  }
+
+  slide "Not a Reciprocal" {
+    id: "a3-not-reciprocal"
+    cat: "Inverses"
+    quiz {
+      ask "For $f(x) = 3x - 4$, what does $f^{-1}(x)$ mean?"
+      skill: "alg-inverse"
+      * "The function that undoes $f$, namely $\dfrac{x+4}{3}$"
+      - "$\dfrac{1}{3x - 4}$" { why: "That is $[f(x)]^{-1}$, the reciprocal. The superscript $-1$ on the *function name* means inverse, not one over. Unfortunate notation, but universal." }
+      - "$-3x + 4$" { why: "That is $-f(x)$. Negating the output is not the same as reversing the machine." }
+      hint "Ask what you would have to do to get back from the answer to the number you started with."
+      ! "Undo the machine. Check it: $f(3) = 5$, and $f^{-1}(5) = 9/3 = 3$, back where we started."
+    }
+  }
+
+  slide "A Reflection in y = x" {
+    id: "a3-reflection"
+    cat: "Inverses"
+    > Swapping $x$ and $y$ has a picture attached, and it is the most useful thing
+    > to remember about inverses.
+    >
+    > Swapping the coordinates of every point reflects the whole graph in the line
+    > $y = x$. So **the graph of $f^{-1}$ is the mirror image of the graph of $f$ in
+    > that diagonal line.**
+    >
+    > Drag the blue point along $f$ and watch its reflection trace out the inverse.
+    > If the point on $f$ is at $(2, 2)$, its partner is at $(2, 2)$ as well, which
+    > is why every inverse meets its function on the mirror line.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-6, 6]
+      aspect: equal
+      grid
+      axes
+      param t = 2 { range: [-1.5, 3.2], step: 0.1 }
+      curve mirror = x { color: neutral, style: dashed, width: 2 }
+      curve f = 2*x - 1 { color: primary, width: 3 }
+      curve finv = (x + 1)/2 { color: accent, width: 3 }
+      point onF = (t, 2*t - 1) { drag: x -> t, color: primary, r: 8 }
+      point onInv = (2*t - 1, t) { color: accent, r: 8 }
+      line link = (t, 2*t - 1) -> (2*t - 1, t) { color: success, style: dotted, width: 2 }
+      label at (-5.7, 5.2) = "f: (${t}, ${2*t - 1})" { color: primary }
+      label at (-5.7, 4.2) = "f inverse: (${2*t - 1}, ${t})" { color: accent }
+      slider t { label: "drag along f" }
+    }
+
+    goal "Find the point where the function meets its own inverse" {
+      when: abs(t - (2*t - 1)) < 0.15
+      hint: "Somewhere on the dashed line, where the coordinates are equal."
+    }
+  }
+
+  slide "Both Ideas at Once" {
+    id: "a3-synth"
+    cat: "Inverses"
+    numeric {
+      ask "With $f(x) = 2x + 1$, what is $f^{-1}(9)$?"
+      skill: "alg-inverse"
+      answer: 4
+      expect: (9 - 1)/2
+      tolerance: 0.01
+      hint "You could find the inverse properly, or just ask: what input would $f$ need to produce $9$?"
+      ! "$f^{-1}(x) = \dfrac{x-1}{2}$, so $f^{-1}(9) = 4$. The shortcut is to solve $2x + 1 = 9$ directly, which is the same question asked backwards."
+    }
+  }
+}
