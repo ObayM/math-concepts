@@ -1,0 +1,231 @@
+lesson "Solving Trig Equations" {
+  course: "pure-maths"
+  unit: "Trigonometry"
+  difficulty: "Advanced"
+  icon: "X"
+  summary: "Your calculator gives you one answer. There are always infinitely many, and exams want the ones in a stated range. How to find every last one of them."
+  skills: ["trig-solving", "trig-all-solutions", "trig-quadrant-signs"]
+
+  slide "The Calculator Lies by Omission" {
+    id: "t4-hook"
+    cat: "More Than One Answer"
+    > Solve $\sin x = 0.5$.
+    >
+    > Your calculator says $30°$, and it is not wrong. It is just deeply incomplete.
+    > $150°$ works too. So do $390°$, $510°$, and infinitely many more in both
+    > directions.
+    >
+    > That is because $\sin x = 0.5$ is asking **where does the wave reach a height
+    > of $0.5$**, and a wave that repeats forever crosses that height forever.
+    >
+    > Drag the horizontal line and count the crossings.
+
+    scene plane {
+      x: [-20, 380]
+      y: [-1.5, 1.5]
+      grid
+      axes
+      param k = 0.5 { range: [-1, 1], step: 0.05 }
+      curve wave = sin(rad(x)) { color: primary, width: 3 }
+      curve level = k { color: danger, width: 2, style: dashed }
+      label at (10, 1.3) = "sin x = ${k}" { color: danger }
+      slider k { label: "the value on the right-hand side" }
+    }
+
+    goal "Find a value the sine wave never reaches" {
+      when: abs(k) > 0.99
+      hint: "Push it right to the edge. Above 1 there would be no solutions at all."
+    }
+  }
+
+  slide "Two Per Turn" {
+    id: "t4-two"
+    cat: "More Than One Answer"
+    > Within one full turn, $0°$ to $360°$, a sine equation normally has **two**
+    > solutions, and the unit circle tells you exactly where the second one hides.
+    >
+    > Sine is the height. Two points on the circle sit at the same height: one in the
+    > first quadrant and its mirror image in the second. So if $x_1$ is the
+    > calculator's answer, the partner is
+    >
+    > $$x_2 = 180° - x_1$$
+    >
+    > For cosine, which is the across, the two matching points are mirrored in the
+    > x-axis instead, so the partner is
+    >
+    > $$x_2 = 360° - x_1$$
+    >
+    > Tangent repeats twice as fast, every $180°$, so its partner is $x_1 + 180°$.
+
+    scene plane {
+      x: [-1.8, 1.8]
+      y: [-1.5, 1.5]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line level = (-1.4, 0.5) -> (1.4, 0.5) { color: danger, style: dashed, width: 2 }
+      point p1 = (cos(rad(30)), 0.5) { color: primary, r: 8, label: "30°" }
+      point p2 = (cos(rad(150)), 0.5) { color: accent, r: 8, label: "150°" }
+      line r1 = (0, 0) -> (cos(rad(30)), sin(rad(30))) { color: primary, width: 2 }
+      line r2 = (0, 0) -> (cos(rad(150)), sin(rad(150))) { color: accent, width: 2 }
+      label at (0, 1.32) = "same height, so the same sine" { anchor: middle, color: danger }
+    }
+
+    numeric {
+      ask "One solution of $\sin x = 0.5$ is $30°$. What is the other solution between $0°$ and $360°$?"
+      skill: "trig-all-solutions"
+      answer: 150
+      expect: 180 - 30
+      tolerance: 0.5
+      hint "For sine, the partner is $180°$ minus the first one."
+      onwrong: "t4-find-the-partner" retry
+      ! "$180° - 30° = 150°$. Both sit at height $0.5$, one on each side of the vertical."
+    }
+  }
+
+  slide "Finding the Partner" {
+    id: "t4-find-the-partner"
+    hidden: true
+    cat: "More Than One Answer"
+    > The partner rule is worth deriving rather than memorising, because then you can
+    > never mix up which is which.
+    >
+    > **Sine is the height.** Draw a horizontal line across the circle and it cuts in
+    > two places, mirrored **left-to-right**. Reflecting an angle in the vertical axis
+    > sends $\theta$ to $180° - \theta$. Hence the rule.
+    >
+    > **Cosine is the across.** Draw a vertical line and it cuts in two places,
+    > mirrored **top-to-bottom**. Reflecting in the horizontal axis sends $\theta$ to
+    > $360° - \theta$, or equivalently $-\theta$.
+    >
+    > So the rule follows from which coordinate you are fixing. Fix the height, mirror
+    > sideways. Fix the across, mirror vertically.
+
+    scene plane {
+      x: [-4.2, 4.2]
+      y: [-1.7, 1.9]
+      aspect: equal
+      axes: false
+      circle cL = (-2.1, 0) { r: 1, color: neutral, opacity: 0 }
+      circle cR = (2.1, 0) { r: 1, color: neutral, opacity: 0 }
+      line hL = (-3.4, 0.5) -> (-0.8, 0.5) { color: danger, style: dashed, width: 2 }
+      line vR = (2.1 + 0.5, -1.3) -> (2.1 + 0.5, 1.3) { color: success, style: dashed, width: 2 }
+      point sa = (-2.1 + cos(rad(30)), 0.5) { color: primary, r: 7 }
+      point sb = (-2.1 + cos(rad(150)), 0.5) { color: accent, r: 7 }
+      point ca = (2.1 + 0.5, sin(rad(60))) { color: primary, r: 7 }
+      point cb = (2.1 + 0.5, 0 - sin(rad(60))) { color: accent, r: 7 }
+      label at (-2.1, 1.6) = "sine: mirror sideways" { anchor: middle, color: danger }
+      label at (2.1, 1.6) = "cosine: mirror vertically" { anchor: middle, color: success }
+      label at (-2.1, -1.5) = "180° - x" { anchor: middle, color: neutral }
+      label at (2.1, -1.5) = "360° - x" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "One solution of $\cos x = 0.5$ is $60°$. What is the other one between $0°$ and $360°$?"
+      skill: "trig-all-solutions"
+      answer: 300
+      expect: 360 - 60
+      tolerance: 0.5
+      hint "For cosine the partner is $360°$ minus the first."
+      ! "$360° - 60° = 300°$. Both have the same across-value of $0.5$, one above the axis and one below."
+    }
+  }
+
+  slide "The Method" {
+    id: "t4-method"
+    cat: "Working Through a Range"
+    > A reliable routine for "solve for $0° \le x \le 360°$":
+    >
+    > **One.** Get the trig function alone on one side.
+    >
+    > **Two.** Take the inverse to get the calculator's answer, $x_1$.
+    >
+    > **Three.** Use the partner rule for that function to get $x_2$.
+    >
+    > **Four.** Add or subtract $360°$ (or $180°$ for tangent) to sweep out any
+    > further solutions, and keep only the ones inside the stated range.
+    >
+    > Step four is the one people skip, and it is where most of the lost marks live.
+
+    order {
+      ask "Put the steps in order for solving $2\sin x - 1 = 0$ for $0° \le x \le 360°$."
+      skill: "trig-solving"
+      item "Rearrange to $\sin x = 0.5$"
+      item "Take the inverse sine: $x_1 = 30°$"
+      item "Apply the sine partner rule: $x_2 = 180° - 30° = 150°$"
+      item "Check for more by adding $360°$: the next would be $390°$"
+      item "Discard $390°$ as outside the range, leaving $30°$ and $150°$"
+      decoy "Stop after the calculator gives $30°$"
+      ! "Rearrange, invert, partner, sweep, filter. The decoy is exactly the habit this method exists to break."
+    }
+  }
+
+  slide "A Negative Right-Hand Side" {
+    id: "t4-negative"
+    cat: "Working Through a Range"
+    > When the value is negative the calculator gets awkward. $\sin^{-1}(-0.5)$
+    > returns $-30°$, which is a perfectly good angle but not in $0°$ to $360°$.
+    >
+    > Do not fight it. Work with the **positive** version to find the reference angle,
+    > then place your answers in the quadrants where sine is negative — the third and
+    > fourth.
+    >
+    > $\sin 30° = 0.5$, so the reference angle is $30°$. Sine is negative below the
+    > axis, giving
+    >
+    > $$x = 180° + 30° = 210° \qquad \text{and} \qquad x = 360° - 30° = 330°$$
+
+    numeric {
+      ask "Solve $\sin x = -0.5$ for $0° \le x \le 360°$ and give the **smaller** solution, in degrees."
+      skill: "trig-all-solutions"
+      answer: 210
+      expect: 180 + 30
+      tolerance: 0.5
+      hint "Reference angle $30°$, and sine is negative in the third and fourth quadrants."
+      ! "$210°$ and $330°$. Taking the calculator's $-30°$ and stopping would have scored nothing, even though $-30°$ genuinely solves the equation."
+    }
+  }
+
+  slide "Watch the Multiplier" {
+    id: "t4-multiple"
+    cat: "Working Through a Range"
+    > One last trap, and it is a good one. Solve $\sin 2x = 0.5$ for
+    > $0° \le x \le 360°$.
+    >
+    > If $x$ runs over $0°$ to $360°$, then $2x$ runs over $0°$ to **$720°$** — two
+    > full turns. So you must find all the solutions for $2x$ across that doubled
+    > range, and only then halve them.
+    >
+    > $2x = 30°, 150°, 390°, 510°$, which gives $x = 15°, 75°, 195°, 255°$.
+    >
+    > **Four** solutions, not two. Solve for the angle inside the function first, over
+    > its own stretched range, and halve at the very end.
+
+    quiz {
+      ask "How many solutions does $\sin 3x = 0.5$ have for $0° \le x \le 360°$?"
+      skill: "trig-solving"
+      * "Six"
+      - "Two" { why: "That is how many $\sin\theta = 0.5$ has in one turn. But $3x$ sweeps through three turns while $x$ goes round once, so there are three times as many." }
+      - "Three" { why: "The $3$ multiplies the number of turns, and each turn contributes two solutions, so it is $3 \times 2$." }
+      hint "If $x$ goes from $0°$ to $360°$, what range does $3x$ cover?"
+      ! "$3x$ runs over $0°$ to $1080°$, three full turns, and each turn holds two solutions. Six in total."
+    }
+  }
+
+  slide "All Together" {
+    id: "t4-synth"
+    cat: "Working Through a Range"
+    > Solve $\cos x = -0.5$ for $0° \le x \le 360°$.
+
+    numeric {
+      ask "Give the **larger** of the two solutions, in degrees."
+      skill: "trig-all-solutions"
+      answer: 240
+      expect: 360 - 120
+      tolerance: 0.5
+      hint "Reference angle is $60°$, since $\cos 60° = 0.5$. Cosine is negative in the second and third quadrants."
+      ! "$120°$ and $240°$. The reference angle $60°$ sets the size; the quadrants where cosine is negative decide where they sit."
+    }
+  }
+}

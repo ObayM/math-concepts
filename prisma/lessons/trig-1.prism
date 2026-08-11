@@ -1,0 +1,180 @@
+lesson "Radian Measure" {
+  course: "pure-maths"
+  unit: "Trigonometry"
+  difficulty: "Beginner"
+  icon: "Circle"
+  summary: "Degrees are an arbitrary inheritance from Babylon. Radians measure an angle by the arc it cuts, which is why every formula gets tidier the moment you switch."
+  skills: ["trig-radians", "trig-arc-length", "trig-convert"]
+
+  slide "Where Does 360 Come From?" {
+    id: "t1-hook"
+    cat: "A Better Unit"
+    > Nowhere, really. A full turn is $360$ degrees because Babylonian astronomers
+    > liked the number $60$ and a year is roughly $360$ days. It is a historical
+    > accident that stuck.
+    >
+    > Radians measure an angle by something the circle actually contains: **how far
+    > you have travelled around the edge, in units of the radius.**
+    >
+    > Take the radius, bend it round the circumference, and the angle it subtends is
+    > **one radian**. No arbitrary numbers, just the circle measuring itself.
+    >
+    > Sweep the angle below until the highlighted arc is exactly as long as the
+    > radius.
+
+    scene plane {
+      x: [-1.9, 1.9]
+      y: [-1.6, 1.6]
+      aspect: equal
+      grid
+      axes
+      param th = 0.6 { range: [0, 6.28], step: 0.01 }
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      line radius = (0, 0) -> (1, 0) { color: warning, width: 5 }
+      arc swept = (0, 0) { r: 1, from: 0, to: deg(th), color: primary, width: 6 }
+      line ray = (0, 0) -> (cos(th), sin(th)) { color: neutral, width: 2 }
+      point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 8 }
+      label at (0, 1.42) = "arc = ${th} radii, so the angle is ${th} rad" { anchor: middle, color: primary }
+      label at (0, -1.45) = "which is ${deg(th)}°" { anchor: middle, color: neutral }
+      slider th { label: "sweep the angle" }
+    }
+
+    goal "Make the arc exactly one radius long" {
+      when: abs(th - 1) < 0.03
+      hint: "One radian, which lands a little under 60°."
+    }
+  }
+
+  slide "The Whole Way Round" {
+    id: "t1-convert"
+    cat: "A Better Unit"
+    > The circumference is $2\pi r$, so going all the way round lays down $2\pi$
+    > radii. That gives the only conversion you ever need:
+    >
+    > $$2\pi \text{ rad} = 360° \qquad \text{so} \qquad \pi \text{ rad} = 180°$$
+    >
+    > Everything follows from that one line. Half a turn is $\pi$, a quarter turn is
+    > $\pi/2$, and $60°$ is $\pi/3$.
+    >
+    > Since $\pi \approx 3.14$, one radian is about $57.3°$ — an awkward number in
+    > degrees, which is rather the point. Radians are not trying to be neat in
+    > degrees; they are trying to be neat in the circle.
+
+    match {
+      ask "Match each angle in degrees to its value in radians."
+      skill: "trig-convert"
+      pair "$180°$" -> "$\pi$"
+      pair "$90°$" -> "$\dfrac{\pi}{2}$"
+      pair "$60°$" -> "$\dfrac{\pi}{3}$"
+      pair "$45°$" -> "$\dfrac{\pi}{4}$"
+      decoy "$\dfrac{\pi}{6}$"
+      hint "Divide $180°$ by the angle and that is what goes under the $\pi$."
+      ! "The decoy, $\pi/6$, is $30°$. A quick check: the bigger the denominator, the smaller the angle."
+    }
+  }
+
+  slide "Converting Both Ways" {
+    id: "t1-numeric"
+    cat: "A Better Unit"
+    > To go from degrees to radians, multiply by $\dfrac{\pi}{180}$. To come back,
+    > multiply by $\dfrac{180}{\pi}$. If you forget which, rebuild it from
+    > $\pi = 180°$ and cancel the unit you want gone.
+
+    numeric {
+      ask "Convert $135°$ to radians. Give your answer as a decimal."
+      skill: "trig-convert"
+      answer: 2.356
+      expect: rad(135)
+      tolerance: 0.01
+      hint "$135 \times \dfrac{\pi}{180}$, which simplifies to $\dfrac{3\pi}{4}$."
+      ! "$\dfrac{3\pi}{4} \approx 2.356$ rad. Three quarters of the way to $\pi$, which matches $135°$ being three quarters of $180°$."
+    }
+  }
+
+  slide "Arc Length Becomes Trivial" {
+    id: "t1-arc"
+    cat: "Why Bother"
+    > Here is the first real payoff. In degrees, the arc length of a sector is
+    >
+    > $$s = \frac{\theta}{360} \times 2\pi r$$
+    >
+    > which nobody enjoys. In radians it collapses to
+    >
+    > $$s = r\theta$$
+    >
+    > That is the *definition* rearranged: an angle in radians is arc over radius, so
+    > arc is radius times angle. All the clutter in the degree version was conversion
+    > factors, and choosing the right unit deleted them.
+    >
+    > The area of a sector gets the same treatment: $A = \tfrac12 r^2\theta$.
+
+    numeric {
+      ask "A circle has radius $6$ cm. What is the length of an arc subtending an angle of $1.5$ radians, in cm?"
+      skill: "trig-arc-length"
+      answer: 9
+      expect: 6*1.5
+      tolerance: 0.01
+      hint "$s = r\theta$, with $\theta$ already in radians."
+      ! "$s = 6 \times 1.5 = 9$ cm. In degrees you would first have converted $1.5$ rad to $85.94°$, then divided by $360$ and multiplied by the circumference, to arrive at the same $9$."
+    }
+  }
+
+  slide "Radians Are a Length, Not a Unit" {
+    id: "t1-dimensionless"
+    cat: "Why Bother"
+    > A radian is an arc **divided by** a radius: a length over a length. The units
+    > cancel, so a radian is a pure number.
+    >
+    > That sounds like pedantry and it has a real consequence. Because $\theta$ is
+    > just a number, you can drop it into things that only accept numbers, like power
+    > series and derivatives. It is why $\dfrac{d}{dx}\sin x = \cos x$ holds
+    > **only** in radians. Use degrees and a stray factor of $\pi/180$ appears in
+    > every derivative forever.
+    >
+    > So radians are not a preference. Every calculus result you meet later quietly
+    > assumes them.
+
+    quiz {
+      ask "Why do calculus and higher mathematics always use radians?"
+      skill: "trig-radians"
+      * "Because a radian is a pure number, so formulas like $\frac{d}{dx}\sin x = \cos x$ come out clean"
+      - "Because radians are more accurate than degrees" { why: "Neither is more accurate — they are just different units for the same angle, like metres and feet." }
+      - "Because $\pi$ appears in them and $\pi$ is important" { why: "$\pi$ turns up because a circle has $2\pi$ radii round its edge, but that is a consequence, not the reason." }
+      hint "What would happen to the derivative of $\sin x$ if $x$ were measured in degrees?"
+      ! "Degrees would drag a factor of $\pi/180$ through every derivative and integral of a trig function. Radians make that factor exactly $1$."
+    }
+  }
+
+  slide "Walking Round the Circle" {
+    id: "t1-synth"
+    cat: "Why Bother"
+    > A last one that only makes sense once radians have clicked.
+    >
+    > You are standing on a unit circle at the point $(1, 0)$. You walk **a distance
+    > of exactly $10$ units** anticlockwise along the edge.
+
+    scene plane {
+      x: [-1.9, 1.9]
+      y: [-1.6, 1.6]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      point start = (1, 0) { color: success, r: 8, label: "start" }
+      arc walked = (0, 0) { r: 1, from: 0, to: 360, color: primary, width: 5 }
+      arc extra = (0, 0) { r: 1, from: 0, to: 212.96, color: accent, width: 6 }
+      point end = (cos(10), sin(10)) { color: accent, r: 9 }
+      label at (0, 1.42) = "10 units of arc: one full lap and a bit more" { anchor: middle, color: accent }
+    }
+
+    numeric {
+      ask "What is your horizontal coordinate when you stop? Give it to 3 decimal places."
+      skill: "trig-arc-length"
+      answer: -0.839
+      expect: cos(10)
+      tolerance: 0.005
+      hint "On a **unit** circle the radius is $1$, so $s = r\theta$ becomes $s = \theta$. Walking $10$ units of arc *is* turning through $10$ radians."
+      ! "$\cos(10) \approx -0.839$. On the unit circle arc length and angle are literally the same number, which is the cleanest possible statement of what a radian is. Note $10$ rad is about $573°$, so you lapped the circle once and carried on to roughly $213°$."
+    }
+  }
+}

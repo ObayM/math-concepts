@@ -1,0 +1,202 @@
+lesson "Trig Identities" {
+  course: "pure-maths"
+  unit: "Trigonometry"
+  difficulty: "Advanced"
+  icon: "Waves"
+  summary: "Sine does not distribute over addition, and once you accept that you need the real formulas. Double angles, sums and differences, and what they are actually for."
+  skills: ["trig-identities", "trig-double-angle", "trig-sum-difference"]
+
+  slide "The Tempting Mistake" {
+    id: "t3-hook"
+    cat: "Sine Does Not Distribute"
+    > It would be convenient if $\sin(a + b)$ were $\sin a + \sin b$. Almost every
+    > student writes it at least once.
+    >
+    > Test it with numbers you know. Take $a = b = 30°$:
+    >
+    > $$\sin(30° + 30°) = \sin 60° \approx 0.866$$
+    > $$\sin 30° + \sin 30° = 0.5 + 0.5 = 1$$
+    >
+    > Not equal, and not even close. **$\sin$ is a function, not a multiplier.**
+    > Writing $\sin(a+b)$ as $\sin a + \sin b$ is the same error as writing
+    > $\sqrt{a+b}$ as $\sqrt a + \sqrt b$.
+    >
+    > Drag the two angles below and watch the gap between the two curves. They agree
+    > only in the trivial cases.
+
+    scene plane {
+      x: [-0.3, 3.3]
+      y: [-1.6, 2.4]
+      grid
+      axes
+      param a = 0.52 { range: [0, 1.5], step: 0.01 }
+      curve truth = sin(x + a) { where: x > 0, color: primary, width: 3 }
+      curve wrong = sin(x) + sin(a) { where: x > 0, color: danger, width: 3, style: dashed }
+      label at (0.1, 2.1) = "sin(x + a), the truth" { color: primary }
+      label at (0.1, 1.75) = "sin x + sin a, the wish" { color: danger }
+      label at (0.1, -1.35) = "a = ${a} rad" { color: neutral }
+      slider a { label: "the angle a" }
+    }
+
+    goal "Find the only value of a where the two curves sit exactly on top of each other" {
+      when: a < 0.02
+      hint: "What would a have to be for adding it to change nothing?"
+    }
+  }
+
+  slide "The Real Formulas" {
+    id: "t3-sum"
+    cat: "Sums and Differences"
+    > The correct expansions mix sine and cosine together, which is exactly why the
+    > naive guess fails:
+    >
+    > $$\sin(a + b) = \sin a\cos b + \cos a\sin b$$
+    > $$\cos(a + b) = \cos a\cos b - \sin a\sin b$$
+    >
+    > Two things worth noticing. **Sine's version keeps the plus; cosine's version
+    > flips to a minus.** And cosine's has matching pairs ($\cos\cos$, $\sin\sin$)
+    > while sine's has mixed ones.
+    >
+    > For the differences, replace $b$ with $-b$. Since $\cos(-b) = \cos b$ and
+    > $\sin(-b) = -\sin b$, every sign that touches a sine flips:
+    >
+    > $$\sin(a - b) = \sin a\cos b - \cos a\sin b$$
+    > $$\cos(a - b) = \cos a\cos b + \sin a\sin b$$
+
+    build {
+      ask "Assemble the expansion of $\cos(a+b)$."
+      skill: "trig-sum-difference"
+      template: "$\cos(a+b) =$ ___ $-$ ___"
+      bank: ["$\cos a\cos b$", "$\sin a\sin b$", "$\cos a\sin b$", "$\sin a\cos b$"]
+      answer: ["$\cos a\cos b$", "$\sin a\sin b$"]
+      hint "Cosine's expansion uses matching pairs and a minus sign."
+      onwrong: "t3-check-with-numbers" retry
+      ! "$\cos(a+b) = \cos a\cos b - \sin a\sin b$. Matching pairs, and the sign flips against the one in the bracket."
+    }
+  }
+
+  slide "Check It With Numbers You Know" {
+    id: "t3-check-with-numbers"
+    hidden: true
+    cat: "Sums and Differences"
+    > You do not have to trust your memory on these. **Test any version against
+    > angles you already know**, and a wrong formula will fail immediately.
+    >
+    > Use $a = b = 45°$, where $\sin 45° = \cos 45° = \dfrac{\sqrt2}{2} \approx 0.707$.
+    >
+    > The true answer is $\cos 90° = 0$.
+    >
+    > With the minus: $0.707 \times 0.707 - 0.707 \times 0.707 = 0$. Correct.
+    >
+    > With a plus instead: $0.5 + 0.5 = 1$. Wrong, and obviously so.
+    >
+    > Ten seconds of arithmetic settles which sign goes where, every time, and it
+    > works for any identity you are unsure of.
+
+    numeric {
+      ask "Use $\cos(a-b) = \cos a\cos b + \sin a\sin b$ with $a = b = 45°$. What should it give?"
+      skill: "trig-sum-difference"
+      answer: 1
+      expect: cos(rad(45))*cos(rad(45)) + sin(rad(45))*sin(rad(45))
+      tolerance: 0.01
+      hint "$a - b = 0$, and you already know $\cos 0°$."
+      ! "$0.5 + 0.5 = 1$, which is $\cos 0° = 1$. The formula passes its own test. Trying it with a minus would give $0$, which is wrong, so the plus is confirmed."
+    }
+  }
+
+  slide "Double Angles" {
+    id: "t3-double"
+    cat: "Double Angles"
+    > Set $b = a$ in the sum formulas and two of the most useful identities drop
+    > out:
+    >
+    > $$\sin 2a = 2\sin a\cos a$$
+    > $$\cos 2a = \cos^2 a - \sin^2 a$$
+    >
+    > The cosine one has two more disguises, obtained by substituting
+    > $\sin^2 a + \cos^2 a = 1$:
+    >
+    > $$\cos 2a = 2\cos^2 a - 1 = 1 - 2\sin^2 a$$
+    >
+    > All three are the same identity. You pick whichever leaves you with the
+    > function you actually want — that flexibility is the whole reason for keeping
+    > three versions around.
+
+    sort {
+      ask "Sort each expression by what it simplifies to."
+      skill: "trig-double-angle"
+      bin "equals $\sin 2\theta$": ["$2\sin\theta\cos\theta$"]
+      bin "equals $\cos 2\theta$": ["$\cos^2\theta - \sin^2\theta$", "$1 - 2\sin^2\theta$", "$2\cos^2\theta - 1$"]
+      bin "equals $1$": ["$\cos^2\theta + \sin^2\theta$", "$\sec^2\theta - \tan^2\theta$"]
+      hint "Three of these are the same identity wearing different clothes."
+      ! "All three of $\cos^2\theta - \sin^2\theta$, $1 - 2\sin^2\theta$ and $2\cos^2\theta - 1$ are $\cos 2\theta$, which is exactly why it is so useful: whichever function is getting in your way, one version removes it. And $\sec^2\theta - \tan^2\theta = 1$ is just $\sin^2 + \cos^2 = 1$ divided through by $\cos^2\theta$."
+    }
+  }
+
+  slide "Halving the Power" {
+    id: "t3-power"
+    cat: "Double Angles"
+    > Here is what those identities are genuinely **for**, and textbooks rarely say
+    > it out loud.
+    >
+    > Rearrange $\cos 2a = 1 - 2\sin^2 a$:
+    >
+    > $$\sin^2 a = \frac{1 - \cos 2a}{2}$$
+    >
+    > Look at what happened. A **squared** trig function became a **plain** one, at
+    > the cost of doubling the angle. That trade is enormously valuable: squares are
+    > awkward to integrate and plain cosines are trivial, so this identity is how
+    > $\int \sin^2 x\, dx$ gets done at all.
+    >
+    > The pattern is worth naming: double-angle identities let you trade powers for
+    > frequency.
+
+    numeric {
+      ask "Given $\sin\theta = 0.6$ and $\cos\theta = 0.8$, what is $\sin 2\theta$?"
+      skill: "trig-double-angle"
+      answer: 0.96
+      expect: 2*0.6*0.8
+      tolerance: 0.005
+      hint "$\sin 2\theta = 2\sin\theta\cos\theta$. Both values are handed to you."
+      ! "$2 \times 0.6 \times 0.8 = 0.96$. Note $0.6^2 + 0.8^2 = 1$, so those two really can be a sine and cosine of the same angle. Not every pair of numbers can."
+    }
+  }
+
+  slide "Exact Values for Free" {
+    id: "t3-exact"
+    cat: "Using Them"
+    > The sum formulas let you build exact values for angles that are not on the
+    > standard list, by writing them as sums of angles that are.
+    >
+    > $75° = 45° + 30°$, and you know both of those exactly. So
+    >
+    > $$\sin 75° = \sin 45°\cos 30° + \cos 45°\sin 30°$$
+    >
+    > which works out to $\dfrac{\sqrt6 + \sqrt2}{4} \approx 0.966$ — an exact value
+    > for an angle no one memorises.
+
+    numeric {
+      ask "Work out $\sin 75°$ using $\sin(45° + 30°)$. Give your answer to 3 decimal places."
+      skill: "trig-sum-difference"
+      answer: 0.966
+      expect: sin(rad(45))*cos(rad(30)) + cos(rad(45))*sin(rad(30))
+      tolerance: 0.005
+      hint "$\sin 45° = \cos 45° \approx 0.7071$, $\cos 30° \approx 0.8660$, $\sin 30° = 0.5$."
+      ! "$0.7071 \times 0.8660 + 0.7071 \times 0.5 \approx 0.966$. Adding the sines instead would have given $1.207$, which is impossible for a sine."
+    }
+  }
+
+  slide "A Sanity Check That Never Fails" {
+    id: "t3-synth"
+    cat: "Using Them"
+    quiz {
+      ask "A student simplifies an expression and gets $\sin\theta = 1.35$. What does that tell you?"
+      skill: "trig-identities"
+      * "They have made an error — sine can never exceed $1$"
+      - "$\theta$ must be greater than $90°$" { why: "Sine never goes above $1$ at any angle. It is the y-coordinate of a point on a circle of radius $1$, so it is trapped between $-1$ and $1$ forever." }
+      - "It is fine, sine can be any value" { why: "Only between $-1$ and $1$. Anything outside that range is a guaranteed mistake." }
+      hint "What is the largest the y-coordinate on a unit circle can possibly be?"
+      ! "Both sine and cosine live between $-1$ and $1$, always. It is the cheapest error check in trigonometry and it costs you nothing to apply."
+    }
+  }
+}

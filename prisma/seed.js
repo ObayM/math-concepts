@@ -52,7 +52,18 @@ const COURSES = [
     sortOrder: 1,
     description:
       'Algebra, counting, trigonometry, coordinate geometry, complex numbers, logs and vectors, finishing with the calculus you need to go further.',
-    lessons: ['alg-1', 'alg-2', 'alg-3', 'comb-1', 'comb-2', 'comb-3', 'trig-2'],
+    lessons: [
+      'alg-1',
+      'alg-2',
+      'alg-3',
+      'comb-1',
+      'comb-2',
+      'comb-3',
+      'trig-1',
+      'trig-2',
+      'trig-3',
+      'trig-4',
+    ],
   },
   {
     name: 'Mechanics',
