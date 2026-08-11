@@ -1,0 +1,201 @@
+lesson "The Argand Diagram" {
+  course: "pure-maths"
+  unit: "Complex Numbers"
+  difficulty: "Advanced"
+  icon: "Circle"
+  summary: "Give complex numbers a plane to live on and multiplication turns out to be a rotation. Multiplying by i is a quarter turn, and everything else follows."
+  skills: ["cplx-argand", "cplx-rotation", "cplx-modulus", "cplx-argument"]
+
+  slide "A Plane, Not a Line" {
+    id: "cx4-hook"
+    cat: "Plotting Them"
+    > Real numbers fit on a line. Complex numbers need two coordinates, so they need
+    > a **plane** — and once you draw it, everything about them becomes visual.
+    >
+    > Plot $a + bi$ at the point $(a, b)$. The horizontal axis holds the real part,
+    > the vertical axis the imaginary part. That picture is called an **Argand
+    > diagram**, and the two things we defined last lesson are now just geometry:
+    >
+    > **Modulus** $|z|$ is the distance from the origin. **Argument** $\arg z$ is the
+    > angle the arrow makes with the positive real axis.
+    >
+    > Drag the point around.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param a = 3 { range: [-5, 5], step: 0.5 }
+      param b = 3 { range: [-4, 4], step: 0.5 }
+      vector z = (0, 0) -> (a, b) { color: primary, width: 4 }
+      point P = (a, b) { drag: xy -> (a, b), color: accent, r: 9, snap: 0.5 }
+      arc argAngle = (0, 0) { r: 1.2, from: 0, to: mod(deg(atan2(b, a)), 360), color: warning, width: 3 }
+      label at (-5.7, 4.5) = "modulus = ${hypot(a, b)}" { color: primary }
+      label at (-5.7, 3.6) = "argument = ${mod(deg(atan2(b, a)), 360)}°" { color: warning }
+      label at (4.2, -4.4) = "real axis" { anchor: middle, color: neutral }
+    }
+
+    goal "Put the number in the second quadrant, where the real part is negative" {
+      when: a < 0 and b > 0
+      hint: "Up and to the left. The argument should pass 90°."
+    }
+  }
+
+  slide "Multiplying by i Is a Quarter Turn" {
+    id: "cx4-rotation"
+    cat: "Multiplication Is Rotation"
+    > Now the result that makes the whole subject worth learning.
+    >
+    > Take $z = 3 + 2i$ and multiply by $i$:
+    >
+    > $$i(3 + 2i) = 3i + 2i^2 = -2 + 3i$$
+    >
+    > The point $(3, 2)$ became $(-2, 3)$. Look at what happened to the coordinates:
+    > they swapped, and one picked up a minus. That is exactly the rotation by $90°$
+    > you met when deriving perpendicular gradients.
+    >
+    > **Multiplying by $i$ rotates a quarter turn anticlockwise.** Not a metaphor —
+    > it is precisely what the arithmetic does, every time.
+    >
+    > Press the button and watch it turn. Four presses bring it home, which is the
+    > cycle $i, -1, -i, 1$ from the first lesson, now visible.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param turns = 0 { range: [0, 4], step: 0.02 }
+      circle path = (0, 0) { r: 3.606, color: neutral, opacity: 0 }
+      vector orig = (0, 0) -> (3, 2) { color: neutral, width: 2, style: dashed }
+      vector z = (0, 0) -> (3.606*cos(rad(33.69 + 90*turns)), 3.606*sin(rad(33.69 + 90*turns))) { color: primary, width: 4 }
+      point P = (3.606*cos(rad(33.69 + 90*turns)), 3.606*sin(rad(33.69 + 90*turns))) { color: accent, r: 9 }
+      label at (0, 4.5) = "started at 3 + 2i, turned ${90*turns}°" { anchor: middle, color: primary }
+      label at (0, -4.5) = "the modulus never changes: still ${hypot(3, 2)}" { anchor: middle, color: neutral }
+      button "multiply by i" { animate: { turns: 1 }, dur: 900, ease: easeInOut }
+      button "and again" { animate: { turns: 2 }, dur: 900, ease: easeInOut }
+      button "reset" { set: { turns: 0 } }
+      slider turns { label: "quarter turns" }
+    }
+
+    goal "Turn it a full circle, back to where it started" {
+      when: turns > 3.9
+      hint: "Four quarter turns. Try the slider, or press the buttons in turn."
+    }
+  }
+
+  slide "Where the Rotation Comes From" {
+    id: "cx4-why"
+    cat: "Multiplication Is Rotation"
+    > It is not a special property of $i$. **Every** complex multiplication is a
+    > rotation combined with a scaling:
+    >
+    > $$|z_1 z_2| = |z_1||z_2| \qquad \arg(z_1 z_2) = \arg z_1 + \arg z_2$$
+    >
+    > **Moduli multiply, arguments add.** So multiplying by any complex number
+    > stretches by its modulus and rotates by its argument.
+    >
+    > Now $i$ makes sense. Its modulus is $1$, so it stretches by nothing. Its
+    > argument is $90°$, so it rotates a quarter turn. Multiplying by $i$ is a pure
+    > rotation because $i$ sits exactly one unit from the origin, straight up.
+    >
+    > And $i^2 = -1$ stops being a definition you accept and becomes something you
+    > can see: two quarter turns is a half turn, which lands you on $-1$.
+
+    numeric {
+      ask "$z_1$ has modulus $2$ and argument $30°$. $z_2$ has modulus $5$ and argument $45°$. What is the argument of $z_1z_2$, in degrees?"
+      skill: "cplx-argument"
+      answer: 75
+      expect: 30 + 45
+      tolerance: 0.5
+      hint "Arguments add."
+      onwrong: "cx4-multiply-add" retry
+      ! "$30 + 45 = 75°$, and the modulus would be $2 \times 5 = 10$. Moduli multiply, arguments add — never the other way round."
+    }
+  }
+
+  slide "One Multiplies, One Adds" {
+    id: "cx4-multiply-add"
+    hidden: true
+    cat: "Multiplication Is Rotation"
+    > These two are easy to swap, so here is why each does what it does.
+    >
+    > **Moduli multiply** because modulus is a *scaling*. Stretch by $2$, then stretch
+    > by $5$, and you have stretched by $10$. Stretches compound by multiplying, as
+    > they always do.
+    >
+    > **Arguments add** because argument is a *turn*. Turn $30°$, then turn $45°$, and
+    > you have turned $75°$. Angles accumulate by adding, as they always do.
+    >
+    > So the rule is not arbitrary at all — it just says that stretching and turning
+    > each behave the way stretching and turning always behave. If you ever forget
+    > which is which, ask what happens when you rotate twice.
+
+    scene plane {
+      x: [-2.5, 11]
+      y: [-2.5, 6]
+      aspect: equal
+      grid
+      axes
+      vector z1 = (0, 0) -> (2*cos(rad(30)), 2*sin(rad(30))) { color: primary, width: 4 }
+      vector prod = (0, 0) -> (10*cos(rad(75)), 10*sin(rad(75))) { color: danger, width: 4 }
+      arc a1 = (0, 0) { r: 1.0, from: 0, to: 30, color: primary, width: 3 }
+      arc a2 = (0, 0) { r: 1.4, from: 30, to: 75, color: accent, width: 3 }
+      label at (2.4, 0.7) = "z1: modulus 2, arg 30°" { color: primary }
+      label at (3.4, 4.6) = "product: modulus 10, arg 75°" { color: danger }
+      label at (5.5, -1.9) = "2 × 5 = 10 for the stretch, 30 + 45 = 75 for the turn" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "Same two numbers. What is the **modulus** of $z_1z_2$?"
+      skill: "cplx-modulus"
+      answer: 10
+      expect: 2*5
+      tolerance: 0.01
+      hint "Moduli multiply."
+      ! "$2 \times 5 = 10$. Stretches compound; turns accumulate."
+    }
+  }
+
+  slide "Reading a Point" {
+    id: "cx4-reading"
+    cat: "Using the Picture"
+    quiz {
+      ask "A complex number is plotted at $(0, -4)$ on an Argand diagram. What is it?"
+      skill: "cplx-argand"
+      * "$-4i$"
+      - "$-4$" { why: "That would sit at $(-4, 0)$, out along the negative real axis. This point is on the *imaginary* axis." }
+      - "$4i$" { why: "Right axis, wrong direction. The point is $4$ units *below* the origin, so the imaginary part is negative." }
+      hint "Horizontal is the real part, vertical is the imaginary part. Here the horizontal is zero."
+      ! "$0 - 4i = -4i$, purely imaginary, with modulus $4$ and argument $270°$ (or $-90°$)."
+    }
+  }
+
+  slide "Geometry Without Geometry" {
+    id: "cx4-synth"
+    cat: "Using the Picture"
+    > A last thought on why any of this matters.
+    >
+    > Rotating a point by $90°$ used to need trigonometry or a matrix. On the Argand
+    > diagram it is **one multiplication**. Rotating by any angle at all is
+    > multiplying by a complex number of modulus $1$ at that angle.
+    >
+    > This is why complex numbers show up everywhere something rotates or
+    > oscillates: alternating current, signal processing, quantum mechanics, computer
+    > graphics. Not because engineers enjoy imaginary numbers, but because complex
+    > multiplication *is* rotation, and rotation is everywhere.
+
+    numeric {
+      ask "The point $2 + 5i$ is multiplied by $i$. What is the imaginary part of the result?"
+      skill: "cplx-rotation"
+      answer: 2
+      expect: 2
+      tolerance: 0.01
+      hint "$i(2 + 5i) = 2i + 5i^2 = -5 + 2i$. Or just rotate $(2, 5)$ a quarter turn anticlockwise to $(-5, 2)$."
+      ! "$-5 + 2i$, so the imaginary part is $2$. The coordinates swapped and the new horizontal picked up a minus, which is exactly what a quarter turn does."
+    }
+  }
+}

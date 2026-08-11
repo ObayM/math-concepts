@@ -1,0 +1,175 @@
+lesson "Arithmetic with a + bi" {
+  course: "pure-maths"
+  unit: "Complex Numbers"
+  difficulty: "Intermediate"
+  icon: "Sigma"
+  summary: "Add and subtract like collecting terms, multiply like expanding brackets, and divide with the one trick that makes the bottom real again."
+  skills: ["cplx-arithmetic", "cplx-multiply", "cplx-divide", "cplx-conjugate"]
+
+  slide "Two Parts, Kept Apart" {
+    id: "cx2-hook"
+    cat: "Adding and Multiplying"
+    > A complex number has a **real part** and an **imaginary part**:
+    >
+    > $$z = a + bi$$
+    >
+    > The two parts never merge. $3 + 2i$ cannot be simplified to $5i$ or to
+    > anything else, any more than $3$ apples $+ 2$ oranges collapses into $5$ of
+    > something. They are different kinds of thing being carried together.
+    >
+    > That single fact makes addition trivial. **Collect the real parts, collect the
+    > imaginary parts:**
+    >
+    > $$(3 + 2i) + (1 + 5i) = 4 + 7i$$
+
+    numeric {
+      ask "What is the imaginary part of $(5 - 3i) + (2 + 8i)$? Give just the coefficient of $i$."
+      skill: "cplx-arithmetic"
+      answer: 5
+      expect: 0 - 3 + 8
+      tolerance: 0.01
+      hint "Collect only the $i$ terms: $-3 + 8$."
+      ! "$-3 + 8 = 5$, and the real parts give $7$, so the answer is $7 + 5i$."
+    }
+  }
+
+  slide "Multiplying Is Just Expanding" {
+    id: "cx2-multiply"
+    cat: "Adding and Multiplying"
+    > Multiply two complex numbers exactly as you would expand two brackets, then
+    > tidy the $i^2$ at the end:
+    >
+    > $$(2 + 3i)(4 + 5i) = 8 + 10i + 12i + 15i^2$$
+    >
+    > Now the only new step. $i^2 = -1$, so $15i^2 = -15$, and that term jumps from
+    > the imaginary side to the **real** side:
+    >
+    > $$= 8 - 15 + 22i = -7 + 22i$$
+    >
+    > That jump is the whole difference from ordinary algebra. Expand as usual, then
+    > convert every $i^2$ into $-1$ and re-collect.
+
+    order {
+      ask "Put the steps in order for multiplying $(1 + 2i)(3 + 4i)$."
+      skill: "cplx-multiply"
+      item "Expand all four products: $3 + 4i + 6i + 8i^2$"
+      item "Replace $i^2$ with $-1$: $3 + 4i + 6i - 8$"
+      item "Collect the real parts: $3 - 8 = -5$"
+      item "Collect the imaginary parts: $4i + 6i = 10i$"
+      item "Write the answer: $-5 + 10i$"
+      decoy "Multiply the real parts and the imaginary parts separately to get $3 + 8i$"
+      ! "The decoy is the tempting shortcut and it is wrong, because it ignores the cross terms entirely. Complex multiplication is genuinely bracket expansion."
+    }
+  }
+
+  slide "A Number Times Its Conjugate" {
+    id: "cx2-conjugate"
+    cat: "Dividing"
+    > Before dividing, one special product. The **conjugate** of $a + bi$ is
+    > $a - bi$: same number, imaginary part negated. It is written $\bar{z}$.
+    >
+    > Watch what happens when you multiply a number by its own conjugate:
+    >
+    > $$(a + bi)(a - bi) = a^2 - abi + abi - b^2i^2 = a^2 + b^2$$
+    >
+    > The cross terms cancel, the $i^2$ turns into a minus that flips the last sign
+    > to a plus, and the result is **completely real**. Always. That is the
+    > difference of two squares doing its usual job, with $i^2$ supplying the extra
+    > sign flip.
+    >
+    > This is the key that unlocks division.
+
+    numeric {
+      ask "What is $(3 + 4i)(3 - 4i)$?"
+      skill: "cplx-conjugate"
+      answer: 25
+      expect: 3^2 + 4^2
+      tolerance: 0.01
+      hint "$a^2 + b^2$, with $a = 3$ and $b = 4$."
+      ! "$9 + 16 = 25$, entirely real. Notice it is the same $a^2 + b^2$ that appears in Pythagoras, which is not a coincidence and will matter next lesson."
+    }
+  }
+
+  slide "Dividing: Make the Bottom Real" {
+    id: "cx2-divide"
+    cat: "Dividing"
+    > You cannot leave an $i$ in a denominator, any more than you would leave a
+    > $\sqrt2$ there. The fix is the same trick as rationalising: **multiply top and
+    > bottom by the conjugate of the bottom.**
+    >
+    > $$\frac{5}{2 + i} = \frac{5}{2 + i} \times \frac{2 - i}{2 - i} = \frac{5(2 - i)}{4 + 1} = \frac{10 - 5i}{5} = 2 - i$$
+    >
+    > The bottom became real because a number times its conjugate always is. The top
+    > is just ordinary multiplication. Then split the fraction and you have $a + bi$
+    > form again.
+
+    build {
+      ask "To simplify $\dfrac{1}{3 - 2i}$, what do you multiply top and bottom by?"
+      skill: "cplx-divide"
+      template: "multiply by $\dfrac{}{}$ ___ over itself"
+      bank: ["$3 + 2i$", "$3 - 2i$", "$-3 + 2i$", "$2i$"]
+      answer: ["$3 + 2i$"]
+      hint "The conjugate of the *denominator*, with the sign of the imaginary part flipped."
+      onwrong: "cx2-which-conjugate" retry
+      ! "Multiply by $\dfrac{3 + 2i}{3 + 2i}$. The bottom becomes $9 + 4 = 13$, safely real."
+    }
+  }
+
+  slide "Flip the Sign, Not the Whole Thing" {
+    id: "cx2-which-conjugate"
+    hidden: true
+    cat: "Dividing"
+    > The conjugate flips **only the imaginary part**. The real part is untouched.
+    >
+    > $$\overline{3 - 2i} = 3 + 2i \qquad \overline{-5 + i} = -5 - i \qquad \overline{7} = 7$$
+    >
+    > Two things people do instead, and why each fails:
+    >
+    > **Negating everything** gives $-3 + 2i$. Multiply that by $3 - 2i$ and you get
+    > $-9 + 6i + 6i - 4i^2 = -5 + 12i$, which still has an $i$ in it. No use at all.
+    >
+    > **Using the same number again** gives $3 - 2i$. Squaring it gives
+    > $9 - 12i - 4 = 5 - 12i$, also still complex.
+    >
+    > Only the true conjugate kills the imaginary part, because only then do the two
+    > cross terms cancel exactly.
+
+    numeric {
+      ask "Simplify $\dfrac{1}{3 - 2i}$ and give the real part as a decimal."
+      skill: "cplx-divide"
+      answer: 0.2308
+      expect: 3/13
+      tolerance: 0.002
+      hint "Multiply top and bottom by $3 + 2i$. The bottom becomes $13$ and the top becomes $3 + 2i$."
+      ! "$\dfrac{3 + 2i}{13}$, so the real part is $\tfrac{3}{13} \approx 0.231$ and the imaginary part is $\tfrac{2}{13}$."
+    }
+  }
+
+  slide "Sort the Operations" {
+    id: "cx2-sort"
+    cat: "Dividing"
+    sort {
+      ask "Sort each result by whether it is real, purely imaginary, or has both parts."
+      skill: "cplx-arithmetic"
+      bin "Entirely real": ["$(2+3i)(2-3i)$", "$(4+i) + (4-i)$"]
+      bin "Purely imaginary": ["$(3+2i) - (3-2i)$", "$5i \times 3$"]
+      bin "Has both parts": ["$(1+i)(2+3i)$", "$(1+i)^2 + 1$"]
+      hint "A number and its conjugate added give a real; subtracted they give a purely imaginary."
+      ! "$(1+i)^2 = 1 + 2i + i^2 = 2i$, so adding $1$ gives $1 + 2i$, which has both. That squaring is worth remembering: $(1+i)^2$ is exactly $2i$."
+    }
+  }
+
+  slide "All the Operations at Once" {
+    id: "cx2-synth"
+    cat: "Dividing"
+    numeric {
+      ask "Simplify $(2 + i)(3 - i)$ and give the real part."
+      skill: "cplx-multiply"
+      answer: 7
+      expect: 2*3 + 1
+      tolerance: 0.01
+      hint "Expand to $6 - 2i + 3i - i^2$, then remember $-i^2 = +1$."
+      ! "$6 - 2i + 3i + 1 = 7 + i$. The $-i^2$ became $+1$ and added to the real part, which is the step that catches people out."
+    }
+  }
+}

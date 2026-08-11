@@ -1,0 +1,205 @@
+lesson "Conjugate and Modulus" {
+  course: "pure-maths"
+  unit: "Complex Numbers"
+  difficulty: "Intermediate"
+  icon: "Ruler"
+  summary: "Two tools that turn complex numbers back into real ones. The conjugate that cancels the imaginary part, and the modulus that measures size."
+  skills: ["cplx-conjugate", "cplx-modulus", "cplx-arithmetic"]
+
+  slide "The Conjugate" {
+    id: "cx3-conjugate"
+    cat: "The Mirror Number"
+    > The **conjugate** of $z = a + bi$ is $\bar{z} = a - bi$. Flip the sign of the
+    > imaginary part and leave everything else alone.
+    >
+    > Two products make it valuable, and both come out real:
+    >
+    > $$z + \bar{z} = 2a \qquad z\bar{z} = a^2 + b^2$$
+    >
+    > Adding gives twice the real part; multiplying gives the sum of the squares. In
+    > both cases the imaginary parts destroy each other, which is exactly what you
+    > want a conjugate for.
+    >
+    > There is a third fact worth knowing: complex roots of real quadratics
+    > **always come in conjugate pairs**. If $2 + 3i$ is a root, $2 - 3i$ is too.
+    > That is why the imaginary parts vanish when you multiply the factors back
+    > together, leaving the real coefficients you started with.
+
+    numeric {
+      ask "If $z = 6 - 5i$, what is $z + \bar{z}$?"
+      skill: "cplx-conjugate"
+      answer: 12
+      expect: 2*6
+      tolerance: 0.01
+      hint "$\bar{z} = 6 + 5i$. Add them and see what survives."
+      ! "$(6 - 5i) + (6 + 5i) = 12$, which is twice the real part. The imaginary parts cancel exactly, every time."
+    }
+  }
+
+  slide "How Big Is a Complex Number?" {
+    id: "cx3-modulus"
+    cat: "Measuring Size"
+    > You cannot ask whether $3 + 4i$ is bigger than $5i$ — complex numbers do not
+    > sit in an order the way real numbers do. There is no "greater than" here.
+    >
+    > But you can ask how **far from zero** each one is, and that is the **modulus**:
+    >
+    > $$|z| = \sqrt{a^2 + b^2}$$
+    >
+    > which is Pythagoras again, exactly as in the coordinate geometry unit. Plot
+    > $a + bi$ at the point $(a, b)$ and the modulus is its distance from the origin.
+    >
+    > Notice $|z|^2 = a^2 + b^2 = z\bar{z}$. The conjugate product and the modulus are
+    > the same quantity, which is why the conjugate keeps turning up.
+    >
+    > Drag the point and watch the distance.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param a = 3 { range: [-5, 5], step: 1 }
+      param b = 4 { range: [-4, 4], step: 1 }
+      vector z = (0, 0) -> (a, b) { color: primary, width: 4 }
+      line across = (0, 0) -> (a, 0) { color: warning, width: 3, style: dashed }
+      line up = (a, 0) -> (a, b) { color: success, width: 3, style: dashed }
+      point P = (a, b) { drag: xy -> (a, b), color: accent, r: 9, snap: 1 }
+      point conj = (a, 0 - b) { color: neutral, r: 7 }
+      label at (-5.7, 4.5) = "z = ${a} + ${b}i" { color: primary, show: b >= 0 }
+      label at (-5.7, 4.5) = "z = ${a} - ${0 - b}i" { color: primary, show: b < 0 }
+      label at (-5.7, 3.6) = "modulus = ${hypot(a, b)}" { color: accent }
+      label at (-5.7, 2.7) = "the grey point is the conjugate" { color: neutral }
+    }
+
+    goal "Find a z whose modulus is exactly 5" {
+      when: abs(hypot(a, b) - 5) < 0.01
+      hint: "3 and 4, in either order, or either sign."
+    }
+  }
+
+  slide "The Conjugate Is a Reflection" {
+    id: "cx3-reflection"
+    cat: "Measuring Size"
+    > On that diagram the conjugate is easy to spot: it is the **mirror image in the
+    > real axis**. Negating the imaginary part flips the point vertically and does
+    > nothing else.
+    >
+    > Which immediately tells you something: $z$ and $\bar{z}$ are the same distance
+    > from the origin, so
+    >
+    > $$|\bar{z}| = |z|$$
+    >
+    > Reflecting cannot change how far away something is.
+
+    quiz {
+      ask "If $|z| = 13$, what is $|\bar{z}|$?"
+      skill: "cplx-modulus"
+      * "$13$"
+      - "$-13$" { why: "A modulus is a distance, so it is never negative. Conjugating flips the point across the axis, but distance does not care about direction." }
+      - "$\dfrac{1}{13}$" { why: "That would be the reciprocal, which is a different operation entirely." }
+      hint "The conjugate is a reflection. Does reflecting move a point closer to the origin?"
+      ! "$13$. The point moves, but not its distance from zero."
+    }
+  }
+
+  slide "Compute a Modulus" {
+    id: "cx3-compute"
+    cat: "Measuring Size"
+    numeric {
+      ask "What is $|5 - 12i|$?"
+      skill: "cplx-modulus"
+      answer: 13
+      expect: hypot(5, 12)
+      tolerance: 0.01
+      hint "$\sqrt{5^2 + 12^2}$. The minus sign disappears when you square."
+      onwrong: "cx3-signs-vanish" retry
+      ! "$\sqrt{25 + 144} = 13$. The $5, 12, 13$ triangle again."
+    }
+  }
+
+  slide "Squaring Erases the Signs" {
+    id: "cx3-signs-vanish"
+    hidden: true
+    cat: "Measuring Size"
+    > A modulus can never be negative, and the formula guarantees it: both parts get
+    > **squared** before anything is added, so any minus signs disappear before they
+    > can do harm.
+    >
+    > That means all four of these have the same modulus of $13$:
+    >
+    > $$5 + 12i \qquad 5 - 12i \qquad -5 + 12i \qquad -5 - 12i$$
+    >
+    > They sit in four different quadrants, mirror images of each other, all exactly
+    > $13$ from the origin. If you ever produce a negative modulus, you have
+    > subtracted where you should have squared.
+
+    scene plane {
+      x: [-8, 8]
+      y: [-8, 8]
+      aspect: equal
+      grid
+      axes
+      circle ring = (0, 0) { r: 6.5, color: neutral, opacity: 0 }
+      point p1 = (2.5, 6) { color: primary, r: 8 }
+      point p2 = (2.5, -6) { color: primary, r: 8 }
+      point p3 = (-2.5, 6) { color: primary, r: 8 }
+      point p4 = (-2.5, -6) { color: primary, r: 8 }
+      vector v1 = (0, 0) -> (2.5, 6) { color: accent, width: 2 }
+      vector v2 = (0, 0) -> (2.5, -6) { color: accent, width: 2 }
+      vector v3 = (0, 0) -> (-2.5, 6) { color: accent, width: 2 }
+      vector v4 = (0, 0) -> (-2.5, -6) { color: accent, width: 2 }
+      label at (0, 7.4) = "all four sit on the same circle" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "What is $|-8 + 6i|$?"
+      skill: "cplx-modulus"
+      answer: 10
+      expect: hypot(0 - 8, 6)
+      tolerance: 0.01
+      hint "$\sqrt{(-8)^2 + 6^2}$, and $(-8)^2$ is $+64$."
+      ! "$\sqrt{64 + 36} = 10$. The negative real part changes where the point sits, never how far away it is."
+    }
+  }
+
+  slide "Moduli Multiply" {
+    id: "cx3-multiply"
+    cat: "A Useful Property"
+    > One property that saves real effort:
+    >
+    > $$|z_1 z_2| = |z_1| \times |z_2|$$
+    >
+    > The modulus of a product is the product of the moduli. So to find how big
+    > $(3+4i)(5+12i)$ is, you never have to multiply them out: $5 \times 13 = 65$.
+    >
+    > Note that the same is emphatically **not** true for addition. $|z_1 + z_2|$ is
+    > generally not $|z_1| + |z_2|$, for exactly the reason two vectors of length $3$
+    > and $4$ do not have to add to $7$. It depends which way they point.
+
+    numeric {
+      ask "Given $|z_1| = 5$ and $|z_2| = 13$, what is $|z_1 z_2|$?"
+      skill: "cplx-modulus"
+      answer: 65
+      expect: 5*13
+      tolerance: 0.01
+      hint "Multiply the moduli."
+      ! "$65$. Expanding the product first would have given the same answer after a lot more work."
+    }
+  }
+
+  slide "Putting Them Together" {
+    id: "cx3-synth"
+    cat: "A Useful Property"
+    numeric {
+      ask "For $z = 3 + 4i$, what is $z\bar{z}$?"
+      skill: "cplx-conjugate"
+      answer: 25
+      expect: 3^2 + 4^2
+      tolerance: 0.01
+      hint "$z\bar{z} = a^2 + b^2$, which is also $|z|^2$."
+      ! "$25$, which is $|z|^2 = 5^2$. The three ideas are one idea: $z\bar{z}$, $a^2+b^2$ and $|z|^2$ are all the same number."
+    }
+  }
+}

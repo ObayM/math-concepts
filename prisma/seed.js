@@ -66,6 +66,10 @@ const COURSES = [
       'coord-1',
       'coord-2',
       'coord-3',
+      'cplx-1',
+      'cplx-2',
+      'cplx-3',
+      'cplx-4',
     ],
   },
   {

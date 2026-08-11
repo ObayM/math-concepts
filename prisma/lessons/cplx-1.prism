@@ -1,0 +1,219 @@
+lesson "The Number That Should Not Exist" {
+  course: "pure-maths"
+  unit: "Complex Numbers"
+  difficulty: "Intermediate"
+  icon: "Star"
+  summary: "Nothing real squares to a negative. So we invent something that does, check it breaks nothing, and discover its powers march round in circles."
+  skills: ["cplx-i", "cplx-powers-of-i", "cplx-square-roots"]
+
+  slide "A Gap in the Number Line" {
+    id: "cx1-hook"
+    cat: "Inventing i"
+    > Solve $x^2 = -1$.
+    >
+    > No real number works. Positives square to positives, negatives square to
+    > positives, and zero squares to zero. The whole number line is used up and none
+    > of it helps.
+    >
+    > Mathematics has done this before. There was no number that solved $x + 3 = 1$
+    > until negatives were invented, and none that solved $2x = 1$ until fractions
+    > were. Each time the fix was the same: **invent the thing you need, then check
+    > it does not break anything you already had.**
+    >
+    > So define
+    >
+    > $$i^2 = -1$$
+    >
+    > and see what follows. It turns out nothing breaks, and a great deal gets
+    > easier.
+
+    quiz {
+      ask "Why is there no real number whose square is $-1$?"
+      skill: "cplx-i"
+      * "Squaring any real number, positive or negative, always gives a positive result or zero"
+      - "Because $-1$ is too small" { why: "Size is not the problem. $-0.01$ has no real square root either, and neither does any negative number at all." }
+      - "There is one, it is just very hard to find" { why: "It genuinely does not exist among the reals. That is precisely why a new kind of number had to be defined." }
+      hint "What happens when you square a negative number?"
+      ! "A negative times a negative is positive, so the square of a real number can never be negative. The gap is real, and $i$ is what fills it."
+    }
+  }
+
+  slide "i Is Not Minus One" {
+    id: "cx1-not-minus-one"
+    cat: "Inventing i"
+    > Worth saying loudly, because it is the most common misreading:
+    >
+    > $$i^2 = -1 \qquad \text{but} \qquad i \neq -1$$
+    >
+    > If $i$ were $-1$ then $i^2$ would be $+1$, not $-1$. So $i$ is not $-1$, and it
+    > is not any real number at all. It is a genuinely new object, defined by what it
+    > **does** rather than by where it sits on the number line.
+    >
+    > That is a normal way to define things in mathematics. You do not need to know
+    > what $i$ "is" any more than you need to know what $-3$ "is". You need to know
+    > how it behaves.
+
+    quiz {
+      ask "What is $i^2$?"
+      skill: "cplx-i"
+      * "$-1$"
+      - "$1$" { why: "That would make $i$ a real number, either $1$ or $-1$, and then nothing new would have been gained." }
+      - "$i$" { why: "That would make $i$ either $0$ or $1$, since those are the only numbers equal to their own square." }
+      - "$2i$" { why: "Squaring is not doubling. $i^2$ means $i \times i$." }
+      hint "It is the defining property, and the whole reason $i$ was invented."
+      ! "$i^2 = -1$ by definition. Every other fact about complex numbers is built on that one line."
+    }
+  }
+
+  slide "The Powers Go Round in Circles" {
+    id: "cx1-powers"
+    cat: "Powers of i"
+    > Now something genuinely delightful. Work out the powers of $i$ one at a time:
+    >
+    > $$i^1 = i \qquad i^2 = -1 \qquad i^3 = i^2 \cdot i = -i \qquad i^4 = i^2 \cdot i^2 = 1$$
+    >
+    > And $i^5 = i^4 \cdot i = i$, so it starts over. The powers **cycle with period
+    > four**, forever.
+    >
+    > There is a picture hiding in that, and it is the whole of the last lesson of
+    > this unit in embryo: each power is a **quarter turn** around a circle. Step the
+    > power up and watch.
+
+    scene plane {
+      x: [-1.9, 1.9]
+      y: [-1.6, 1.6]
+      aspect: equal
+      grid
+      axes
+      param n = 1 { range: [0, 8], step: 1 }
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      vector z = (0, 0) -> (cos(rad(90*n)), sin(rad(90*n))) { color: primary, width: 4 }
+      point P = (cos(rad(90*n)), sin(rad(90*n))) { color: accent, r: 9 }
+      label at (0, 1.4) = "i to the power ${n}" { anchor: middle, color: neutral }
+      label at (0, -1.45) = "= 1" { anchor: middle, color: primary, show: mod(n, 4) == 0 }
+      label at (0, -1.45) = "= i" { anchor: middle, color: primary, show: mod(n, 4) == 1 }
+      label at (0, -1.45) = "= -1" { anchor: middle, color: primary, show: mod(n, 4) == 2 }
+      label at (0, -1.45) = "= -i" { anchor: middle, color: primary, show: mod(n, 4) == 3 }
+      stepper n { label: "the power", step: 1 }
+    }
+
+    goal "Step round until the arrow comes back to where it started" {
+      when: n >= 4
+      hint: "Four quarter turns make a full turn, so i to the fourth is back at 1."
+    }
+  }
+
+  slide "Any Power at All" {
+    id: "cx1-any-power"
+    cat: "Powers of i"
+    > Because the cycle has length four, **only the remainder on dividing by four
+    > matters**. Everything else is complete laps that bring you back to the start.
+    >
+    > For $i^{27}$: divide $27$ by $4$ to get $6$ remainder $3$. Six full laps, then
+    > three quarter turns. So $i^{27} = i^3 = -i$.
+    >
+    > That works however big the power gets, without any multiplying.
+
+    numeric {
+      ask "The powers cycle every $4$. What is the remainder when $50$ is divided by $4$?"
+      skill: "cplx-powers-of-i"
+      answer: 2
+      expect: mod(50, 4)
+      tolerance: 0.01
+      hint "$48$ is twelve fours, leaving $2$."
+      ! "Remainder $2$, so $i^{50} = i^2 = -1$. Twelve complete laps and then a half turn."
+    }
+  }
+
+  slide "Match the Powers" {
+    id: "cx1-match"
+    cat: "Powers of i"
+    match {
+      ask "Match each power of $i$ to its value."
+      skill: "cplx-powers-of-i"
+      pair "$i^{12}$" -> "$1$"
+      pair "$i^{13}$" -> "$i$"
+      pair "$i^{14}$" -> "$-1$"
+      pair "$i^{15}$" -> "$-i$"
+      hint "Divide each power by $4$ and keep only the remainder."
+      ! "$12$ divides exactly, so $i^{12} = 1$, and the next three step round the cycle one quarter at a time. Four consecutive powers always give all four values, in that order."
+    }
+  }
+
+  slide "Roots of Negative Numbers" {
+    id: "cx1-roots"
+    cat: "Using i"
+    > With $i$ available, every negative number has a square root. Pull the minus out
+    > as an $i$ and deal with the rest normally:
+    >
+    > $$\sqrt{-9} = \sqrt{9 \times -1} = \sqrt{9} \times \sqrt{-1} = 3i$$
+    >
+    > So the quadratics that had "no solutions" now have two. $x^2 + 9 = 0$ gives
+    > $x = \pm 3i$, and a negative discriminant no longer means failure — it means
+    > the roots are complex.
+    >
+    > One warning. The rule $\sqrt{a}\sqrt{b} = \sqrt{ab}$ **stops being reliable**
+    > once both are negative: $\sqrt{-4}\sqrt{-9}$ is $2i \times 3i = -6$, not
+    > $\sqrt{36} = 6$. Convert each root to $i$ form **first**, then multiply.
+
+    numeric {
+      ask "Write $\sqrt{-25}$ in the form $bi$. What is $b$?"
+      skill: "cplx-square-roots"
+      answer: 5
+      expect: sqrt(25)
+      tolerance: 0.01
+      hint "Split off the $-1$: $\sqrt{25} \times \sqrt{-1}$."
+      onwrong: "cx1-convert-first" retry
+      ! "$\sqrt{-25} = 5i$. Check it: $(5i)^2 = 25i^2 = -25$."
+    }
+  }
+
+  slide "Convert Before You Multiply" {
+    id: "cx1-convert-first"
+    hidden: true
+    cat: "Using i"
+    > The habit that keeps you out of trouble: **turn every square root of a negative
+    > into $i$ form before doing anything else with it.**
+    >
+    > Here is what goes wrong otherwise:
+    >
+    > Careless: $\sqrt{-4} \times \sqrt{-9} = \sqrt{(-4)(-9)} = \sqrt{36} = 6$.
+    >
+    > Careful: $\sqrt{-4} \times \sqrt{-9} = 2i \times 3i = 6i^2 = -6$.
+    >
+    > The second is right. The familiar rule $\sqrt{a}\sqrt{b} = \sqrt{ab}$ was only
+    > ever proved for non-negative numbers, and it quietly fails here.
+    >
+    > Convert first and the problem disappears, because after conversion you are only
+    > ever multiplying real numbers and powers of $i$, both of which behave.
+
+    numeric {
+      ask "What is $\sqrt{-4} \times \sqrt{-9}$?"
+      skill: "cplx-square-roots"
+      answer: -6
+      expect: 0 - 6
+      tolerance: 0.01
+      hint "Convert both to $i$ form first: $2i$ and $3i$."
+      ! "$2i \times 3i = 6i^2 = -6$. Combining under one root first would have given $+6$, and that is the trap."
+    }
+  }
+
+  slide "Complex Roots of a Quadratic" {
+    id: "cx1-synth"
+    cat: "Using i"
+    > Back in the algebra unit, a negative discriminant meant "no real roots". Now it
+    > means two complex ones, and the quadratic formula carries on working unchanged.
+    >
+    > For $x^2 + 4 = 0$: $x^2 = -4$, so $x = \pm 2i$.
+
+    numeric {
+      ask "Solve $x^2 + 49 = 0$ and give the positive imaginary root as $bi$. What is $b$?"
+      skill: "cplx-square-roots"
+      answer: 7
+      expect: sqrt(49)
+      tolerance: 0.01
+      hint "$x^2 = -49$, so $x = \pm\sqrt{-49}$."
+      ! "$x = \pm 7i$. Every quadratic now has exactly two roots, always — which is a far tidier state of affairs than before."
+    }
+  }
+}
