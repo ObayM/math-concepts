@@ -1,0 +1,184 @@
+lesson "Parallel and Perpendicular" {
+  course: "pure-maths"
+  unit: "Coordinate Geometry"
+  difficulty: "Intermediate"
+  icon: "Move"
+  summary: "Same gradient means parallel. Gradients multiplying to -1 means perpendicular, and there is a reason for that minus one rather than a rule to memorise."
+  skills: ["coord-parallel", "coord-perpendicular", "coord-line-equation"]
+
+  slide "Parallel Is the Easy One" {
+    id: "cd3-parallel"
+    cat: "Same Direction"
+    > Two lines are parallel when they lean the same way, and leaning is exactly
+    > what the gradient measures. So:
+    >
+    > $$\text{parallel} \iff m_1 = m_2$$
+    >
+    > The intercepts are what keep them apart. Same $m$, different $c$, and they run
+    > alongside each other forever. Same $m$ **and** same $c$ and they are not two
+    > lines at all, they are one line written twice.
+
+    scene plane {
+      x: [-7, 7]
+      y: [-6, 6]
+      aspect: equal
+      grid
+      axes
+      param m1 = 1 { range: [-3, 3], step: 0.25 }
+      param m2 = 2 { range: [-3, 3], step: 0.25 }
+      curve l1 = m1*x + 1 { color: primary, width: 3 }
+      curve l2 = m2*x - 2 { color: accent, width: 3 }
+      label at (-6.7, 5.4) = "gradients ${m1} and ${m2}" { color: neutral }
+      label at (-6.7, 4.5) = "parallel" { color: success, show: m1 == m2 }
+      label at (-6.7, 4.5) = "not parallel: they must cross somewhere" { color: warning, show: m1 != m2 }
+      slider m1 { label: "gradient of the blue line" }
+      slider m2 { label: "gradient of the purple line" }
+    }
+
+    goal "Make the two lines parallel" {
+      when: m1 == m2
+      hint: "Match the gradients exactly. The different intercepts keep them apart."
+    }
+  }
+
+  slide "Perpendicular, and Why Minus One" {
+    id: "cd3-perpendicular"
+    cat: "At Right Angles"
+    > For lines at right angles the rule is
+    >
+    > $$m_1 \times m_2 = -1 \qquad \text{or} \qquad m_2 = -\frac{1}{m_1}$$
+    >
+    > which looks arbitrary until you see where it comes from.
+    >
+    > Turning a direction by $90°$ swaps the rise and the run, and flips one sign.
+    > A line going **$1$ across, $3$ up** has gradient $3$. Rotate it a quarter turn
+    > and it now goes **$3$ across, $1$ down** — gradient $-\tfrac13$.
+    >
+    > The reciprocal comes from swapping rise and run. The minus comes from the
+    > quarter turn sending one of them backwards. Multiply them and the swap cancels
+    > itself, leaving $-1$.
+    >
+    > So: **flip it over and change the sign.**
+
+    scene plane {
+      x: [-5, 5]
+      y: [-4, 4]
+      aspect: equal
+      grid
+      axes
+      vector v1 = (0, 0) -> (1, 3) { color: primary, width: 4 }
+      vector v2 = (0, 0) -> (3, -1) { color: accent, width: 4 }
+      curve l1 = 3*x { color: primary, width: 2, style: dashed }
+      curve l2 = 0 - x/3 { color: accent, width: 2, style: dashed }
+      label at (1.2, 3.2) = "1 across, 3 up: m = 3" { color: primary }
+      label at (3.2, -1.2) = "3 across, 1 down: m = -1/3" { color: accent }
+      label at (-4.7, -3.4) = "3 × (-1/3) = -1" { color: success }
+    }
+
+    build {
+      ask "A line has gradient $\tfrac25$. Assemble the gradient of a line perpendicular to it."
+      skill: "coord-perpendicular"
+      template: "$m_2 =$ ___"
+      bank: ["$-\dfrac{5}{2}$", "$\dfrac{5}{2}$", "$-\dfrac{2}{5}$", "$\dfrac{2}{5}$"]
+      answer: ["$-\dfrac{5}{2}$"]
+      hint "Turn the fraction upside down, then change its sign."
+      onwrong: "cd3-flip-and-negate" retry
+      ! "$-\tfrac52$. Check it: $\tfrac25 \times -\tfrac52 = -1$."
+    }
+  }
+
+  slide "Both Steps, Not One" {
+    id: "cd3-flip-and-negate"
+    hidden: true
+    cat: "At Right Angles"
+    > Nearly every wrong answer here does **one** of the two steps. Flipping without
+    > the sign change, or changing the sign without flipping.
+    >
+    > Test any candidate by multiplying. It has to come out at exactly $-1$:
+    >
+    > $\tfrac25 \times \tfrac52 = 1$. Flipped but not negated. Wrong.
+    >
+    > $\tfrac25 \times -\tfrac25 = -\tfrac{4}{25}$. Negated but not flipped. Wrong.
+    >
+    > $\tfrac25 \times -\tfrac52 = -1$. Both. Correct.
+    >
+    > That multiply-and-check takes three seconds and is never ambiguous, so use it
+    > rather than trusting your memory of which step you did.
+    >
+    > One special case: a **horizontal** line has $m = 0$, and its perpendicular is
+    > **vertical**, which has no gradient at all. You cannot flip zero, so that pair
+    > has to be handled by looking at it rather than by the formula.
+
+    numeric {
+      ask "A line has gradient $-4$. What is the gradient of a line perpendicular to it?"
+      skill: "coord-perpendicular"
+      answer: 0.25
+      expect: 0 - 1/(0 - 4)
+      tolerance: 0.001
+      hint "Flip $-4$ to get $-\tfrac14$, then change the sign."
+      ! "$\tfrac14$. Check: $-4 \times \tfrac14 = -1$. Two negatives in the process cancel, so the answer comes out positive."
+    }
+  }
+
+  slide "Sort the Pairs" {
+    id: "cd3-sort"
+    cat: "At Right Angles"
+    sort {
+      ask "Sort each pair of gradients by how the two lines are related."
+      skill: "coord-parallel"
+      bin "Parallel": ["$3$ and $3$", "$-\tfrac12$ and $-\tfrac12$"]
+      bin "Perpendicular": ["$2$ and $-\tfrac12$", "$-3$ and $\tfrac13$"]
+      bin "Neither": ["$2$ and $3$", "$1$ and $-2$"]
+      hint "Equal means parallel. Multiplying to $-1$ means perpendicular. Anything else is neither."
+      ! "Check the last one: $1 \times -2 = -2$, which is neither equal nor $-1$, so those two lines cross at some angle that is not a right angle."
+    }
+  }
+
+  slide "Build the Perpendicular" {
+    id: "cd3-build"
+    cat: "Putting It Together"
+    > A very common exam question: find the line through a given point,
+    > perpendicular to a given line.
+    >
+    > Three steps, and the first is the one people rush. **Get the original gradient
+    > properly** (rearranging first if the equation is not in $y = mx + c$ form),
+    > then flip and negate it, then use point-slope with your point.
+    >
+    > Find the line through $(2, 3)$ perpendicular to $y = 4x - 1$:
+    >
+    > Original gradient $4$, so the new one is $-\tfrac14$. Then
+    > $y - 3 = -\tfrac14(x - 2)$, which tidies to $y = -\tfrac14 x + \tfrac72$.
+
+    numeric {
+      ask "Find the line through $(6, 1)$ perpendicular to $y = 3x + 5$. What is its y-intercept?"
+      skill: "coord-line-equation"
+      answer: 3
+      expect: 1 + 6/3
+      tolerance: 0.01
+      hint "The new gradient is $-\tfrac13$. Then $1 = -\tfrac13(6) + c$."
+      ! "$1 = -2 + c$, so $c = 3$ and the line is $y = -\tfrac13 x + 3$. Check it passes through $(6,1)$: $-\tfrac13(6) + 3 = 1$."
+    }
+  }
+
+  slide "A Right Angle in a Triangle" {
+    id: "cd3-synth"
+    cat: "Putting It Together"
+    > Gradients are also how you *prove* something is a right angle, without
+    > measuring anything.
+    >
+    > Take $A(1, 1)$, $B(4, 2)$ and $C(3, 5)$. Is the angle at $B$ a right angle?
+    >
+    > Gradient of $BA$: $\dfrac{1-2}{1-4} = \dfrac{-1}{-3} = \tfrac13$.
+    > Gradient of $BC$: $\dfrac{5-2}{3-4} = \dfrac{3}{-1} = -3$.
+
+    numeric {
+      ask "Multiply those two gradients together. What do you get?"
+      skill: "coord-perpendicular"
+      answer: -1
+      expect: (1/3)*(0 - 3)
+      tolerance: 0.001
+      hint "$\tfrac13 \times -3$."
+      ! "$-1$, so the two sides really are perpendicular and the angle at $B$ is exactly $90°$. This is how right angles get proved in coordinate geometry: no protractor, just a product."
+    }
+  }
+}

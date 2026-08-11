@@ -63,6 +63,9 @@ const COURSES = [
       'trig-2',
       'trig-3',
       'trig-4',
+      'coord-1',
+      'coord-2',
+      'coord-3',
     ],
   },
   {

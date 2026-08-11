@@ -1,0 +1,181 @@
+lesson "The Equation of a Line" {
+  course: "pure-maths"
+  unit: "Coordinate Geometry"
+  difficulty: "Beginner"
+  icon: "LineChart"
+  summary: "Gradient is rise over run and never the other way round. Slope-intercept, point-slope, and how to build a line's equation from almost nothing."
+  skills: ["coord-gradient", "coord-line-equation", "coord-point-slope"]
+
+  slide "Two Numbers Fix a Line" {
+    id: "cd2-hook"
+    cat: "Gradient and Intercept"
+    > A straight line needs exactly two pieces of information: **how steep it is**
+    > and **where it sits**. That is the whole content of
+    >
+    > $$y = mx + c$$
+    >
+    > $m$ is the **gradient**, how much $y$ climbs for each step of $1$ across. $c$
+    > is the **y-intercept**, the height at which it crosses the y-axis.
+    >
+    > Move both sliders and watch which one tilts the line and which one lifts it.
+
+    scene plane {
+      x: [-7, 7]
+      y: [-6, 6]
+      aspect: equal
+      grid
+      axes
+      param m = 1 { range: [-3, 3], step: 0.25 }
+      param c = 1 { range: [-4, 4], step: 0.5 }
+      curve line = m*x + c { color: primary, width: 3 }
+      point icept = (0, c) { color: accent, r: 8 }
+      line runSeg = (1, m + c) -> (2, m + c) { color: warning, width: 4 }
+      line riseSeg = (2, m + c) -> (2, 2*m + c) { color: success, width: 4 }
+      label at (-6.7, 5.4) = "y = ${m}x + ${c}" { color: primary, show: c >= 0 }
+      label at (-6.7, 5.4) = "y = ${m}x - ${0 - c}" { color: primary, show: c < 0 }
+      label at (-6.7, 4.5) = "run 1 across, rise ${m} up" { color: neutral }
+      slider m { label: "gradient m" }
+      slider c { label: "intercept c" }
+    }
+
+    goal "Make a line that falls as you go right" {
+      when: m < 0
+      hint: "A negative gradient tilts it downhill."
+    }
+    goal "Now make it perfectly flat" {
+      when: m == 0
+      hint: "No rise at all for any run."
+    }
+  }
+
+  slide "Rise Over Run, Never the Reverse" {
+    id: "cd2-gradient"
+    cat: "Gradient and Intercept"
+    > From two points, the gradient is
+    >
+    > $$m = \frac{y_2 - y_1}{x_2 - x_1} = \frac{\text{rise}}{\text{run}}$$
+    >
+    > **Rise on top.** Flipping it is the single most common error in this topic, and
+    > the way to never do it is to sanity-check against a line you can picture. A
+    > steep line climbs a lot for a small step across, so its gradient should be a
+    > **big** number. Put the run on top and steep lines would come out near zero,
+    > which is obviously wrong.
+    >
+    > A quick reading of the sign, too: uphill left-to-right is positive, downhill is
+    > negative, flat is zero, and a vertical line has no gradient at all, because the
+    > run is zero and you cannot divide by it.
+
+    numeric {
+      ask "What is the gradient of the line through $(2, 3)$ and $(6, 11)$?"
+      skill: "coord-gradient"
+      answer: 2
+      expect: (11 - 3)/(6 - 2)
+      tolerance: 0.01
+      hint "Rise is $11 - 3$, run is $6 - 2$. Rise goes on top."
+      onwrong: "cd2-rise-over-run" retry
+      ! "$m = 8/4 = 2$. It climbs two units for every one across."
+    }
+  }
+
+  slide "Which Way Up?" {
+    id: "cd2-rise-over-run"
+    hidden: true
+    cat: "Gradient and Intercept"
+    > If you got $\tfrac12$, you divided run by rise. Here is a picture that makes
+    > the right way round obvious and hard to forget.
+    >
+    > The blue line below climbs steeply: $4$ up for $1$ across. Its gradient is
+    > $4$, a big number for a steep line, which feels right.
+    >
+    > Flip the fraction and you would call it $\tfrac14$ — a *small* number for a
+    > *steep* line. The orange line, which is genuinely shallow, would then also come
+    > out large. The two would be the wrong way round entirely.
+    >
+    > **Steep means big. Steep means lots of rise per run. So rise is on top.**
+
+    scene plane {
+      x: [-1, 6]
+      y: [-1, 5.5]
+      aspect: equal
+      grid
+      axes
+      curve steep = 4*x - 1 { color: primary, width: 3 }
+      curve shallow = 0.25*x + 0.5 { color: warning, width: 3 }
+      line r1 = (1, 3) -> (1.9, 3) { color: neutral, width: 3 }
+      line r2 = (1.9, 3) -> (1.9, 6.6) { color: neutral, width: 3 }
+      label at (2.0, 4.6) = "steep: m = 4" { color: primary }
+      label at (3.4, 1.1) = "shallow: m = 0.25" { color: warning }
+    }
+
+    numeric {
+      ask "What is the gradient of the line through $(1, 5)$ and $(4, 2)$?"
+      skill: "coord-gradient"
+      answer: -1
+      expect: (2 - 5)/(4 - 1)
+      tolerance: 0.01
+      hint "Rise is $2 - 5 = -3$, run is $4 - 1 = 3$."
+      ! "$m = -3/3 = -1$. It falls as you go right, so a negative gradient is exactly what you should expect."
+    }
+  }
+
+  slide "When You Do Not Know c" {
+    id: "cd2-point-slope"
+    cat: "Building the Equation"
+    > You usually get a gradient and a point, not a gradient and an intercept. The
+    > **point-slope form** handles that directly:
+    >
+    > $$y - y_1 = m(x - x_1)$$
+    >
+    > It is just the gradient formula rearranged. It says: starting from a point you
+    > know, the rise from it is $m$ times the run from it.
+    >
+    > For gradient $3$ through $(2, 5)$: $\; y - 5 = 3(x - 2)$, which tidies to
+    > $y = 3x - 1$.
+    >
+    > Note you never had to find $c$ separately. It fell out of the tidying, which is
+    > exactly why this form is worth using.
+
+    order {
+      ask "Put the steps in order to find the equation of the line through $(4, 1)$ with gradient $2$."
+      skill: "coord-point-slope"
+      item "Write $y - y_1 = m(x - x_1)$"
+      item "Substitute the point and the gradient: $y - 1 = 2(x - 4)$"
+      item "Expand the bracket: $y - 1 = 2x - 8$"
+      item "Add $1$ to both sides: $y = 2x - 7$"
+      decoy "Find $c$ first by guessing where it crosses the y-axis"
+      ! "$y = 2x - 7$. Check it against the point: $2(4) - 7 = 1$, which matches. Always substitute the original point back in — it catches sign errors instantly."
+    }
+  }
+
+  slide "From Two Points" {
+    id: "cd2-two-points"
+    cat: "Building the Equation"
+    > Given two points and nothing else, it is two steps: find the gradient, then
+    > use either point in the point-slope form. Either point works and gives the same
+    > line, which is a useful thing to check with if you are unsure.
+
+    numeric {
+      ask "The line through $(1, 2)$ and $(3, 8)$ is $y = mx + c$. What is $c$?"
+      skill: "coord-line-equation"
+      answer: -1
+      expect: 2 - 3*1
+      tolerance: 0.01
+      hint "First the gradient: $(8-2)/(3-1) = 3$. Then substitute one point into $y = 3x + c$."
+      ! "$m = 3$, and $2 = 3(1) + c$ gives $c = -1$, so $y = 3x - 1$. Checking with the other point: $3(3) - 1 = 8$. Both fit, so the line is right."
+    }
+  }
+
+  slide "Reading a Line Backwards" {
+    id: "cd2-read"
+    cat: "Building the Equation"
+    quiz {
+      ask "What is the gradient of the line $2x + 3y = 12$?"
+      skill: "coord-gradient"
+      * "$-\dfrac{2}{3}$"
+      - "$2$" { why: "That is the coefficient of $x$, but only *after* rearranging to $y = mx + c$ does the coefficient mean the gradient. This equation is not in that form yet." }
+      - "$\dfrac{2}{3}$" { why: "Right size, wrong sign. Rearranging gives $3y = -2x + 12$, and the minus survives the division." }
+      hint "Rearrange it into the form $y = mx + c$ before reading anything off."
+      ! "$3y = -2x + 12$, so $y = -\tfrac23 x + 4$. The gradient is $-\tfrac23$ and the intercept is $4$. Never read a gradient off an equation that is not solved for $y$."
+    }
+  }
+}

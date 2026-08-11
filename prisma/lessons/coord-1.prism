@@ -1,0 +1,184 @@
+lesson "Distance and Midpoint" {
+  course: "pure-maths"
+  unit: "Coordinate Geometry"
+  difficulty: "Beginner"
+  icon: "Ruler"
+  summary: "Pythagoras in disguise. Drag two points around and watch the right triangle that measures the gap between them build itself."
+  skills: ["coord-distance", "coord-midpoint", "coord-pythagoras"]
+
+  slide "There Is Always a Right Triangle" {
+    id: "cd1-hook"
+    cat: "Measuring a Gap"
+    > Take any two points. Go across from one, then up to the other, and you have
+    > drawn a right triangle whose hypotenuse is the straight-line distance between
+    > them.
+    >
+    > That is the entire idea. The distance formula is Pythagoras with the legs
+    > written in coordinates:
+    >
+    > $$\text{across} = x_2 - x_1 \qquad \text{up} = y_2 - y_1$$
+    >
+    > Drag either red point and watch the triangle rebuild itself.
+
+    scene plane {
+      x: [-7, 7]
+      y: [-5.5, 5.5]
+      aspect: equal
+      grid
+      axes
+      param ax = -3 { range: [-6, 6], step: 1 }
+      param ay = -2 { range: [-4, 4], step: 1 }
+      param bx = 2 { range: [-6, 6], step: 1 }
+      param by = 2 { range: [-4, 4], step: 1 }
+      polygon tri = [(ax, ay), (bx, ay), (bx, by)] { color: primary, opacity: 0.12 }
+      line across = (ax, ay) -> (bx, ay) { color: warning, width: 4 }
+      line up = (bx, ay) -> (bx, by) { color: success, width: 4 }
+      line hyp = (ax, ay) -> (bx, by) { color: primary, width: 4 }
+      point A = (ax, ay) { drag: xy -> (ax, ay), color: danger, r: 8, snap: 1 }
+      point B = (bx, by) { drag: xy -> (bx, by), color: danger, r: 8, snap: 1 }
+      point M = ((ax + bx)/2, (ay + by)/2) { color: accent, r: 7 }
+      label at (-6.7, 5.0) = "across = ${bx - ax}, up = ${by - ay}" { color: neutral }
+      label at (-6.7, 4.2) = "distance = ${hypot(bx - ax, by - ay)}" { color: primary }
+      label at (-6.7, 3.4) = "midpoint = (${(ax + bx)/2}, ${(ay + by)/2})" { color: accent }
+    }
+
+    goal "Line the two points up so the gap is purely horizontal" {
+      when: ay == by
+      hint: "Same height. The triangle collapses and the distance is just the across."
+    }
+    goal "Now make a 3, 4, 5 triangle" {
+      when: abs(hypot(bx - ax, by - ay) - 5) < 0.01 and abs(bx - ax) > 0 and abs(by - ay) > 0
+      hint: "Three across and four up, or the other way round."
+    }
+  }
+
+  slide "The Formula" {
+    id: "cd1-formula"
+    cat: "Measuring a Gap"
+    > Squaring both legs and adding gives Pythagoras, and the square root turns it
+    > back into a length:
+    >
+    > $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
+    >
+    > Because both differences get squared, **it does not matter which point you
+    > call first**. Swapping them flips both signs, and squaring erases them. So you
+    > can never get a negative distance out of this, which is as it should be.
+
+    build {
+      ask "Assemble the distance between two points."
+      skill: "coord-distance"
+      template: "$d = \sqrt{}$ ___ $+$ ___"
+      bank: ["$(x_2 - x_1)^2$", "$(y_2 - y_1)^2$", "$(x_2 - y_1)^2$", "$(x_2 - x_1)$"]
+      answer: ["$(x_2 - x_1)^2$", "$(y_2 - y_1)^2$"]
+      hint "Each bracket compares a coordinate with the *same* coordinate of the other point."
+      onwrong: "cd1-match-the-letters" retry
+      ! "$d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$. Xs with xs, ys with ys, both squared."
+    }
+  }
+
+  slide "Xs With Xs" {
+    id: "cd1-match-the-letters"
+    hidden: true
+    cat: "Measuring a Gap"
+    > The classic slip is mixing an $x$ with a $y$, writing something like
+    > $(x_2 - y_1)$. It is worth seeing why that can never mean anything.
+    >
+    > The two legs of the triangle are a **horizontal** distance and a **vertical**
+    > one. A horizontal distance is found only by comparing two x-coordinates; the
+    > y-coordinates play no part in it whatsoever. Subtracting a $y$ from an $x$ is
+    > like subtracting a temperature from a weight.
+    >
+    > So the check is mechanical: **every bracket must contain two letters of the
+    > same kind.**
+    >
+    > For $(1, 2)$ and $(4, 6)$: across is $4 - 1 = 3$, up is $6 - 2 = 4$, and the
+    > distance is $\sqrt{9 + 16} = 5$.
+
+    scene plane {
+      x: [-1, 6]
+      y: [-1, 7]
+      aspect: equal
+      grid
+      axes
+      polygon tri = [(1, 2), (4, 2), (4, 6)] { color: primary, opacity: 0.12 }
+      line across = (1, 2) -> (4, 2) { color: warning, width: 4 }
+      line up = (4, 2) -> (4, 6) { color: success, width: 4 }
+      line hyp = (1, 2) -> (4, 6) { color: primary, width: 4 }
+      point A = (1, 2) { color: danger, r: 8, label: "(1, 2)" }
+      point B = (4, 6) { color: danger, r: 8, label: "(4, 6)" }
+      label at (2.5, 1.4) = "3" { anchor: middle, color: warning }
+      label at (4.3, 4) = "4" { color: success }
+      label at (2.0, 4.4) = "5" { color: primary }
+    }
+
+    numeric {
+      ask "What is the distance between $(2, 1)$ and $(7, 13)$?"
+      skill: "coord-distance"
+      answer: 13
+      expect: hypot(7 - 2, 13 - 1)
+      tolerance: 0.01
+      hint "Across is $5$, up is $12$. Those two should look familiar."
+      ! "$\sqrt{25 + 144} = \sqrt{169} = 13$. The $5, 12, 13$ triangle, which turns up almost as often as $3, 4, 5$."
+    }
+  }
+
+  slide "The Midpoint Is Just an Average" {
+    id: "cd1-midpoint"
+    cat: "Halfway"
+    > The midpoint needs no square roots at all. Halfway between two numbers is
+    > their average, and you do that to each coordinate separately:
+    >
+    > $$M = \left(\frac{x_1 + x_2}{2},\ \frac{y_1 + y_2}{2}\right)$$
+    >
+    > **Add and halve** — that is the whole operation. If you find yourself
+    > subtracting, you have reached for the distance formula by mistake. Distances
+    > subtract; midpoints add.
+
+    numeric {
+      ask "What is the x-coordinate of the midpoint of $(-3, 5)$ and $(9, 1)$?"
+      skill: "coord-midpoint"
+      answer: 3
+      expect: (0 - 3 + 9)/2
+      tolerance: 0.01
+      hint "Average the two x-coordinates: $(-3 + 9)/2$."
+      ! "$(-3 + 9)/2 = 3$. And the y-coordinate is $(5+1)/2 = 3$, so the midpoint is $(3, 3)$."
+    }
+  }
+
+  slide "Working Backwards" {
+    id: "cd1-backwards"
+    cat: "Halfway"
+    > Questions often run the other way: you are given one end and the midpoint, and
+    > asked for the other end.
+    >
+    > Do not invent a new formula. The midpoint is the average, so
+    > $\dfrac{x_1 + x_2}{2} = x_M$ means $x_1 + x_2 = 2x_M$. Whatever you know, the
+    > other end is **twice the midpoint minus the end you have**.
+
+    numeric {
+      ask "$A$ is $(1, 4)$ and the midpoint of $AB$ is $(5, 7)$. What is the x-coordinate of $B$?"
+      skill: "coord-midpoint"
+      answer: 9
+      expect: 2*5 - 1
+      tolerance: 0.01
+      hint "$2 \times 5 - 1$."
+      ! "$x_B = 2(5) - 1 = 9$, and similarly $y_B = 2(7) - 4 = 10$, so $B$ is $(9, 10)$. Check it: the average of $1$ and $9$ is indeed $5$."
+    }
+  }
+
+  slide "Both at Once" {
+    id: "cd1-synth"
+    cat: "Halfway"
+    > A triangle has vertices $P(0, 0)$, $Q(6, 0)$ and $R(6, 8)$.
+
+    numeric {
+      ask "What is the length of the longest side?"
+      skill: "coord-distance"
+      answer: 10
+      expect: hypot(6, 8)
+      tolerance: 0.01
+      hint "The sides are $PQ = 6$, $QR = 8$ and $PR$. Which of the three is the hypotenuse?"
+      ! "$PR = \sqrt{36 + 64} = 10$. It is a $6, 8, 10$ triangle, which is the $3,4,5$ doubled — worth spotting, because it saves the arithmetic entirely."
+    }
+  }
+}
