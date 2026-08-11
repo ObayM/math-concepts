@@ -14,7 +14,7 @@ import {
   AXIS_LABEL_SIZE,
   AXIS_LABEL_WEIGHT,
 } from '@/engine/colors';
-import { toDataCoords, PLOT_PAD } from './coords';
+import { toDataCoords, planeCoords, PLOT_PAD } from './coords';
 import {
   centerCursor,
   moveCursor,
@@ -87,14 +87,7 @@ export default function SvgRenderer({
   const [xMin, xMax] = ir.space.xDomain;
   const [yMin, yMax] = ir.space.yDomain;
 
-  const cx: CoordSystem = {
-    toX: (x) => PLOT_PAD + ((x - xMin) / (xMax - xMin)) * (W - 2 * PLOT_PAD),
-    toY: (y) => H - PLOT_PAD - ((y - yMin) / (yMax - yMin)) * (H - 2 * PLOT_PAD),
-    W,
-    H,
-    xDomain: ir.space.xDomain,
-    yDomain: ir.space.yDomain,
-  };
+  const cx: CoordSystem = planeCoords(ir.space.xDomain, ir.space.yDomain, W, H, ir.space.aspect);
 
   const objects = expandObjects(ir.objects, scope);
 
@@ -111,14 +104,7 @@ export default function SvgRenderer({
     const move = (ev: PointerEvent) => {
       const svg = svgRef.current;
       if (!svg) return;
-      const [dataX, dataY] = toDataCoords(
-        svg,
-        ev.clientX,
-        ev.clientY,
-        [xMin, xMax],
-        [yMin, yMax],
-        PLOT_PAD
-      );
+      const [dataX, dataY] = toDataCoords(svg, ev.clientX, ev.clientY, cx);
       const patch = applyDrag(draggable, dataX, dataY, ir, scope);
       for (const key in patch) set(key, patch[key]);
     };
@@ -135,14 +121,7 @@ export default function SvgRenderer({
   const handleTap = (e: React.PointerEvent<SVGRectElement>) => {
     const svg = svgRef.current;
     if (!svg || !onTap) return;
-    const [dataX, dataY] = toDataCoords(
-      svg,
-      e.clientX,
-      e.clientY,
-      [xMin, xMax],
-      [yMin, yMax],
-      PLOT_PAD
-    );
+    const [dataX, dataY] = toDataCoords(svg, e.clientX, e.clientY, cx);
     onTap(dataX, dataY);
     setKeyCursor(null);
   };

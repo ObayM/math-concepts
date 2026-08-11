@@ -4,6 +4,8 @@ import type { Scope } from '@/engine/ir/types';
 export interface CoordSystem {
   toX: (x: number) => number;
   toY: (y: number) => number;
+  fromX: (px: number) => number;
+  fromY: (py: number) => number;
   W: number;
   H: number;
   xDomain: [number, number];

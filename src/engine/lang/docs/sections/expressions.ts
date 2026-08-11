@@ -16,9 +16,11 @@ export const expressionsSection: DocSection = {
     {
       keyword: 'math functions',
       syntax:
-        'sin cos tan asin acos atan atan2 sinh cosh tanh sqrt cbrt abs log log2 log10 exp floor ceil round sign pow hypot min max',
-      description: 'All standard math functions. Called without a namespace prefix.',
-      example: `curve s = sin(x) * exp(-x/4) { color: primary }\nlabel at (PI, 0) = "π"`,
+        'sin cos tan asin acos atan atan2 sinh cosh tanh sec csc cot\nsqrt cbrt abs log log2 log10 exp pow hypot\nfloor ceil round sign min max clamp lerp mod\ndeg rad fact nCr nPr',
+      description:
+        'All standard math functions, called without a namespace prefix. Trig works in radians — `deg`/`rad` convert. `mod` is a true modulo (unlike the `%` operator, `mod(-1, 3)` is `2`). `fact`, `nCr` and `nPr` are the counting functions; they return nothing usable for negative, non-integer, or out-of-range input.',
+      example:
+        'curve s = sin(x) * exp(-x/4) { color: primary }\nlabel at (0, 0) = "C(5,2) = ${nCr(5, 2)}"',
     },
     {
       keyword: 'constants',

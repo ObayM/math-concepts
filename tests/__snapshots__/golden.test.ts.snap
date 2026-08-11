@@ -457,6 +457,50 @@ exports[`scene compiler goldens > compiles shapes.prism to stable IR 1`] = `
       "y": -2,
     },
     {
+      "color": "success",
+      "h": 0.6,
+      "id": "tilted",
+      "rotate": {
+        "k": "id",
+        "name": "t",
+      },
+      "type": "rect",
+      "w": 1.2,
+      "x": -2,
+      "y": -2,
+    },
+    {
+      "color": "warning",
+      "id": "spun",
+      "points": [
+        [
+          -1,
+          2,
+        ],
+        [
+          0,
+          2,
+        ],
+        [
+          0,
+          2.6,
+        ],
+      ],
+      "rotate": {
+        "k": "bin",
+        "l": {
+          "k": "num",
+          "v": 0,
+        },
+        "op": "-",
+        "r": {
+          "k": "id",
+          "name": "t",
+        },
+      },
+      "type": "polygon",
+    },
+    {
       "alt": "a small placeholder square",
       "h": 1,
       "id": "logo",

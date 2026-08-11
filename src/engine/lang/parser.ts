@@ -11,7 +11,7 @@ import type {
 } from './ast';
 import { CompileError } from './errors';
 
-const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes']);
+const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes', 'aspect']);
 
 // the whole parser lives in one closure over (tokens, pos); makeParser exposes
 // the two entry points — a full file, or a bare expression (f-string fragments etc.)

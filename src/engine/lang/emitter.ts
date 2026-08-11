@@ -482,6 +482,11 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
       case 'repeat_s': {
         const startV = cNum(s.start, cScope, s.ln);
         if (startV !== 0) throw new CompileError('repeat range must start at 0', s.ln);
+        if (repeatVars.includes(s.var))
+          throw new CompileError(
+            `repeat variable "${s.var}" is already used by an enclosing repeat`,
+            s.ln
+          );
         const count = lowerR(s.count, cScope, s.ln);
 
         const savedObjects = ir.objects;
@@ -558,12 +563,23 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
           yV && yV !== true && yV.k === 'list'
             ? (yV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number])
             : undefined;
+        const axesRaw = s.props.get('axes');
+        const axesV =
+          axesRaw === undefined || axesRaw === true ? true : cBool(axesRaw, cScope, s.ln);
+        const aspectV = s.props.get('aspect');
+        if (aspectV !== undefined) {
+          if (aspectV === true || aspectV.k !== 'id' || aspectV.name !== 'equal')
+            throw new CompileError('aspect must be "equal"', s.ln);
+          if (isNumberline)
+            throw new CompileError('aspect: equal has no meaning on a numberline', s.ln);
+        }
         ir.space = {
           type: s.spaceType,
           xDomain: xD,
           ...(yD && { yDomain: yD }),
           ...(s.props.has('grid') && { grid: true }),
-          ...(s.props.has('axes') && { axes: true }),
+          ...(s.props.has('axes') && { axes: axesV !== false }),
+          ...(aspectV !== undefined && { aspect: 'equal' }),
         };
         run(s.children, cScope);
         break;
@@ -671,9 +687,32 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
               throw new CompileError('along(...) takes one object id', s.ln);
             }
             if (drag.to.k !== 'id') throw new CompileError('along(...) -> binds one param', s.ln);
+            const ref = drag.from.args[0].name;
+            const target = ir.objects.find((o: any) => o.id === ref);
+            if (!target) {
+              throw new CompileError(
+                `along("${ref}") but no such object exists yet${suggest(
+                  ref,
+                  ir.objects.map((o: any) => o.id)
+                )}`,
+                s.ln
+              );
+            }
+            if (target.type !== 'circle' && target.type !== 'line') {
+              throw new CompileError(
+                `along(...) needs a circle or a two-point line, but "${ref}" is a ${target.type}`,
+                s.ln
+              );
+            }
+            if (target.type === 'line' && target.x1 == null) {
+              throw new CompileError(
+                `along("${ref}") needs a two-point line, not one defined by through:/slope:`,
+                s.ln
+              );
+            }
             obj.draggable = {
               bind: bindTo(drag.to.name, 'drag', s.ln),
-              along: { ref: drag.from.args[0].name },
+              along: { ref },
             };
           } else {
             if (drag.from.k !== 'id' || !['x', 'y', 'xy'].includes(drag.from.name)) {
@@ -757,6 +796,16 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         const obj: any = { id, type: 'label', x, y, text };
         const size = propNum(s.props, 'size', s.ln, cScope);
         if (size != null) obj.fontSize = size;
+        const anchor = s.props.get('anchor');
+        if (anchor !== undefined) {
+          if (
+            anchor === true ||
+            anchor.k !== 'id' ||
+            !['start', 'middle', 'end'].includes(anchor.name)
+          )
+            throw new CompileError('anchor must be start, middle, or end', s.ln);
+          obj.anchor = anchor.name;
+        }
         if (s.props.has('tex')) obj.tex = true;
         applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
@@ -770,6 +819,8 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         const h = propLowerR(s.props, 'h', cScope, s.ln);
         if (w == null || h == null) throw new CompileError('rect needs w: and h: props', s.ln);
         const obj: any = { id, type: 'rect', x, y, w, h };
+        const rotate = propLowerR(s.props, 'rotate', cScope, s.ln);
+        if (rotate != null) obj.rotate = rotate;
         const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
         applyCommon(obj, s.props, cScope, s.ln);
@@ -801,6 +852,8 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
           ];
         });
         const obj: any = { id, type: 'polygon', points };
+        const rotate = propLowerR(s.props, 'rotate', cScope, s.ln);
+        if (rotate != null) obj.rotate = rotate;
         const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
         applyCommon(obj, s.props, cScope, s.ln);

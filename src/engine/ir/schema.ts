@@ -33,6 +33,7 @@ const space = z
     yDomain: z.tuple([z.number(), z.number()]).optional(),
     grid: z.boolean().optional(),
     axes: z.boolean().optional(),
+    aspect: z.literal('equal').optional(),
   })
   .refine((s) => s.type === 'numberline' || s.yDomain !== undefined, {
     message: 'yDomain is required unless type is "numberline"',
@@ -112,17 +113,20 @@ const labelObj = z.object({
   y: expr,
   text: liveText, // you can drop ${expr} in here
   fontSize: z.number().optional(),
+  anchor: z.enum(['start', 'middle', 'end']).optional(),
   tex: z.boolean().optional(), // render text as LaTeX (KaTeX) instead of plain
   ...objBase,
 });
 
 // (x, y) is the bottom-left corner in scene coords; w/h in scene units
+// rotate is degrees counter-clockwise about (x, y), the placement anchor
 const rectObj = z.object({
   type: z.literal('rect'),
   x: expr,
   y: expr,
   w: expr,
   h: expr,
+  rotate: expr.optional(),
   opacity: z.number().optional(),
   ...objBase,
 });
@@ -137,9 +141,11 @@ const circleObj = z.object({
   ...objBase,
 });
 
+// rotate is degrees counter-clockwise about the first vertex
 const polygonObj = z.object({
   type: z.literal('polygon'),
   points: z.array(z.tuple([expr, expr])).min(2),
+  rotate: expr.optional(),
   opacity: z.number().optional(),
   ...objBase,
 });

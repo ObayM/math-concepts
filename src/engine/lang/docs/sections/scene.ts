@@ -8,16 +8,27 @@ export const sceneSection: DocSection = {
   entries: [
     {
       keyword: 'scene',
-      syntax: 'scene <type> {\n  x: [min,max]\n  [y: [min,max]]\n  [grid]\n  [axes]\n  ...\n}',
+      syntax:
+        'scene <type> {\n  x: [min,max]\n  [y: [min,max]]\n  [grid]\n  [axes]\n  [aspect: equal]\n  ...\n}',
       description:
-        '`type` is `plane` (2D cartesian) or `numberline` (1D axis). For `plane`, both `x:` and `y:` are required. For `numberline`, only `x:` is needed. The space config lines can appear anywhere in the block, in any order, alongside state/object/control declarations.',
+        '`type` is `plane` (2D cartesian) or `numberline` (1D axis). For `plane`, both `x:` and `y:` are required. For `numberline`, only `x:` is needed. The space config lines can appear anywhere in the block, in any order, alongside state/object/control declarations.\n\nBy default the x and y domains are stretched independently to fill the box, so a circle only looks round if the domains happen to match the box. Add `aspect: equal` when shape matters — unit circles, Argand diagrams, geometry, force diagrams — and one shared scale is used for both axes, letterboxed inside the same space.',
       props: [
         { name: 'x', type: '[number, number]', description: 'x-axis domain', required: true },
         { name: 'y', type: '[number, number]', description: 'y-axis domain (plane only)' },
         { name: 'grid', type: 'flag', description: 'draw a background grid (plane only)' },
-        { name: 'axes', type: 'flag', description: 'draw axes' },
+        {
+          name: 'axes',
+          type: 'flag',
+          description: 'draw axes. they are on by default — write `axes: false` to hide them',
+        },
+        {
+          name: 'aspect',
+          type: 'equal',
+          description: 'one scale for both axes, so circles stay round (plane only)',
+        },
       ],
-      example: 'scene plane {\n  x: [-5, 5]\n  y: [-5, 5]\n  grid\n  axes\n}',
+      example:
+        'scene plane {\n  x: [-2, 2]\n  y: [-2, 2]\n  aspect: equal\n  grid\n  axes\n  circle unit = (0, 0) { r: 1, color: primary }\n}',
     },
     {
       keyword: 'param',

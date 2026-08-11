@@ -27,6 +27,7 @@ const NUM_FIELDS = [
   'end',
   'where',
   'opacity',
+  'rotate',
   'visibleIf',
 ] as const;
 
@@ -79,7 +80,11 @@ function instantiate(obj: Record<string, unknown>, varName: string, k: number): 
       Array.isArray(pt) ? [subst(pt[0], varName, k), subst(pt[1], varName, k)] : pt
     );
   }
-  if (out.type === 'repeat') out.count = subst(out.count, varName, k);
+  if (out.type === 'repeat') {
+    out.count = subst(out.count, varName, k);
+    const body = out.body as Record<string, unknown>[];
+    out.body = body.map((child) => instantiate(child, varName, k));
+  }
   return out as unknown as SceneObject;
 }
 

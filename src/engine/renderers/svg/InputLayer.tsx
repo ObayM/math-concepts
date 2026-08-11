@@ -41,7 +41,7 @@ export default function InputLayer({
   const getPoint = (clientX: number, clientY: number): Pt => {
     const svg = svgRef.current;
     if (!svg) return [0, 0];
-    return toDataCoords(svg, clientX, clientY, cx.xDomain, cx.yDomain, PLOT_PAD);
+    return toDataCoords(svg, clientX, clientY, cx);
   };
 
   const handleDown = (e: React.PointerEvent<SVGRectElement>) => {

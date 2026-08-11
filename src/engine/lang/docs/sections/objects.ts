@@ -70,18 +70,20 @@ export const objectsSection: DocSection = {
     },
     {
       keyword: 'label',
-      syntax: 'label [id] at (x, y) = <text> { [size: <number>], [tex], [props] }',
+      syntax:
+        'label [id] at (x, y) = <text> { [size: <number>], [anchor: start|middle|end], [tex], [props] }',
       description:
-        'Text positioned in scene coordinates. Use `${expr}` in the text for live-updating values (rounded to 2 dp). Add `tex` flag to render as LaTeX via KaTeX.',
+        'Text positioned in scene coordinates. Use `${expr}` in the text for live-updating values (rounded to 2 dp). Add `tex` flag to render as LaTeX via KaTeX. `anchor:` says which end of the text sits on (x, y) — the default `start` runs the text rightwards, `middle` centres it, which is what you want for a column of numbers of different widths.',
       example: `param t = 0 { range: [-3, 3] }\nlabel at (t, t^2+0.5) = "slope = \${2*t}"\nlabel eq at (0, 4) = "x^2 + 1" { tex }`,
     },
     {
       keyword: 'rect',
-      syntax: 'rect <id> = (x, y) { w: <expr>, h: <expr>, [opacity: <number>], [props] }',
+      syntax:
+        'rect <id> = (x, y) { w: <expr>, h: <expr>, [rotate: <expr>], [opacity: <number>], [props] }',
       description:
-        '(x, y) is the bottom-left corner in scene coords. Width and height are expressions.',
+        '(x, y) is the bottom-left corner in scene coords. Width and height are expressions. `rotate:` tilts the rectangle counter-clockwise by that many degrees about (x, y), so the anchor stays put and the body swings around it — that is what puts a block on a ramp. The angle can be live state, and the rotation happens in scene coords, so it stays correct with or without `aspect: equal`.',
       example:
-        'param t = 1 { range: [0, 3] }\nrect bar = (0, 0) { w: 0.5, h: t^2, color: primary, opacity: 0.4 }',
+        'param a = 25 { range: [0, 60] }\nrect block = (2, 0) { w: 1.2, h: 0.7, rotate: a, color: primary }\nslider a { label: "ramp angle" }',
     },
     {
       keyword: 'circle',
@@ -91,9 +93,11 @@ export const objectsSection: DocSection = {
     },
     {
       keyword: 'polygon',
-      syntax: 'polygon <id> = [(x1,y1), (x2,y2), (x3,y3), ...] { [props] }',
-      description: 'Closed polygon. Vertices are a list `[...]` of `(x, y)` tuples.',
-      example: 'polygon tri = [(0,0), (2,0), (1, sqrt(3))]',
+      syntax: 'polygon <id> = [(x1,y1), (x2,y2), ...] { [rotate: <expr>], [props] }',
+      description:
+        'Closed polygon. Vertices are a list `[...]` of `(x, y)` tuples. `rotate:` turns the whole shape counter-clockwise by that many degrees about the **first** vertex.',
+      example:
+        'param spin = 0 { range: [0, 360] }\npolygon tri = [(0,0), (2,0), (1, sqrt(3))] { rotate: spin }\nslider spin { label: "spin" }',
     },
     {
       keyword: 'vector',

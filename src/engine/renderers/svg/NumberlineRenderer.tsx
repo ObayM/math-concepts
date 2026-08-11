@@ -46,6 +46,8 @@ export default function NumberlineRenderer({
   const cx: CoordSystem = {
     toX: (x) => ((x - xMin) / (xMax - xMin)) * W,
     toY: () => Y_MID,
+    fromX: (px) => xMin + (px / W) * (xMax - xMin),
+    fromY: () => 0,
     W,
     H,
     xDomain: ir.space.xDomain,

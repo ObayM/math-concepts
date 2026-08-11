@@ -16,7 +16,9 @@ export default function Label({ obj, scope, cx }: PrimProps) {
     const narrow = cx.W < 420;
     const estW = raw.replace(/\\[a-zA-Z]+|[{}\s]/g, '').length * fontSize * 0.62 + 12;
     const boxW = narrow ? Math.max(60, Math.min(360, cx.W)) : 360;
-    const boxX = narrow ? Math.max(0, Math.min(px, cx.W - Math.min(estW, cx.W))) : px;
+    const shift = obj.anchor === 'middle' ? estW / 2 : obj.anchor === 'end' ? estW : 0;
+    const anchored = px - shift;
+    const boxX = narrow ? Math.max(0, Math.min(anchored, cx.W - Math.min(estW, cx.W))) : anchored;
     return (
       <foreignObject
         x={boxX}
@@ -46,6 +48,7 @@ export default function Label({ obj, scope, cx }: PrimProps) {
     <text
       x={px}
       y={py}
+      textAnchor={obj.anchor ?? 'start'}
       fontSize={obj.fontSize ?? 16}
       fontWeight={600}
       fill={resolveColor(obj.color ?? 'neutral')}

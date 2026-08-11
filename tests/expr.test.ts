@@ -206,6 +206,86 @@ describe('differential test vs a reference evaluator', () => {
   it('BUILTIN_NAMES is stable (schema enum depends on it)', () => {
     expect(BUILTIN_NAMES).toContain('clamp');
     expect(BUILTIN_NAMES).toContain('atan2');
+    expect(BUILTIN_NAMES).toContain('nCr');
+    expect(BUILTIN_NAMES).toContain('fact');
     expect(new Set(BUILTIN_NAMES).size).toBe(BUILTIN_NAMES.length);
+  });
+});
+
+describe('counting builtins', () => {
+  it('computes factorials', () => {
+    expect(evalNum(call('fact', n(0)), {})).toBe(1);
+    expect(evalNum(call('fact', n(5)), {})).toBe(120);
+    expect(evalNum(call('fact', n(10)), {})).toBe(3628800);
+  });
+
+  it('computes combinations', () => {
+    expect(evalNum(call('nCr', n(5), n(2)), {})).toBe(10);
+    expect(evalNum(call('nCr', n(6), n(3)), {})).toBe(20);
+    expect(evalNum(call('nCr', n(4), n(0)), {})).toBe(1);
+    expect(evalNum(call('nCr', n(4), n(4)), {})).toBe(1);
+  });
+
+  it('keeps combinations exact where a triple-factorial form would overflow', () => {
+    expect(evalNum(call('nCr', n(60), n(30)), {})).toBe(118264581564861424);
+    expect(Number.isFinite(evalNum(call('nCr', n(200), n(100)), {}))).toBe(true);
+  });
+
+  it('is symmetric', () => {
+    for (let k = 0; k <= 9; k++) {
+      expect(evalNum(call('nCr', n(9), n(k)), {})).toBe(evalNum(call('nCr', n(9), n(9 - k)), {}));
+    }
+  });
+
+  it('satisfies Pascal’s rule', () => {
+    for (let k = 1; k <= 6; k++) {
+      const above = evalNum(call('nCr', n(6), n(k - 1)), {}) + evalNum(call('nCr', n(6), n(k)), {});
+      expect(evalNum(call('nCr', n(7), n(k)), {})).toBe(above);
+    }
+  });
+
+  it('computes permutations', () => {
+    expect(evalNum(call('nPr', n(5), n(2)), {})).toBe(20);
+    expect(evalNum(call('nPr', n(5), n(5)), {})).toBe(120);
+    expect(evalNum(call('nPr', n(5), n(0)), {})).toBe(1);
+  });
+
+  it('relates nPr and nCr', () => {
+    expect(evalNum(call('nPr', n(8), n(3)), {})).toBe(
+      evalNum(call('nCr', n(8), n(3)), {}) * evalNum(call('fact', n(3)), {})
+    );
+  });
+
+  it('returns NaN rather than throwing on nonsense input', () => {
+    for (const tree of [
+      call('fact', n(-1)),
+      call('fact', n(2.5)),
+      call('fact', n(400)),
+      call('nCr', n(4), n(9)),
+      call('nCr', n(-2), n(1)),
+      call('nPr', n(3), n(-1)),
+    ]) {
+      expect(Number.isNaN(evalNum(tree, {}))).toBe(true);
+    }
+  });
+});
+
+describe('angle and modulo builtins', () => {
+  it('converts between degrees and radians', () => {
+    expect(evalNum(call('deg', id('PI')), {})).toBeCloseTo(180, 10);
+    expect(evalNum(call('rad', n(180)), {})).toBeCloseTo(Math.PI, 10);
+    expect(evalNum(call('deg', call('rad', n(37))), {})).toBeCloseTo(37, 10);
+  });
+
+  it('gives the reciprocal trig functions', () => {
+    expect(evalNum(call('sec', n(0)), {})).toBeCloseTo(1, 10);
+    expect(evalNum(call('csc', n(Math.PI / 2)), {})).toBeCloseTo(1, 10);
+    expect(evalNum(call('cot', n(Math.PI / 4)), {})).toBeCloseTo(1, 10);
+  });
+
+  it('wraps negatives the way the % operator does not', () => {
+    expect(evalNum(call('mod', n(-1), n(3)), {})).toBe(2);
+    expect(evalNum(call('mod', n(7), n(3)), {})).toBe(1);
+    expect(evalNum(call('mod', n(-7), n(3)), {})).toBe(2);
   });
 });

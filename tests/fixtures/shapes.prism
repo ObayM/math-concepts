@@ -8,6 +8,8 @@ scene plane {
   vector v = (0, 0) -> (cos(t * PI / 180), sin(t * PI / 180)) { color: accent }
   arc angle = (0, 0) { r: 0.5, from: 0, to: t }
   rect bar = (1, -2) { w: 0.5, h: 1.5, color: primary, opacity: 0.4 }
+  rect tilted = (-2, -2) { w: 1.2, h: 0.6, rotate: t, color: success }
+  polygon spun = [(-1, 2), (0, 2), (0, 2.6)] { rotate: 0 - t, color: warning }
   image logo = (-2.5, 1.5) { w: 1, h: 1, src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", alt: "a small placeholder square" }
   stepper t { label: "angle", step: 5 }
   button "reset" { set: { t: 0 } }
