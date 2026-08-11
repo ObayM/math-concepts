@@ -1,5 +1,5 @@
 import { evalNumber } from '@/engine/runtime/eval';
-import { resolveColor, STROKE } from '@/engine/colors';
+import { resolveColor, dash, STROKE } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Vector({ obj, scope, cx }: PrimProps) {
@@ -23,7 +23,15 @@ export default function Vector({ obj, scope, cx }: PrimProps) {
 
   return (
     <g stroke={color} fill={color}>
-      <line x1={x1} y1={y1} x2={nx} y2={ny} strokeWidth={sw} strokeLinecap="round" />
+      <line
+        x1={x1}
+        y1={y1}
+        x2={nx}
+        y2={ny}
+        strokeWidth={sw}
+        strokeLinecap="round"
+        strokeDasharray={dash(obj.style)}
+      />
       <polygon
         points={`${x2},${y2} ${a1x},${a1y} ${nx},${ny} ${a2x},${a2y}`}
         stroke="none"
