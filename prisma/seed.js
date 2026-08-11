@@ -74,6 +74,11 @@ const COURSES = [
       'explog-2',
       'explog-3',
       'explog-4',
+      'vec-1',
+      'vec-2',
+      'vec-3',
+      'vec-4',
+      'vec-5',
     ],
   },
   {

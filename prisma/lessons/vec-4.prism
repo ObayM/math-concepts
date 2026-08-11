@@ -1,0 +1,172 @@
+lesson "The Dot Product" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Advanced"
+  icon: "Link"
+  summary: "Multiply two vectors and get a plain number. It measures how much they agree, which makes it the fastest test for perpendicular there is."
+  skills: ["vec-dot-product", "vec-perpendicular", "vec-angle"]
+
+  slide "A Product That Is Not a Vector" {
+    id: "v4-hook"
+    cat: "Two Formulas"
+    > The **dot product** (or scalar product) of two vectors is a single number, not
+    > a vector. That is why it is called scalar, and it catches people out
+    > constantly.
+    >
+    > There are two formulas and they are equal:
+    >
+    > $$\mathbf{a}\cdot\mathbf{b} = a_1b_1 + a_2b_2$$
+    > $$\mathbf{a}\cdot\mathbf{b} = |\mathbf{a}||\mathbf{b}|\cos\theta$$
+    >
+    > The first is what you compute with. The second is what it **means**: the
+    > product of the two lengths, scaled by how well aligned they are.
+    >
+    > That $\cos\theta$ is the whole story. Pointing the same way gives $\cos 0 = 1$
+    > and the biggest possible value. At right angles $\cos 90° = 0$ and the product
+    > vanishes. Pointing oppositely gives $\cos 180° = -1$ and it goes negative.
+    >
+    > Swing the second vector and watch the number.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param th = 45 { range: [0, 180], step: 5 }
+      vector a = (0, 0) -> (4, 0) { color: primary, width: 4 }
+      vector b = (0, 0) -> (3*cos(rad(th)), 3*sin(rad(th))) { color: accent, width: 4 }
+      arc ang = (0, 0) { r: 1.2, from: 0, to: th, color: neutral, width: 3 }
+      label at (-5.7, 4.4) = "angle between them: ${th}°" { color: neutral }
+      label at (-5.7, 3.5) = "a · b = ${4*3*cos(rad(th))}" { color: primary }
+      label at (-5.7, 2.6) = "they agree" { color: success, show: cos(rad(th)) > 0.02 }
+      label at (-5.7, 2.6) = "perpendicular: the product is zero" { color: warning, show: abs(cos(rad(th))) <= 0.02 }
+      label at (-5.7, 2.6) = "they oppose" { color: danger, show: cos(rad(th)) < 0 - 0.02 }
+      slider th { label: "angle between the vectors" }
+    }
+
+    goal "Find the angle that makes the dot product exactly zero" {
+      when: abs(cos(rad(th))) < 0.02
+      hint: "Perpendicular. A right angle means no agreement at all."
+    }
+  }
+
+  slide "The Perpendicular Test" {
+    id: "v4-perpendicular"
+    cat: "Right Angles"
+    > That zero is the single most useful fact about the dot product:
+    >
+    > $$\mathbf{a}\cdot\mathbf{b} = 0 \iff \mathbf{a} \text{ and } \mathbf{b} \text{ are perpendicular}$$
+    >
+    > (assuming neither is the zero vector). Testing for a right angle becomes one
+    > multiplication and one addition, with no angles or trigonometry anywhere.
+    >
+    > Check $3\mathbf{i} + 4\mathbf{j}$ against $4\mathbf{i} - 3\mathbf{j}$:
+    >
+    > $$3(4) + 4(-3) = 12 - 12 = 0$$
+    >
+    > Perpendicular. And notice how those components were built: swap them and
+    > negate one — exactly the "flip and change the sign" rule for perpendicular
+    > gradients. Same geometry, different notation.
+
+    numeric {
+      ask "What is $(2\mathbf{i} + 5\mathbf{j}) \cdot (10\mathbf{i} - 4\mathbf{j})$?"
+      skill: "vec-dot-product"
+      answer: 0
+      expect: 2*10 + 5*(0 - 4)
+      tolerance: 0.01
+      hint "$2 \times 10 + 5 \times (-4)$."
+      onwrong: "v4-not-componentwise" retry
+      ! "$20 - 20 = 0$, so those two are perpendicular. The dot product found a right angle without measuring one."
+    }
+  }
+
+  slide "Multiply Across, Then Add" {
+    id: "v4-not-componentwise"
+    hidden: true
+    cat: "Right Angles"
+    > The dot product is **not** done component by component. It does not give a
+    > vector at all.
+    >
+    > $$(2\mathbf{i} + 5\mathbf{j}) \cdot (10\mathbf{i} - 4\mathbf{j}) = \underbrace{2 \times 10}_{20} + \underbrace{5 \times (-4)}_{-20} = 0$$
+    >
+    > Multiply the matching components, **then add the results into one number**.
+    > There is no $\mathbf{i}$ or $\mathbf{j}$ left in the answer.
+    >
+    > Compare it with addition, which really is componentwise and really does give a
+    > vector:
+    >
+    > $$(2\mathbf{i} + 5\mathbf{j}) + (10\mathbf{i} - 4\mathbf{j}) = 12\mathbf{i} + \mathbf{j}$$
+    >
+    > Adding keeps the components apart. The dot product deliberately collapses them
+    > together, and that collapse is what lets a single number describe the angle.
+
+    numeric {
+      ask "What is $(3\mathbf{i} - \mathbf{j}) \cdot (2\mathbf{i} + 6\mathbf{j})$?"
+      skill: "vec-dot-product"
+      answer: 0
+      expect: 3*2 + (0 - 1)*6
+      tolerance: 0.01
+      hint "$3 \times 2 + (-1) \times 6$, and add the two results."
+      ! "$6 - 6 = 0$. Perpendicular again, and again the answer is a single number rather than a vector."
+    }
+  }
+
+  slide "Finding the Angle" {
+    id: "v4-angle"
+    cat: "Right Angles"
+    > Setting the two formulas equal gives you the angle between any two vectors:
+    >
+    > $$\cos\theta = \frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{a}||\mathbf{b}|}$$
+    >
+    > Compute the dot product, divide by both magnitudes, take the inverse cosine.
+    >
+    > For $\mathbf{a} = 3\mathbf{i} + 4\mathbf{j}$ and $\mathbf{b} = 5\mathbf{i}$:
+    > the dot product is $15$, the magnitudes are $5$ and $5$, so
+    > $\cos\theta = 15/25 = 0.6$ and $\theta \approx 53.1°$.
+    >
+    > A useful check: that fraction can never leave the range $-1$ to $1$. If yours
+    > does, the arithmetic went wrong somewhere.
+
+    numeric {
+      ask "For $\mathbf{a} = 3\mathbf{i} + 4\mathbf{j}$ and $\mathbf{b} = 5\mathbf{i}$, find the angle between them in degrees."
+      skill: "vec-angle"
+      answer: 53.13
+      expect: deg(acos(15/25))
+      tolerance: 0.3
+      hint "$\cos\theta = 15/(5 \times 5) = 0.6$."
+      ! "$\arccos(0.6) \approx 53.1°$. That is the $3,4,5$ triangle's angle, which is exactly what $\mathbf{a}$ describes."
+    }
+  }
+
+  slide "Sort by Angle" {
+    id: "v4-sort"
+    cat: "Reading the Sign"
+    > You can read the rough geometry off the **sign** alone, without computing an
+    > angle at all.
+
+    sort {
+      ask "Sort each dot product by what it says about the angle between the vectors."
+      skill: "vec-dot-product"
+      bin "Acute, under 90°": ["$\mathbf{a}\cdot\mathbf{b} = 12$", "$\mathbf{a}\cdot\mathbf{b} = 0.5$"]
+      bin "Exactly 90°": ["$\mathbf{a}\cdot\mathbf{b} = 0$"]
+      bin "Obtuse, over 90°": ["$\mathbf{a}\cdot\mathbf{b} = -7$", "$\mathbf{a}\cdot\mathbf{b} = -30$"]
+      hint "The sign of the dot product is the sign of $\cos\theta$, since the magnitudes are always positive."
+      ! "Positive means they broadly agree, zero means perpendicular, negative means they broadly oppose. The *size* depends on the lengths too, but the sign is purely about the angle."
+    }
+  }
+
+  slide "Everything Together" {
+    id: "v4-synth"
+    cat: "Reading the Sign"
+    numeric {
+      ask "Find the value of $k$ that makes $2\mathbf{i} + k\mathbf{j}$ perpendicular to $6\mathbf{i} - 3\mathbf{j}$."
+      skill: "vec-perpendicular"
+      answer: 4
+      expect: 12/3
+      tolerance: 0.01
+      hint "Perpendicular means the dot product is zero: $2(6) + k(-3) = 0$."
+      ! "$12 - 3k = 0$, so $k = 4$. Turning a geometric condition into a one-line equation is what the dot product is best at."
+    }
+  }
+}

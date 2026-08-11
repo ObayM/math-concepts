@@ -1,0 +1,207 @@
+lesson "Position and Displacement" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Intermediate"
+  icon: "MapPin"
+  summary: "The one place a vector does get pinned down. Position vectors locate points, displacement vectors connect them, and the difference between the two matters."
+  skills: ["vec-position", "vec-displacement", "vec-addition"]
+
+  slide "Pinning a Vector Down" {
+    id: "v5-hook"
+    cat: "Position Vectors"
+    > Vectors are free to be drawn anywhere — except for one deliberate exception.
+    >
+    > A **position vector** is a vector drawn **from the origin** to a point. Tying
+    > one end down like that turns it into a way of naming locations. The position
+    > vector of the point $A(3, 4)$ is
+    >
+    > $$\mathbf{a} = \overrightarrow{OA} = 3\mathbf{i} + 4\mathbf{j}$$
+    >
+    > which carries exactly the same numbers as the coordinates. That is the point of
+    > them: they let you do vector algebra with points.
+    >
+    > Small convention worth knowing: a lower-case bold letter, $\mathbf{a}$, usually
+    > means the position vector of the capital-letter point $A$.
+
+    scene plane {
+      x: [-1.5, 8]
+      y: [-1.5, 7]
+      aspect: equal
+      grid
+      axes
+      param ax = 2 { range: [0, 7], step: 1 }
+      param ay = 5 { range: [0, 6], step: 1 }
+      param bx = 6 { range: [0, 7], step: 1 }
+      param by = 2 { range: [0, 6], step: 1 }
+      vector oa = (0, 0) -> (ax, ay) { color: primary, width: 4 }
+      vector ob = (0, 0) -> (bx, by) { color: accent, width: 4 }
+      vector ab = (ax, ay) -> (bx, by) { color: success, width: 5 }
+      point A = (ax, ay) { drag: xy -> (ax, ay), color: primary, r: 8, snap: 1, label: "A" }
+      point B = (bx, by) { drag: xy -> (bx, by), color: accent, r: 8, snap: 1, label: "B" }
+      label at (-1.3, 6.5) = "a = ${ax}i + ${ay}j" { color: primary }
+      label at (-1.3, 5.8) = "b = ${bx}i + ${by}j" { color: accent }
+      label at (-1.3, 5.1) = "AB = b - a = ${bx - ax}i + ${by - ay}j" { color: success }
+    }
+
+    goal "Move the points until AB is purely horizontal" {
+      when: ay == by
+      hint: "Same height, so there is no j component in the displacement."
+    }
+  }
+
+  slide "Displacement Is a Difference" {
+    id: "v5-displacement"
+    cat: "Getting Between Points"
+    > The vector **from** $A$ **to** $B$ is
+    >
+    > $$\overrightarrow{AB} = \mathbf{b} - \mathbf{a}$$
+    >
+    > **Destination minus start.** That order is the whole rule, and getting it
+    > backwards gives you a vector pointing exactly the wrong way.
+    >
+    > Why it works: to get from $A$ to $B$ you could go back to the origin and out
+    > again, which is $-\mathbf{a}$ followed by $\mathbf{b}$. Adding those gives
+    > $\mathbf{b} - \mathbf{a}$.
+    >
+    > For $A(2, 5)$ and $B(6, 2)$:
+    > $\overrightarrow{AB} = (6-2)\mathbf{i} + (2-5)\mathbf{j} = 4\mathbf{i} - 3\mathbf{j}$,
+    > with magnitude $5$ — which is just the distance from $A$ to $B$, arrived at the
+    > vector way.
+
+    numeric {
+      ask "$P$ is $(1, 7)$ and $Q$ is $(5, 4)$. What is the $\mathbf{j}$ component of $\overrightarrow{PQ}$?"
+      skill: "vec-displacement"
+      answer: -3
+      expect: 4 - 7
+      tolerance: 0.01
+      hint "Destination minus start: $4 - 7$."
+      onwrong: "v5-which-way" retry
+      ! "$-3$, and the $\mathbf{i}$ component is $4$, so $\overrightarrow{PQ} = 4\mathbf{i} - 3\mathbf{j}$. Negative $\mathbf{j}$ because $Q$ is *below* $P$."
+    }
+  }
+
+  slide "Destination Minus Start" {
+    id: "v5-which-way"
+    hidden: true
+    cat: "Getting Between Points"
+    > Getting the order backwards is easy, so here is a way to be sure.
+    >
+    > $\overrightarrow{PQ}$ means "from $P$ to $Q$". Read the letters in order: you
+    > **start** at $P$ and **finish** at $Q$. The subtraction runs the other way
+    > round from the letters:
+    >
+    > $$\overrightarrow{PQ} = \mathbf{q} - \mathbf{p}$$
+    >
+    > Test it on something you can see. From $P(1,7)$ to $Q(5,4)$ you clearly go
+    > **right** and **down**, so the answer must be positive $\mathbf{i}$ and
+    > negative $\mathbf{j}$.
+    >
+    > $\mathbf{q} - \mathbf{p} = 4\mathbf{i} - 3\mathbf{j}$. Right and down. Correct.
+    >
+    > $\mathbf{p} - \mathbf{q} = -4\mathbf{i} + 3\mathbf{j}$. Left and up — that is
+    > $\overrightarrow{QP}$, the return journey.
+    >
+    > A rough sketch settles the direction in about three seconds, and it is worth
+    > doing every time.
+
+    scene plane {
+      x: [-1.5, 7]
+      y: [-1.5, 8.5]
+      aspect: equal
+      grid
+      axes
+      point P = (1, 7) { color: primary, r: 8, label: "P(1, 7)" }
+      point Q = (5, 4) { color: accent, r: 8, label: "Q(5, 4)" }
+      vector pq = (1, 7) -> (5, 4) { color: success, width: 5 }
+      line rightStep = (1, 7) -> (5, 7) { color: neutral, width: 2, style: dashed }
+      line downStep = (5, 7) -> (5, 4) { color: neutral, width: 2, style: dashed }
+      label at (3.0, 7.4) = "4 right" { anchor: middle, color: neutral }
+      label at (5.3, 5.5) = "3 down" { color: neutral }
+      label at (1.9, 5.0) = "PQ = 4i - 3j" { color: success }
+    }
+
+    numeric {
+      ask "Same two points. What is the $\mathbf{i}$ component of $\overrightarrow{QP}$, the journey back?"
+      skill: "vec-displacement"
+      answer: -4
+      expect: 1 - 5
+      tolerance: 0.01
+      hint "Now $Q$ is the start and $P$ the destination, so it is $\mathbf{p} - \mathbf{q}$."
+      ! "$1 - 5 = -4$. The return journey is the exact negative: $\overrightarrow{QP} = -\overrightarrow{PQ}$."
+    }
+  }
+
+  slide "Distance Between Two Points" {
+    id: "v5-distance"
+    cat: "Getting Between Points"
+    > The magnitude of the displacement is the distance between the points:
+    >
+    > $$|\overrightarrow{AB}| = |\mathbf{b} - \mathbf{a}|$$
+    >
+    > Work that out in components and you get
+    > $\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$ — the distance formula from coordinate
+    > geometry, rediscovered. It was a vector calculation all along; we just were not
+    > calling it one.
+
+    numeric {
+      ask "$A$ is $(1, 2)$ and $B$ is $(9, 8)$. What is the distance $|\overrightarrow{AB}|$?"
+      skill: "vec-displacement"
+      answer: 10
+      expect: hypot(9 - 1, 8 - 2)
+      tolerance: 0.01
+      hint "$\overrightarrow{AB} = 8\mathbf{i} + 6\mathbf{j}$, then take its magnitude."
+      ! "$\sqrt{64 + 36} = 10$. The $6,8,10$ triangle again."
+    }
+  }
+
+  slide "The Midpoint, Vector Style" {
+    id: "v5-midpoint"
+    cat: "Getting Between Points"
+    > The midpoint of $AB$ has position vector
+    >
+    > $$\mathbf{m} = \frac{\mathbf{a} + \mathbf{b}}{2}$$
+    >
+    > which is the average of the two position vectors — the same "add and halve" as
+    > the coordinate version, because that is exactly what it is.
+    >
+    > The vector route to it is quite pretty: start at $A$, travel **half** of
+    > $\overrightarrow{AB}$, and stop.
+    >
+    > $$\mathbf{m} = \mathbf{a} + \tfrac12(\mathbf{b} - \mathbf{a}) = \tfrac12\mathbf{a} + \tfrac12\mathbf{b}$$
+    >
+    > That trick generalises. To get a third of the way along, use $\tfrac13$ instead,
+    > and the same reasoning handles any fraction you like.
+
+    numeric {
+      ask "$A$ has position vector $2\mathbf{i} + 6\mathbf{j}$ and $B$ has $8\mathbf{i} + 2\mathbf{j}$. What is the $\mathbf{i}$ component of the midpoint's position vector?"
+      skill: "vec-position"
+      answer: 5
+      expect: (2 + 8)/2
+      tolerance: 0.01
+      hint "Average the $\mathbf{i}$ components."
+      ! "$(2+8)/2 = 5$, and the $\mathbf{j}$ gives $4$, so $\mathbf{m} = 5\mathbf{i} + 4\mathbf{j}$."
+    }
+  }
+
+  slide "Proving Things With Vectors" {
+    id: "v5-synth"
+    cat: "Getting Between Points"
+    > Vectors are genuinely good at proof, because "parallel" and "equal length"
+    > become algebra.
+    >
+    > If $\overrightarrow{AB} = \overrightarrow{DC}$, then $ABCD$ has one pair of
+    > sides both parallel **and** equal in length, which is exactly the condition for
+    > a parallelogram. One vector equation replaces two separate geometric
+    > statements.
+
+    quiz {
+      ask "$\overrightarrow{AB} = 3\mathbf{i} + \mathbf{j}$ and $\overrightarrow{DC} = 3\mathbf{i} + \mathbf{j}$. What does that tell you about $ABCD$?"
+      skill: "vec-position"
+      * "$AB$ and $DC$ are parallel and the same length, so $ABCD$ is a parallelogram"
+      - "$AB$ and $DC$ are the same line" { why: "Equal vectors need not be in the same place. These are two different sides that happen to have the same length and direction." }
+      - "Nothing, since the points are different" { why: "Equal vectors say a great deal: same direction and same magnitude. That is precisely what a pair of parallelogram sides must satisfy." }
+      hint "What does it mean for two vectors to be exactly equal?"
+      ! "Equal vectors means parallel and equal in length at once. A whole geometric proof collapses into checking two components."
+    }
+  }
+}

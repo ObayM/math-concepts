@@ -1,0 +1,174 @@
+lesson "Unit Vectors i and j" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Beginner"
+  icon: "Ruler"
+  summary: "Two little arrows of length one, and every vector in the plane becomes an ordinary sum. Component form, column form, and how to build a unit vector from any vector."
+  skills: ["vec-components", "vec-unit-vectors", "vec-magnitude"]
+
+  slide "Two Building Blocks" {
+    id: "v2-hook"
+    cat: "Components"
+    > Define two special vectors, each of length exactly $1$:
+    >
+    > $$\mathbf{i} = \text{one unit east} \qquad \mathbf{j} = \text{one unit north}$$
+    >
+    > Now **every** vector in the plane is built from those two. Four across and
+    > three up is simply
+    >
+    > $$\mathbf{a} = 4\mathbf{i} + 3\mathbf{j}$$
+    >
+    > which is the same information as the column form $\begin{pmatrix} 4 \\ 3
+    > \end{pmatrix}$. Two notations, one vector — use whichever the question uses.
+    >
+    > The point of this is that vector algebra becomes ordinary algebra. You collect
+    > $\mathbf{i}$ terms and $\mathbf{j}$ terms exactly as you would collect $x$ and
+    > $y$ terms, because the two directions never interfere.
+
+    scene plane {
+      x: [-2, 7]
+      y: [-2, 6]
+      aspect: equal
+      grid
+      axes
+      param ax = 4 { range: [-1, 6], step: 1 }
+      param ay = 3 { range: [-1, 5], step: 1 }
+      vector ihat = (0, 0) -> (1, 0) { color: warning, width: 5 }
+      vector jhat = (0, 0) -> (0, 1) { color: success, width: 5 }
+      vector a = (0, 0) -> (ax, ay) { color: primary, width: 4 }
+      line stepx = (0, 0) -> (ax, 0) { color: warning, width: 2, style: dashed }
+      line stepy = (ax, 0) -> (ax, ay) { color: success, width: 2, style: dashed }
+      point tip = (ax, ay) { drag: xy -> (ax, ay), color: accent, r: 9, snap: 1 }
+      label at (1.15, -0.55) = "i" { color: warning }
+      label at (-0.55, 1.15) = "j" { color: success }
+      label at (-1.8, 5.5) = "${ax}i + ${ay}j" { color: primary, show: ay >= 0 }
+      label at (-1.8, 5.5) = "${ax}i - ${0 - ay}j" { color: primary, show: ay < 0 }
+      label at (-1.8, 4.7) = "magnitude ${hypot(ax, ay)}" { color: accent }
+    }
+
+    goal "Build a vector with no j component at all" {
+      when: ay == 0
+      hint: "Purely horizontal, so it lies along i."
+    }
+  }
+
+  slide "Algebra, Component by Component" {
+    id: "v2-algebra"
+    cat: "Components"
+    > Because $\mathbf{i}$ and $\mathbf{j}$ are independent directions, everything
+    > happens in each component separately:
+    >
+    > $$(3\mathbf{i} + 2\mathbf{j}) + (\mathbf{i} - 5\mathbf{j}) = 4\mathbf{i} - 3\mathbf{j}$$
+    >
+    > Collect the $\mathbf{i}$s, collect the $\mathbf{j}$s, and never mix them. It is
+    > the same rule that stopped $3 + 2i$ collapsing in complex numbers, and the same
+    > reason a horizontal force never affects a vertical equation.
+
+    numeric {
+      ask "What is the $\mathbf{j}$ component of $(5\mathbf{i} - 2\mathbf{j}) + (3\mathbf{i} + 9\mathbf{j})$?"
+      skill: "vec-components"
+      answer: 7
+      expect: 0 - 2 + 9
+      tolerance: 0.01
+      hint "Collect only the $\mathbf{j}$ terms: $-2 + 9$."
+      ! "$7$, and the $\mathbf{i}$ terms give $8$, so the result is $8\mathbf{i} + 7\mathbf{j}$."
+    }
+  }
+
+  slide "Making a Unit Vector" {
+    id: "v2-unit"
+    cat: "Unit Vectors"
+    > A **unit vector** has magnitude exactly $1$. It carries a direction and nothing
+    > else, which is often precisely what you want.
+    >
+    > To build one from any vector, divide by its own magnitude:
+    >
+    > $$\hat{\mathbf{a}} = \frac{\mathbf{a}}{|\mathbf{a}|}$$
+    >
+    > For $\mathbf{a} = 3\mathbf{i} + 4\mathbf{j}$, the magnitude is $5$, so
+    >
+    > $$\hat{\mathbf{a}} = \tfrac35\mathbf{i} + \tfrac45\mathbf{j} = 0.6\mathbf{i} + 0.8\mathbf{j}$$
+    >
+    > Check it: $\sqrt{0.36 + 0.64} = 1$. The direction is untouched, the length is
+    > now $1$. The little hat always means "unit vector in this direction".
+
+    numeric {
+      ask "For $\mathbf{a} = 6\mathbf{i} + 8\mathbf{j}$, what is the $\mathbf{i}$ component of the unit vector $\hat{\mathbf{a}}$?"
+      skill: "vec-unit-vectors"
+      answer: 0.6
+      expect: 6/hypot(6, 8)
+      tolerance: 0.005
+      hint "The magnitude is $10$, so divide each component by $10$."
+      onwrong: "v2-divide-by-magnitude" retry
+      ! "$6/10 = 0.6$, and the $\mathbf{j}$ component is $0.8$. Same direction as $3\mathbf{i} + 4\mathbf{j}$, which is no surprise since $6\mathbf{i}+8\mathbf{j}$ is just double it."
+    }
+  }
+
+  slide "Divide by the Length, Not a Component" {
+    id: "v2-divide-by-magnitude"
+    hidden: true
+    cat: "Unit Vectors"
+    > The usual slip is dividing by one of the components rather than by the
+    > magnitude.
+    >
+    > For $6\mathbf{i} + 8\mathbf{j}$ the magnitude is $\sqrt{36 + 64} = 10$, not $6$
+    > and not $8$. Both components get divided by that **same** number, which is what
+    > keeps the direction unchanged.
+    >
+    > Divide by different numbers and you tilt the vector, which defeats the whole
+    > purpose. Scaling a vector means multiplying every component by one common
+    > factor.
+    >
+    > Always check afterwards: a unit vector's components must satisfy
+    > $\sqrt{x^2 + y^2} = 1$. Here $\sqrt{0.6^2 + 0.8^2} = \sqrt{0.36+0.64} = 1$.
+
+    scene plane {
+      x: [-1.5, 11]
+      y: [-1.5, 9]
+      aspect: equal
+      grid
+      axes
+      vector orig = (0, 0) -> (6, 8) { color: primary, width: 4 }
+      vector unit = (0, 0) -> (0.6, 0.8) { color: accent, width: 5 }
+      circle ring = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      label at (6.3, 8.2) = "6i + 8j, length 10" { color: primary }
+      label at (1.6, 0.5) = "0.6i + 0.8j, length 1" { color: accent }
+      label at (4.5, -1.1) = "same direction, both on the same line" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "What is the magnitude of the unit vector $0.6\mathbf{i} + 0.8\mathbf{j}$?"
+      skill: "vec-unit-vectors"
+      answer: 1
+      expect: hypot(0.6, 0.8)
+      tolerance: 0.005
+      hint "$\sqrt{0.36 + 0.64}$."
+      ! "$1$, exactly as a unit vector must be. That check catches the error every time."
+    }
+  }
+
+  slide "Direction With a Size Attached" {
+    id: "v2-scaled"
+    cat: "Unit Vectors"
+    > Unit vectors earn their keep when you know a direction and a size separately.
+    > Multiply the unit vector by the size you want:
+    >
+    > $$\text{a force of } 20 \text{ N along } \hat{\mathbf{a}} = 20\hat{\mathbf{a}}$$
+    >
+    > So a $20$ N force in the direction of $3\mathbf{i} + 4\mathbf{j}$ is
+    > $20(0.6\mathbf{i} + 0.8\mathbf{j}) = 12\mathbf{i} + 16\mathbf{j}$.
+    >
+    > This is how a physics problem gets from "the rope points that way and pulls
+    > this hard" to actual components.
+
+    numeric {
+      ask "A force of $50$ N acts in the direction of the unit vector $0.6\mathbf{i} + 0.8\mathbf{j}$. What is its $\mathbf{j}$ component, in newtons?"
+      skill: "vec-unit-vectors"
+      answer: 40
+      expect: 50*0.8
+      tolerance: 0.01
+      hint "Multiply the unit vector by $50$."
+      ! "$50 \times 0.8 = 40$ N, and the $\mathbf{i}$ component is $30$ N. Check: $\sqrt{900 + 1600} = 50$, so the total force really is $50$ N."
+    }
+  }
+}

@@ -1,0 +1,149 @@
+lesson "What a Vector Is" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Beginner"
+  icon: "Move"
+  summary: "Some quantities need a direction to mean anything. Magnitude, direction, and why a vector does not care where you draw it."
+  skills: ["vec-definition", "vec-magnitude", "vec-scalar-vs-vector"]
+
+  slide "Some Numbers Need a Direction" {
+    id: "v1-hook"
+    cat: "Two Kinds of Quantity"
+    > "I walked $5$ km" tells you how tired I am. "I walked $5$ km **north**" tells
+    > you where I ended up. The second is strictly more information, and some
+    > questions cannot be answered without it.
+    >
+    > A **scalar** is a size on its own: mass, time, temperature, speed. A **vector**
+    > carries a size *and* a direction: displacement, velocity, force,
+    > acceleration.
+    >
+    > You have been using vectors all through mechanics without the label. Every
+    > force arrow was one.
+
+    sort {
+      ask "Sort each quantity by whether it needs a direction to be fully described."
+      skill: "vec-scalar-vs-vector"
+      bin "Scalar": ["mass, 5 kg", "time, 20 s", "speed, 30 m/s", "temperature, 18°C"]
+      bin "Vector": ["velocity, 30 m/s east", "force, 12 N downwards", "displacement, 5 km north"]
+      hint "Ask whether the phrase would be incomplete without a direction attached."
+      ! "Speed and velocity are the pair worth watching. Speed is $30$ m/s; velocity is $30$ m/s *in a stated direction*. A car going round a roundabout at a steady speed has a constantly changing velocity, which is exactly why it needs a force."
+    }
+  }
+
+  slide "Magnitude and Direction" {
+    id: "v1-magnitude"
+    cat: "Two Kinds of Quantity"
+    > Draw a vector as an arrow: its **length** is the magnitude and the way it
+    > **points** is the direction. Written $\mathbf{a}$ in bold, or
+    > $\overrightarrow{AB}$ when named by its endpoints.
+    >
+    > The magnitude, written $|\mathbf{a}|$, is Pythagoras once again:
+    >
+    > $$|\mathbf{a}| = \sqrt{a_1^2 + a_2^2}$$
+    >
+    > Exactly the same formula as the distance between two points and as the modulus
+    > of a complex number. Three topics, one triangle.
+    >
+    > Drag the arrowhead and watch the length and the angle.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param ax = 4 { range: [-5, 5], step: 1 }
+      param ay = 3 { range: [-4, 4], step: 1 }
+      vector a = (0, 0) -> (ax, ay) { color: primary, width: 4 }
+      line across = (0, 0) -> (ax, 0) { color: warning, width: 3, style: dashed }
+      line up = (ax, 0) -> (ax, ay) { color: success, width: 3, style: dashed }
+      point tip = (ax, ay) { drag: xy -> (ax, ay), color: accent, r: 9, snap: 1 }
+      arc ang = (0, 0) { r: 1.1, from: 0, to: mod(deg(atan2(ay, ax)), 360), color: neutral, width: 2 }
+      label at (-5.7, 4.5) = "components ${ax} across, ${ay} up" { color: neutral }
+      label at (-5.7, 3.6) = "magnitude = ${hypot(ax, ay)}" { color: primary }
+      label at (-5.7, 2.7) = "direction = ${mod(deg(atan2(ay, ax)), 360)}°" { color: accent }
+    }
+
+    goal "Build a vector of magnitude exactly 5" {
+      when: abs(hypot(ax, ay) - 5) < 0.01
+      hint: "3 and 4 in some order, or 5 and 0."
+    }
+  }
+
+  slide "Position Does Not Matter" {
+    id: "v1-free"
+    cat: "Free Vectors"
+    > This is the idea that separates vectors from points, and it takes a moment to
+    > accept.
+    >
+    > **A vector has no location.** It is a size and a direction, and that is all. Two
+    > arrows of the same length pointing the same way are the *same vector*, however
+    > far apart you draw them.
+    >
+    > "Three metres east" is three metres east whether you start from your front door
+    > or from the far side of the country. The instruction is identical; only the
+    > outcome differs.
+    >
+    > All three arrows below are the same vector. This is exactly why tip-to-tail
+    > addition is allowed: sliding an arrow somewhere else does not change it.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-4, 4]
+      aspect: equal
+      grid
+      axes
+      vector v1 = (-5, -3) -> (-2, -1) { color: primary, width: 4 }
+      vector v2 = (-1, 1) -> (2, 3) { color: primary, width: 4 }
+      vector v3 = (2, -3) -> (5, -1) { color: primary, width: 4 }
+      label at (0, 3.6) = "same length, same direction, so the same vector" { anchor: middle, color: primary }
+    }
+
+    quiz {
+      ask "Two arrows are drawn in different places on a grid. Both are $4$ units long and both point north-east. Are they the same vector?"
+      skill: "vec-definition"
+      * "Yes — a vector is only a magnitude and a direction"
+      - "No, they start at different points" { why: "Where you draw it is not part of what a vector is. Only its length and direction count." }
+      - "Only if they start at the origin" { why: "Vectors drawn from the origin have a special name, position vectors, and they come later. An ordinary vector is free to be drawn anywhere." }
+      hint "Which two pieces of information define a vector?"
+      ! "The same vector. Being able to slide an arrow without changing it is what makes vector addition work."
+    }
+  }
+
+  slide "Compute a Magnitude" {
+    id: "v1-compute"
+    cat: "Free Vectors"
+    numeric {
+      ask "A vector has components $7$ across and $24$ up. What is its magnitude?"
+      skill: "vec-magnitude"
+      answer: 25
+      expect: hypot(7, 24)
+      tolerance: 0.01
+      hint "$\sqrt{7^2 + 24^2}$."
+      ! "$\sqrt{49 + 576} = \sqrt{625} = 25$. The $7, 24, 25$ triangle, which turns up almost as often as $3,4,5$ and $5,12,13$."
+    }
+  }
+
+  slide "The Negative of a Vector" {
+    id: "v1-negative"
+    cat: "Free Vectors"
+    > $-\mathbf{a}$ is the same length as $\mathbf{a}$, pointing the **opposite way**.
+    > Negating a vector reverses it; it never shrinks it.
+    >
+    > So $|-\mathbf{a}| = |\mathbf{a}|$, always. A magnitude is a length and lengths
+    > are never negative, exactly as with the modulus of a complex number.
+    >
+    > That also means $\overrightarrow{AB} = -\overrightarrow{BA}$: walking from $A$
+    > to $B$ is the exact reverse of walking from $B$ to $A$.
+
+    quiz {
+      ask "If $|\mathbf{a}| = 10$, what is $|-3\mathbf{a}|$?"
+      skill: "vec-magnitude"
+      * "$30$"
+      - "$-30$" { why: "A magnitude is a length, so it can never come out negative however many minus signs are involved." }
+      - "$10$" { why: "The $3$ does stretch it. Only the minus sign leaves the length alone." }
+      hint "The $3$ triples the length. What does the minus sign do to a length?"
+      ! "$30$. Multiplying by $-3$ reverses the direction and triples the length, and only the tripling shows up in the magnitude."
+    }
+  }
+}

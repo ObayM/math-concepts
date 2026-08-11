@@ -1,0 +1,187 @@
+lesson "Adding and Scaling Vectors" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Intermediate"
+  icon: "Waves"
+  summary: "Tip to tail, or component by component, and they always agree. Scaling stretches without turning, unless the factor is negative."
+  skills: ["vec-addition", "vec-scalar-multiple", "vec-components"]
+
+  slide "Two Ways, One Answer" {
+    id: "v3-hook"
+    cat: "Adding"
+    > Adding vectors has a picture and an arithmetic, and it is worth seeing that
+    > they are the same thing.
+    >
+    > **The picture:** slide the second arrow so its tail sits at the first arrow's
+    > tip. The sum runs from the very start to the very finish. Legal because a
+    > vector does not care where it is drawn.
+    >
+    > **The arithmetic:** add the components separately.
+    >
+    > $$(3\mathbf{i} + 1\mathbf{j}) + (1\mathbf{i} + 3\mathbf{j}) = 4\mathbf{i} + 4\mathbf{j}$$
+    >
+    > Drag the second vector and watch both stay in step.
+
+    scene plane {
+      x: [-2, 9]
+      y: [-2, 7]
+      aspect: equal
+      grid
+      axes
+      param bx = 1 { range: [-3, 5], step: 1 }
+      param by = 3 { range: [-2, 5], step: 1 }
+      vector a = (0, 0) -> (3, 1) { color: primary, width: 4 }
+      vector b = (3, 1) -> (3 + bx, 1 + by) { color: accent, width: 4 }
+      vector sum = (0, 0) -> (3 + bx, 1 + by) { color: success, width: 5 }
+      vector bAtOrigin = (0, 0) -> (bx, by) { color: accent, width: 2, style: dashed }
+      point tip = (3 + bx, 1 + by) { drag: xy -> (bx, by), color: neutral, r: 8, snap: 1 }
+      label at (-1.8, 6.4) = "a = 3i + j" { color: primary }
+      label at (-1.8, 5.6) = "b = ${bx}i + ${by}j" { color: accent }
+      label at (-1.8, 4.8) = "a + b = ${3 + bx}i + ${1 + by}j" { color: success }
+    }
+
+    goal "Choose a b that cancels a completely" {
+      when: bx == -3 and by == -1
+      hint: "The exact opposite of a, so the sum is the zero vector."
+    }
+  }
+
+  slide "Order Does Not Matter" {
+    id: "v3-commutative"
+    cat: "Adding"
+    > $\mathbf{a} + \mathbf{b} = \mathbf{b} + \mathbf{a}$, which is obvious from the
+    > components and rather pretty from the picture: going along $\mathbf{a}$ then
+    > $\mathbf{b}$ lands in the same place as going along $\mathbf{b}$ then
+    > $\mathbf{a}$. The two routes form a **parallelogram**, and the sum is its
+    > diagonal.
+    >
+    > That is why the tip-to-tail rule and the parallelogram rule you may have met
+    > separately are not two methods. They are one picture, drawn two ways.
+    >
+    > Subtraction is addition of the reverse: $\mathbf{a} - \mathbf{b}$ means
+    > $\mathbf{a} + (-\mathbf{b})$, so flip $\mathbf{b}$ round and add as usual.
+
+    scene plane {
+      x: [-1.5, 7]
+      y: [-1.5, 6]
+      aspect: equal
+      grid
+      axes
+      polygon para = [(0, 0), (3, 1), (4, 4), (1, 3)] { color: neutral, opacity: 0.12 }
+      vector a1 = (0, 0) -> (3, 1) { color: primary, width: 4 }
+      vector b1 = (3, 1) -> (4, 4) { color: accent, width: 4 }
+      vector b2 = (0, 0) -> (1, 3) { color: accent, width: 3, style: dashed }
+      vector a2 = (1, 3) -> (4, 4) { color: primary, width: 3, style: dashed }
+      vector sum = (0, 0) -> (4, 4) { color: success, width: 5 }
+      label at (4.3, 4.2) = "a + b = b + a" { color: success }
+      label at (3.0, -1.0) = "both routes reach the same corner" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "If $\mathbf{a} = 5\mathbf{i} - \mathbf{j}$ and $\mathbf{b} = 2\mathbf{i} + 4\mathbf{j}$, what is the $\mathbf{j}$ component of $\mathbf{a} - \mathbf{b}$?"
+      skill: "vec-addition"
+      answer: -5
+      expect: 0 - 1 - 4
+      tolerance: 0.01
+      hint "Subtract component by component: $-1 - 4$."
+      ! "$-5$, and the $\mathbf{i}$ components give $3$, so $\mathbf{a} - \mathbf{b} = 3\mathbf{i} - 5\mathbf{j}$."
+    }
+  }
+
+  slide "Scaling Stretches, Never Turns" {
+    id: "v3-scalar"
+    cat: "Scaling"
+    > Multiplying a vector by a **scalar** multiplies every component by it:
+    >
+    > $$3(2\mathbf{i} + \mathbf{j}) = 6\mathbf{i} + 3\mathbf{j}$$
+    >
+    > The direction is untouched, because both components grow in the same
+    > proportion. Only the length changes, and it changes by exactly that factor:
+    > $|k\mathbf{a}| = |k||\mathbf{a}|$.
+    >
+    > A **negative** scalar is the one exception worth naming. It reverses the
+    > direction as well as scaling, since every component flips sign.
+    >
+    > Two vectors that are scalar multiples of each other are **parallel**. That is
+    > the test: if $\mathbf{b} = k\mathbf{a}$ for some number $k$, they point along
+    > the same line.
+
+    scene plane {
+      x: [-7, 7]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param k = 2 { range: [-2, 2.5], step: 0.25 }
+      vector base = (0, 0) -> (2, 1.5) { color: neutral, width: 3, style: dashed }
+      vector scaled = (0, 0) -> (2*k, 1.5*k) { color: primary, width: 5 }
+      label at (-6.7, 4.4) = "k = ${k}" { color: neutral }
+      label at (-6.7, 3.5) = "length is now ${abs(k)*hypot(2, 1.5)}" { color: primary }
+      label at (-6.7, 2.6) = "pointing the opposite way" { color: danger, show: k < 0 }
+      slider k { label: "the scalar k" }
+    }
+
+    goal "Make the vector point the other way without changing its length" {
+      when: k < -0.9 and k > -1.1
+      hint: "k = -1 reverses it exactly."
+    }
+  }
+
+  slide "Parallel or Not?" {
+    id: "v3-parallel"
+    cat: "Scaling"
+    quiz {
+      ask "Is $\mathbf{b} = 6\mathbf{i} + 9\mathbf{j}$ parallel to $\mathbf{a} = 2\mathbf{i} + 3\mathbf{j}$?"
+      skill: "vec-scalar-multiple"
+      * "Yes — $\mathbf{b} = 3\mathbf{a}$"
+      - "No, the components are different" { why: "They are different, but in the *same ratio*: $6 = 3 \times 2$ and $9 = 3 \times 3$. One consistent factor across both components means parallel." }
+      - "Only if they start at the same point" { why: "Where they are drawn is irrelevant. Parallel is about direction alone." }
+      hint "Is there a single number that turns both components of $\mathbf{a}$ into those of $\mathbf{b}$?"
+      onwrong: "v3-same-factor" retry
+      ! "$3 \times 2 = 6$ and $3 \times 3 = 9$, one factor for both, so they are parallel and $\mathbf{b}$ is three times as long."
+    }
+  }
+
+  slide "One Factor, Both Components" {
+    id: "v3-same-factor"
+    hidden: true
+    cat: "Scaling"
+    > The test for parallel is that **the same** scalar works on both components. Not
+    > two different ones.
+    >
+    > $2\mathbf{i} + 3\mathbf{j}$ and $6\mathbf{i} + 9\mathbf{j}$: the factors are
+    > $6/2 = 3$ and $9/3 = 3$. Equal, so parallel.
+    >
+    > $2\mathbf{i} + 3\mathbf{j}$ and $6\mathbf{i} + 8\mathbf{j}$: the factors are
+    > $3$ and $8/3 \approx 2.67$. Not equal, so **not** parallel — the second vector
+    > has been stretched more horizontally than vertically, which tilts it.
+    >
+    > A quick equivalent: compare the ratios $\dfrac{y}{x}$. Equal ratios mean equal
+    > gradients mean parallel, which is exactly the parallel-lines test from
+    > coordinate geometry wearing vector notation.
+
+    numeric {
+      ask "For $\mathbf{a} = 4\mathbf{i} + 6\mathbf{j}$ and $\mathbf{b} = 10\mathbf{i} + 15\mathbf{j}$, what is the scalar $k$ with $\mathbf{b} = k\mathbf{a}$?"
+      skill: "vec-scalar-multiple"
+      answer: 2.5
+      expect: 10/4
+      tolerance: 0.01
+      hint "Divide the $\mathbf{i}$ components, then check the $\mathbf{j}$ ones give the same."
+      ! "$10/4 = 2.5$ and $15/6 = 2.5$. The same factor both times, so they really are parallel."
+    }
+  }
+
+  slide "Both Operations Together" {
+    id: "v3-synth"
+    cat: "Scaling"
+    numeric {
+      ask "With $\mathbf{a} = 3\mathbf{i} + \mathbf{j}$ and $\mathbf{b} = \mathbf{i} - 2\mathbf{j}$, what is the $\mathbf{i}$ component of $2\mathbf{a} + 3\mathbf{b}$?"
+      skill: "vec-addition"
+      answer: 9
+      expect: 2*3 + 3*1
+      tolerance: 0.01
+      hint "Scale each vector first, then add: $2\mathbf{a} = 6\mathbf{i} + 2\mathbf{j}$ and $3\mathbf{b} = 3\mathbf{i} - 6\mathbf{j}$."
+      ! "$6 + 3 = 9$, and the $\mathbf{j}$ components give $2 - 6 = -4$, so the answer is $9\mathbf{i} - 4\mathbf{j}$. Scale first, then add, exactly as with ordinary algebra."
+    }
+  }
+}
