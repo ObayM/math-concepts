@@ -1,0 +1,207 @@
+lesson "Permutations and Combinations" {
+  course: "pure-maths"
+  unit: "Counting & Pascal's Triangle"
+  difficulty: "Intermediate"
+  icon: "Dumbbell"
+  summary: "One question decides everything: does the order matter? Get that right and nPr and nCr stop being interchangeable mysteries."
+  skills: ["comb-permutation", "comb-combination", "comb-order-matters"]
+
+  slide "One Question, Two Answers" {
+    id: "c2-hook"
+    cat: "Does Order Matter?"
+    > Pick $3$ people from a group of $5$.
+    >
+    > If you are picking a **president, secretary and treasurer**, then swapping two
+    > of them gives a genuinely different outcome. Order matters. There are
+    > $5 \times 4 \times 3 = 60$ ways.
+    >
+    > If you are just picking **three people to form a committee**, then the same
+    > three people are the same committee however you happened to name them. Order
+    > does not matter. There are only $10$ ways.
+    >
+    > Same numbers, same phrase "pick 3 from 5", answers differing by a factor of
+    > six. Everything in this lesson hangs on which question you are being asked.
+
+    scene plane {
+      x: [-1.0, 12.0]
+      y: [-3.4, 4.0]
+      aspect: equal
+      axes: false
+      rect boxL = (0.2, -1.6) { w: 5.0, h: 4.4, color: primary, opacity: 0.14 }
+      rect boxR = (6.8, -1.6) { w: 5.0, h: 4.4, color: accent, opacity: 0.14 }
+      label at (2.7, 3.4) = "roles: order matters" { anchor: middle, color: primary }
+      label at (9.3, 3.4) = "committee: order does not" { anchor: middle, color: accent }
+      label at (2.7, 1.9) = "nPr = 60" { anchor: middle, color: primary }
+      label at (9.3, 1.9) = "nCr = 10" { anchor: middle, color: accent }
+      label at (2.7, 0.4) = "A,B,C differs from B,A,C" { anchor: middle, color: neutral }
+      label at (9.3, 0.4) = "A,B,C is B,A,C" { anchor: middle, color: neutral }
+      label at (6.0, -2.6) = "the 60 splits into 10 groups of 3! = 6 orderings each" { anchor: middle, color: success }
+    }
+  }
+
+  slide "Permutations" {
+    id: "c2-permutation"
+    cat: "Does Order Matter?"
+    > When order matters you are counting **permutations**, written $^nP_r$:
+    >
+    > $$^nP_r = \frac{n!}{(n-r)!}$$
+    >
+    > It is the slot-filling count from last lesson: $n$ choices, then $n-1$, and so
+    > on for $r$ slots. The $(n-r)!$ underneath simply chops off the part of the
+    > countdown you never got to.
+    >
+    > For $^5P_3$: $\dfrac{5!}{2!} = \dfrac{120}{2} = 60$, which is exactly
+    > $5 \times 4 \times 3$.
+
+    numeric {
+      ask "How many ways can gold, silver and bronze be awarded among $8$ runners?"
+      skill: "comb-permutation"
+      answer: 336
+      expect: nPr(8, 3)
+      tolerance: 0.01
+      hint "Different medals mean order matters, so this is $^8P_3$."
+      ! "$^8P_3 = 8 \times 7 \times 6 = 336$. Finishing first rather than third is very much a different outcome, which is what makes it a permutation."
+    }
+  }
+
+  slide "Combinations" {
+    id: "c2-combination"
+    cat: "Does Order Matter?"
+    > When order does **not** matter you are counting **combinations**, written
+    > $^nC_r$. And there is a lovely way to get it from the permutation count.
+    >
+    > Every group of $r$ people has been counted $r!$ times over, once for each
+    > order you could have picked them in. So divide that out:
+    >
+    > $$^nC_r = \frac{^nP_r}{r!} = \frac{n!}{r!\,(n-r)!}$$
+    >
+    > For $^5C_3$: $\dfrac{60}{3!} = \dfrac{60}{6} = 10$. The $60$ orderings collapse
+    > into $10$ genuinely different committees.
+    >
+    > **Combinations are always the smaller number**, because you are treating whole
+    > families of orderings as one thing.
+
+    build {
+      ask "Assemble the combination formula."
+      skill: "comb-combination"
+      template: "$^nC_r = \dfrac{^nP_r}{}$ ___"
+      bank: ["$r!$", "$n!$", "$(n-r)!$", "$r$"]
+      answer: ["$r!$"]
+      hint "How many different orders does each single group get counted in?"
+      ! "Divide by $r!$, the number of ways of ordering the $r$ things you chose. That is exactly the overcounting you need to remove."
+    }
+  }
+
+  slide "Which One Is It?" {
+    id: "c2-sort"
+    cat: "Choosing the Tool"
+    sort {
+      ask "For each situation, does order matter?"
+      skill: "comb-order-matters"
+      bin "Order matters, use nPr": ["the first three finishers in a race", "a 4-digit PIN", "who is captain and who is vice-captain"]
+      bin "Order does not matter, use nCr": ["a hand of 5 cards", "picking 3 toppings for a pizza", "choosing 4 players for a team"]
+      hint "Ask whether swapping two of your choices produces a genuinely different result."
+      ! "The card hand is the one people argue about: you receive the cards in some order, but a hand is judged on which cards it contains, not the order they arrived. Pizza toppings likewise, unless you have very strong opinions."
+    }
+  }
+
+  slide "The Overcounting Trap" {
+    id: "c2-trap"
+    cat: "Choosing the Tool"
+    quiz {
+      ask "A committee of $3$ is chosen from $10$ people. Someone answers $^{10}P_3 = 720$. What has gone wrong?"
+      skill: "comb-order-matters"
+      * "Each committee has been counted $6$ times, once per ordering — the answer is $720/6 = 120$"
+      - "Nothing, $720$ is right" { why: "It counts the same three people as $6$ different committees depending on the order they were named in. A committee has no order." }
+      - "They should have used $10!$" { why: "That arranges all ten people, when only three are being chosen." }
+      hint "How many ways can three chosen people be ordered among themselves?"
+      onwrong: "c2-why-divide" retry
+      ! "$^{10}C_3 = 720/3! = 120$. Whenever order does not matter, divide the permutation count by $r!$."
+    }
+  }
+
+  slide "Seeing the Overcount" {
+    id: "c2-why-divide"
+    hidden: true
+    cat: "Choosing the Tool"
+    > It is worth seeing the overcounting rather than trusting the formula.
+    >
+    > Take just three people, A, B and C, and pick all three. As a **permutation**
+    > there are $3! = 6$ answers:
+    >
+    > $$ABC \quad ACB \quad BAC \quad BCA \quad CAB \quad CBA$$
+    >
+    > As a **committee** every one of those is the same three people. Six listings,
+    > one committee. So the permutation count is exactly $6 = 3!$ times too big, and
+    > dividing by $3!$ fixes it precisely.
+    >
+    > That factor is always $r!$ — the number of ways of shuffling whatever you
+    > picked. It never depends on $n$, only on how many you chose.
+
+    scene plane {
+      x: [-1.0, 11.0]
+      y: [-2.6, 3.4]
+      aspect: equal
+      axes: false
+      rect group = (0.3, -1.4) { w: 9.4, h: 3.2, color: accent, opacity: 0.12 }
+      label at (5.0, 2.8) = "six orderings" { anchor: middle, color: primary }
+      label at (1.4, 1.0) = "ABC" { anchor: middle, color: primary }
+      label at (3.0, 1.0) = "ACB" { anchor: middle, color: primary }
+      label at (4.6, 1.0) = "BAC" { anchor: middle, color: primary }
+      label at (6.2, 1.0) = "BCA" { anchor: middle, color: primary }
+      label at (7.8, 1.0) = "CAB" { anchor: middle, color: primary }
+      label at (9.4, 1.0) = "CBA" { anchor: middle, color: primary }
+      label at (5.0, -0.6) = "one committee" { anchor: middle, color: accent }
+      label at (5.0, -2.1) = "6 = 3!, so divide by 3! to stop counting it six times" { anchor: middle, color: success }
+    }
+
+    numeric {
+      ask "How many ways can a committee of $3$ be chosen from $10$ people?"
+      skill: "comb-combination"
+      answer: 120
+      expect: nCr(10, 3)
+      tolerance: 0.01
+      hint "$^{10}P_3 = 720$, and each committee was counted $3! = 6$ times."
+      ! "$^{10}C_3 = 120$."
+    }
+  }
+
+  slide "A Symmetry Worth Knowing" {
+    id: "c2-symmetry"
+    cat: "Choosing the Tool"
+    > $^{10}C_3 = 120$, and $^{10}C_7 = 120$ as well. That is not a coincidence.
+    >
+    > $$^nC_r = {}^nC_{n-r}$$
+    >
+    > Choosing which $3$ people to include is exactly the same act as choosing which
+    > $7$ to leave out. Every selection of $3$ pairs off with precisely one selection
+    > of $7$, so the counts must match.
+    >
+    > It also saves arithmetic. $^{20}C_{18}$ looks unpleasant until you notice it
+    > equals $^{20}C_2 = 190$.
+
+    numeric {
+      ask "Using that symmetry, what is $^{12}C_{10}$?"
+      skill: "comb-combination"
+      answer: 66
+      expect: nCr(12, 10)
+      tolerance: 0.01
+      hint "$^{12}C_{10} = {}^{12}C_2$, which is a much smaller sum."
+      ! "$^{12}C_2 = \dfrac{12 \times 11}{2} = 66$. Choosing $10$ to keep is choosing $2$ to discard."
+    }
+  }
+
+  slide "Decide, Then Compute" {
+    id: "c2-synth"
+    cat: "Choosing the Tool"
+    numeric {
+      ask "How many different $5$-card hands can be dealt from a standard $52$-card deck?"
+      skill: "comb-combination"
+      answer: 2598960
+      expect: nCr(52, 5)
+      tolerance: 1
+      hint "A hand is judged by which cards it holds, not the order they were dealt. So it is a combination."
+      ! "$^{52}C_5 = 2{,}598{,}960$. As a permutation it would have been $311{,}875{,}200$, exactly $120 = 5!$ times bigger, counting every hand once for each order it could arrive in."
+    }
+  }
+}

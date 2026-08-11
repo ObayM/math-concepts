@@ -1,0 +1,158 @@
+lesson "Factorials" {
+  course: "pure-maths"
+  unit: "Counting & Pascal's Triangle"
+  difficulty: "Beginner"
+  icon: "Star"
+  summary: "How many ways can you arrange things in a row? The answer explodes faster than almost anything in mathematics, and it explains why 0! has to be 1."
+  skills: ["comb-factorial", "comb-arrangements", "comb-zero-factorial"]
+
+  slide "Counting the Orders" {
+    id: "c1-hook"
+    cat: "Arrangements"
+    > Three books on a shelf. How many different orders can you put them in?
+    >
+    > Think of it as filling three slots. The first slot has $3$ candidates. Once
+    > that book is placed, the second slot has only $2$ left. The last slot has no
+    > choice at all, $1$.
+    >
+    > $$3 \times 2 \times 1 = 6$$
+    >
+    > That pattern — count down to one, multiplying — is so common it gets its own
+    > symbol:
+    >
+    > $$n! = n \times (n-1) \times (n-2) \times \cdots \times 2 \times 1$$
+    >
+    > Add books below and watch the number of possible shelves.
+
+    scene plane {
+      x: [-1.0, 11.0]
+      y: [-2.6, 4.4]
+      aspect: equal
+      axes: false
+      param n = 4 { range: [1, 8], step: 1 }
+      line shelf = (-0.6, 0) -> (10.6, 0) { color: neutral, width: 4 }
+      for i in range(0, 8) {
+        rect b = (0.2 + i*1.28, 0) { w: 0.95, h: 1.9, color: primary, opacity: 0.4, show: n > i }
+      }
+      label at (5.0, 3.6) = "${n} books" { anchor: middle, color: primary }
+      label at (5.0, -1.4) = "can be arranged in ${fact(n)} different orders" { anchor: middle, color: success }
+      slider n { label: "how many books" }
+    }
+
+    goal "Get past a thousand possible orders" {
+      when: fact(n) > 1000
+      hint: "Seven books is already more than five thousand."
+    }
+  }
+
+  slide "It Grows Absurdly Fast" {
+    id: "c1-growth"
+    cat: "Arrangements"
+    > Factorials outrun everything. Not exponentials, not squares — everything.
+    >
+    > $5! = 120$. $10!$ is already over three and a half million. $20!$ is bigger
+    > than the number of seconds since the dinosaurs. And $52!$, the number of ways
+    > to shuffle a deck of cards, is around $8 \times 10^{67}$ — so a genuinely
+    > shuffled deck has almost certainly never existed in that order before, in the
+    > whole history of card games.
+    >
+    > This matters practically. It is why brute-force checking every arrangement
+    > stops being possible almost immediately.
+
+    table {
+      ask "Work out each factorial."
+      skill: "comb-factorial"
+      header: ["n", "n!"]
+      row: 3, blank(6)
+      row: 4, blank(24)
+      row: 5, blank(120)
+      row: 6, blank(720)
+      hint "Each one is the previous answer multiplied by the new $n$."
+      ! "$6, 24, 120, 720$. Notice you never restart: $6! = 6 \times 5!$. That recursive step is the fastest way to compute them and the reason for the next slide."
+    }
+  }
+
+  slide "Why 0! = 1" {
+    id: "c1-zero"
+    cat: "The Odd One"
+    > $0! = 1$ looks like a typo. It is forced, by exactly the argument that made
+    > $a^0 = 1$.
+    >
+    > Every factorial obeys $n! = n \times (n-1)!$. Rearranged:
+    >
+    > $$(n-1)! = \frac{n!}{n}$$
+    >
+    > Put $n = 1$:
+    >
+    > $$0! = \frac{1!}{1} = \frac{1}{1} = 1$$
+    >
+    > There is a second argument, and it is the more satisfying one. $n!$ counts the
+    > arrangements of $n$ things. How many ways are there to arrange nothing at all?
+    > Exactly one: the empty arrangement. You do not have zero options, you have one
+    > option, and it is to do nothing.
+
+    quiz {
+      ask "Why is $0!$ defined as $1$ rather than $0$?"
+      skill: "comb-zero-factorial"
+      * "Because $n! = n \times (n-1)!$ forces it, and there is exactly one way to arrange nothing"
+      - "Because multiplying by nothing gives $1$" { why: "Multiplying by nothing is not a defined operation. The reason comes from the recursion $0! = 1!/1$, which pins the value down." }
+      - "It is an arbitrary convention" { why: "It is a definition, but the only one that keeps the factorial recursion and every counting formula consistent. Choose $0$ and $nCr$ formulas start dividing by zero." }
+      hint "Set $n = 1$ in $(n-1)! = n!/n$ and see what falls out."
+      ! "Forced by the recursion, and it matches the counting: there is one way to arrange an empty shelf. Define it as $0$ and every combination formula breaks."
+    }
+  }
+
+  slide "Arranging Some of Them" {
+    id: "c1-partial"
+    cat: "The Odd One"
+    > Often you do not want to arrange everything. Out of $8$ runners, how many
+    > different ways can the gold, silver and bronze be handed out?
+    >
+    > Same slot-filling logic, but you stop early. $8$ choices for gold, $7$ for
+    > silver, $6$ for bronze:
+    >
+    > $$8 \times 7 \times 6 = 336$$
+    >
+    > Written with factorials, that is $\dfrac{8!}{5!}$ — the full countdown with the
+    > unwanted tail divided off. This is about to be given a name in the next
+    > lesson.
+
+    numeric {
+      ask "From $6$ people, how many ways can you pick a president and a vice-president, where the two roles are different?"
+      skill: "comb-arrangements"
+      answer: 30
+      expect: 6*5
+      tolerance: 0.01
+      hint "Six candidates for the first job, then five left for the second."
+      ! "$6 \times 5 = 30$. The roles being different is what makes the order matter here: Amira as president with Youssef as deputy is not the same outcome as the reverse."
+    }
+  }
+
+  slide "Careful With the Symbol" {
+    id: "c1-trap"
+    cat: "The Odd One"
+    quiz {
+      ask "Which of these is equal to $\dfrac{7!}{5!}$?"
+      skill: "comb-factorial"
+      * "$42$"
+      - "$\dfrac{7}{5}$, since the factorials cancel" { why: "Factorials do not cancel like that. $7!/5! = (7 \times 6 \times 5!)/5!$, and it is the $5!$ blocks that cancel, leaving $7 \times 6$." }
+      - "$2! = 2$" { why: "$7! / 5!$ is not $(7-5)!$. Division of factorials strips off a tail, it does not subtract the numbers." }
+      hint "Write $7!$ as $7 \times 6 \times 5!$ and see what cancels."
+      ! "$\dfrac{7 \times 6 \times 5!}{5!} = 42$. Writing the bigger factorial in terms of the smaller one is the trick that makes these instant."
+    }
+  }
+
+  slide "Putting It Together" {
+    id: "c1-synth"
+    cat: "The Odd One"
+    numeric {
+      ask "In how many different orders can $5$ people sit in a row of $5$ chairs?"
+      skill: "comb-arrangements"
+      answer: 120
+      expect: fact(5)
+      tolerance: 0.01
+      hint "All five are being arranged, so it is a straight factorial."
+      ! "$5! = 120$. If two of them insisted on sitting together you would have a harder problem, and one you will meet soon enough."
+    }
+  }
+}
