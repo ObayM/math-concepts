@@ -1,0 +1,184 @@
+lesson "Laws of Logarithms" {
+  course: "pure-maths"
+  unit: "Exponentials & Logarithms"
+  difficulty: "Intermediate"
+  icon: "Sigma"
+  summary: "Logs turn multiplication into addition, which is the trick that once powered slide rules. Three laws, all inherited straight from the index laws."
+  skills: ["explog-log-laws", "explog-power-law", "explog-common-errors"]
+
+  slide "Multiplication Becomes Addition" {
+    id: "e3-hook"
+    cat: "The Three Laws"
+    > Logs are powers, so the log laws are just the index laws in translation.
+    >
+    > Multiplying powers **adds** the exponents. A log *is* an exponent. So:
+    >
+    > $$\log(ab) = \log a + \log b$$
+    >
+    > Dividing subtracts, and a power of a power multiplies:
+    >
+    > $$\log\!\left(\frac{a}{b}\right) = \log a - \log b \qquad \log(a^n) = n\log a$$
+    >
+    > Three laws, and each is an index law you already met, seen from the other side.
+    > That third one is the workhorse — it is what pulls an unknown down out of an
+    > exponent, and the whole of the next lesson depends on it.
+
+    match {
+      ask "Match each expression to what it equals."
+      skill: "explog-log-laws"
+      pair "$\log 6 + \log 5$" -> "$\log 30$"
+      pair "$\log 12 - \log 4$" -> "$\log 3$"
+      pair "$3\log 2$" -> "$\log 8$"
+      pair "$\tfrac12 \log 9$" -> "$\log 3$ "
+      hint "Addition of logs is multiplication inside; a multiple in front is a power inside."
+      ! "$\tfrac12\log 9 = \log 9^{1/2} = \log 3$, since a half power is a square root. The power law works for fractional powers just as happily as whole ones."
+    }
+  }
+
+  slide "Why It Was Revolutionary" {
+    id: "e3-history"
+    cat: "The Three Laws"
+    > It is easy to see logs as an exam topic. They were, for three hundred years,
+    > the most important computational tool in existence.
+    >
+    > Multiplying two seven-digit numbers by hand is miserable and error-prone.
+    > **Adding** two seven-digit numbers is routine. So astronomers and navigators
+    > looked up the logs of their numbers, added them, then looked up the answer
+    > backwards. Multiplication was reduced to addition.
+    >
+    > That is exactly what a slide rule does mechanically, and it is why log tables
+    > sat in every scientist's desk until the pocket calculator arrived. The law
+    > $\log(ab) = \log a + \log b$ was not a curiosity. It was infrastructure.
+
+    numeric {
+      ask "Given $\log 2 \approx 0.301$ and $\log 3 \approx 0.477$, what is $\log 6$?"
+      skill: "explog-log-laws"
+      answer: 0.778
+      expect: 0.301 + 0.477
+      tolerance: 0.002
+      hint "$6 = 2 \times 3$, and multiplying inside means adding outside."
+      ! "$0.301 + 0.477 = 0.778$. Two lookups and one addition replaced a multiplication, which is precisely how the tables were used."
+    }
+  }
+
+  slide "The Error That Costs Most Marks" {
+    id: "e3-trap"
+    cat: "What Logs Do Not Do"
+    quiz {
+      ask "Is $\log(a + b)$ the same as $\log a + \log b$?"
+      skill: "explog-common-errors"
+      * "No — $\log a + \log b$ is $\log(ab)$, and $\log(a+b)$ does not simplify at all"
+      - "Yes, logs distribute over addition" { why: "They emphatically do not. Test it: $\log(2+2) = \log 4 \approx 0.602$, but $\log 2 + \log 2 \approx 0.602$... which happens to match here by coincidence, since $2+2 = 2\times2$. Try $3$ and $4$ instead and the two are nowhere near." }
+      - "Only when $a$ and $b$ are positive" { why: "Positivity is required for the logs to exist at all, but it does not make the false law true." }
+      hint "Which operation *inside* a log corresponds to addition outside it?"
+      onwrong: "e3-no-distribution" retry
+      ! "**Adding logs multiplies the insides.** There is no law at all for the log of a sum, and $\log(a+b)$ simply stays as it is."
+    }
+  }
+
+  slide "Logs Do Not Distribute" {
+    id: "e3-no-distribution"
+    hidden: true
+    cat: "What Logs Do Not Do"
+    > This is worth testing with real numbers once, so you never write it again.
+    >
+    > Take $a = 3$ and $b = 4$, using base $10$.
+    >
+    > $$\log(3 + 4) = \log 7 \approx 0.845$$
+    > $$\log 3 + \log 4 \approx 0.477 + 0.602 = 1.079$$
+    >
+    > Nowhere near. And that second number is not meaningless — it is $\log 12$,
+    > because adding logs multiplies the insides, and $3 \times 4 = 12$.
+    >
+    > Two others in the same family, both false:
+    >
+    > $$\dfrac{\log a}{\log b} \neq \log\!\left(\dfrac{a}{b}\right) \qquad (\log a)^2 \neq 2\log a$$
+    >
+    > The first is a genuinely useful expression, but it equals $\log_b a$, not the
+    > log of a quotient. The second confuses squaring the log with the log of a
+    > square.
+    >
+    > **The rule of thumb: a log law only ever exists when the operation is inside
+    > the log.**
+
+    numeric {
+      ask "Using $\log 3 \approx 0.477$ and $\log 4 \approx 0.602$, what is $\log 12$?"
+      skill: "explog-log-laws"
+      answer: 1.079
+      expect: 0.477 + 0.602
+      tolerance: 0.002
+      hint "$12 = 3 \times 4$, so add the logs."
+      ! "$1.079$. Adding the logs gave the log of the *product*, which is exactly what the law promises."
+    }
+  }
+
+  slide "Condensing and Expanding" {
+    id: "e3-condense"
+    cat: "Using the Laws"
+    > Questions run both ways. Sometimes you expand one log into several; more often
+    > you **condense** several into one, because a single log can then be undone in
+    > one step.
+    >
+    > $$2\log x + \log 3 - \log 5 = \log x^2 + \log 3 - \log 5 = \log\!\left(\frac{3x^2}{5}\right)$$
+    >
+    > The order that always works: **powers first**, using the multiple-in-front law
+    > to move coefficients up as exponents. Then combine the additions into
+    > multiplications and the subtractions into divisions.
+    >
+    > Condense before you solve. Trying to solve while several logs are still
+    > floating about is how questions become hard.
+
+    order {
+      ask "Put the steps in order to condense $3\log a - 2\log b$ into a single logarithm."
+      skill: "explog-power-law"
+      item "Move the coefficients up as powers: $\log a^3 - \log b^2$"
+      item "Recognise the subtraction as a division"
+      item "Combine into one log: $\log\!\left(\dfrac{a^3}{b^2}\right)$"
+      decoy "Divide the coefficients to get $\tfrac32 \log(a - b)$"
+      ! "Powers first, then combine. The decoy invents a law that does not exist, and it does it by treating the log as if it distributed."
+    }
+  }
+
+  slide "Change of Base" {
+    id: "e3-change"
+    cat: "Using the Laws"
+    > Your calculator usually offers only $\log_{10}$ and $\ln$. For any other base
+    > there is one more formula:
+    >
+    > $$\log_a b = \frac{\log b}{\log a}$$
+    >
+    > and you may use either base on the right, as long as you use the same one top
+    > and bottom.
+    >
+    > So $\log_2 10 = \dfrac{\log 10}{\log 2} = \dfrac{1}{0.301} \approx 3.32$, which
+    > makes sense: $2^3 = 8$ and $2^4 = 16$, so the answer should sit between $3$ and
+    > $4$.
+    >
+    > This is also the correct home for that $\dfrac{\log a}{\log b}$ expression from
+    > earlier. It is not the log of a quotient — it is a change of base.
+
+    numeric {
+      ask "Using $\log 2 \approx 0.301$ and $\log 5 \approx 0.699$, evaluate $\log_2 5$."
+      skill: "explog-log-laws"
+      answer: 2.322
+      expect: 0.699/0.301
+      tolerance: 0.01
+      hint "$\log_2 5 = \dfrac{\log 5}{\log 2}$."
+      ! "$0.699/0.301 \approx 2.32$. Sanity check: $2^2 = 4$ and $2^3 = 8$, so the power that gives $5$ must lie between $2$ and $3$."
+    }
+  }
+
+  slide "All Three at Once" {
+    id: "e3-synth"
+    cat: "Using the Laws"
+    numeric {
+      ask "Simplify $\log_2 40 - \log_2 5$."
+      skill: "explog-log-laws"
+      answer: 3
+      expect: log2(40/5)
+      tolerance: 0.01
+      hint "Subtracting logs of the same base means dividing the insides: $40/5$."
+      ! "$\log_2 8 = 3$. Combining first turned an awkward pair into a log you can do in your head — which is why condensing is almost always the right first move."
+    }
+  }
+}

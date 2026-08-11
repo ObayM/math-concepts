@@ -70,6 +70,10 @@ const COURSES = [
       'cplx-2',
       'cplx-3',
       'cplx-4',
+      'explog-1',
+      'explog-2',
+      'explog-3',
+      'explog-4',
     ],
   },
   {

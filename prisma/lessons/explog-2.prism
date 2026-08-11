@@ -1,0 +1,194 @@
+lesson "Logarithms as Inverses" {
+  course: "pure-maths"
+  unit: "Exponentials & Logarithms"
+  difficulty: "Intermediate"
+  icon: "Undo2"
+  summary: "A logarithm answers one question: what power was that? Which makes it the exact undo button for an exponential, and its graph the mirror image."
+  skills: ["explog-log-definition", "explog-ln", "explog-graphs"]
+
+  slide "What Power Was That?" {
+    id: "e2-hook"
+    cat: "The Undo Button"
+    > $2^x = 8$ is easy: $x = 3$. But $2^x = 10$ has no whole-number answer, and
+    > there is nothing in ordinary algebra that gets $x$ down out of the exponent.
+    >
+    > So, exactly as with $i$ and with negative numbers, we invent the tool we need
+    > and give it a name. The **logarithm** answers precisely the question "what
+    > power was that?"
+    >
+    > $$\log_a b = c \quad \text{means exactly} \quad a^c = b$$
+    >
+    > Read it aloud as: *the power you raise $a$ to, to get $b$.* So $\log_2 8 = 3$
+    > because $2^3 = 8$. Every logarithm statement is an index statement wearing a
+    > different coat.
+
+    match {
+      ask "Match each logarithm to its value."
+      skill: "explog-log-definition"
+      pair "$\log_2 16$" -> "$4$"
+      pair "$\log_3 27$" -> "$3$"
+      pair "$\log_{10} 1000$" -> "$3$ "
+      pair "$\log_5 1$" -> "$0$"
+      hint "Each time ask: what power of the base gives that number?"
+      ! "$\log_5 1 = 0$ is the one worth pausing on. Anything to the power zero is $1$, so the log of $1$ is always zero, whatever the base."
+    }
+  }
+
+  slide "Two Ways to Write One Fact" {
+    id: "e2-swap"
+    cat: "The Undo Button"
+    > Being fluent at switching between the two forms is most of what this topic
+    > asks of you.
+    >
+    > $$a^c = b \quad \longleftrightarrow \quad \log_a b = c$$
+    >
+    > The **base stays the base**. What swaps is the answer and the power. In the
+    > index form the power is up in the air and the answer is on its own; in the log
+    > form the power is what you are computing.
+    >
+    > If you get stuck on a log question, write it back as an index question. It is
+    > usually obvious in that form.
+
+    build {
+      ask "Rewrite $\log_4 64 = 3$ as an index statement."
+      skill: "explog-log-definition"
+      template: "___ $^{}$ ___ $= 64$"
+      bank: ["$4$", "$3$", "$64$", "$12$"]
+      answer: ["$4$", "$3$"]
+      hint "The base of the log becomes the base of the power, and the log's value is the power itself."
+      onwrong: "e2-which-is-which" retry
+      ! "$4^3 = 64$. Base stays put, and the log's answer is the exponent."
+    }
+  }
+
+  slide "Base, Power, Answer" {
+    id: "e2-which-is-which"
+    hidden: true
+    cat: "The Undo Button"
+    > Three numbers are involved and it is easy to lose track of which is which, so
+    > name them once and it stops being confusing.
+    >
+    > $$\log_{\;\underbrace{4}_{\text{base}}} \underbrace{64}_{\text{answer}} \;=\; \underbrace{3}_{\text{power}}$$
+    >
+    > The base is small and low down in both notations — it never moves. The other
+    > two trade places:
+    >
+    > In $4^3 = 64$, you are **given** the power and computing the answer.
+    >
+    > In $\log_4 64 = 3$, you are **given** the answer and computing the power.
+    >
+    > Same three numbers, same relationship, just a different unknown. A log is a
+    > question about an exponent, and its answer is always an exponent.
+
+    numeric {
+      ask "Rewrite $\log_2 32 = 5$ as an index statement and give the base."
+      skill: "explog-log-definition"
+      answer: 2
+      expect: 2
+      tolerance: 0.01
+      hint "The base of the log is the base of the power. It does not move."
+      ! "$2^5 = 32$. The base was $2$ in both forms."
+    }
+  }
+
+  slide "The Mirror" {
+    id: "e2-graphs"
+    cat: "The Mirror"
+    > Since the logarithm undoes the exponential, they are **inverse functions** — and
+    > from the algebra unit you already know what that means for the graphs.
+    >
+    > **They are reflections of each other in the line $y = x$.**
+    >
+    > That reflection explains every feature at once. $y = a^x$ passes through
+    > $(0,1)$, so $y = \log_a x$ passes through $(1, 0)$. The exponential has the
+    > x-axis as an asymptote, so the logarithm has the **y-axis** as one. The
+    > exponential is defined for all $x$ but only ever positive, so the logarithm is
+    > **only defined for positive $x$** and takes any value at all.
+    >
+    > That last one matters: **you cannot take the log of a negative number or of
+    > zero.** There is no power of $2$ that gives $-8$.
+    >
+    > Drag along the curve and watch its mirror.
+
+    scene plane {
+      x: [-5, 5]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param t = 1 { range: [-2, 1.5], step: 0.05 }
+      curve mirror = x { color: neutral, style: dashed, width: 2 }
+      curve expo = E^x { color: primary, width: 3 }
+      curve logc = log(x) { where: x > 0.01, color: accent, width: 3 }
+      point onExp = (t, E^t) { drag: x -> t, color: primary, r: 8 }
+      point onLog = (E^t, t) { color: accent, r: 8 }
+      line link = (t, E^t) -> (E^t, t) { color: success, style: dotted, width: 2 }
+      label at (-4.7, 4.4) = "e^x at (${t}, ${E^t})" { color: primary }
+      label at (-4.7, 3.5) = "ln x at (${E^t}, ${t})" { color: accent }
+      slider t { label: "drag along the exponential" }
+    }
+
+    goal "Bring the two mirrored points as close together as they will go" {
+      when: abs(t - E^t) < 1.05
+      hint: "Try around t = 0. They never actually meet, because e^x always stays above the line y = x."
+    }
+  }
+
+  slide "The Natural Logarithm" {
+    id: "e2-ln"
+    cat: "The Mirror"
+    > A logarithm to base $e$ is used so constantly that it gets its own symbol:
+    >
+    > $$\ln x \quad \text{means} \quad \log_e x$$
+    >
+    > It is called the **natural** logarithm, and the name is earned: since $e^x$ is
+    > the exponential that describes natural growth, $\ln$ is the one that inverts
+    > it. Anything modelled with $e^{kt}$ gets solved with $\ln$.
+    >
+    > Two values worth knowing on sight, both straight from the definition:
+    >
+    > $$\ln 1 = 0 \qquad \ln e = 1$$
+    >
+    > And the pair that says the two really do undo each other:
+    >
+    > $$\ln(e^x) = x \qquad e^{\ln x} = x$$
+
+    quiz {
+      ask "What is $\ln(e^7)$?"
+      skill: "explog-ln"
+      * "$7$"
+      - "$e^7$" { why: "The $\ln$ undoes the $e$, so it does not leave one behind. They cancel completely." }
+      - "$7e$" { why: "$\ln$ is not a multiplier. It asks what power of $e$ this is, and the answer is written right there." }
+      hint "What power of $e$ gives $e^7$?"
+      ! "$7$. $\ln$ and $e^x$ are exact inverses, so applying one after the other returns whatever you started with."
+    }
+  }
+
+  slide "Only Positive Inputs" {
+    id: "e2-domain"
+    cat: "The Mirror"
+    quiz {
+      ask "What is $\ln(-5)$?"
+      skill: "explog-graphs"
+      * "Undefined — no power of $e$ gives a negative number"
+      - "$-\ln 5$" { why: "That is a real number, about $-1.6$, and it is the log of $\tfrac15$, not of $-5$. A minus outside the log is fine; a negative *inside* is not." }
+      - "It is imaginary, like $\sqrt{-1}$" { why: "Complex logarithms do exist at a higher level, but within real numbers there is no answer at all." }
+      hint "Look at the exponential graph. Does it ever dip below the axis?"
+      ! "Undefined for real numbers. $e^x$ is always positive, so it never produces $-5$, so nothing can be the log of it. Watch for this whenever solving log equations — answers that need the log of a negative must be discarded."
+    }
+  }
+
+  slide "Both Directions" {
+    id: "e2-synth"
+    cat: "The Mirror"
+    numeric {
+      ask "Solve $\log_3 x = 4$ for $x$."
+      skill: "explog-log-definition"
+      answer: 81
+      expect: 3^4
+      tolerance: 0.01
+      hint "Rewrite it as an index statement: $3^4 = x$."
+      ! "$x = 81$. When the unknown is inside the log, switching to index form solves it in one step."
+    }
+  }
+}

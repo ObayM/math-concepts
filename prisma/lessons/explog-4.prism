@@ -1,0 +1,188 @@
+lesson "Solving Exponential Equations" {
+  course: "pure-maths"
+  unit: "Exponentials & Logarithms"
+  difficulty: "Advanced"
+  icon: "Check"
+  summary: "The unknown is stuck up in the exponent. Taking logs is the crowbar that gets it down, and the power law is what does the actual work."
+  skills: ["explog-solving", "explog-power-law", "explog-growth"]
+
+  slide "Getting x Down From the Exponent" {
+    id: "e4-hook"
+    cat: "The Method"
+    > $3^x = 20$. There is no rearranging that frees $x$ — it is trapped in the
+    > exponent, and none of the ordinary moves reach it.
+    >
+    > So use the one law that acts on exponents. **Take logs of both sides**, then
+    > apply $\log(a^n) = n\log a$:
+    >
+    > $$3^x = 20$$
+    > $$\log(3^x) = \log 20$$
+    > $$x\log 3 = \log 20$$
+    > $$x = \frac{\log 20}{\log 3} \approx 2.727$$
+    >
+    > The instant the power law is applied, $x$ becomes an ordinary coefficient and
+    > the rest is dividing. That is the whole technique, and it works for every
+    > equation of this shape.
+    >
+    > Sanity check it: $3^2 = 9$ and $3^3 = 27$, so an answer between $2$ and $3$ is
+    > exactly right.
+
+    order {
+      ask "Put the steps in order for solving $5^x = 12$."
+      skill: "explog-solving"
+      item "Take logs of both sides: $\log(5^x) = \log 12$"
+      item "Use the power law to bring $x$ down: $x\log 5 = \log 12$"
+      item "Divide by $\log 5$: $x = \dfrac{\log 12}{\log 5}$"
+      item "Evaluate: $x \approx 1.544$"
+      decoy "Divide both sides by $5$ to get $x = 12/5$"
+      ! "The decoy treats $5^x$ as $5 \times x$, which it is not. Only logs can reach an exponent."
+    }
+  }
+
+  slide "Either Base Works" {
+    id: "e4-base"
+    cat: "The Method"
+    > You may take $\log_{10}$ or $\ln$ — the answer is identical, because the two
+    > appear top and bottom and any scaling cancels.
+    >
+    > $$x = \frac{\log 20}{\log 3} = \frac{\ln 20}{\ln 3} \approx 2.727$$
+    >
+    > In practice, **use $\ln$ when the base is $e$** and it collapses beautifully,
+    > since $\ln(e^x) = x$ with no division needed at all:
+    >
+    > $$e^{2x} = 7 \;\Rightarrow\; 2x = \ln 7 \;\Rightarrow\; x = \tfrac12\ln 7 \approx 0.973$$
+    >
+    > For any other base it makes no difference which you pick.
+
+    numeric {
+      ask "Solve $e^{3x} = 20$. Give $x$ to 3 decimal places."
+      skill: "explog-solving"
+      answer: 0.999
+      expect: log(20)/3
+      tolerance: 0.005
+      hint "Take $\ln$ of both sides. The left collapses straight to $3x$."
+      ! "$3x = \ln 20 \approx 2.996$, so $x \approx 0.999$. With base $e$ the $\ln$ cancels the exponential outright and there is no division by a log at all."
+    }
+  }
+
+  slide "The Coefficient Comes First" {
+    id: "e4-coefficient"
+    cat: "Order of Operations"
+    > A very common trap. In $3 \times 2^x = 48$, the $3$ is **multiplying the whole
+    > power**, not part of it.
+    >
+    > So deal with the $3$ before touching any logs:
+    >
+    > $$3 \times 2^x = 48 \;\Rightarrow\; 2^x = 16 \;\Rightarrow\; x = 4$$
+    >
+    > Taking logs first would have given
+    > $\log 3 + x\log 2 = \log 48$, which still works but is more effort. Isolate the
+    > exponential term on its own, **then** take logs. Same instinct as solving any
+    > equation: undo the outermost operation first.
+
+    quiz {
+      ask "To solve $5 \times 3^x = 45$, what is the correct first move?"
+      skill: "explog-solving"
+      * "Divide both sides by $5$ to get $3^x = 9$"
+      - "Take logs of both sides immediately" { why: "It does work, but it makes more of a mess. Once the exponential is alone the problem is often solvable by inspection, as it is here." }
+      - "Divide both sides by $3$" { why: "The $3$ is the base of a power, not a factor you can divide out. Only the $5$ is multiplying the whole term." }
+      hint "Which number is multiplying the entire power, and which is inside it?"
+      onwrong: "e4-isolate-first" retry
+      ! "Divide by $5$ to get $3^x = 9$, which you can read off as $x = 2$ without any logs at all."
+    }
+  }
+
+  slide "Isolate, Then Take Logs" {
+    id: "e4-isolate-first"
+    hidden: true
+    cat: "Order of Operations"
+    > The structure matters more than the numbers here. In $5 \times 3^x$:
+    >
+    > The $5$ is **outside**, multiplying the whole exponential. It comes off by
+    > dividing, and it comes off first.
+    >
+    > The $3$ is **inside**, as the base of the power. Dividing by it is meaningless,
+    > because $3^x$ is not $3 \times x$.
+    >
+    > Same story with anything added on. For $2^x + 7 = 39$, subtract the $7$ first to
+    > reach $2^x = 32$, and then $x = 5$. Taking logs while the $+7$ is still there
+    > gets you nowhere, because $\log(2^x + 7)$ does not simplify — there is no law
+    > for the log of a sum, as the last lesson insisted.
+    >
+    > **Peel away everything outside the exponential, then take logs.**
+
+    numeric {
+      ask "Solve $2^x + 7 = 39$."
+      skill: "explog-solving"
+      answer: 5
+      expect: log2(32)
+      tolerance: 0.01
+      hint "Subtract $7$ first, then ask what power of $2$ gives $32$."
+      ! "$2^x = 32$, so $x = 5$. Trying to take logs before subtracting would have stalled immediately."
+    }
+  }
+
+  slide "Back to the Bacteria" {
+    id: "e4-model"
+    cat: "In Context"
+    > This is what the technique is actually for. Growth models tell you the size at
+    > a given time; solving them tells you the **time to reach a given size**, and
+    > that always means logs.
+    >
+    > A colony follows $N = 500 \times 2^t$ with $t$ in hours. When does it reach
+    > $8000$?
+    >
+    > $$8000 = 500 \times 2^t \;\Rightarrow\; 16 = 2^t \;\Rightarrow\; t = 4$$
+    >
+    > Isolate first, then solve. Exactly the same shape as before, dressed in
+    > biology.
+
+    numeric {
+      ask "The same colony, $N = 500 \times 2^t$. After how many hours does it reach $32000$?"
+      skill: "explog-growth"
+      answer: 6
+      expect: log2(32000/500)
+      tolerance: 0.01
+      hint "Divide by $500$ first, then ask what power of $2$ gives $64$."
+      ! "$64 = 2^t$, so $t = 6$ hours. Six doublings, since $2^6 = 64$."
+    }
+  }
+
+  slide "When the Answer Is Not Whole" {
+    id: "e4-messy"
+    cat: "In Context"
+    > Real problems rarely land on whole numbers, and that is when logs stop being
+    > optional.
+    >
+    > An investment of £2000 grows at $6\%$ a year, so $A = 2000 \times 1.06^t$. When
+    > does it double?
+    >
+    > $$4000 = 2000 \times 1.06^t \;\Rightarrow\; 2 = 1.06^t \;\Rightarrow\; t = \frac{\log 2}{\log 1.06} \approx 11.9$$
+    >
+    > So about **twelve years**, and no amount of inspection would have found that.
+
+    numeric {
+      ask "Using $A = 2000 \times 1.06^t$, how many years until the investment reaches $£3000$? Give it to 1 decimal place."
+      skill: "explog-solving"
+      answer: 7.0
+      expect: log(1.5)/log(1.06)
+      tolerance: 0.15
+      hint "Divide by $2000$ to get $1.5 = 1.06^t$, then take logs of both sides."
+      ! "$t = \dfrac{\log 1.5}{\log 1.06} \approx 7.0$ years. Note that reaching $1.5$ times takes about $7$ years while doubling takes about $12$ — growth of this kind is never proportional to the target."
+    }
+  }
+
+  slide "Everything at Once" {
+    id: "e4-synth"
+    cat: "In Context"
+    build {
+      ask "Assemble the solution of $4 \times 3^x = 36$."
+      skill: "explog-solving"
+      template: "$3^x =$ ___ $\quad$ so $\quad x =$ ___"
+      bank: ["$9$", "$2$", "$36$", "$12$"]
+      answer: ["$9$", "$2$"]
+      hint "Divide by the $4$ first, then recognise the power of $3$."
+      ! "$3^x = 9$, so $x = 2$. Isolate, then solve — and here the numbers were kind enough that no logs were needed at all."
+    }
+  }
+}

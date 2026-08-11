@@ -1,0 +1,185 @@
+lesson "Exponential Growth and e" {
+  course: "pure-maths"
+  unit: "Exponentials & Logarithms"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "Growth that depends on how much you already have. Why exponentials outrun every polynomial, and where the strangest important number in mathematics comes from."
+  skills: ["explog-exponential", "explog-e", "explog-growth"]
+
+  slide "Growth That Feeds Itself" {
+    id: "e1-hook"
+    cat: "Exponential Growth"
+    > A **linear** quantity grows by the same amount each step. An **exponential**
+    > one grows by the same *proportion* each step, so the more it has, the faster it
+    > gains.
+    >
+    > $$y = a^x$$
+    >
+    > Bacteria doubling, money at compound interest, a rumour spreading — all the
+    > same shape, because in each case the growth is proportional to the current
+    > size.
+    >
+    > Change the base below. Above $1$ it climbs; below $1$ it decays; at exactly $1$
+    > it does nothing at all, because multiplying by $1$ forever is a very quiet
+    > life.
+
+    scene plane {
+      x: [-4, 4]
+      y: [-1, 9]
+      grid
+      axes
+      param b = 2 { range: [0.3, 3], step: 0.1 }
+      curve f = b^x { color: primary, width: 3 }
+      curve linear = x + 1 { color: neutral, width: 2, style: dashed }
+      point anchor = (0, 1) { color: accent, r: 7 }
+      label at (-3.8, 8.4) = "y = ${b} to the power x" { color: primary }
+      label at (-3.8, 7.6) = "every curve passes through (0, 1)" { color: accent }
+      label at (-3.8, 6.8) = "dashed line is y = x + 1, for comparison" { color: neutral }
+      slider b { label: "the base" }
+    }
+
+    goal "Find a base that makes the curve decay instead of grow" {
+      when: b < 1
+      hint: "Anything below 1. Multiplying repeatedly by a fraction shrinks things."
+    }
+  }
+
+  slide "Every One Passes Through (0, 1)" {
+    id: "e1-through-one"
+    cat: "Exponential Growth"
+    > Whatever the base, $a^0 = 1$, so **every** exponential curve goes through
+    > $(0, 1)$. That is the anchor point they all share.
+    >
+    > Two other features are worth naming. An exponential of a positive base is
+    > **never negative** — you cannot reach zero by repeated multiplication, only
+    > approach it. So the curve has the x-axis as an **asymptote**, getting closer
+    > forever without ever touching.
+    >
+    > And growth beats polynomials eventually, always. $2^x$ starts below $x^2$ and
+    > looks harmless, but by $x = 5$ it has caught up and after that it is never
+    > headed anywhere but away.
+
+    quiz {
+      ask "Why does $y = 3^x$ never take a negative value?"
+      skill: "explog-exponential"
+      * "Multiplying a positive number by itself, any number of times, stays positive"
+      - "Because the graph is drawn above the axis" { why: "That is the observation, not the reason. The graph sits above the axis *because* the values cannot be negative." }
+      - "It does go negative, for negative $x$" { why: "Negative $x$ gives a *small* value, not a negative one. $3^{-2} = \tfrac19$, which is still positive." }
+      hint "What is the smallest thing $3$ multiplied by itself can ever produce?"
+      ! "Negative powers give fractions, never negatives. The curve approaches zero as $x$ goes left but never reaches or crosses it."
+    }
+  }
+
+  slide "Where e Comes From" {
+    id: "e1-e"
+    cat: "The Number e"
+    > Among all the possible bases, one is special, and it turns up from a very
+    > concrete question about money.
+    >
+    > Invest £1 at $100\%$ interest for a year. Paid once at the end, you have £2.
+    > Paid in two instalments of $50\%$, you get $(1 + \tfrac12)^2 = 2.25$, because
+    > the first half earns interest too. Four instalments give $2.44$, twelve give
+    > $2.613$.
+    >
+    > Keep chopping it finer and the total keeps climbing, but by less and less. It
+    > does not run away to infinity. It **converges**:
+    >
+    > $$\left(1 + \frac{1}{n}\right)^n \to e \approx 2.71828\ldots$$
+    >
+    > That limit is $e$: the result of growth compounding continuously rather than in
+    > steps. Push $n$ up and watch it settle.
+
+    scene plane {
+      x: [-2, 26]
+      y: [1.6, 3.0]
+      grid
+      axes
+      param n = 4 { range: [1, 24], step: 1 }
+      curve compounding = (1 + 1/x)^x { where: x > 0.5, color: primary, width: 3 }
+      curve limit = 2.71828 { color: danger, width: 2, style: dashed }
+      point now = (n, (1 + 1/n)^n) { color: accent, r: 8 }
+      label at (10, 2.92) = "with ${n} instalments you get ${(1 + 1/n)^n}" { color: accent }
+      label at (16.5, 2.62) = "e = 2.718..." { color: danger }
+      slider n { label: "how many instalments" }
+    }
+
+    goal "Split it finely enough to get past 2.65" {
+      when: (1 + 1/n)^n > 2.65
+      hint: "Around twenty instalments. Notice how slowly it creeps up, and that it never reaches e."
+    }
+  }
+
+  slide "The Curve That Is Its Own Gradient" {
+    id: "e1-derivative"
+    cat: "The Number e"
+    > The real reason $e$ matters comes later, in calculus, but it is worth knowing
+    > now because it explains why $e$ is *the* base rather than a curiosity.
+    >
+    > Of all the exponential curves, $y = e^x$ is the one whose **gradient at every
+    > point equals its own height**.
+    >
+    > $$\frac{d}{dx}e^x = e^x$$
+    >
+    > At the point where the curve is $5$ high, it is climbing at a rate of $5$.
+    > Nothing else does that. $2^x$ climbs a bit slower than its height, $3^x$ a bit
+    > faster, and $e$ is exactly the base where the two match.
+    >
+    > That is what "growth proportional to current size" means written as an
+    > equation, and it is why $e$ appears in anything that grows or decays naturally.
+
+    quiz {
+      ask "What is special about $y = e^x$ compared with $y = 2^x$ or $y = 3^x$?"
+      skill: "explog-e"
+      * "Its gradient at every point is equal to its value there"
+      - "It is the only one that passes through $(0, 1)$" { why: "They all do, since anything to the power zero is $1$." }
+      - "It grows the fastest" { why: "$3^x$ grows faster, and $10^x$ faster still. Speed is not what makes $e$ special." }
+      hint "It is about the relationship between the curve's height and its steepness."
+      ! "$\frac{d}{dx}e^x = e^x$. The curve is its own derivative, and $e$ is defined as the base that makes that true."
+    }
+  }
+
+  slide "Reading an Exponential Model" {
+    id: "e1-model"
+    cat: "Using Them"
+    > Real models are usually written $N = N_0 a^{t}$ or $N = N_0 e^{kt}$, where
+    > $N_0$ is the starting amount.
+    >
+    > A colony starts at $500$ bacteria and doubles every hour: $N = 500 \times 2^t$
+    > with $t$ in hours. The $500$ sets the scale, the $2$ sets the growth per hour.
+    >
+    > Read the two parts separately and these models stop looking intimidating: one
+    > number says where you began, the other says what happens each step.
+
+    numeric {
+      ask "A colony starts at $500$ bacteria and doubles every hour. How many are there after $4$ hours?"
+      skill: "explog-growth"
+      answer: 8000
+      expect: 500*2^4
+      tolerance: 1
+      hint "$N = 500 \times 2^4$."
+      ! "$500 \times 16 = 8000$. Doubling four times multiplies by $16$, not by $8$ — the doublings compound rather than add."
+    }
+  }
+
+  slide "Decay Is the Same Idea" {
+    id: "e1-decay"
+    cat: "Using Them"
+    > A base below $1$ gives **decay**, and everything else works the same way.
+    > Halving each step means a base of $\tfrac12$, and $N = N_0(\tfrac12)^t$.
+    >
+    > Just as growth never reaches infinity in finite time, decay never reaches zero.
+    > It halves, and halves again, approaching zero forever without arriving. That is
+    > why radioactive materials are described by a **half-life** rather than a
+    > lifetime: there is no moment at which the last of it goes.
+
+    numeric {
+      ask "A sample of $80$ grams has a half-life of $3$ years. How much is left after $9$ years?"
+      skill: "explog-growth"
+      answer: 10
+      expect: 80*(1/2)^3
+      tolerance: 0.01
+      hint "Nine years is three half-lives, so it halves three times."
+      ! "$80 \to 40 \to 20 \to 10$ grams. Three halvings divide by $8$, not by $6$."
+    }
+  }
+}
