@@ -60,7 +60,7 @@ const COURSES = [
     sortOrder: 2,
     description:
       'Forces, friction, the three laws of motion, and motion under constant acceleration. Bring vectors and a little trigonometry.',
-    lessons: ['force-2'],
+    lessons: ['force-1', 'force-2', 'force-3', 'force-4'],
   },
 ];
 

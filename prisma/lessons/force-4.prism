@@ -1,0 +1,284 @@
+lesson "Equilibrium" {
+  course: "mechanics"
+  unit: "Forces & Equilibrium"
+  difficulty: "Intermediate"
+  icon: "Check"
+  summary: "When everything cancels. Why a still object is covered in forces, why a cruising car is in equilibrium too, and why a nearly flat cable is close to snapping."
+  skills: ["force-equilibrium", "force-resolve-tilted", "force-resultant"]
+
+  slide "Nothing Happening, Plenty Going On" {
+    id: "f4-hook"
+    cat: "Balanced Forces"
+    > A vase sits on a table. It is not moving, it is not going to move, and it is
+    > the least dramatic thing in the room.
+    >
+    > It is also being pulled and pushed with about $150$ N in two directions at
+    > once. Gravity hauls it down with its full weight. The table shoves back up
+    > with exactly as much. The two cancel to nothing, which is why the vase does
+    > nothing.
+    >
+    > **Equilibrium does not mean no forces. It means the forces total zero.** Have
+    > a guess at what the arrows look like, then check the answer.
+
+    scene plane {
+      x: [-4.2, 4.2]
+      y: [-2.4, 5.2]
+      aspect: equal
+      axes: false
+      line table = (-3.6, 0) -> (3.6, 0) { color: neutral, width: 4 }
+      line legL = (-2.4, 0) -> (-2.4, -1.8) { color: neutral, width: 3 }
+      line legR = (2.4, 0) -> (2.4, -1.8) { color: neutral, width: 3 }
+      rect vase = (-0.6, 0) { w: 1.2, h: 1.6, color: primary, opacity: 0.35 }
+      reveal {
+        vector weight = (0, 0.8) -> (0, -0.7) { color: danger, width: 5 }
+        vector normal = (0, 0.8) -> (0, 2.3) { color: success, width: 5 }
+        label at (0.55, 2.6) = "table pushes up: 150 N" { color: success }
+        label at (0.55, -1.05) = "gravity pulls down: 150 N" { color: danger }
+        label at (0, 4.6) = "total = 0 N" { anchor: middle, color: neutral }
+      }
+    }
+
+    quiz {
+      ask "How many forces are acting on that perfectly still vase?"
+      skill: "force-equilibrium"
+      * "Two, and they cancel"
+      - "None — it is not moving" { why: "Then nothing would be holding it up against gravity, and it would fall through the table. Stillness is the *result* of forces cancelling, not the absence of them." }
+      - "One, its weight" { why: "If weight were the only force, the vase would accelerate downwards. Something has to be pushing back, and it is the table." }
+      hint "If you took the table away, would anything change? Then the table must be doing something."
+      ! "Two: weight down, and the table's push up. They are equal and opposite, so the vase feels no *net* force and stays put."
+    }
+  }
+
+  slide "The Two Equations" {
+    id: "f4-equations"
+    cat: "Balanced Forces"
+    > Writing that down properly is the whole of statics. A body in equilibrium has
+    > forces that cancel in **every** direction at once, so you get one equation per
+    > direction:
+    >
+    > $$\sum F_x = 0 \qquad \sum F_y = 0$$
+    >
+    > That is it. Every problem in this unit is those two lines, filled in with
+    > whatever the picture gives you.
+    >
+    > In practice: resolve everything into two perpendicular directions, then insist
+    > that each direction balances. Two equations means you can find two unknowns.
+
+    build {
+      ask "Complete the two conditions for a body to be in equilibrium."
+      skill: "force-equilibrium"
+      template: "$\sum F_x =$ ___ $\qquad \sum F_y =$ ___"
+      bank: ["$0$", "$0$", "$ma$", "$mg$"]
+      answer: ["$0$", "$0$"]
+      hint "Nothing is accelerating, so there is no leftover force in any direction."
+      ! "Both sums are zero. If either one were not, there would be a net force in that direction and the body would accelerate along it."
+    }
+  }
+
+  slide "Moving Counts Too" {
+    id: "f4-moving"
+    cat: "Balanced Forces"
+    quiz {
+      ask "A car cruises down a motorway at a rock-steady $80$ km/h. Its engine drives it forwards with $3000$ N; drag and friction push back with $3000$ N. Is the car in equilibrium?"
+      skill: "force-equilibrium"
+      * "Yes — the forces cancel, so it keeps doing exactly what it was doing"
+      - "No, because it is moving" { why: "Equilibrium is about the forces adding to zero, not about the speed being zero. A car at a constant speed in a straight line is every bit as balanced as a parked one." }
+      - "No, because the engine is doing work" { why: "The engine is certainly working, but that is a question about energy. Equilibrium only asks whether the forces cancel, and here they do." }
+      hint "Is anything about the car's motion *changing*?"
+      onwrong: "f4-still-vs-steady" retry
+      ! "Yes. Equilibrium means no *change* in motion. Standing still and cruising at a constant velocity are the same situation as far as the forces are concerned."
+    }
+  }
+
+  slide "Still and Steady Are the Same Thing" {
+    id: "f4-still-vs-steady"
+    hidden: true
+    cat: "Balanced Forces"
+    > This is worth getting straight, because it is the idea Newton's first law is
+    > built on.
+    >
+    > Forces do not maintain motion. They **change** it. So the question is never
+    > "is it moving?" but "is its motion changing?"
+    >
+    > Both vehicles below have their forces cancelling exactly. The parked one stays
+    > parked. The cruising one stays cruising, at the same speed, in the same
+    > direction, forever, until something upsets the balance. Neither is
+    > accelerating, so both are in equilibrium.
+    >
+    > The only thing that would break it is a *mismatch* — ease off the accelerator
+    > and drag wins, so the car slows down.
+
+    scene plane {
+      x: [-5.6, 5.6]
+      y: [-2.4, 3.6]
+      aspect: equal
+      axes: false
+      line roadL = (-5.2, 0) -> (-0.4, 0) { color: neutral, width: 3 }
+      line roadR = (0.4, 0) -> (5.2, 0) { color: neutral, width: 3 }
+      rect parked = (-3.8, 0) { w: 2.0, h: 0.9, color: neutral, opacity: 0.3 }
+      rect cruising = (1.8, 0) { w: 2.0, h: 0.9, color: primary, opacity: 0.35 }
+      vector driveR = (3.8, 0.45) -> (5.0, 0.45) { color: success, width: 4 }
+      vector dragR = (1.8, 0.45) -> (0.6, 0.45) { color: danger, width: 4 }
+      label at (-2.8, 2.6) = "parked: 0 N each way" { anchor: middle, color: neutral }
+      label at (2.8, 2.6) = "cruising at 80 km/h" { anchor: middle, color: primary }
+      label at (2.8, 1.6) = "3000 N forward, 3000 N back" { anchor: middle, color: neutral }
+      label at (0, -1.6) = "both have zero net force, so neither is speeding up or slowing down" { anchor: middle, color: neutral }
+    }
+
+    quiz {
+      ask "The driver eases off the accelerator so the engine now pushes with only $2000$ N, while drag still pushes back with $3000$ N. What happens?"
+      skill: "force-equilibrium"
+      * "The car slows down, because there is now a net $1000$ N backwards"
+      - "It keeps cruising, since there is still a forward force" { why: "There is, but it is outmatched. What decides the motion is the *total*, and the total now points backwards." }
+      - "It stops immediately" { why: "A net force changes the speed gradually, it does not delete it. The car slows, and keeps slowing while the imbalance lasts." }
+      ! "Net $1000$ N backwards, so the car decelerates. Break the balance and the motion starts changing."
+    }
+  }
+
+  slide "The Sagging Sign" {
+    id: "f4-sign"
+    cat: "Hanging Things Up"
+    > Now the interactive worth playing with. A $20$ kg shop sign, weight
+    > $196$ N, hangs from two cables. Both cables share the load, so their upward
+    > pulls together have to add to exactly $196$ N:
+    >
+    > $$2T\sin\theta = 196$$
+    >
+    > Pull the cables taut and flat, and $\sin\theta$ gets tiny — so $T$ has to get
+    > enormous to compensate. This is why a washing line always sags a bit, and why
+    > insisting it be perfectly straight is how you snap it.
+
+    scene plane {
+      x: [-4.6, 4.6]
+      y: [-4.2, 2.6]
+      aspect: equal
+      axes: false
+      param a = 30 { range: [5, 60], step: 1 }
+      line ceiling = (-4.2, 2.0) -> (4.2, 2.0) { color: neutral, width: 4 }
+      line cableL = (-3, 2.0) -> (0, 2.0 - 3*tan(rad(a))) { color: primary, width: 3 }
+      line cableR = (3, 2.0) -> (0, 2.0 - 3*tan(rad(a))) { color: primary, width: 3 }
+      rect sign = (-0.8, 2.0 - 3*tan(rad(a)) - 0.7) { w: 1.6, h: 0.7, color: accent, opacity: 0.4 }
+      vector weight = (0, 2.0 - 3*tan(rad(a)) - 0.7) -> (0, 2.0 - 3*tan(rad(a)) - 2.0) { color: danger, width: 4 }
+      label at (0, 2.45) = "each cable pulls with ${196/(2*sin(rad(a)))} N" { anchor: middle, color: primary }
+      label at (-2.6, 1.4) = "${a}°" { color: neutral }
+      slider a { label: "angle of the cables below the ceiling" }
+    }
+
+    goal "Flatten the cables until each one is pulling harder than twice the sign's weight" {
+      when: a < 15
+      hint: "Bring the angle down towards 5° and watch the number climb."
+    }
+  }
+
+  slide "The Picture on the Nail" {
+    id: "f4-picture"
+    cat: "Hanging Things Up"
+    > A picture frame weighing $12$ kg.wt hangs from a single wire looped over a
+    > nail. The wire makes a V, with an angle of $120°$ at the nail — so each half
+    > leans $60°$ away from the vertical.
+
+    scene plane {
+      x: [-3.6, 3.6]
+      y: [-3.4, 2.0]
+      aspect: equal
+      axes: false
+      point nail = (0, 1.4) { color: neutral, r: 7 }
+      line wireL = (0, 1.4) -> (-2.078, 0.2) { color: primary, width: 3 }
+      line wireR = (0, 1.4) -> (2.078, 0.2) { color: primary, width: 3 }
+      rect frame = (-2.078, -1.6) { w: 4.156, h: 1.8, color: accent, opacity: 0.3 }
+      arc sweep = (0, 1.4) { r: 0.85, from: 210, to: 330, color: warning }
+      label at (0, 0.42) = "120°" { anchor: middle, color: warning }
+      vector w = (0, -1.6) -> (0, -2.7) { color: danger, width: 4 }
+      label at (0, -3.1) = "weight 12 kg.wt" { anchor: middle, color: danger }
+    }
+
+    numeric {
+      ask "What is the tension in **each** half of the wire, in kg.wt?"
+      skill: "force-equilibrium"
+      answer: 12
+      expect: 12/(2*cos(rad(60)))
+      tolerance: 0.05
+      hint "Only the vertical part of each half holds the frame up. Each half is $60°$ from the vertical, so that part is $T\cos 60°$."
+      hint "Two halves, so $2T\cos 60° = 12$. And $\cos 60° = 0.5$."
+      ! "$2T\cos 60° = 12$, and $\cos 60° = \tfrac12$, so $T = 12$ kg.wt. A neat result: at $120°$ the tension in each half equals the whole weight. Open the angle any further and each half is pulling *harder* than the picture weighs."
+    }
+  }
+
+  slide "Tilt the Axes to Suit Yourself" {
+    id: "f4-tilted"
+    cat: "Choosing Your Axes"
+    > A last trick, and the one that separates people who find statics fiddly from
+    > people who find it easy.
+    >
+    > You get to choose which two perpendicular directions to balance. Nothing says
+    > they must be horizontal and vertical. Pick them to make an awkward unknown
+    > **disappear**.
+    >
+    > On a ramp, the surface pushes perpendicular to itself, and you usually do not
+    > care what that push is. So resolve *along the ramp* and *perpendicular to it*:
+    > the normal force has no component along the slope at all, so it drops straight
+    > out of that equation and never bothers you.
+
+    scene plane {
+      x: [-4.2, 4.2]
+      y: [-2.8, 2.8]
+      aspect: equal
+      axes: false
+      param a = 30 { range: [10, 50], step: 1 }
+      polygon ramp = [(-3, -2), (3, -2), (3, -2 + 6*tan(rad(a)))] { color: neutral, opacity: 0.25 }
+      rect block = (-3 + 3*cos(rad(a)), -2 + 3*sin(rad(a))) { w: 1.1, h: 0.6, rotate: a, color: primary }
+      vector weight = (-3 + 3*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a))) -> (-3 + 3*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a)) - 1.5) { color: danger, width: 4 }
+      vector push = (-3 + 3*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)) - 1.5, -2 + 3*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a))) -> (-3 + 3*cos(rad(a)) + 0.55*cos(rad(a)) - 0.3*sin(rad(a)), -2 + 3*sin(rad(a)) + 0.55*sin(rad(a)) + 0.3*cos(rad(a))) { color: success, width: 4 }
+      arc sweep = (-3, -2) { r: 1.0, from: 0, to: a, color: accent }
+      label at (-1.75, -1.72) = "${a}°" { color: accent }
+      label at (0, 2.4) = "a horizontal push P holds it still on a frictionless ramp" { anchor: middle, color: neutral }
+      slider a { label: "ramp angle" }
+    }
+
+    numeric {
+      ask "A $10$ kg block rests on a **frictionless** ramp at $30°$, held in place by a horizontal push $P$. What is $P$, in kg.wt?"
+      skill: "force-resolve-tilted"
+      answer: 5.77
+      expect: 10*tan(rad(30))
+      tolerance: 0.05
+      hint "Balance along the slope. The weight drags down it with $W\sin 30°$, and the horizontal push has a component up it of $P\cos 30°$."
+      hint "$P\cos 30° = 10\sin 30°$, so $P = 10\tan 30°$."
+      ! "$P = 10\tan 30° \approx 5.77$ kg.wt. Resolving along the ramp made the normal force vanish from the equation entirely, because it acts at right angles to that direction. Choosing the axes well is most of the work."
+    }
+  }
+
+  slide "The Whole Unit, in One Ring" {
+    id: "f4-synth"
+    cat: "Choosing Your Axes"
+    > A ring is held still by three ropes. One pulls $30$ N due east, another pulls
+    > $40$ N due north.
+
+    scene plane {
+      x: [-3.6, 3.6]
+      y: [-3.6, 3.6]
+      aspect: equal
+      grid
+      axes
+      vector east = (0, 0) -> (1.5, 0) { color: primary, width: 4 }
+      vector north = (0, 0) -> (0, 2) { color: success, width: 4 }
+      point ring = (0, 0) { color: accent, r: 9 }
+      label at (1.65, -0.35) = "30 N" { color: primary }
+      label at (0.2, 2.25) = "40 N" { color: success }
+      reveal {
+        vector third = (0, 0) -> (-1.5, -2) { color: danger, width: 4, style: dashed }
+        label at (-1.7, -2.4) = "50 N, south-west-ish" { anchor: middle, color: danger }
+      }
+    }
+
+    numeric {
+      ask "For the ring to stay in equilibrium, what must the size of the third rope's pull be, in newtons?"
+      skill: "force-equilibrium"
+      answer: 50
+      expect: sqrt(30^2 + 40^2)
+      tolerance: 0.1
+      hint "Everything must total zero, so the third rope has to exactly undo the other two put together."
+      hint "The first two are at right angles: combine them with Pythagoras first."
+      ! "The first two combine to $\sqrt{30^2 + 40^2} = 50$ N. The third must pull $50$ N in precisely the opposite direction, so all three sum to zero. Every equilibrium problem is this: find the resultant of what you know, then demand that the rest cancels it."
+    }
+  }
+}

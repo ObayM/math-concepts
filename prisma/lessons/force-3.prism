@@ -1,0 +1,267 @@
+lesson "The Resultant of Several Forces" {
+  course: "mechanics"
+  unit: "Forces & Equilibrium"
+  difficulty: "Intermediate"
+  icon: "Waves"
+  summary: "Replace any pile of forces with the single one that does the same job. Tip to tail, component by component, and why two 10 N pulls almost never make 20 N."
+  skills: ["force-resultant", "force-tip-to-tail", "force-components"]
+
+  slide "Two Tens Are Rarely Twenty" {
+    id: "f3-hook"
+    cat: "Adding Forces"
+    > Two people haul on a ring, each pulling with exactly $10$ N. How hard is the
+    > ring being pulled altogether?
+    >
+    > The tempting answer is $20$ N, and it is right exactly once — when both pull
+    > the same way. Open the angle between them and the total starts falling. Get
+    > them pulling directly against each other and the ring feels **nothing at
+    > all**, despite $20$ N of effort going into it.
+    >
+    > Drag the angle open and watch the red arrow, which is the single pull that
+    > would do the same job as both of them together.
+
+    scene plane {
+      x: [-2.6, 5.4]
+      y: [-3.0, 3.0]
+      aspect: equal
+      axes: false
+      param a = 60 { range: [0, 180], step: 1 }
+      vector f1 = (0, 0) -> (2*cos(rad(a/2)), 2*sin(rad(a/2))) { color: primary, width: 4 }
+      vector f2 = (0, 0) -> (2*cos(rad(a/2)), 0 - 2*sin(rad(a/2))) { color: primary, width: 4 }
+      vector res = (0, 0) -> (4*cos(rad(a/2)), 0) { color: danger, width: 5 }
+      point ring = (0, 0) { color: accent, r: 9 }
+      arc sweep = (0, 0) { r: 1.1, from: 0 - a/2, to: a/2, color: neutral }
+      label at (2.4, 2.5) = "each rope pulls 10 N, ${a}° apart" { anchor: middle, color: primary }
+      label at (2.4, -2.5) = "together they do the work of ${20*cos(rad(a/2))} N" { anchor: middle, color: danger }
+      slider a { label: "angle between the two ropes" }
+    }
+
+    goal "Line them up so the two pulls really do add to 20 N" {
+      when: a < 4
+      hint: "Close the angle right down until both ropes point the same way."
+    }
+    goal "Now set them fighting each other until the ring feels nothing" {
+      when: a > 176
+      hint: "Open it all the way to 180°, straight opposite."
+    }
+  }
+
+  slide "Tip to Tail" {
+    id: "f3-tip-to-tail"
+    cat: "Adding Forces"
+    > The picture that makes this obvious: **slide the second arrow so its tail
+    > starts where the first one ends.** Whatever gets you from the very start to
+    > the very finish is the **resultant** — the one force that could replace the
+    > whole lot.
+    >
+    > It is the same move as walking. Three metres east then four metres north
+    > leaves you five metres from where you began, not seven. Forces add the way
+    > journeys do, not the way piles of coins do.
+    >
+    > That $3$, $4$, $5$ is not a coincidence, by the way. When the two are at
+    > right angles, the resultant is just Pythagoras:
+    >
+    > $$R = \sqrt{F_x^2 + F_y^2}$$
+
+    scene plane {
+      x: [-1.4, 6.6]
+      y: [-1.4, 5.4]
+      aspect: equal
+      grid
+      axes
+      vector east = (0, 0) -> (3, 0) { color: primary, width: 4 }
+      vector northShifted = (3, 0) -> (3, 4) { color: success, width: 4 }
+      vector northAtOrigin = (0, 0) -> (0, 4) { color: success, width: 3, style: dashed }
+      vector res = (0, 0) -> (3, 4) { color: danger, width: 5 }
+      label at (1.5, -0.55) = "3 N east" { anchor: middle, color: primary }
+      label at (3.3, 2.0) = "4 N north, slid over" { color: success }
+      label at (0.9, 2.6) = "R = 5 N" { color: danger }
+    }
+  }
+
+  slide "Build the Resultant" {
+    id: "f3-build"
+    cat: "Adding Forces"
+    build {
+      ask "Two forces act at right angles to each other. Assemble the size of their resultant."
+      skill: "force-resultant"
+      template: "$R =$ ___"
+      bank: ["$\sqrt{F_x^2 + F_y^2}$", "$F_x + F_y$", "$\sqrt{F_x + F_y}$", "$F_x^2 + F_y^2$"]
+      answer: ["$\sqrt{F_x^2 + F_y^2}$"]
+      hint "Right angles mean a right triangle, with the resultant as the hypotenuse."
+      onwrong: "f3-not-just-adding" retry
+      ! "$R = \sqrt{F_x^2 + F_y^2}$. Straight Pythagoras, because perpendicular forces make a right triangle."
+    }
+  }
+
+  slide "Why Adding the Numbers Fails" {
+    id: "f3-not-just-adding"
+    hidden: true
+    cat: "Adding Forces"
+    > Adding the sizes only works when the forces point the **same way**. The
+    > moment they do not, some of each pull is spent fighting a direction the
+    > other one is not going in.
+    >
+    > Look at the two below. Each is $10$ N. Added like plain numbers you would
+    > expect $20$ N. The actual resultant is $14.1$ N — you have lost nearly a
+    > third of your effort simply by pulling at right angles to each other.
+    >
+    > $$R = \sqrt{10^2 + 10^2} = \sqrt{200} \approx 14.1$$
+    >
+    > The arrow tells you the truth: the diagonal of a square is shorter than
+    > walking two sides of it.
+
+    scene plane {
+      x: [-1.2, 4.4]
+      y: [-1.2, 4.4]
+      aspect: equal
+      grid
+      axes
+      polygon box = [(0, 0), (3, 0), (3, 3), (0, 3)] { color: neutral, opacity: 0.12 }
+      vector fx = (0, 0) -> (3, 0) { color: primary, width: 4 }
+      vector fy = (0, 0) -> (0, 3) { color: success, width: 4 }
+      vector res = (0, 0) -> (3, 3) { color: danger, width: 5 }
+      label at (1.5, -0.6) = "10 N" { anchor: middle, color: primary }
+      label at (-0.75, 1.5) = "10 N" { anchor: middle, color: success }
+      label at (1.55, 2.3) = "R = 14.1 N, not 20" { color: danger }
+    }
+
+    numeric {
+      ask "Two forces of $6$ N and $8$ N act at right angles. What is the size of their resultant, in newtons?"
+      skill: "force-resultant"
+      answer: 10
+      expect: sqrt(6^2 + 8^2)
+      tolerance: 0.05
+      hint "Square them, add, square root. Do not just add $6$ and $8$."
+      ! "$\sqrt{36 + 64} = \sqrt{100} = 10$ N. Adding them would have given $14$ N, which the ring never feels."
+    }
+  }
+
+  slide "More Than Two" {
+    id: "f3-components"
+    cat: "Component by Component"
+    > With three or four forces at awkward angles, drawing them nose to tail gets
+    > messy fast. So we do the reliable thing instead: **resolve everything into
+    > across and up, add each direction separately, then rebuild.**
+    >
+    > Three steps, no cleverness required:
+    >
+    > $$R_x = \sum F_x \qquad R_y = \sum F_y \qquad R = \sqrt{R_x^2 + R_y^2}$$
+    >
+    > Directions that oppose each other simply come out with opposite signs and
+    > cancel themselves. The arithmetic does the thinking for you.
+
+    scene plane {
+      x: [-4.6, 4.6]
+      y: [-4.0, 4.0]
+      aspect: equal
+      grid
+      axes
+      vector a = (0, 0) -> (0, 3) { color: primary, width: 4 }
+      vector b = (0, 0) -> (2, 0) { color: primary, width: 4 }
+      vector c = (0, 0) -> (0, -1) { color: primary, width: 4 }
+      point ring = (0, 0) { color: accent, r: 8 }
+      label at (0.3, 3.2) = "12 N north" { color: primary }
+      label at (2.2, -0.45) = "5 N east" { color: primary }
+      label at (0.3, -1.5) = "4 N south" { color: primary }
+      reveal {
+        vector res = (0, 0) -> (2, 2) { color: danger, width: 5, style: dashed }
+        label at (2.2, 2.2) = "R = 9.4 N" { color: danger }
+      }
+    }
+
+    numeric {
+      ask "Three forces act on a ring: $12$ N north, $5$ N east, and $4$ N south. What is the size of the resultant, in newtons?"
+      skill: "force-components"
+      answer: 9.43
+      expect: sqrt((12-4)^2 + 5^2)
+      tolerance: 0.05
+      hint "North and south are the same line, so settle those against each other first."
+      hint "You are left with $8$ N north and $5$ N east, at right angles."
+      ! "North and south cancel down to $8$ N north. With $5$ N east that gives $\sqrt{8^2 + 5^2} = \sqrt{89} \approx 9.43$ N. Opposite directions subtract; perpendicular ones go through Pythagoras."
+    }
+  }
+
+  slide "Which Direction?" {
+    id: "f3-direction"
+    cat: "Component by Component"
+    > A resultant is a force, so a size alone does not finish the job. You need
+    > the direction too, and it comes from the same right triangle:
+    >
+    > $$\tan\theta = \frac{R_y}{R_x}$$
+
+    numeric {
+      ask "A resultant has $R_x = 5$ N east and $R_y = 8$ N north. What angle does it make with the east direction, in degrees?"
+      skill: "force-resultant"
+      answer: 58
+      expect: deg(atan(8/5))
+      tolerance: 0.6
+      hint "$\tan\theta = 8/5 = 1.6$, so $\theta = \arctan(1.6)$."
+      ! "$\theta = \arctan(1.6) \approx 58°$ north of east. More north than east, which matches: the northward part is the bigger one."
+    }
+  }
+
+  slide "Order the Method" {
+    id: "f3-order"
+    cat: "Component by Component"
+    order {
+      ask "Put the steps in order for finding the resultant of several awkward forces."
+      skill: "force-components"
+      item "Resolve every force into its across and up components"
+      item "Add all the across components to get $R_x$"
+      item "Add all the up components to get $R_y$"
+      item "Combine with $R = \sqrt{R_x^2 + R_y^2}$"
+      item "Find the direction with $\tan\theta = R_y / R_x$"
+      decoy "Add all the force magnitudes together"
+      ! "Split, add each direction on its own, rebuild, then point it. Adding raw magnitudes is the one move that is never right unless everything already points the same way."
+    }
+  }
+
+  slide "Three at 120°" {
+    id: "f3-symmetry"
+    cat: "Component by Component"
+    > Sometimes the components do something beautiful. Three forces of $15$ N pull
+    > outwards from a point, spaced evenly at $120°$ apart, like a peace sign.
+    >
+    > Add the across components: $15 + 15\cos 120° + 15\cos 240° = 15 - 7.5 - 7.5 = 0$.
+    > Do the up components and they cancel too.
+
+    scene plane {
+      x: [-3.4, 3.4]
+      y: [-3.4, 3.4]
+      aspect: equal
+      axes: false
+      vector f1 = (0, 0) -> (2.4, 0) { color: primary, width: 4 }
+      vector f2 = (0, 0) -> (2.4*cos(rad(120)), 2.4*sin(rad(120))) { color: primary, width: 4 }
+      vector f3 = (0, 0) -> (2.4*cos(rad(240)), 2.4*sin(rad(240))) { color: primary, width: 4 }
+      point ring = (0, 0) { color: accent, r: 9 }
+      label at (0, 3.0) = "three 15 N pulls, 120° apart" { anchor: middle, color: neutral }
+    }
+
+    quiz {
+      ask "What is the resultant of those three forces?"
+      skill: "force-resultant"
+      * "Zero — they cancel exactly"
+      - "$45$ N outwards" { why: "That is the three magnitudes added. They point in three different directions, so their sizes never simply total up." }
+      - "$15$ N, in the direction of the first force" { why: "The other two do not vanish; they each contribute a backwards component of $7.5$ N, which is precisely what cancels the first one." }
+      hint "Work out the across components: $15$, then $15\cos 120°$, then $15\cos 240°$."
+      ! "Zero. Perfect symmetry means every direction is pulled on exactly as hard as its opposite, so the ring sits there doing nothing. That state has a name, and it is the next lesson: **equilibrium**."
+    }
+  }
+
+  slide "One Force, Replacing Many" {
+    id: "f3-synth"
+    cat: "Component by Component"
+    match {
+      ask "Match each pair of perpendicular forces to the size of its resultant."
+      skill: "force-resultant"
+      pair "$3$ N and $4$ N" -> "$5$ N"
+      pair "$5$ N and $12$ N" -> "$13$ N"
+      pair "$8$ N and $15$ N" -> "$17$ N"
+      pair "$9$ N and $12$ N" -> "$15$ N"
+      decoy "$20$ N"
+      hint "All four are Pythagoras. Two of them are the $3,4,5$ triangle in disguise."
+      ! "$5$, $13$, $17$ and $15$. That last one is the $3,4,5$ triangle scaled up by three, which is worth spotting because it saves you the arithmetic."
+    }
+  }
+}

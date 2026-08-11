@@ -1,0 +1,328 @@
+lesson "What a Force Really Is" {
+  course: "mechanics"
+  unit: "Forces & Equilibrium"
+  difficulty: "Beginner"
+  icon: "Move"
+  summary: "Force as a push with a direction, what a newton actually measures, and the difference between your mass and your weight that costs marks every single year."
+  skills: ["force-what-is", "force-newton", "force-mass-vs-weight", "force-kgwt"]
+
+  slide "Size Is Only Half the Story" {
+    id: "f1-hook"
+    cat: "Force Is a Vector"
+    > A force is a push or a pull. That is genuinely all it is.
+    >
+    > But telling someone you pushed "with $200$ newtons" tells them almost
+    > nothing. Push a stalled car forwards with $200$ N and it rolls. Push
+    > straight *down* on its roof with the same $200$ N and it goes nowhere at
+    > all — you have just made it press harder into the road.
+    >
+    > Same number. Completely different outcome. Force is a **vector**: it needs a
+    > size and a direction before it means anything.
+    >
+    > Swing the arrow below and watch how much of your push actually goes into
+    > moving the car forwards.
+
+    scene plane {
+      x: [-4.6, 4.6]
+      y: [-1.4, 3.8]
+      aspect: equal
+      axes: false
+      param a = 20 { range: [0, 90], step: 1 }
+      line ground = (-4.2, 0) -> (4.2, 0) { color: neutral, width: 3 }
+      rect car = (-3.4, 0) { w: 2.4, h: 1.1, color: neutral, opacity: 0.3 }
+      vector push = (-1.0, 0.7) -> (-1.0 + 3*cos(rad(a)), 0.7 + 3*sin(rad(a))) { color: primary, width: 4 }
+      vector useful = (-1.0, 0.7) -> (-1.0 + 3*cos(rad(a)), 0.7) { color: success, width: 3, style: dashed }
+      arc sweep = (-1.0, 0.7) { r: 0.9, from: 0, to: a, color: primary }
+      label at (0.6, 3.4) = "you push with 200 N at ${a}°" { anchor: middle, color: primary }
+      label at (0.6, 0.2) = "only ${200*cos(rad(a))} N of that pushes it along" { anchor: middle, color: success }
+      slider a { label: "angle of your push" }
+    }
+
+    goal "Find the angle where your whole 200 N goes into moving the car" {
+      when: a < 3
+      hint: "Push flat, straight along the ground."
+    }
+    goal "Now find the angle where literally none of it moves the car forwards" {
+      when: a > 87
+      hint: "Push straight down and see what the green number does."
+    }
+  }
+
+  slide "What a Force Can Do" {
+    id: "f1-effects"
+    cat: "Force Is a Vector"
+    > A force never just "exists". You spot one by what it *changes*. There are
+    > only three things on the list:
+    >
+    > **Speed something up. Slow something down. Change its direction.** (Change
+    > its shape too, if the thing is squashy.)
+    >
+    > Notice what is *not* on that list: keeping something moving. A puck sliding
+    > across perfect ice needs no force at all to keep going. That idea has a name
+    > and a whole lesson coming, but it starts here.
+
+    sort {
+      ask "Which of these situations definitely has a force acting on the moving object?"
+      skill: "force-what-is"
+      bin "There is a force": ["a ball curving in mid air", "a car braking at lights", "a satellite circling the Earth"]
+      bin "No force is needed": ["a puck gliding at a steady speed on perfect ice", "a spacecraft coasting between stars"]
+      hint "Ask what is *changing*. Curving counts as changing, because the direction is changing."
+      ! "Any change of speed **or** direction means a force. Steady speed in a straight line means the forces are balanced, and out in deep space, absent altogether. The satellite is the sneaky one: its speed barely changes, but it is constantly turning, so gravity is very much acting."
+    }
+  }
+
+  slide "One Newton" {
+    id: "f1-newton"
+    cat: "Newtons"
+    > The unit is the **newton**, written $N$. The definition is deliberately
+    > plain:
+    >
+    > $$1\ \text{N} \ \text{gives a } 1\ \text{kg mass an acceleration of } 1\ \text{m/s}^2$$
+    >
+    > It helps to have something physical to hang that on. A small apple resting
+    > in your hand pushes down with roughly **one newton**. So when a problem says
+    > $600$ N, picture six hundred apples, and you will never write down a silly
+    > answer without noticing.
+
+    numeric {
+      ask "A trolley of mass $3$ kg is pushed so that it speeds up at $2$ m/s². What force is acting, in newtons?"
+      skill: "force-newton"
+      answer: 6
+      expect: 3*2
+      tolerance: 0.01
+      hint "One newton buys one kilogram one metre per second squared. You have three kilograms and want two of those."
+      ! "$6$ N. This is $F = ma$ arriving early — you will meet it properly in Newton's laws, but the unit was built around it from the start."
+    }
+  }
+
+  slide "Your Mass Does Not Change. Your Weight Does." {
+    id: "f1-mass-weight"
+    cat: "Mass and Weight"
+    > Here is the distinction that costs more marks than any other in mechanics.
+    >
+    > **Mass** is how much stuff you are made of. It is measured in **kilograms**
+    > and it is the same everywhere in the universe.
+    >
+    > **Weight** is the *force* gravity pulls you down with. It is measured in
+    > **newtons**, and it changes the moment the gravity does:
+    >
+    > $$W = mg$$
+    >
+    > Move the mass slider, then send the same box to the Moon and to Jupiter. The
+    > number of kilograms never flinches. The arrow does.
+
+    scene plane {
+      x: [-4.2, 4.2]
+      y: [-6.2, 2.2]
+      aspect: equal
+      axes: false
+      param m = 6 { range: [1, 10], step: 1 }
+      choice place = "Earth" { options: ["Earth", "Moon", "Jupiter"] }
+      rect box = (-0.8, 0) { w: 1.6, h: 1.1, color: primary, opacity: 0.35 }
+      vector w = (0, 0) -> (0, 0 - m*(9.8*(place == 'Earth') + 1.62*(place == 'Moon') + 24.8*(place == 'Jupiter'))/52) { color: danger, width: 5 }
+      label at (0, 1.75) = "mass = ${m} kg, wherever it goes" { anchor: middle, color: primary }
+      label at (0, -5.7) = "weight = ${m*(9.8*(place == 'Earth') + 1.62*(place == 'Moon') + 24.8*(place == 'Jupiter'))} N" { anchor: middle, color: danger }
+      label at (0, -6.05) = "g here = ${9.8*(place == 'Earth') + 1.62*(place == 'Moon') + 24.8*(place == 'Jupiter')} m/s²" { anchor: middle, color: neutral }
+      slider m { label: "mass in kilograms" }
+      picker place { label: "take it somewhere else" }
+    }
+
+    goal "Send the box to the Moon and watch what happens to the arrow" {
+      when: place == "Moon"
+      hint: "Use the picker underneath the diagram."
+    }
+    goal "Now try Jupiter, without touching the mass slider" {
+      when: place == "Jupiter"
+      hint: "Same box, same kilograms, much angrier gravity."
+    }
+  }
+
+  slide "Which One Travels With You?" {
+    id: "f1-quiz-mass"
+    cat: "Mass and Weight"
+    quiz {
+      ask "An astronaut with a mass of $70$ kg travels to the Moon. What happens?"
+      skill: "force-mass-vs-weight"
+      * "Mass stays $70$ kg, weight drops to about a sixth"
+      - "Both the mass and the weight drop to about a sixth" { why: "Mass counts the stuff you are made of, and the trip does not remove five sixths of the astronaut. Only the gravitational pull changed." }
+      - "Mass drops to about a sixth, weight stays the same" { why: "Backwards. Weight is the force of gravity, so weight is the one that follows the gravity." }
+      - "Neither changes, since the astronaut is the same person" { why: "The astronaut is the same, but gravity is not. Weight is a force *from* the Moon, and the Moon pulls far more gently than Earth." }
+      hint "Which of the two is a property of the astronaut, and which is a property of the place?"
+      onwrong: "f1-kilograms-are-not-newtons" retry
+      ! "Mass is yours and travels with you. Weight belongs to wherever you are standing: $70 \times 1.62 \approx 113$ N on the Moon, against $686$ N at home."
+    }
+  }
+
+  slide "Bathroom Scales Tell a White Lie" {
+    id: "f1-kilograms-are-not-newtons"
+    hidden: true
+    cat: "Mass and Weight"
+    > The confusion is not your fault. Bathroom scales cause it.
+    >
+    > A scale cannot feel your mass. It can only feel how hard you press down on
+    > it, which is a **force**. It then quietly divides by $9.8$ and prints
+    > kilograms, because that is what you wanted to know.
+    >
+    > That works fine at home and falls apart the instant the gravity changes.
+    > Take the same scale to the Moon and it would read about $11$ kg for a
+    > $70$ kg person — not because they lost anything, but because the scale is
+    > still dividing by Earth's $9.8$ while the Moon pushes with $1.62$.
+    >
+    > **Kilograms are never a force. Newtons are never an amount of stuff.**
+
+    scene plane {
+      x: [-5.0, 5.0]
+      y: [-1.2, 4.6]
+      aspect: equal
+      axes: false
+      line groundL = (-4.6, 0) -> (-0.4, 0) { color: neutral, width: 3 }
+      line groundR = (0.4, 0) -> (4.6, 0) { color: neutral, width: 3 }
+      rect scaleL = (-3.4, 0) { w: 1.8, h: 0.5, color: neutral, opacity: 0.3 }
+      rect scaleR = (1.6, 0) { w: 1.8, h: 0.5, color: neutral, opacity: 0.3 }
+      rect personL = (-3.0, 0.5) { w: 1.0, h: 1.6, color: primary, opacity: 0.35 }
+      rect personR = (2.0, 0.5) { w: 1.0, h: 1.6, color: primary, opacity: 0.35 }
+      vector wL = (-2.5, 2.1) -> (-2.5, 0.6) { color: danger, width: 5 }
+      vector wR = (2.5, 2.1) -> (2.5, 1.75) { color: danger, width: 5 }
+      label at (-2.5, 4.1) = "on Earth" { anchor: middle, color: neutral }
+      label at (2.5, 4.1) = "on the Moon" { anchor: middle, color: neutral }
+      label at (-2.5, 3.5) = "presses with 686 N" { anchor: middle, color: danger }
+      label at (2.5, 3.5) = "presses with 113 N" { anchor: middle, color: danger }
+      label at (-2.5, -0.7) = "scale says 70 kg" { anchor: middle, color: success }
+      label at (2.5, -0.7) = "scale says 11 kg" { anchor: middle, color: warning }
+    }
+
+    numeric {
+      ask "The person really has a mass of $70$ kg in both pictures. On the Moon, what is their **weight** in newtons? Use $g = 1.62$ m/s²."
+      skill: "force-mass-vs-weight"
+      answer: 113.4
+      expect: 70*1.62
+      tolerance: 0.5
+      hint "Weight is a force, so use $W = mg$ with the Moon's $g$, not Earth's."
+      ! "$70 \times 1.62 = 113.4$ N. The mass is still $70$ kg. Only the pull changed."
+    }
+  }
+
+  slide "The Kilogram-Weight" {
+    id: "f1-kgwt"
+    cat: "Mass and Weight"
+    > Because "the weight of a $1$ kg mass" comes up constantly, it gets its own
+    > unit: the **kilogram-weight**, written $\text{kg.wt}$.
+    >
+    > $$1\ \text{kg.wt} = 9.8\ \text{N}$$
+    >
+    > It is a force, despite the name having "kilogram" in it. Think of it as a
+    > shortcut: saying a crate is pulled down with $50$ kg.wt is a quicker way of
+    > saying $490$ N, and it saves you multiplying by $9.8$ over and over.
+    >
+    > Converting is a single step in each direction. **kg.wt to newtons, multiply
+    > by $9.8$. Newtons to kg.wt, divide by it.**
+
+    table {
+      ask "Fill in the gaps. Take $g = 9.8$ m/s²."
+      skill: "force-kgwt"
+      header: ["force in kg.wt", "force in N"]
+      row: 1, blank(9.8)
+      row: 5, blank(49)
+      row: 20, blank(196)
+      row: blank(3), 29.4
+      hint "Going right, multiply by $9.8$. Going left, divide by it."
+      ! "$9.8$, $49$, $196$, and $29.4 \div 9.8 = 3$ kg.wt. One conversion factor, used in whichever direction the gap is."
+    }
+  }
+
+  slide "Reading the Units" {
+    id: "f1-units-quiz"
+    cat: "Mass and Weight"
+    quiz {
+      ask "A problem says: *a body of mass $5$ kg hangs from a string*. What is the tension in the string, in kg.wt?"
+      skill: "force-kgwt"
+      * "$5$ kg.wt"
+      - "$49$ kg.wt" { why: "That is the answer in **newtons**. You have already converted once; converting again double-counts the $9.8$." }
+      - "$5$ N" { why: "Right number, wrong unit. A $5$ kg mass weighs $49$ N, which *is* $5$ kg.wt. Newtons and kg.wt are not interchangeable labels." }
+      - "$0.51$ kg.wt" { why: "That is dividing by $9.8$ when the mass in kilograms already gives you the kg.wt directly." }
+      hint "How many newtons does a $5$ kg mass weigh? Now how many lots of $9.8$ N is that?"
+      ! "A mass of $m$ kg weighs $m$ kg.wt, always. That is the entire point of the unit: $5$ kg weighs $49$ N, and $49 \div 9.8 = 5$ kg.wt. The string holds it up, so the tension matches."
+    }
+  }
+
+  slide "Put a Number on It" {
+    id: "f1-numeric"
+    cat: "Mass and Weight"
+    numeric {
+      ask "A crate is pulled downwards by its weight of $24$ kg.wt. What is that weight in newtons? Take $g = 9.8$ m/s²."
+      skill: "force-kgwt"
+      answer: 235.2
+      expect: 24*9.8
+      tolerance: 0.5
+      hint "One kg.wt is $9.8$ N, and you have twenty-four of them."
+      ! "$24 \times 9.8 = 235.2$ N. And since a mass of $m$ kg weighs $m$ kg.wt, that crate has a mass of $24$ kg."
+    }
+  }
+
+  slide "All of It at Once" {
+    id: "f1-synth"
+    cat: "Mass and Weight"
+    > A $2$ kg bag of sugar sits on a table on Earth.
+
+    build {
+      ask "Assemble the bag's weight as a force in newtons."
+      skill: "force-mass-vs-weight"
+      template: "$W =$ ___ $\times$ ___ $=$ ___ $\text{N}$"
+      bank: ["$2$", "$9.8$", "$19.6$", "$0.2$", "$2 \times 9.8$"]
+      answer: ["$2$", "$9.8$", "$19.6$"]
+      hint "$W = mg$, with the mass in kilograms and $g$ in m/s²."
+      ! "$W = 2 \times 9.8 = 19.6$ N, which is the same thing as $2$ kg.wt. Mass in kilograms, weight in newtons, and never the two labels swapped."
+    }
+  }
+
+  slide "Somewhere Heavier" {
+    id: "f1-other-planet"
+    cat: "Mass and Weight"
+    > One that catches people who learned "$m$ kg weighs $m$ kg.wt" as a rule
+    > instead of understanding where it came from.
+    >
+    > You take a $40$ kg box to a planet where gravity pulls exactly **three times**
+    > as hard as Earth's.
+
+    numeric {
+      ask "What does the box weigh there, in kg.wt?"
+      skill: "force-kgwt"
+      answer: 120
+      expect: 40*3
+      tolerance: 0.5
+      hint "The kg.wt is nailed to *Earth's* gravity: one kg.wt is $9.8$ N no matter where you stand. So work out the weight in newtons first, then see how many lots of $9.8$ N that is."
+      ! "In newtons: $40 \times 29.4 = 1176$ N. In kg.wt: $1176 \div 9.8 = 120$. The shortcut '$m$ kg weighs $m$ kg.wt' is an Earth-only convenience, because it quietly assumes $g = 9.8$. Off Earth you have to go the long way."
+    }
+  }
+
+  slide "Everything Pressing Down" {
+    id: "f1-stack"
+    cat: "Mass and Weight"
+    > A $12$ kg block sits on a table. You then press straight down on top of it
+    > with your hand, with a force of $29.4$ N.
+
+    scene plane {
+      x: [-3.4, 3.4]
+      y: [-1.0, 5.2]
+      aspect: equal
+      axes: false
+      line table = (-3.0, 0) -> (3.0, 0) { color: neutral, width: 4 }
+      rect block = (-1.0, 0) { w: 2.0, h: 1.4, color: primary, opacity: 0.35 }
+      vector hand = (0, 4.3) -> (0, 2.9) { color: warning, width: 4 }
+      vector weight = (0, 1.4) -> (0, 0.1) { color: danger, width: 4 }
+      label at (1.35, 3.6) = "your hand: 29.4 N" { color: warning }
+      label at (1.35, 0.75) = "its weight: 12 kg.wt" { color: danger }
+    }
+
+    numeric {
+      ask "What is the total downward force on the table, in kg.wt?"
+      skill: "force-kgwt"
+      answer: 15
+      expect: 12 + 29.4/9.8
+      tolerance: 0.1
+      hint "You cannot add $12$ kg.wt to $29.4$ N directly. Put them both in the same unit first."
+      hint "$29.4$ N is how many lots of $9.8$ N?"
+      ! "$29.4 \div 9.8 = 3$ kg.wt, and $12 + 3 = 15$ kg.wt. Both forces point the same way, straight down, so here they simply add. Forces pointing in *different* directions are a longer story, and that is the next lesson."
+    }
+  }
+}
