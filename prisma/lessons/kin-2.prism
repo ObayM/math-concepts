@@ -1,0 +1,181 @@
+lesson "s = ut + ½at²" {
+  course: "mechanics"
+  unit: "Kinematics"
+  difficulty: "Intermediate"
+  icon: "Waves"
+  summary: "Distance travelled is the area under the velocity graph, and that area is a rectangle plus a triangle. Where the one half comes from, and the displacement trap."
+  skills: ["kin-displacement", "kin-area-under-graph", "kin-suvat"]
+
+  slide "Distance Is an Area" {
+    id: "k2-hook"
+    cat: "Area Under the Graph"
+    > Travel at a steady $12$ m/s for $5$ s and you cover $60$ m. That is speed
+    > times time, and on a velocity-time graph it is exactly the **area** of the
+    > rectangle underneath the line.
+    >
+    > That idea does not stop working when the velocity changes. Whatever shape the
+    > graph makes, the area underneath it is the displacement.
+    >
+    > For constant acceleration the shape is a rectangle sitting under a triangle.
+    > The rectangle is the distance you would have covered at your starting speed,
+    > $ut$. The triangle on top is the extra you gained by accelerating, with base
+    > $t$ and height $at$, so its area is $\tfrac12 at^2$.
+    >
+    > $$s = \underbrace{ut}_{\text{rectangle}} + \underbrace{\tfrac12 at^2}_{\text{triangle}}$$
+    >
+    > There is the one half, and it was never arbitrary. It is the area of a
+    > triangle.
+
+    scene plane {
+      x: [-0.5, 9.0]
+      y: [-2, 26]
+      grid
+      axes
+      param u = 6 { range: [0, 16], step: 1 }
+      param a = 2 { range: [0, 4], step: 0.5 }
+      param t = 5 { range: [1, 8], step: 0.5 }
+      area rect = u { from: 0, to: t, color: primary, opacity: 0.3 }
+      area tri = u + a*x { lower: u, from: 0, to: t, color: accent, opacity: 0.3 }
+      curve v = u + a*x { where: x > 0, color: primary, width: 3 }
+      line vline = (t, 0) -> (t, u + a*t) { color: neutral, style: dashed, width: 2 }
+      label at (0.35, 24) = "rectangle ut = ${u*t} m" { color: primary }
+      label at (0.35, 21.5) = "triangle ½at² = ${0.5*a*t*t} m" { color: accent }
+      label at (0.35, 19) = "total s = ${u*t + 0.5*a*t*t} m" { color: success }
+      slider u { label: "starting velocity u" }
+      slider a { label: "acceleration a" }
+      slider t { label: "time t" }
+    }
+
+    goal "Make the triangle bigger than the rectangle" {
+      when: 0.5*a*t*t > u*t
+      hint: "Hard acceleration from a slow start, given plenty of time."
+    }
+  }
+
+  slide "Where the Halves Live" {
+    id: "k2-build"
+    cat: "Area Under the Graph"
+    build {
+      ask "Assemble the displacement for constant acceleration."
+      skill: "kin-displacement"
+      template: "$s =$ ___ $+$ ___"
+      bank: ["$ut$", "$\tfrac12 at^2$", "$\tfrac12 ut$", "$at^2$"]
+      answer: ["$ut$", "$\tfrac12 at^2$"]
+      hint "Rectangle first, then the triangle sitting on top of it."
+      ! "$s = ut + \tfrac12 at^2$. The $t^2$ belongs to the triangle, and so does the half."
+    }
+  }
+
+  slide "Starting From Rest" {
+    id: "k2-rest"
+    cat: "Area Under the Graph"
+    > When something starts from rest, $u = 0$ and the rectangle vanishes entirely.
+    > The whole displacement is the triangle:
+    >
+    > $$s = \tfrac12 at^2$$
+    >
+    > Notice the $t^2$. Double the time and you go **four times** as far, not twice.
+    > That is why stopping distances get so alarming so quickly, and why a fall from
+    > twice the height hurts far more than twice as much.
+
+    table {
+      ask "An object starts from rest and accelerates at $2$ m/s². Fill in how far it has travelled."
+      skill: "kin-displacement"
+      header: ["time in s", "distance in m"]
+      row: 1, blank(1)
+      row: 2, blank(4)
+      row: 3, blank(9)
+      row: 4, blank(16)
+      hint "$s = \tfrac12 \times 2 \times t^2$, which for this acceleration is simply $t^2$."
+      ! "$1$, $4$, $9$, $16$. Perfect squares, because $s$ grows with $t^2$. In the fourth second alone it covers $7$ m, against just $1$ m in the first."
+    }
+  }
+
+  slide "Distance or Displacement?" {
+    id: "k2-displacement"
+    cat: "The Trap"
+    > $s$ is **displacement**, not distance travelled. Usually identical, and
+    > occasionally very much not.
+    >
+    > Throw a ball straight up at $19.6$ m/s and catch it again $4$ seconds later.
+    > Put those numbers into the equation:
+    >
+    > $$s = 19.6 \times 4 + \tfrac12(-9.8)(4^2) = 78.4 - 78.4 = 0$$
+    >
+    > Zero. And that is the correct answer: the ball ends up exactly where it
+    > started, so its displacement really is nothing. The *distance travelled* is
+    > $39.2$ m, up and back down again, but that is a different question and the
+    > equation was never asked it.
+
+    quiz {
+      ask "The equation gives $s = 0$ for that ball. What does that mean?"
+      skill: "kin-displacement"
+      * "It finished at the same height it started from"
+      - "The ball never moved" { why: "It went up $19.6$ m and came back. Displacement measures the net change in position, and it happens to be zero, which is not the same as never moving." }
+      - "The calculation went wrong somewhere" { why: "It is right. $s$ is displacement, and over a complete up-and-down trip the displacement genuinely is zero." }
+      hint "What is the difference between how far something travelled and where it ended up?"
+      onwrong: "k2-net-not-total" retry
+      ! "Displacement is a vector: where you finished, relative to where you began. The up cancels the down exactly."
+    }
+  }
+
+  slide "Net Change, Not Total Travel" {
+    id: "k2-net-not-total"
+    hidden: true
+    cat: "The Trap"
+    > Walk five metres forward and five metres back. Distance travelled: $10$ m.
+    > Displacement: $0$ m. Both are correct answers to different questions.
+    >
+    > Every suvat equation deals in **displacement**, because they are all built out
+    > of vectors that carry a sign. Once any part of the motion runs backwards the
+    > two numbers separate.
+    >
+    > The graph makes it obvious. Area above the axis counts positive; area below
+    > counts negative. For the thrown ball the two areas are mirror images, so they
+    > cancel to zero. Add their *sizes* instead and you get the distance travelled,
+    > $39.2$ m.
+    >
+    > If a question asks how **far** something went, work out each phase separately
+    > and add the sizes. Never trust a single suvat calculation to do it for you.
+
+    scene plane {
+      x: [-0.4, 4.6]
+      y: [-24, 24]
+      grid
+      axes
+      area up = 19.6 - 9.8*x { from: 0, to: 2, color: success, opacity: 0.3 }
+      area down = 19.6 - 9.8*x { from: 2, to: 4, color: danger, opacity: 0.3 }
+      curve v = 19.6 - 9.8*x { where: x > 0, color: primary, width: 3 }
+      label at (0.55, 14) = "+19.6 m" { color: success }
+      label at (2.6, -16) = "-19.6 m" { color: danger }
+      label at (2.2, 21) = "the two areas cancel" { anchor: middle, color: neutral }
+    }
+
+    numeric {
+      ask "For that same ball, what is the total **distance travelled** in the $4$ seconds, in metres?"
+      skill: "kin-displacement"
+      answer: 39.2
+      expect: 2*(19.6*2 - 0.5*9.8*4)
+      tolerance: 0.1
+      hint "Work out how high it got in the first $2$ s, then double it for the way back down."
+      ! "It rose $19.6$ m and fell $19.6$ m, so it covered $39.2$ m while ending up nowhere new."
+    }
+  }
+
+  slide "A Full Question" {
+    id: "k2-synth"
+    cat: "The Trap"
+    > A car starts from rest and accelerates uniformly at $1.5$ m/s² for $12$
+    > seconds.
+
+    numeric {
+      ask "How far does it travel, in metres?"
+      skill: "kin-suvat"
+      answer: 108
+      expect: 0.5*1.5*12^2
+      tolerance: 0.1
+      hint "'From rest' gives $u = 0$, so the rectangle is gone and only the triangle is left."
+      ! "$s = \tfrac12 \times 1.5 \times 144 = 108$ m. And since the motion never reverses, the distance travelled and the displacement agree here."
+    }
+  }
+}

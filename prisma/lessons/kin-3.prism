@@ -1,0 +1,176 @@
+lesson "v² = u² + 2as" {
+  course: "mechanics"
+  unit: "Kinematics"
+  difficulty: "Intermediate"
+  icon: "Dumbbell"
+  summary: "The equation with no time in it, for when you neither know t nor care. Plus the reason stopping distances grow so much faster than speed does."
+  skills: ["kin-suvat", "kin-no-time", "kin-braking"]
+
+  slide "When You Do Not Know the Time" {
+    id: "k3-hook"
+    cat: "Losing t"
+    > A car brakes from $30$ m/s to a stop at $5$ m/s². How far does it travel?
+    >
+    > You could find the time first, then the distance, and it works. But it is two
+    > steps and the time was never interesting. There is an equation that skips it.
+    >
+    > Take $v = u + at$, rearrange it to $t = \dfrac{v - u}{a}$, and substitute that
+    > into $s = ut + \tfrac12 at^2$. The algebra is a page of tidying up and $t$
+    > disappears entirely, leaving:
+    >
+    > $$v^2 = u^2 + 2as$$
+    >
+    > This is not a new law of physics. It is the same two equations with the time
+    > eliminated, which is exactly why it never mentions it.
+
+    scene plane {
+      x: [-0.5, 9.0]
+      y: [-3, 34]
+      grid
+      axes
+      param u = 30 { range: [5, 30], step: 1 }
+      param a = 5 { range: [1, 8], step: 0.5 }
+      area covered = u - a*x { from: 0, to: u/a, color: primary, opacity: 0.3 }
+      curve v = u - a*x { where: x > 0, color: primary, width: 3 }
+      label at (0.35, 31) = "from ${u} m/s, braking at ${a} m/s²" { color: primary }
+      label at (0.35, 27.5) = "it stops after ${u/a} s" { color: neutral }
+      label at (0.35, 24) = "having travelled ${u*u/(2*a)} m" { color: success }
+      slider u { label: "starting speed u" }
+      slider a { label: "braking rate a" }
+    }
+
+    goal "Find a combination that needs more than 60 m to stop" {
+      when: u*u/(2*a) > 60
+      hint: "High speed, gentle brakes. Speed matters far more than you would guess."
+    }
+  }
+
+  slide "Pick the Right Tool" {
+    id: "k3-pick"
+    cat: "Losing t"
+    > Each equation is missing exactly one of the five letters, and that is how you
+    > choose between them. Find the letter you do not have and do not want, then use
+    > the equation without it.
+    >
+    > $v = u + at$ has no $s$.
+    >
+    > $s = ut + \tfrac12 at^2$ has no $v$.
+    >
+    > $v^2 = u^2 + 2as$ has no $t$.
+    >
+    > $s = \dfrac{(u + v)}{2}t$ has no $a$, and is just "average velocity times
+    > time", which works only because the acceleration is constant.
+
+    match {
+      ask "Match each situation to the equation that solves it in one step."
+      skill: "kin-no-time"
+      pair "know u, a, t — want v" -> "$v = u + at$"
+      pair "know u, a, t — want s" -> "$s = ut + \tfrac12 at^2$"
+      pair "know u, v, a — want s" -> "$v^2 = u^2 + 2as$"
+      pair "know u, v, t — want s" -> "$s = \tfrac{(u+v)}{2}t$"
+      hint "Look at which letter is absent from both what you have and what you want."
+      ! "The missing letter picks the equation for you. Getting into that habit turns most of these questions into a single substitution."
+    }
+  }
+
+  slide "Stopping Distance Is Not Proportional to Speed" {
+    id: "k3-braking"
+    cat: "Why v Squared Matters"
+    > Rearrange it for a car braking to a stop, with $v = 0$:
+    >
+    > $$s = \frac{u^2}{2a}$$
+    >
+    > The $u$ is **squared**. Double your speed and you do not need twice the
+    > distance to stop, you need **four times** it. Triple it and you need nine
+    > times.
+    >
+    > At $5$ m/s² braking, stopping from $30$ km/h takes about $7$ m. From $60$
+    > km/h it takes about $28$ m. The speed doubled; the distance quadrupled. This
+    > is the single most useful thing in the whole unit and it is why speed limits
+    > near schools are what they are.
+
+    table {
+      ask "A car brakes at $5$ m/s². Work out its stopping distance from each speed, using $s = u^2/(2a)$."
+      skill: "kin-braking"
+      header: ["speed in m/s", "stopping distance in m"]
+      row: 10, blank(10)
+      row: 20, blank(40)
+      row: 30, blank(90)
+      row: 40, blank(160)
+      hint "$s = u^2 \div 10$ for this braking rate."
+      ! "$10$, $40$, $90$, $160$. Four times the speed needs sixteen times the distance. The relationship is a parabola, not a straight line, and that catches people out constantly."
+    }
+  }
+
+  slide "Squaring Cuts Both Ways" {
+    id: "k3-quiz"
+    cat: "Why v Squared Matters"
+    quiz {
+      ask "A car takes $20$ m to stop from $20$ m/s. Braking just as hard, how far does it need from $40$ m/s?"
+      skill: "kin-braking"
+      * "$80$ m"
+      - "$40$ m" { why: "That is doubling the distance for doubled speed, but $s$ depends on $u^2$. Doubling $u$ multiplies $s$ by $2^2 = 4$." }
+      - "$160$ m" { why: "That would be four times the speed. The speed only doubled, so the distance goes up by a factor of four, not sixteen." }
+      hint "$s \propto u^2$. What does doubling $u$ do to $u^2$?"
+      onwrong: "k3-squared-detour" retry
+      ! "$80$ m. Twice the speed, four times the distance. It is the squaring that does it."
+    }
+  }
+
+  slide "What Squaring Actually Does" {
+    id: "k3-squared-detour"
+    hidden: true
+    cat: "Why v Squared Matters"
+    > The instinct that twice the speed needs twice the distance is reasonable and
+    > wrong, and it is worth seeing why.
+    >
+    > Going twice as fast means two separate things get worse at once. You have
+    > **twice as much speed to shed**, and while you are shedding it you are
+    > **covering ground twice as fast**. Two factors of two, multiplied, is four.
+    >
+    > That is what the square is: not one effect, but two compounding.
+    >
+    > The curve below is stopping distance against speed at $5$ m/s². Notice how
+    > gently it starts and how sharply it climbs. Between $10$ and $20$ m/s you add
+    > $30$ m. Between $30$ and $40$ you add $70$ m, for exactly the same extra speed.
+
+    scene plane {
+      x: [-2, 46]
+      y: [-15, 180]
+      grid
+      axes
+      curve stop = x*x/10 { where: x > 0, color: danger, width: 3 }
+      point p10 = (10, 10) { color: primary, r: 6, label: "10 m" }
+      point p20 = (20, 40) { color: primary, r: 6, label: "40 m" }
+      point p30 = (30, 90) { color: primary, r: 6, label: "90 m" }
+      point p40 = (40, 160) { color: primary, r: 6, label: "160 m" }
+      label at (3, 165) = "stopping distance against speed" { color: neutral }
+    }
+
+    numeric {
+      ask "At the same braking rate, a car stops in $45$ m from $30$ m/s. How far would it need from $60$ m/s, in metres?"
+      skill: "kin-braking"
+      answer: 180
+      expect: 45*4
+      tolerance: 0.5
+      hint "The speed doubled, so multiply the distance by $2^2$."
+      ! "$45 \times 4 = 180$ m. You do not need the braking rate at all — the ratio does the work."
+    }
+  }
+
+  slide "Without the Time" {
+    id: "k3-synth"
+    cat: "Why v Squared Matters"
+    > A motorcycle accelerates from $8$ m/s to $20$ m/s over a distance of $70$ m.
+
+    numeric {
+      ask "What is its acceleration, in m/s²?"
+      skill: "kin-no-time"
+      answer: 2.4
+      expect: (20^2 - 8^2)/(2*70)
+      tolerance: 0.02
+      hint "You have $u$, $v$ and $s$, and no time anywhere. That points at exactly one equation."
+      ! "$400 = 64 + 140a$, so $a = 336/140 = 2.4$ m/s². Solving this through $t$ would have taken two steps and given the same answer."
+    }
+  }
+}

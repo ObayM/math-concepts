@@ -1,0 +1,183 @@
+lesson "v = u + at" {
+  course: "mechanics"
+  unit: "Kinematics"
+  difficulty: "Beginner"
+  icon: "LineChart"
+  summary: "The first equation of motion, read straight off a velocity-time graph. What u, v, a and t each mean, and why a minus sign is not the same as going backwards."
+  skills: ["kin-suvat", "kin-velocity-time", "kin-signs"]
+
+  slide "Five Letters, One Story" {
+    id: "k1-hook"
+    cat: "The First Equation"
+    > For the rest of this unit an object moves in a straight line with **constant
+    > acceleration**. That single restriction lets four equations describe
+    > everything, and they all use the same five letters:
+    >
+    > $u$ the velocity it started with, $v$ the velocity it ended with, $a$ the
+    > acceleration, $t$ the time, and $s$ the displacement.
+    >
+    > The first equation is barely an equation at all. Acceleration is how much
+    > velocity you gain each second, so after $t$ seconds you have gained $at$:
+    >
+    > $$v = u + at$$
+    >
+    > Started at $u$, gained $at$, ended at $v$. Set the starting velocity and the
+    > acceleration below and watch the line.
+
+    scene plane {
+      x: [-0.6, 10.5]
+      y: [-12, 32]
+      grid
+      axes
+      param u = 5 { range: [-10, 20], step: 1 }
+      param a = 2 { range: [-4, 4], step: 0.5 }
+      param t = 4 { range: [0, 10], step: 0.5 }
+      curve v = u + a*x { where: x > 0, color: primary, width: 3 }
+      point start = (0, u) { color: success, r: 7 }
+      point now = (t, u + a*t) { drag: x -> t, color: accent, r: 8 }
+      line drop = (t, u + a*t) -> (t, 0) { color: accent, style: dashed, width: 2 }
+      label at (0.4, 28) = "u = ${u} m/s, a = ${a} m/s²" { color: primary }
+      label at (0.4, 24) = "after ${t} s the velocity is ${u + a*t} m/s" { color: accent }
+      slider u { label: "starting velocity u" }
+      slider a { label: "acceleration a" }
+    }
+
+    goal "Set up a motion that is slowing down rather than speeding up" {
+      when: a < 0 and u > 0
+      hint: "Positive starting velocity, negative acceleration. The line should slope downwards."
+    }
+  }
+
+  slide "The Graph Is the Equation" {
+    id: "k1-graph"
+    cat: "The First Equation"
+    > Plot velocity against time and $v = u + at$ is just the equation of a
+    > straight line, wearing physics clothes.
+    >
+    > $$\underbrace{v}_{y} = \underbrace{u}_{c} + \underbrace{a}_{m}\underbrace{t}_{x}$$
+    >
+    > So the **intercept is the starting velocity** and the **gradient is the
+    > acceleration**. Steeper line, harder acceleration. Flat line, no acceleration
+    > and constant velocity. Downward slope, slowing down.
+    >
+    > If you can read a straight-line graph you already know this equation, and it
+    > is worth leaning on that rather than memorising a new thing.
+
+    match {
+      ask "Match each velocity-time graph description to what the object is doing."
+      skill: "kin-velocity-time"
+      pair "horizontal line above the axis" -> "constant velocity, no acceleration"
+      pair "straight line sloping up" -> "speeding up at a steady rate"
+      pair "straight line sloping down, still above the axis" -> "slowing down"
+      pair "line crossing below the axis" -> "has reversed direction"
+      hint "Height is velocity, gradient is acceleration. Read them separately."
+      ! "Height and slope answer two different questions. Height says how fast and which way; slope says whether that is changing."
+    }
+  }
+
+  slide "Minus Does Not Mean Backwards" {
+    id: "k1-signs"
+    cat: "Signs"
+    > Here is the thing that trips people up more than any formula.
+    >
+    > **A negative acceleration does not mean moving backwards.** It means the
+    > velocity is becoming more negative, which could be either of two completely
+    > different situations:
+    >
+    > A car travelling forwards at $20$ m/s with $a = -4$ m/s² is **slowing down**.
+    >
+    > A car already travelling backwards at $-5$ m/s with $a = -4$ m/s² is
+    > **speeding up**, backwards.
+    >
+    > The test is simple: if $a$ and $v$ have the **same sign** the object is
+    > speeding up. **Opposite signs** means slowing down. Nothing to do with which
+    > sign is which.
+
+    sort {
+      ask "For each case, is the object speeding up or slowing down?"
+      skill: "kin-signs"
+      bin "Speeding up": ["$v = 8$, $a = 3$", "$v = -6$, $a = -2$"]
+      bin "Slowing down": ["$v = 12$, $a = -4$", "$v = -9$, $a = 5$"]
+      hint "Same signs means speeding up. Opposite signs means slowing down."
+      ! "Two of these have a negative acceleration and only one of them is slowing down. The sign of $a$ on its own tells you nothing until you compare it with the sign of $v$."
+    }
+  }
+
+  slide "First Numbers" {
+    id: "k1-numeric"
+    cat: "Signs"
+    numeric {
+      ask "A car starts at $8$ m/s and accelerates at $3$ m/s² for $5$ seconds. What is its final velocity, in m/s?"
+      skill: "kin-suvat"
+      answer: 23
+      expect: 8 + 3*5
+      tolerance: 0.01
+      hint "$v = u + at$. You have all three of $u$, $a$ and $t$."
+      ! "$v = 8 + 3 \times 5 = 23$ m/s. It gained $3$ m/s every second for five seconds, so $15$ m/s on top of the $8$ it already had."
+    }
+  }
+
+  slide "Braking to a Stop" {
+    id: "k1-braking"
+    cat: "Signs"
+    > A train is travelling at $30$ m/s when the brakes are applied, giving it a
+    > constant acceleration of $-1.5$ m/s².
+
+    numeric {
+      ask "How many seconds does it take to stop?"
+      skill: "kin-suvat"
+      answer: 20
+      expect: (0 - 30)/(0 - 1.5)
+      tolerance: 0.05
+      hint "Stopping means the final velocity $v$ is zero. Put that into $v = u + at$ and solve for $t$."
+      onwrong: "k1-stopping-means-v-zero" retry
+      ! "$0 = 30 - 1.5t$, so $t = 20$ s. The word 'stops' is what hands you $v = 0$; nothing else in the question says it."
+    }
+  }
+
+  slide "Reading the Words as Numbers" {
+    id: "k1-stopping-means-v-zero"
+    hidden: true
+    cat: "Signs"
+    > Most of the difficulty in these questions is not the algebra. It is spotting
+    > which of the five letters the English has quietly given you.
+    >
+    > **"starts from rest"** means $u = 0$.
+    > **"comes to a stop"** or **"comes to rest"** means $v = 0$.
+    > **"decelerates at $2$"** means $a = -2$.
+    > **"dropped"** means $u = 0$.
+    > **"thrown up at $15$"** means $u = +15$ with $a = -9.8$.
+    >
+    > So the routine before any calculation: write out $u$, $v$, $a$, $t$, $s$ in a
+    > column, fill in the three you were given, circle the one you want, and only
+    > then choose the equation that connects those four. It sounds fussy and it will
+    > save you constantly.
+    >
+    > For the train: $u = 30$, $v = 0$, $a = -1.5$, and $t$ is what you want. The
+    > equation containing exactly those four is $v = u + at$.
+
+    numeric {
+      ask "A cyclist starts from rest and accelerates at $0.8$ m/s². How long, in seconds, until they reach $12$ m/s?"
+      skill: "kin-suvat"
+      answer: 15
+      expect: 12/0.8
+      tolerance: 0.05
+      hint "'From rest' is telling you $u = 0$."
+      ! "$12 = 0 + 0.8t$, so $t = 15$ s. Three words, 'starts from rest', supplied a whole variable."
+    }
+  }
+
+  slide "Which Equation?" {
+    id: "k1-synth"
+    cat: "Signs"
+    build {
+      ask "A ball is thrown straight up at $21$ m/s. Taking upwards as positive and $g = 9.8$, assemble the calculation for how long it takes to reach the top."
+      skill: "kin-suvat"
+      template: "$t =$ ___ $\div$ ___ $= 2.14\ \text{s}$"
+      bank: ["$21$", "$9.8$", "$0$", "$21 + 9.8$"]
+      answer: ["$21$", "$9.8$"]
+      hint "At the very top the ball has stopped rising, so $v = 0$. Put that into $v = u + at$ with $a = -9.8$."
+      ! "$0 = 21 - 9.8t$, so $t = 21/9.8 \approx 2.14$ s. Upwards was chosen as positive, so gravity gets the minus sign. Choose the other convention and every sign flips, but the time comes out the same."
+    }
+  }
+}

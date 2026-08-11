@@ -73,6 +73,10 @@ const COURSES = [
       'newton-2',
       'newton-3',
       'newton-4',
+      'kin-1',
+      'kin-2',
+      'kin-3',
+      'kin-4',
     ],
   },
 ];

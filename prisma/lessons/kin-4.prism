@@ -1,0 +1,204 @@
+lesson "Free Fall and Gravity" {
+  course: "mechanics"
+  unit: "Kinematics"
+  difficulty: "Advanced"
+  icon: "Circle"
+  summary: "No new equations, just a = -9.8. Sign conventions, the truth about what happens at the top of a throw, and two questions that punish blind substitution."
+  skills: ["kin-free-fall", "kin-signs", "kin-suvat", "kin-displacement"]
+
+  slide "Nothing New Here" {
+    id: "k4-hook"
+    cat: "Falling"
+    > Free fall gets treated as its own topic with its own formulas. It is not. It
+    > is the same four equations with one number filled in:
+    >
+    > $$a = -9.8\ \text{m/s}^2$$
+    >
+    > Negative because we almost always take **upwards as positive**, and gravity
+    > pulls the other way. Choose downwards as positive instead and $a = +9.8$, and
+    > every answer still comes out right, provided you stay consistent for the whole
+    > question.
+    >
+    > The one genuinely important fact is that this number is the same for
+    > everything. A hammer and a feather in a vacuum fall identically, because
+    > $a = mg/m = g$ with the mass cancelling. Toggle the air away and watch.
+
+    scene plane {
+      x: [-5.0, 5.0]
+      y: [-1.2, 9.4]
+      aspect: equal
+      axes: false
+      bool vacuum = false
+      param t = 0.6 { range: [0, 1.3], step: 0.02 }
+      line ground = (-4.6, 0) -> (4.6, 0) { color: neutral, width: 4 }
+      rect hammer = (-2.6, 8 - 4.9*t*t) { w: 0.9, h: 0.7, color: primary, opacity: 0.5 }
+      rect featherAir = (1.8, 8 - 1.2*t*t) { w: 0.9, h: 0.7, color: accent, opacity: 0.5, show: not vacuum }
+      rect featherVac = (1.8, 8 - 4.9*t*t) { w: 0.9, h: 0.7, color: accent, opacity: 0.5, show: vacuum }
+      label at (-2.15, 9.0) = "hammer" { anchor: middle, color: primary }
+      label at (2.25, 9.0) = "feather" { anchor: middle, color: accent }
+      label at (0, -0.8) = "with air: the feather dawdles" { anchor: middle, color: neutral, show: not vacuum }
+      label at (0, -0.8) = "in a vacuum: exactly together" { anchor: middle, color: success, show: vacuum }
+      toggle vacuum { label: "take the air away" }
+      slider t { label: "time" }
+      button "drop them" { animate: { t: 1.3 }, dur: 1600 }
+    }
+
+    goal "Remove the air and drop them again" {
+      when: vacuum
+      hint: "Flip the toggle, then press drop."
+    }
+  }
+
+  slide "At the Top, v = 0 but a Does Not" {
+    id: "k4-top"
+    cat: "Up and Down"
+    > Throw a ball straight up. At the highest point it is, for an instant, not
+    > moving. So is the acceleration zero there too?
+    >
+    > No. And here is the argument that settles it.
+    >
+    > Acceleration is the *rate of change of velocity*. If it really were zero at
+    > the top, the velocity would stop changing. And a ball whose velocity is zero
+    > and stops changing would **hang there forever**.
+    >
+    > It does not hang there. A fraction of a second later it is moving downwards,
+    > so its velocity must have been changing the whole time. The acceleration is
+    > still a full $9.8$ m/s² downwards at the top, exactly as it is everywhere
+    > else during the flight.
+    >
+    > **Velocity zero and acceleration zero are completely different statements.**
+
+    scene plane {
+      x: [-0.4, 4.4]
+      y: [-24, 26]
+      grid
+      axes
+      curve vel = 19.6 - 9.8*x { where: x > 0, color: primary, width: 3 }
+      point top = (2, 0) { color: danger, r: 8 }
+      label at (2.15, 3.5) = "v = 0 here" { color: danger }
+      label at (0.2, 22) = "velocity" { color: primary }
+      label at (2.15, -10) = "but the gradient never changes" { color: neutral }
+      label at (0.2, -20) = "gradient = a = -9.8 the whole way" { color: success }
+    }
+
+    quiz {
+      ask "At the highest point of a ball's flight, what are its velocity and acceleration?"
+      skill: "kin-free-fall"
+      * "$v = 0$, $a = 9.8$ m/s² downwards"
+      - "Both are zero" { why: "If the acceleration were zero the velocity would stop changing, and the ball would hover at the top permanently. It plainly does not." }
+      - "$v = 0$ and $a$ briefly reverses to push it back down" { why: "Gravity never changes size or direction during the flight. It was $9.8$ downwards on the way up, at the top, and on the way down." }
+      hint "Look at the velocity graph. Its *height* is zero at the top, but is its *gradient*?"
+      ! "The graph crosses zero at the top but never changes slope. Velocity passes through zero; acceleration does not even flicker."
+    }
+  }
+
+  slide "The Stone and the Cliff" {
+    id: "k4-cliff"
+    cat: "Reading the Question"
+    > A boy stands at the edge of a $30$ m cliff and throws a stone straight up at
+    > $10$ m/s. Take $g = 10$ m/s² and upwards as positive.
+
+    scene plane {
+      x: [-4.2, 4.2]
+      y: [-1.6, 8.4]
+      aspect: equal
+      axes: false
+      polygon cliff = [(-3.4, 0), (0.4, 0), (0.4, 6.4), (-3.4, 6.4)] { color: neutral, opacity: 0.25 }
+      line sea = (0.4, 0) -> (3.8, 0) { color: neutral, width: 3 }
+      point boy = (0.0, 6.4) { color: primary, r: 8 }
+      vector throw = (0.9, 6.4) -> (0.9, 8.0) { color: accent, width: 4 }
+      label at (1.15, 7.4) = "10 m/s up" { color: accent }
+      label at (2.1, 3.2) = "30 m" { anchor: middle, color: neutral }
+      line drop = (1.5, 6.4) -> (1.5, 0) { color: neutral, style: dashed, width: 2 }
+    }
+
+    numeric {
+      ask "What is the stone's velocity exactly $4$ seconds after it is thrown, in m/s?"
+      skill: "kin-free-fall"
+      answer: 0
+      expect: 0
+      tolerance: 0.01
+      hint "Before substituting, ask a different question first: is the stone still in the air at $t = 4$?"
+      hint "Find when it lands. It hits the sea when $s = -30$, and that works out at about $3.6$ s."
+      onwrong: "k4-still-flying" retry
+      ! "It landed at about $t = 3.65$ s, so by $4$ s it is lying at the bottom of the cliff, not moving. Substituting blindly gives $v = 10 - 10(4) = -30$ m/s, which describes a stone that carried on through solid rock."
+    }
+  }
+
+  slide "Check the Motion Is Still Happening" {
+    id: "k4-still-flying"
+    hidden: true
+    cat: "Reading the Question"
+    > The equations are obedient and completely unaware of the ground. Feed them a
+    > time after the object has landed and they will happily tell you how fast it
+    > would be going if the planet had a hole in it.
+    >
+    > So for anything thrown near a surface, **check the flight time first**.
+    >
+    > For the stone, taking up as positive and the sea at $s = -30$:
+    >
+    > $$-30 = 10t - 5t^2$$
+    >
+    > which rearranges to $t^2 - 2t - 6 = 0$, giving $t \approx 3.65$ s. That is the
+    > entire life of the stone. Any question about $t = 4$ is a question about a
+    > stone lying still on the beach.
+    >
+    > This is also why the sign of $s$ matters. The stone finishes **below** where
+    > it started, so its displacement is negative. Write $+30$ there and you are
+    > solving a different problem.
+
+    numeric {
+      ask "Using $t^2 - 2t - 6 = 0$, how long is the stone actually in the air, in seconds?"
+      skill: "kin-suvat"
+      answer: 3.65
+      expect: 1 + sqrt(7)
+      tolerance: 0.02
+      hint "Quadratic formula: $t = 1 \pm \sqrt{7}$. Take the root that is not negative."
+      ! "$t = 1 + \sqrt{7} \approx 3.65$ s. The other root, $1 - \sqrt{7} \approx -1.65$, is the time the stone would have left the sea had it been in flight beforehand. Mathematically real, physically not part of this story."
+    }
+  }
+
+  slide "How Far, Not Where" {
+    id: "k4-distance"
+    cat: "Reading the Question"
+    > One more trap, and it is the displacement one again in a new coat.
+    >
+    > You throw a ball straight up at $20$ m/s. Take $g = 10$ m/s².
+
+    numeric {
+      ask "What total **distance** has it travelled by $t = 3$ s, in metres?"
+      skill: "kin-displacement"
+      answer: 25
+      expect: 20 + 5
+      tolerance: 0.1
+      hint "Split the journey at the top. When does it peak, and how high does it get?"
+      hint "It peaks at $t = 2$ s having risen $20$ m, then falls for the remaining $1$ s."
+      ! "Up $20$ m in the first $2$ s, then down $5$ m in the third. Total distance $25$ m. Substituting straight into $s = ut + \tfrac12at^2$ gives $60 - 45 = 15$ m, which is the *displacement*: it is $15$ m above the throwing point, having travelled $25$ m to get there."
+    }
+  }
+
+  slide "Symmetry" {
+    id: "k4-symmetry"
+    cat: "Reading the Question"
+    > Free fall has a tidy symmetry worth knowing, because it saves real time in an
+    > exam.
+    >
+    > Throw something up and catch it at the same height, and the trip is a mirror
+    > image. **Time up equals time down.** And the speed it arrives with equals the
+    > speed it left with, just pointing the other way.
+    >
+    > It follows from $v^2 = u^2 + 2as$: at the same height $s$ is the same, so $v^2$
+    > is the same, so the speeds match and only the sign flips.
+
+    quiz {
+      ask "A ball is thrown up at $15$ m/s and caught at the same height it left. What is its velocity when caught?"
+      skill: "kin-free-fall"
+      * "$15$ m/s downwards"
+      - "$15$ m/s upwards" { why: "Right size, wrong direction. It is on its way down when you catch it." }
+      - "$0$ m/s" { why: "It is only momentarily at rest at the very top. By the time it is back at your hand it has regained all its speed." }
+      - "It depends on how long it was in the air" { why: "The time follows from the speed, not the other way round. Same height means same speed, whatever the numbers." }
+      hint "Same starting and finishing height means $s = 0$, so $v^2 = u^2$."
+      ! "$15$ m/s downwards. Gravity gives back exactly the speed it took away, which is why a catch stings as much as the throw did."
+    }
+  }
+}
