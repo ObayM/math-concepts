@@ -1,0 +1,131 @@
+lesson "Limits, Briefly" {
+  course: "pure-maths"
+  unit: "Calculus Essentials"
+  difficulty: "Intermediate"
+  icon: "ChevronRight"
+  summary: "A short recap of the one idea calculus is built on: what a function approaches, as opposed to what it does when it gets there."
+  skills: ["lim-notation", "lim-algebraic", "lim-at-infinity"]
+
+  slide "Approaching, Not Arriving" {
+    id: "ce1-hook"
+    cat: "The Idea"
+    > A limit asks what a function **heads towards** as the input closes in on some
+    > value. Crucially, it does not care what happens exactly at that value, or
+    > whether anything happens there at all.
+    >
+    > $$\lim_{x \to a} f(x) = L$$
+    >
+    > The classic case is $f(x) = \dfrac{x^2 - 1}{x - 1}$ at $x = 1$. Substituting
+    > gives $\tfrac00$, which is meaningless. But factor first:
+    >
+    > $$\frac{(x-1)(x+1)}{x-1} = x + 1 \quad \text{for every } x \neq 1$$
+    >
+    > So as $x$ approaches $1$, the function approaches $2$. There is a hole in the
+    > graph at exactly $x = 1$, and the limit sails straight over it.
+    >
+    > Drag the point towards the hole and watch the height.
+
+    scene plane {
+      x: [-1, 3.5]
+      y: [-0.5, 4]
+      grid
+      axes
+      param t = 0.4 { range: [-0.5, 2.5], step: 0.02 }
+      curve f = x + 1 { color: primary, width: 3 }
+      point hole = (1, 2) { open, color: danger, r: 8 }
+      point probe = (t, t + 1) { drag: x -> t, color: accent, r: 8 }
+      line drop = (t, t + 1) -> (t, 0) { color: accent, style: dashed, width: 2 }
+      label at (-0.8, 3.7) = "x = ${t}, f(x) = ${t + 1}" { color: accent }
+      label at (1.15, 2.15) = "undefined at x = 1" { color: danger }
+      slider t { label: "slide towards 1" }
+    }
+
+    goal "Get within 0.05 of x = 1 and see what the height is doing" {
+      when: abs(t - 1) < 0.05
+      hint: "Creep up on it from either side. The height heads for 2 without ever landing there."
+    }
+  }
+
+  slide "How to Actually Evaluate One" {
+    id: "ce1-evaluate"
+    cat: "Three Techniques"
+    > Three techniques cover nearly everything you will meet.
+    >
+    > **Substitute.** Try it first. If $f(a)$ is defined and the function is
+    > continuous there, that is the answer. Most limits are this dull, and that is a
+    > good thing.
+    >
+    > **Factor and cancel.** If substituting gives $\tfrac00$, there is a common
+    > factor hiding. Cancel it and substitute again.
+    >
+    > **Rationalise.** When square roots produce the $\tfrac00$, multiply top and
+    > bottom by the conjugate, exactly as with complex numbers.
+    >
+    > $\tfrac00$ is not an answer. It is a signal that the expression needs
+    > rearranging before it will tell you anything.
+
+    order {
+      ask "Put the steps in order for evaluating $\lim_{x \to 3} \dfrac{x^2 - 9}{x - 3}$."
+      skill: "lim-algebraic"
+      item "Substitute $x = 3$ and get $\tfrac00$, so more work is needed"
+      item "Factor the top as a difference of squares: $(x-3)(x+3)$"
+      item "Cancel the common $(x - 3)$ to leave $x + 3$"
+      item "Substitute again: $3 + 3 = 6$"
+      decoy "Conclude the limit does not exist"
+      ! "$6$. The $\tfrac00$ meant 'rearrange me', not 'give up'. Cancelling is legitimate because $x$ only ever approaches $3$ and never equals it, so $x - 3$ is never actually zero."
+    }
+  }
+
+  slide "Limits at Infinity" {
+    id: "ce1-infinity"
+    cat: "Three Techniques"
+    > The other question worth asking is what happens as $x$ grows without bound.
+    >
+    > The technique: **divide top and bottom by the highest power of $x$ present**,
+    > then use the fact that $\dfrac{1}{x} \to 0$.
+    >
+    > $$\lim_{x\to\infty} \frac{3x^2 + 5x}{x^2 - 1} = \lim_{x\to\infty} \frac{3 + 5/x}{1 - 1/x^2} = \frac{3}{1} = 3$$
+    >
+    > Every term with an $x$ underneath dies away, leaving only the ratio of the
+    > leading coefficients. In practice you can often read the answer straight off:
+    > **compare the highest powers.** Equal powers give the ratio of coefficients, a
+    > bigger power on top runs off to infinity, and a bigger power underneath drives
+    > it to zero.
+
+    numeric {
+      ask "What is $\lim_{x\to\infty} \dfrac{6x^2 + 2x}{2x^2 + 9}$?"
+      skill: "lim-at-infinity"
+      answer: 3
+      expect: 6/2
+      tolerance: 0.01
+      hint "Same highest power top and bottom, so take the ratio of the leading coefficients."
+      ! "$6/2 = 3$. The $2x$ and the $9$ are irrelevant once $x$ is enormous — they are swamped by the squared terms."
+    }
+  }
+
+  slide "Why Any of This Matters" {
+    id: "ce1-why"
+    cat: "The Payoff"
+    > Limits look like a technicality until you see what they are for. **The
+    > derivative is a limit**, and it is a $\tfrac00$ one:
+    >
+    > $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+    >
+    > Put $h = 0$ straight in and you get $\tfrac00$. The whole of differentiation is
+    > the business of doing that cancellation properly, once and for all, so you never
+    > have to again.
+    >
+    > That is why limits come first. Every rule in the next lesson was obtained by
+    > evaluating exactly this expression.
+
+    quiz {
+      ask "Why can you not just substitute $h = 0$ into the derivative definition?"
+      skill: "lim-notation"
+      * "It gives $\tfrac00$, which is meaningless until the expression is rearranged"
+      - "Because $h$ is not allowed to be zero in mathematics" { why: "Zero is a perfectly good number. The problem is dividing by it, which this expression would do." }
+      - "You can, and it gives zero" { why: "The top is also zero, so it is $\tfrac00$, not $\tfrac0{\text{something}}$. Those are very different situations." }
+      hint "Put $h = 0$ into both the numerator and the denominator and see what you get."
+      ! "Both parts go to zero at once. Cancelling an $h$ first is what makes it evaluable, and that cancellation is where every differentiation rule comes from."
+    }
+  }
+}

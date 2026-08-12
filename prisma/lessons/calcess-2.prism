@@ -1,0 +1,184 @@
+lesson "The Rules of Differentiation" {
+  course: "pure-maths"
+  unit: "Calculus Essentials"
+  difficulty: "Advanced"
+  icon: "TrendingUp"
+  summary: "Every rule you need, in one place, with the question that tells you which one to reach for."
+  skills: ["deriv-power-rule", "deriv-chain-rule", "deriv-product-rule", "deriv-trig-sin-cos", "deriv-exp"]
+
+  slide "The Derivative Is a Gradient" {
+    id: "ce2-hook"
+    cat: "The Toolkit"
+    > $f'(x)$ is the **gradient of the curve** at $x$: how fast the output changes
+    > per unit of input. Everything else is technique for computing it.
+    >
+    > The workhorse is the power rule:
+    >
+    > $$\frac{d}{dx}\left[x^n\right] = nx^{n-1}$$
+    >
+    > **Bring the power down, drop it by one.** It works for every $n$ — negative,
+    > fractional, all of them — provided you rewrite roots and reciprocals as powers
+    > first. $\sqrt{x}$ is $x^{1/2}$ and $\dfrac1x$ is $x^{-1}$, and then the rule
+    > applies as usual.
+    >
+    > Drag along the curve and watch the tangent's gradient match $2x$.
+
+    scene plane {
+      x: [-3.5, 3.5]
+      y: [-2, 9]
+      grid
+      axes
+      param t = 1.2 { range: [-2.5, 2.5], step: 0.05 }
+      curve f = x*x { color: primary, width: 3 }
+      point P = (t, t*t) { drag: x -> t, color: accent, r: 8 }
+      line tangent { through: P, slope: 2*t, color: success, width: 2, style: dashed }
+      label at (-3.3, 8.4) = "at x = ${t}" { color: neutral }
+      label at (-3.3, 7.6) = "gradient = 2x = ${2*t}" { color: success }
+      slider t { label: "slide along the curve" }
+    }
+
+    goal "Find the point where the curve is momentarily flat" {
+      when: abs(t) < 0.06
+      hint: "Where the tangent is horizontal, so the gradient is zero."
+    }
+  }
+
+  slide "The Standard Derivatives" {
+    id: "ce2-standard"
+    cat: "The Toolkit"
+    > These are worth knowing on sight. All in **radians**, which is exactly why the
+    > trigonometry unit insisted on them.
+    >
+    > $$\frac{d}{dx}\sin x = \cos x \qquad \frac{d}{dx}\cos x = -\sin x$$
+    > $$\frac{d}{dx}e^x = e^x \qquad \frac{d}{dx}\ln x = \frac1x$$
+    >
+    > Two of these are worth a second look. $e^x$ is its own derivative, which is
+    > what makes $e$ the natural base. And the cosine picks up a **minus** — the one
+    > sign in the whole list that gets forgotten.
+
+    match {
+      ask "Match each function to its derivative."
+      skill: "deriv-trig-sin-cos"
+      pair "$\sin x$" -> "$\cos x$"
+      pair "$\cos x$" -> "$-\sin x$"
+      pair "$e^x$" -> "$e^x$"
+      pair "$\ln x$" -> "$\dfrac{1}{x}$"
+      hint "One of the four is unchanged by differentiating, and one of them gains a minus sign."
+      ! "Differentiating four times in the sine-cosine cycle brings you back to where you started, exactly like the powers of $i$. That is not a coincidence, though seeing why takes complex exponentials."
+    }
+  }
+
+  slide "Which Rule?" {
+    id: "ce2-which"
+    cat: "Combining Functions"
+    > Three rules handle combinations, and picking the right one is just a matter of
+    > asking **how the expression is built**.
+    >
+    > **A function inside another?** Chain rule.
+    > $$\frac{d}{dx}f(g(x)) = f'(g(x)) \cdot g'(x)$$
+    >
+    > **Two things multiplied?** Product rule.
+    > $$[uv]' = u'v + uv'$$
+    >
+    > **One thing over another?** Quotient rule.
+    > $$\left[\frac{u}{v}\right]' = \frac{u'v - uv'}{v^2}$$
+    >
+    > Look at the structure before you look at the functions. $\sin(x^2)$ is a
+    > composition; $x^2\sin x$ is a product. Same two ingredients, different rules,
+    > because they are combined differently.
+
+    sort {
+      ask "Which rule does each expression need?"
+      skill: "deriv-chain-rule"
+      bin "Chain rule": ["$\sin(3x)$", "$(2x+1)^5$", "$e^{x^2}$"]
+      bin "Product rule": ["$x^2\sin x$", "$xe^x$"]
+      bin "Quotient rule": ["$\dfrac{\sin x}{x}$", "$\dfrac{x}{x^2+1}$"]
+      hint "Ask whether one function is *inside* another, *multiplied* by another, or *divided* by another."
+      ! "$e^{x^2}$ is a composition, since $x^2$ sits inside the exponential. $xe^x$ is a product, since two separate functions are multiplied. Reading the structure is most of the work."
+    }
+  }
+
+  slide "The Chain Rule Is the One Forgotten" {
+    id: "ce2-chain"
+    cat: "Combining Functions"
+    > Of the three, the chain rule is the one people half-apply. They differentiate
+    > the outside correctly and then forget to multiply by the derivative of the
+    > inside.
+    >
+    > $$\frac{d}{dx}\sin(3x) = \cos(3x) \cdot 3 = 3\cos(3x)$$
+    >
+    > That $\times 3$ is not decoration. The inside is changing three times as fast as
+    > $x$, so the whole thing does too.
+    >
+    > **Differentiate the outside, keep the inside, then multiply by the inside's
+    > derivative.**
+
+    numeric {
+      ask "What is the coefficient in front when you differentiate $\sin(5x)$? That is, $\frac{d}{dx}\sin(5x) = k\cos(5x)$ — what is $k$?"
+      skill: "deriv-chain-rule"
+      answer: 5
+      expect: 5
+      tolerance: 0.01
+      hint "The derivative of the inside, $5x$, is $5$."
+      onwrong: "ce2-inner-derivative" retry
+      ! "$k = 5$, so the answer is $5\cos(5x)$. Leaving it as $\cos(5x)$ is the classic half-answer."
+    }
+  }
+
+  slide "The Inside Changes Too" {
+    id: "ce2-inner-derivative"
+    hidden: true
+    cat: "Combining Functions"
+    > Here is why that factor has to be there.
+    >
+    > Compare $\sin x$ with $\sin(5x)$. The second completes its whole cycle five
+    > times faster — it is squashed horizontally by a factor of five. Squash a curve
+    > horizontally and it gets **five times steeper** everywhere.
+    >
+    > So its derivative must be five times bigger, and the $\times 5$ is exactly that.
+    >
+    > $$\frac{d}{dx}\sin(5x) = 5\cos(5x)$$
+    >
+    > A quick check that never fails: if the inside is $ax + b$, the derivative picks
+    > up a factor of $a$. If you differentiate something composite and no new factor
+    > appears anywhere, you have probably forgotten this step.
+
+    numeric {
+      ask "What is $\frac{d}{dx}(2x + 1)^3$ at $x = 0$?"
+      skill: "deriv-chain-rule"
+      answer: 6
+      expect: 3*(2*0 + 1)^2 * 2
+      tolerance: 0.01
+      hint "Outside first: $3(2x+1)^2$. Then multiply by the inside's derivative, which is $2$."
+      ! "$3(2x+1)^2 \cdot 2 = 6(2x+1)^2$, and at $x = 0$ that is $6$. Without the $\times 2$ you would have got $3$, exactly half the truth."
+    }
+  }
+
+  slide "A Product" {
+    id: "ce2-product"
+    cat: "Combining Functions"
+    numeric {
+      ask "For $f(x) = x^2 e^x$, what is $f'(0)$?"
+      skill: "deriv-product-rule"
+      answer: 0
+      expect: 2*0*1 + 0*1
+      tolerance: 0.01
+      hint "Product rule: $f' = 2xe^x + x^2e^x$. Then put $x = 0$."
+      ! "$f'(x) = 2xe^x + x^2e^x = xe^x(2 + x)$, and at $x = 0$ every term has a factor of $x$, so it is $0$. The curve is momentarily flat at the origin."
+    }
+  }
+
+  slide "All the Rules at Once" {
+    id: "ce2-synth"
+    cat: "Combining Functions"
+    build {
+      ask "Assemble the derivative of $f(x) = e^{3x}$."
+      skill: "deriv-exp"
+      template: "$f'(x) =$ ___ $\cdot$ ___"
+      bank: ["$e^{3x}$", "$3$", "$3x$", "$e^{x}$"]
+      answer: ["$e^{3x}$", "$3$"]
+      hint "The exponential differentiates to itself, then the chain rule brings down the inside's derivative."
+      ! "$f'(x) = 3e^{3x}$. The $e^{3x}$ survives untouched and the $3$ arrives from the chain rule."
+    }
+  }
+}

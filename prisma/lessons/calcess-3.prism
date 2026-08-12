@@ -1,0 +1,167 @@
+lesson "Integration as the Reverse" {
+  course: "pure-maths"
+  unit: "Calculus Essentials"
+  difficulty: "Advanced"
+  icon: "Undo2"
+  summary: "Differentiation run backwards. The power rule in reverse, the standard integrals, and why the constant that appears is not a formality."
+  skills: ["int-antiderivative", "int-power-rule", "int-definite-integral"]
+
+  slide "Undoing a Derivative" {
+    id: "ce3-hook"
+    cat: "Antiderivatives"
+    > Integration asks the reverse question. Differentiation says "here is a
+    > function, what is its gradient?" Integration says **"here is a gradient, what
+    > was the function?"**
+    >
+    > $$\int f'(x)\,dx = f(x) + c$$
+    >
+    > So the power rule runs backwards. Instead of down-one-and-multiply, it is
+    > **up-one-and-divide**:
+    >
+    > $$\int x^n\,dx = \frac{x^{n+1}}{n+1} + c \qquad (n \neq -1)$$
+    >
+    > Check it the honest way: differentiate your answer. If you get back what you
+    > started with, it was right. Integration is the only topic where you can always
+    > mark your own work in one line.
+    >
+    > That exclusion $n \neq -1$ matters, because it would mean dividing by zero. The
+    > gap is filled by $\int \frac1x dx = \ln|x| + c$, and that is exactly why $\ln$
+    > exists in the table at all.
+
+    match {
+      ask "Match each integral to its result. Constants of integration are assumed."
+      skill: "int-power-rule"
+      pair "$\int x^2\,dx$" -> "$\dfrac{x^3}{3}$"
+      pair "$\int x\,dx$" -> "$\dfrac{x^2}{2}$"
+      pair "$\int 1\,dx$" -> "$x$"
+      pair "$\int \dfrac{1}{x}\,dx$" -> "$\ln|x|$"
+      hint "Raise the power by one, divide by the new power. Except for the last one, which is the exception."
+      ! "$\int 1\,dx$ is really $\int x^0 dx = \dfrac{x^1}{1} = x$, so it follows the same rule after all. Only $x^{-1}$ genuinely escapes it."
+    }
+  }
+
+  slide "The Constant Is Not Optional" {
+    id: "ce3-constant"
+    cat: "Antiderivatives"
+    > Every one of these has the same derivative:
+    >
+    > $$x^2 \qquad x^2 + 7 \qquad x^2 - 100$$
+    >
+    > because differentiating kills a constant. So running it backwards cannot
+    > possibly recover which constant was there. There is a **whole family** of
+    > antiderivatives, one for each vertical shift, and $+c$ names the family rather
+    > than one member of it.
+    >
+    > Slide the constant and watch the curves shift while every tangent stays exactly
+    > as steep.
+
+    scene plane {
+      x: [-3.5, 3.5]
+      y: [-4, 9]
+      grid
+      axes
+      param c = 0 { range: [-3, 4], step: 0.5 }
+      curve base = x*x { color: neutral, width: 2, style: dashed }
+      curve shifted = x*x + c { color: primary, width: 3 }
+      point p1 = (1.2, 1.44 + c) { color: accent, r: 7 }
+      line t1 { through: p1, slope: 2.4, color: success, width: 2 }
+      label at (-3.3, 8.2) = "y = x² + ${c}" { color: primary }
+      label at (-3.3, 7.2) = "gradient at x = 1.2 is still 2.4" { color: success }
+      slider c { label: "the constant c" }
+    }
+
+    goal "Shift the curve and confirm the tangent never changes its slope" {
+      when: abs(c) > 1.4
+      hint: "Move it well away from zero. The curve rises, the steepness does not."
+    }
+  }
+
+  slide "Pinning the Constant Down" {
+    id: "ce3-pin"
+    cat: "Antiderivatives"
+    > Given one extra fact, the constant stops being unknown. If you know the curve
+    > passes through a particular point, substitute it and solve.
+    >
+    > A curve has gradient $\dfrac{dy}{dx} = 2x$ and passes through $(1, 5)$:
+    >
+    > $$y = x^2 + c \quad\Rightarrow\quad 5 = 1 + c \quad\Rightarrow\quad c = 4$$
+    >
+    > so $y = x^2 + 4$. That extra fact is called a **boundary condition**, and in
+    > mechanics it is almost always something like "it started from rest" or "it was
+    > thrown from a height of $2$ m".
+
+    numeric {
+      ask "A curve has $\dfrac{dy}{dx} = 3x^2$ and passes through $(2, 10)$. What is $c$?"
+      skill: "int-antiderivative"
+      answer: 2
+      expect: 10 - 2^3
+      tolerance: 0.01
+      hint "Integrate to get $y = x^3 + c$, then substitute the point."
+      ! "$10 = 8 + c$, so $c = 2$ and $y = x^3 + 2$. One point was all it took to single out one curve from the family."
+    }
+  }
+
+  slide "Standard Integrals" {
+    id: "ce3-standard"
+    cat: "The Table"
+    > Read the derivative table backwards and you have the integral table:
+    >
+    > $$\int \cos x\,dx = \sin x + c \qquad \int \sin x\,dx = -\cos x + c$$
+    > $$\int e^x\,dx = e^x + c \qquad \int \frac{1}{x}\,dx = \ln|x| + c$$
+    >
+    > Note where the minus lands. Differentiating cosine *produces* a minus, so
+    > integrating sine *needs* one to cancel it. If you are unsure, differentiate your
+    > answer and see whether the sign comes out right — it takes two seconds and is
+    > never ambiguous.
+
+    quiz {
+      ask "What is $\int \sin x\,dx$?"
+      skill: "int-antiderivative"
+      * "$-\cos x + c$"
+      - "$\cos x + c$" { why: "Differentiate that and you get $-\sin x$, not $\sin x$. The sign is out, so a minus is needed on the answer." }
+      - "$-\sin x + c$" { why: "Integrating should change which function you have, not just its sign. Sine integrates to a cosine." }
+      hint "Differentiate each option and see which one gives back $\sin x$."
+      ! "$\frac{d}{dx}(-\cos x) = -(-\sin x) = \sin x$. Correct. Checking by differentiating settles every sign question in this table."
+    }
+  }
+
+  slide "Definite Integrals" {
+    id: "ce3-definite"
+    cat: "The Table"
+    > Put limits on and you get a **number** rather than a family of functions, and
+    > the constant cancels itself:
+    >
+    > $$\int_a^b f(x)\,dx = F(b) - F(a)$$
+    >
+    > because the $+c$ appears in both terms and subtracts away. That is why you never
+    > write it on a definite integral.
+    >
+    > Geometrically this is the **area** under the curve between $a$ and $b$, with
+    > area below the axis counting as negative — the same signed-area idea that made
+    > displacement differ from distance in kinematics.
+
+    numeric {
+      ask "Evaluate $\int_0^3 2x\,dx$."
+      skill: "int-definite-integral"
+      answer: 9
+      expect: 3^2 - 0^2
+      tolerance: 0.01
+      hint "The antiderivative is $x^2$. Evaluate at $3$ and subtract its value at $0$."
+      ! "$[x^2]_0^3 = 9 - 0 = 9$. Check it geometrically: the region under $y = 2x$ from $0$ to $3$ is a triangle of base $3$ and height $6$, area $\tfrac12 \times 3 \times 6 = 9$."
+    }
+  }
+
+  slide "Both Directions" {
+    id: "ce3-synth"
+    cat: "The Table"
+    numeric {
+      ask "Evaluate $\int_1^2 3x^2\,dx$."
+      skill: "int-definite-integral"
+      answer: 7
+      expect: 2^3 - 1^3
+      tolerance: 0.01
+      hint "The antiderivative is $x^3$."
+      ! "$[x^3]_1^2 = 8 - 1 = 7$. And differentiating $x^3$ gives back $3x^2$, which is the check that the antiderivative was right in the first place."
+    }
+  }
+}

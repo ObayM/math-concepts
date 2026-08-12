@@ -1,0 +1,193 @@
+lesson "The Calculus of Motion" {
+  course: "pure-maths"
+  unit: "Calculus Essentials"
+  difficulty: "Advanced"
+  icon: "Play"
+  summary: "Where the suvat equations actually come from. Differentiate to go from position to velocity to acceleration, integrate to come back, and constant acceleration falls out."
+  skills: ["deriv-power-rule", "int-antiderivative", "intapp-accumulation"]
+
+  slide "One Ladder, Two Directions" {
+    id: "ce4-hook"
+    cat: "The Ladder"
+    > Velocity is how fast position changes. Acceleration is how fast velocity
+    > changes. Both of those sentences say "rate of change", and rate of change is
+    > exactly what a derivative is.
+    >
+    > $$s \xrightarrow{\ \frac{d}{dt}\ } v \xrightarrow{\ \frac{d}{dt}\ } a$$
+    >
+    > $$v = \frac{ds}{dt} \qquad a = \frac{dv}{dt} = \frac{d^2s}{dt^2}$$
+    >
+    > And integration climbs back down the ladder:
+    >
+    > $$a \xrightarrow{\ \int dt\ } v \xrightarrow{\ \int dt\ } s$$
+    >
+    > **Differentiate to go up, integrate to come down.** That is the whole
+    > relationship, and it makes every kinematics question a calculus question in
+    > disguise.
+
+    scene plane {
+      x: [-1, 11.5]
+      y: [-2.6, 3.2]
+      aspect: equal
+      axes: false
+      rect boxS = (0.4, -0.7) { w: 1.9, h: 1.4, color: primary, opacity: 0.3 }
+      rect boxV = (4.6, -0.7) { w: 1.9, h: 1.4, color: accent, opacity: 0.3 }
+      rect boxA = (8.8, -0.7) { w: 1.9, h: 1.4, color: success, opacity: 0.3 }
+      label at (1.35, -0.15) = "s" { anchor: middle, color: primary }
+      label at (5.55, -0.15) = "v" { anchor: middle, color: accent }
+      label at (9.75, -0.15) = "a" { anchor: middle, color: success }
+      vector d1 = (2.4, 0.9) -> (4.5, 0.9) { color: neutral, width: 3 }
+      vector d2 = (6.6, 0.9) -> (8.7, 0.9) { color: neutral, width: 3 }
+      vector i1 = (4.5, -0.9) -> (2.4, -0.9) { color: warning, width: 3 }
+      vector i2 = (8.7, -0.9) -> (6.6, -0.9) { color: warning, width: 3 }
+      label at (3.45, 1.5) = "differentiate" { anchor: middle, color: neutral }
+      label at (7.65, 1.5) = "differentiate" { anchor: middle, color: neutral }
+      label at (3.45, -1.9) = "integrate" { anchor: middle, color: warning }
+      label at (7.65, -1.9) = "integrate" { anchor: middle, color: warning }
+    }
+  }
+
+  slide "Going Up the Ladder" {
+    id: "ce4-differentiate"
+    cat: "The Ladder"
+    > If a particle's position is $s = 2t^3 - 5t^2 + 4t$ metres at time $t$ seconds,
+    > then differentiating gives its velocity and differentiating again gives its
+    > acceleration:
+    >
+    > $$v = \frac{ds}{dt} = 6t^2 - 10t + 4$$
+    > $$a = \frac{dv}{dt} = 12t - 10$$
+    >
+    > Notice this acceleration is **not constant** — it depends on $t$. The suvat
+    > equations would be useless here, which is exactly why calculus is the more
+    > general tool. Constant acceleration is a special case, not the rule.
+    >
+    > A question like "when is the particle at rest?" now becomes "solve $v = 0$",
+    > which is just algebra.
+
+    numeric {
+      ask "For $s = t^3 - 3t^2$, find the velocity at $t = 2$."
+      skill: "deriv-power-rule"
+      answer: 0
+      expect: 3*2^2 - 6*2
+      tolerance: 0.01
+      hint "$v = 3t^2 - 6t$, then substitute $t = 2$."
+      ! "$v = 3(4) - 6(2) = 0$. The particle is momentarily at rest at $t = 2$, which is exactly the sort of thing you find by setting $v = 0$."
+    }
+  }
+
+  slide "Coming Back Down" {
+    id: "ce4-integrate"
+    cat: "The Ladder"
+    > Going the other way needs the boundary conditions, because each integration
+    > brings a constant.
+    >
+    > A particle starts at the origin with velocity $3$ m/s and has acceleration
+    > $a = 4t$. Integrate once:
+    >
+    > $$v = \int 4t\,dt = 2t^2 + c$$
+    >
+    > At $t = 0$ the velocity is $3$, so $c = 3$ and $v = 2t^2 + 3$. Integrate again:
+    >
+    > $$s = \frac{2t^3}{3} + 3t + k$$
+    >
+    > and starting at the origin gives $k = 0$.
+    >
+    > **Every integration needs one fact to pin its constant.** Going from $a$ to $s$
+    > needs two, which is why these questions always tell you an initial velocity and
+    > an initial position.
+
+    order {
+      ask "Put the steps in order for finding $s$ from $a$, given the starting velocity and position."
+      skill: "int-antiderivative"
+      item "Integrate $a$ with respect to $t$ to get $v$, with a constant"
+      item "Use the initial velocity to find that constant"
+      item "Integrate $v$ to get $s$, with a second constant"
+      item "Use the initial position to find that one"
+      decoy "Integrate twice and ignore the constants"
+      ! "Pin each constant as soon as it appears. Carrying two unknowns through to the end is where these questions go wrong."
+    }
+  }
+
+  slide "Where suvat Comes From" {
+    id: "ce4-suvat"
+    cat: "Deriving suvat"
+    > Now the payoff. Set the acceleration to a **constant** $a$ and turn the handle.
+    >
+    > Integrate once, with velocity $u$ at $t = 0$:
+    >
+    > $$v = \int a\,dt = at + c \quad\Rightarrow\quad c = u \quad\Rightarrow\quad \boxed{v = u + at}$$
+    >
+    > There is the first suvat equation, derived rather than memorised. Integrate
+    > again, starting from $s = 0$:
+    >
+    > $$s = \int (u + at)\,dt = ut + \tfrac12 at^2 + k \quad\Rightarrow\quad k = 0 \quad\Rightarrow\quad \boxed{s = ut + \tfrac12at^2}$$
+    >
+    > And there is the second, with the $\tfrac12$ arriving from the power rule rather
+    > than from a triangle. Both pictures were right; this one shows *why* the
+    > $\tfrac12$ has to be there.
+    >
+    > The suvat equations are not separate laws. They are what these two integrals
+    > give when the acceleration happens to be constant.
+
+    quiz {
+      ask "Why do the suvat equations only work for constant acceleration?"
+      skill: "intapp-accumulation"
+      * "Because they come from integrating a constant $a$ — a varying $a$ integrates to something else entirely"
+      - "Because they were derived from graphs, and graphs need straight lines" { why: "The straight-line velocity graph is a *consequence* of constant acceleration, not the reason for the restriction. The restriction is in the integration." }
+      - "They work for any acceleration, provided you use an average" { why: "An average happens to work in special cases, but it is not generally true. With varying $a$ you must integrate the actual function." }
+      hint "What did we assume about $a$ when taking it out of the integral?"
+      ! "$\int a\,dt = at$ only when $a$ is constant. If $a$ depends on $t$ you get something quite different, and the suvat forms stop applying. That is precisely when you go back to integrating properly."
+    }
+  }
+
+  slide "A Varying Acceleration" {
+    id: "ce4-varying"
+    cat: "Deriving suvat"
+    > Here is a problem the mechanics unit could not have touched.
+    >
+    > A particle starts from rest with acceleration $a = 6t$ m/s². Constant-acceleration
+    > formulas are no help at all, but the calculus is unchanged:
+    >
+    > $$v = \int 6t\,dt = 3t^2 + c, \quad v = 0 \text{ at } t = 0 \Rightarrow c = 0$$
+    >
+    > so $v = 3t^2$.
+
+    numeric {
+      ask "With $a = 6t$ and starting from rest, what is the velocity at $t = 4$ seconds?"
+      skill: "int-antiderivative"
+      answer: 48
+      expect: 3*4^2
+      tolerance: 0.01
+      hint "$v = 3t^2$, then substitute $t = 4$."
+      ! "$3(16) = 48$ m/s. Using $v = u + at$ with $a = 6$ would have given $24$, which is wrong, because the acceleration was never $6$ — it was $6t$."
+    }
+  }
+
+  slide "Area Under a Velocity Graph" {
+    id: "ce4-area"
+    cat: "Deriving suvat"
+    > One last thread to tie off. Since $s = \int v\,dt$, the displacement between two
+    > times is
+    >
+    > $$s = \int_{t_1}^{t_2} v\,dt$$
+    >
+    > which is the **area under the velocity-time graph** — exactly what the
+    > kinematics unit claimed when it split the area into a rectangle and a triangle.
+    >
+    > It also explains why area below the axis counted as negative there. A definite
+    > integral is signed area, and negative velocity means travelling backwards, so
+    > the displacement genuinely decreases.
+    >
+    > The graph argument and the calculus argument were the same argument all along.
+
+    numeric {
+      ask "A particle has velocity $v = 2t$ m/s. How far does it travel between $t = 0$ and $t = 3$ seconds?"
+      skill: "intapp-accumulation"
+      answer: 9
+      expect: 3^2
+      tolerance: 0.01
+      hint "$s = \int_0^3 2t\,dt = [t^2]_0^3$."
+      ! "$9$ metres. Geometrically it is a triangle of base $3$ and height $6$, area $9$ — the same answer from the same fact, viewed two ways."
+    }
+  }
+}
