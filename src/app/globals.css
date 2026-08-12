@@ -50,6 +50,19 @@
   --color-accent-700: #7e22ce;
   --color-accent-800: #6b21a8;
 
+  --color-pair-1: #3b82f6;
+  --color-pair-1-soft: #eff6ff;
+  --color-pair-2: #f59e0b;
+  --color-pair-2-soft: #fffbeb;
+  --color-pair-3: #a855f7;
+  --color-pair-3-soft: #faf5ff;
+  --color-pair-4: #14b8a6;
+  --color-pair-4-soft: #f0fdfa;
+  --color-pair-5: #ec4899;
+  --color-pair-5-soft: #fdf2f8;
+  --color-pair-6: #6366f1;
+  --color-pair-6-soft: #eef2ff;
+
   --color-surface: #f5f5f7;
   --color-snow: #fafbfd;
   --color-snow-grid: #e9eef5;
