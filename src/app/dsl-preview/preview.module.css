@@ -112,22 +112,10 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: #22c55e;
-  animation: pulse 2s ease-in-out infinite;
 }
 
 .dotOff {
   background: #1e1e1e;
-  animation: none;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
 }
 
 .sceneWrap {

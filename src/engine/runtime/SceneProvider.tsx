@@ -20,6 +20,11 @@ const EASES: Record<string, (t: number) => number> = {
   easeInOut: (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2),
 };
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+}
+
 function initScope(ir: SceneIR): Scope {
   const scope: Scope = {};
   for (const [key, def] of Object.entries(ir.state)) {
@@ -109,6 +114,10 @@ export function SceneProvider({
   const animate = useCallback(
     (targets: Record<string, number>, duration = 600, ease = 'easeInOut') => {
       cancelRaf();
+      if (prefersReducedMotion()) {
+        setMany(targets);
+        return;
+      }
       const from: Record<string, number> = {};
       const cur = scopeRef.current;
       for (const k in targets) from[k] = typeof cur[k] === 'number' ? (cur[k] as number) : 0;
@@ -127,7 +136,7 @@ export function SceneProvider({
       };
       rafRef.current = requestAnimationFrame(tick);
     },
-    [ir, cancelRaf]
+    [ir, cancelRaf, setMany]
   );
 
   return <Ctx.Provider value={{ scope, set, setMany, animate, ir }}>{children}</Ctx.Provider>;

@@ -87,7 +87,7 @@ export default function DslPreview() {
   return (
     <div className={s.container}>
       <div className={s.bar}>
-        <div className={`${s.dot} ${!isLive ? s.dotOff : ''}`} />
+        <div className={`${s.dot} ${isLive ? 'animate-pulse' : s.dotOff}`} />
 
         <form className={s.fileForm} onSubmit={submit}>
           <input
