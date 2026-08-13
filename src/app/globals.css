@@ -153,6 +153,76 @@
   animation-delay: calc(var(--stagger-step) * --value(integer));
 }
 
+/* keyframes for the slide swap live outside @theme so they survive whether or
+   not a --animate-* token still references them */
+@keyframes vtSlideOutLeft {
+  to {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes vtSlideOutRight {
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+@keyframes vtSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+@keyframes vtSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+.slide-stage {
+  view-transition-name: slide;
+}
+
+/* where the browser can animate the outgoing slide, the enter-only class is
+   redundant and would double up with the transition */
+@supports (view-transition-name: none) {
+  .slide-stage {
+    animation: none;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-old(slide),
+::view-transition-new(slide) {
+  animation-duration: var(--duration-base);
+  animation-timing-function: var(--ease-entrance);
+  animation-fill-mode: both;
+}
+
+::view-transition-old(slide) {
+  animation-name: vtSlideOutLeft;
+}
+
+::view-transition-new(slide) {
+  animation-name: vtSlideInRight;
+}
+
+:root[data-slide-dir='left']::view-transition-old(slide) {
+  animation-name: vtSlideOutRight;
+}
+
+:root[data-slide-dir='left']::view-transition-new(slide) {
+  animation-name: vtSlideInLeft;
+}
+
 [data-drop-over='true'] {
   outline: 2px dashed var(--color-primary-400);
   outline-offset: 2px;
@@ -288,5 +358,12 @@
 
   .animate-pulse {
     animation: var(--animate-pulse) !important;
+  }
+
+  /* the blanket rule above matches elements, and these are pseudo-elements */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

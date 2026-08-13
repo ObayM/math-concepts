@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Sparkles, RotateCcw, Send, PencilLine } from 'lucide-react';
 
@@ -205,19 +206,38 @@ export default function LessonPlayer({
       .catch(() => setSaveError(true));
   };
 
+  // the old slide has to still be on screen to animate out, which only the view
+  // transition api can do. without it the swap is instant, exactly as before.
+  const runTransition = (dir, apply) => {
+    if (typeof document === 'undefined' || typeof document.startViewTransition !== 'function') {
+      setSlideDir(dir);
+      apply();
+      return;
+    }
+    const root = document.documentElement;
+    root.dataset.slideDir = dir;
+    const transition = document.startViewTransition(() => {
+      flushSync(() => {
+        setSlideDir(dir);
+        apply();
+      });
+    });
+    transition.finished.finally(() => {
+      delete root.dataset.slideDir;
+    });
+  };
+
   const handleNext = () => {
     const { state, complete } = nextFlow(slides, flow);
-    setSlideDir(flow.detour?.retry ? 'left' : 'right');
-    setFlow(state);
-    if (complete) {
-      markComplete();
-      setIsComplete(true);
-    }
+    runTransition(flow.detour?.retry ? 'left' : 'right', () => {
+      setFlow(state);
+      if (complete) setIsComplete(true);
+    });
+    if (complete) markComplete();
   };
 
   const handleBack = () => {
-    setSlideDir('left');
-    setFlow(backFlow(slides, flow));
+    runTransition('left', () => setFlow(backFlow(slides, flow)));
   };
 
   const handleCheck = () => {
@@ -472,7 +492,7 @@ export default function LessonPlayer({
           <div className="relative flex-1 overflow-y-auto px-10 py-6 max-md:px-4 max-md:py-4">
             <div
               key={currentKey}
-              className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
+              className={`slide-stage h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
             >
               <div className="mb-8">
                 <div className="flex items-center space-x-2 mb-3">
