@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, RotateCcw, Send } from 'lucide-react';
+import { Sparkles, RotateCcw, Send, PencilLine } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -21,7 +21,11 @@ import {
 
 import RichText from './RichText';
 import SlideView from './SlideView';
+import Scratchpad from './scratchpad/Scratchpad';
+import useScratchpad from './scratchpad/useScratchpad';
 import { exercises } from './exercises';
+
+const PAD_KEY = 'mathly-scratchpad-open';
 
 const getChecker = (s) => (s?.exercise ? (exercises[s.exercise.kind] ?? null) : null);
 
@@ -45,6 +49,15 @@ export default function LessonPlayer({
   const [saveError, setSaveError] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
 
+  const [padOpen, setPadOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem(PAD_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorQuery, setTutorQuery] = useState('');
   const [tutorTurns, setTutorTurns] = useState([]);
@@ -60,6 +73,28 @@ export default function LessonPlayer({
   const currentKey = slideKey(flow);
   const isLast = !inDetour && pathIndex === path.length - 1;
   const checker = getChecker(slide);
+
+  const pad = useScratchpad(lessonId, slide?.id, () => setSaveError(true));
+
+  const [padFits, setPadFits] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setPadFits(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  const showPad = padOpen && padFits;
+
+  const togglePad = () => {
+    setPadOpen((open) => {
+      const next = !open;
+      try {
+        localStorage.setItem(PAD_KEY, next ? '1' : '0');
+      } catch {}
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!lessonId) return;
@@ -355,8 +390,23 @@ export default function LessonPlayer({
     </>
   );
 
+  const padButton = (
+    <button
+      onClick={togglePad}
+      aria-pressed={showPad}
+      title="Scratchpad"
+      aria-label="Scratchpad"
+      className={`relative hidden lg:block rounded-xl p-2 transition-colors hover:bg-primary-50 ${showPad ? 'bg-primary-50 text-primary-600' : 'text-neutral-400 hover:text-primary-600'}`}
+    >
+      <PencilLine className="h-5 w-5" />
+      {pad.hasWork && !showPad && (
+        <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary-500" />
+      )}
+    </button>
+  );
+
   const mobileChrome = (
-    <div className="flex shrink-0 items-center gap-2 md:hidden">
+    <div className={`flex shrink-0 items-center gap-2 ${showPad ? '' : 'md:hidden'}`}>
       {streak !== null && (
         <div className="flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-sm font-bold text-orange-500">
           🔥 {streak}
@@ -376,190 +426,212 @@ export default function LessonPlayer({
           </button>
         </div>
       )}
-      <div className="absolute right-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10 max-md:hidden">
-        {lessonChrome}
-      </div>
-
-      <div className="card-hero animate-fade-in-up w-full max-w-4xl bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex flex-col relative max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]">
-        <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
-          <div
-            className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
-            role="progressbar"
-            aria-label="Lesson progress"
-            aria-valuemin={1}
-            aria-valuemax={path.length}
-            aria-valuenow={pathIndex + 1}
-            aria-valuetext={
-              inDetour
-                ? `Detour off slide ${pathIndex + 1} of ${path.length}`
-                : `Slide ${pathIndex + 1} of ${path.length}`
-            }
-          >
-            {path.map((_, idx) => (
-              <div
-                key={idx}
-                className={`flex-1 rounded-full transition-all duration-500 ${
-                  inDetour && idx === pathIndex
-                    ? 'bg-primary-200'
-                    : idx <= pathIndex
-                      ? 'bg-primary-500'
-                      : 'bg-neutral-200'
-                }`}
-              />
-            ))}
-          </div>
-          {mobileChrome}
+      {!showPad && (
+        <div className="absolute right-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10 max-md:hidden">
+          {lessonChrome}
         </div>
+      )}
 
-        <div className="relative flex-1 overflow-y-auto px-10 py-6 max-md:px-4 max-md:py-4">
-          <div
-            key={currentKey}
-            className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
-          >
-            <div className="mb-8">
-              <div className="flex items-center space-x-2 mb-3">
-                <span className="text-primary-500 font-bold text-sm tracking-wider uppercase">
-                  {inDetour ? 'Quick detour' : slide?.category || 'Concept'}
-                </span>
-              </div>
-              <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight">
-                {slide?.title}
-              </h1>
-            </div>
-
-            <div className="flex-1 w-full">
-              <SlideView
-                slide={slide}
-                value={answer}
-                checked={checked}
-                correct={correct}
-                onChange={handleAnswerChange}
-                goalsMet={goalsMet}
-                onScopeChange={handleScopeChange}
-              />
-              <div aria-live="polite" className="sr-only">
-                {checked &&
-                  correct !== null &&
-                  (correct ? 'Correct.' : 'Not quite. Review the explanation and try again.')}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4 max-md:px-4 max-md:py-3 max-md:pb-[calc(0.75rem+var(--safe-b))]">
-          <Button onClick={handleBack} variant="ghost" disabled={!canGoBack(flow)}>
-            Back
-          </Button>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setTutorOpen((o) => !o)}
-              className="text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
-              title="Ask AI Tutor"
-              aria-label="Ask AI Tutor"
+      <div
+        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-4xl'} transition-[max-width] duration-300 bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex relative max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
+      >
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
+            <div
+              className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
+              role="progressbar"
+              aria-label="Lesson progress"
+              aria-valuemin={1}
+              aria-valuemax={path.length}
+              aria-valuenow={pathIndex + 1}
+              aria-valuetext={
+                inDetour
+                  ? `Detour off slide ${pathIndex + 1} of ${path.length}`
+                  : `Slide ${pathIndex + 1} of ${path.length}`
+              }
             >
-              <Sparkles className="w-5 h-5" />
-            </button>
-
-            {checker && !checked ? (
-              <Button
-                onClick={handleCheck}
-                variant="primary"
-                disabled={!checker.isComplete(slide, answer)}
-              >
-                Check
-              </Button>
-            ) : (
-              <Button onClick={handleNext} variant="primary" disabled={!canAdvance}>
-                {nextLabel}
-              </Button>
-            )}
+              {path.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`flex-1 rounded-full transition-all duration-500 ${
+                    inDetour && idx === pathIndex
+                      ? 'bg-primary-200'
+                      : idx <= pathIndex
+                        ? 'bg-primary-500'
+                        : 'bg-neutral-200'
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              {padButton}
+              {mobileChrome}
+            </div>
           </div>
-        </div>
 
-        <div
-          className={`border-t border-neutral-100 bg-neutral-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
-        >
-          <div className="p-6 max-md:p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
-                <Sparkles className="h-4 w-4" />
-                AI Tutor
-              </p>
-              {tutorTurns.length > 0 && !tutorStreaming && (
-                <button
-                  onClick={() => {
-                    setTutorTurns([]);
-                    setTutorError(null);
-                  }}
-                  className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-primary-600"
+          <div className="relative flex-1 overflow-y-auto px-10 py-6 max-md:px-4 max-md:py-4">
+            <div
+              key={currentKey}
+              className={`h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
+            >
+              <div className="mb-8">
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="text-primary-500 font-bold text-sm tracking-wider uppercase">
+                    {inDetour ? 'Quick detour' : slide?.category || 'Concept'}
+                  </span>
+                </div>
+                <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight">
+                  {slide?.title}
+                </h1>
+              </div>
+
+              <div className="flex-1 w-full">
+                <SlideView
+                  slide={slide}
+                  value={answer}
+                  checked={checked}
+                  correct={correct}
+                  onChange={handleAnswerChange}
+                  goalsMet={goalsMet}
+                  onScopeChange={handleScopeChange}
+                />
+                <div aria-live="polite" className="sr-only">
+                  {checked &&
+                    correct !== null &&
+                    (correct ? 'Correct.' : 'Not quite. Review the explanation and try again.')}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4 max-md:px-4 max-md:py-3 max-md:pb-[calc(0.75rem+var(--safe-b))]">
+            <Button onClick={handleBack} variant="ghost" disabled={!canGoBack(flow)}>
+              Back
+            </Button>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setTutorOpen((o) => !o)}
+                className="text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
+                title="Ask AI Tutor"
+                aria-label="Ask AI Tutor"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+
+              {checker && !checked ? (
+                <Button
+                  onClick={handleCheck}
+                  variant="primary"
+                  disabled={!checker.isComplete(slide, answer)}
                 >
-                  <RotateCcw className="h-3 w-3" /> Start over
-                </button>
+                  Check
+                </Button>
+              ) : (
+                <Button onClick={handleNext} variant="primary" disabled={!canAdvance}>
+                  {nextLabel}
+                </Button>
               )}
             </div>
+          </div>
 
-            {tutorTurns.length > 0 && (
-              <div
-                ref={transcriptRef}
-                className="mb-3 max-h-72 space-y-3 overflow-y-auto pr-1"
-                aria-live="polite"
-              >
-                {tutorTurns.map((turn, i) =>
-                  turn.role === 'user' ? (
-                    <p
-                      key={i}
-                      className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
-                    >
-                      {turn.content}
-                    </p>
-                  ) : (
-                    <div
-                      key={i}
-                      className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
-                    >
-                      {turn.content ? (
-                        <RichText>{turn.content}</RichText>
-                      ) : (
-                        <span className="flex gap-1" aria-label="Thinking">
-                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
-                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:150ms]" />
-                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:300ms]" />
-                        </span>
-                      )}
-                    </div>
-                  )
+          <div
+            className={`border-t border-neutral-100 bg-neutral-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
+          >
+            <div className="p-6 max-md:p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
+                  <Sparkles className="h-4 w-4" />
+                  AI Tutor
+                </p>
+                {tutorTurns.length > 0 && !tutorStreaming && (
+                  <button
+                    onClick={() => {
+                      setTutorTurns([]);
+                      setTutorError(null);
+                    }}
+                    className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-primary-600"
+                  >
+                    <RotateCcw className="h-3 w-3" /> Start over
+                  </button>
                 )}
               </div>
-            )}
 
-            {tutorError && (
-              <p className="mb-3 text-sm font-medium text-danger-600" role="alert">
-                {tutorError}
-              </p>
-            )}
+              {tutorTurns.length > 0 && (
+                <div
+                  ref={transcriptRef}
+                  className="mb-3 max-h-72 space-y-3 overflow-y-auto pr-1"
+                  aria-live="polite"
+                >
+                  {tutorTurns.map((turn, i) =>
+                    turn.role === 'user' ? (
+                      <p
+                        key={i}
+                        className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
+                      >
+                        {turn.content}
+                      </p>
+                    ) : (
+                      <div
+                        key={i}
+                        className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
+                      >
+                        {turn.content ? (
+                          <RichText>{turn.content}</RichText>
+                        ) : (
+                          <span className="flex gap-1" aria-label="Thinking">
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:150ms]" />
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:300ms]" />
+                          </span>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
 
-            <div className="flex gap-2">
-              <input
-                value={tutorQuery}
-                onChange={(e) => setTutorQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
-                disabled={tutorStreaming}
-                placeholder={tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'}
-                aria-label="Ask the tutor"
-                className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
-              />
-              <Button
-                onClick={handleTutorAsk}
-                variant="primary"
-                size="sm"
-                disabled={tutorStreaming || !tutorQuery.trim()}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
+              {tutorError && (
+                <p className="mb-3 text-sm font-medium text-danger-600" role="alert">
+                  {tutorError}
+                </p>
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  value={tutorQuery}
+                  onChange={(e) => setTutorQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
+                  disabled={tutorStreaming}
+                  placeholder={
+                    tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'
+                  }
+                  aria-label="Ask the tutor"
+                  className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
+                />
+                <Button
+                  onClick={handleTutorAsk}
+                  variant="primary"
+                  size="sm"
+                  disabled={tutorStreaming || !tutorQuery.trim()}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+
+        {showPad && (
+          <Scratchpad
+            slideId={slide?.id}
+            notes={pad.notes}
+            strokes={pad.strokes}
+            onNotesChange={pad.setNotes}
+            onStrokesChange={pad.setStrokes}
+            onClose={togglePad}
+          />
+        )}
       </div>
     </div>
   );
