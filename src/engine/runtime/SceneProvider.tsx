@@ -20,6 +20,14 @@ const EASES: Record<string, (t: number) => number> = {
   easeInOut: (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2),
 };
 
+type Tween = {
+  from: number;
+  to: number;
+  start: number;
+  duration: number;
+  ease: (t: number) => number;
+};
+
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined') return false;
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -60,6 +68,7 @@ export function SceneProvider({
 }) {
   const [scope, setScope] = useState<Scope>(() => initScope(ir));
   const scopeRef = useRef(scope);
+  const tweensRef = useRef<Map<string, Tween>>(new Map());
   const rafRef = useRef<number | null>(null);
   const onScopeChangeRef = useRef(onScopeChange);
   useEffect(() => {
@@ -81,62 +90,86 @@ export function SceneProvider({
     onScopeChangeRef.current?.(scope);
   }, [scope]);
 
-  const cancelRaf = useCallback(() => {
-    if (rafRef.current != null) {
+  // scopeRef leads and the state mirrors it, so a set() followed synchronously
+  // by an animate() reads the value the user just produced, not last render's
+  const commit = useCallback((next: Scope) => {
+    scopeRef.current = next;
+    setScope(next);
+  }, []);
+
+  const stopTweens = useCallback((keys: Iterable<string>) => {
+    for (const k of keys) tweensRef.current.delete(k);
+    if (tweensRef.current.size === 0 && rafRef.current != null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
   }, []);
 
-  useEffect(() => cancelRaf, [cancelRaf]);
+  useEffect(
+    () => () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      tweensRef.current.clear();
+    },
+    []
+  );
 
-  // a manual set (drag/slider), kill any running tween so the user wins
+  // a manual set (drag/slider) drops that key's tween so the user wins
   const set = useCallback(
     (key: string, value: number | boolean | string) => {
-      cancelRaf();
-      setScope((prev) => ({ ...prev, [key]: clampVal(ir, key, value) }));
+      stopTweens([key]);
+      commit({ ...scopeRef.current, [key]: clampVal(ir, key, value) });
     },
-    [ir, cancelRaf]
+    [ir, commit, stopTweens]
   );
 
   const setMany = useCallback(
     (values: Record<string, number | boolean | string>) => {
-      setScope((prev) => {
-        const next = { ...prev };
-        for (const k in values) next[k] = clampVal(ir, k, values[k]);
-        return next;
-      });
+      stopTweens(Object.keys(values));
+      const next = { ...scopeRef.current };
+      for (const k in values) next[k] = clampVal(ir, k, values[k]);
+      commit(next);
     },
-    [ir]
+    [ir, commit, stopTweens]
   );
 
-  // tween numeric keys from where they are now to the targets
+  // tween numeric keys from where they are now to the targets. tweens are
+  // tracked per key, so retargeting one key leaves the others running instead
+  // of stranding them wherever the interrupted frame left them.
   const animate = useCallback(
     (targets: Record<string, number>, duration = 600, ease = 'easeInOut') => {
-      cancelRaf();
       if (prefersReducedMotion()) {
         setMany(targets);
         return;
       }
-      const from: Record<string, number> = {};
-      const cur = scopeRef.current;
-      for (const k in targets) from[k] = typeof cur[k] === 'number' ? (cur[k] as number) : 0;
       const easeFn = EASES[ease] ?? EASES.easeInOut;
       const start = performance.now();
+      const cur = scopeRef.current;
+      for (const k in targets) {
+        tweensRef.current.set(k, {
+          from: typeof cur[k] === 'number' ? (cur[k] as number) : 0,
+          to: targets[k],
+          start,
+          duration,
+          ease: easeFn,
+        });
+      }
+      if (rafRef.current != null) return;
 
       const tick = (now: number) => {
-        const p = duration <= 0 ? 1 : Math.min(1, (now - start) / duration);
-        const e = easeFn(p);
-        setScope((prev) => {
-          const next = { ...prev };
-          for (const k in targets) next[k] = clampVal(ir, k, from[k] + (targets[k] - from[k]) * e);
-          return next;
-        });
-        rafRef.current = p < 1 ? requestAnimationFrame(tick) : null;
+        const tweens = tweensRef.current;
+        const next = { ...scopeRef.current };
+        for (const [k, tw] of tweens) {
+          const p = tw.duration <= 0 ? 1 : Math.min(1, (now - tw.start) / tw.duration);
+          next[k] = clampVal(ir, k, tw.from + (tw.to - tw.from) * tw.ease(p));
+          if (p >= 1) tweens.delete(k);
+        }
+        commit(next);
+        rafRef.current = tweens.size ? requestAnimationFrame(tick) : null;
       };
       rafRef.current = requestAnimationFrame(tick);
     },
-    [ir, cancelRaf, setMany]
+    [ir, commit, setMany]
   );
 
   return <Ctx.Provider value={{ scope, set, setMany, animate, ir }}>{children}</Ctx.Provider>;

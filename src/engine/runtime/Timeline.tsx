@@ -53,10 +53,12 @@ export default function Timeline({ ir }: { ir: SceneIR }) {
   const goto = (target: number) => {
     const next = Math.max(0, Math.min(steps.length - 1, target));
     const targetState = foldTo(ir, next);
-    const step = steps[next];
+    // the step between i-1 and i describes that transition in both directions,
+    // so walking back undoes it with the same curve that played it
+    const step = next > idx ? steps[next] : steps[idx];
 
-    // only tween when moving forward; back/replay just snaps
-    if (next > idx && step) {
+    // a replay is a reset, not a rewind, so only single steps tween
+    if (Math.abs(next - idx) === 1 && step) {
       const nums: Record<string, number> = {};
       const rest: Record<string, number | boolean> = {};
       for (const k in targetState) {
