@@ -536,87 +536,89 @@ export default function LessonPlayer({
           </div>
 
           <div
-            className={`border-t border-neutral-100 bg-neutral-50/50 transition-all duration-300 ${tutorOpen ? 'h-auto' : 'h-0 overflow-hidden'}`}
+            className={`grid border-t border-neutral-100 bg-neutral-50/50 transition-[grid-template-rows] duration-300 ${tutorOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
           >
-            <div className="p-6 max-md:p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
-                  <Sparkles className="h-4 w-4" />
-                  AI Tutor
-                </p>
-                {tutorTurns.length > 0 && !tutorStreaming && (
-                  <button
-                    onClick={() => {
-                      setTutorTurns([]);
-                      setTutorError(null);
-                    }}
-                    className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-primary-600"
-                  >
-                    <RotateCcw className="h-3 w-3" /> Start over
-                  </button>
-                )}
-              </div>
-
-              {tutorTurns.length > 0 && (
-                <div
-                  ref={transcriptRef}
-                  className="mb-3 max-h-72 space-y-3 overflow-y-auto pr-1"
-                  aria-live="polite"
-                >
-                  {tutorTurns.map((turn, i) =>
-                    turn.role === 'user' ? (
-                      <p
-                        key={i}
-                        className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
-                      >
-                        {turn.content}
-                      </p>
-                    ) : (
-                      <div
-                        key={i}
-                        className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
-                      >
-                        {turn.content ? (
-                          <RichText>{turn.content}</RichText>
-                        ) : (
-                          <span className="flex gap-1" aria-label="Thinking">
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:150ms]" />
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:300ms]" />
-                          </span>
-                        )}
-                      </div>
-                    )
+            <div className="min-h-0 overflow-hidden">
+              <div className="p-6 max-md:p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
+                    <Sparkles className="h-4 w-4" />
+                    AI Tutor
+                  </p>
+                  {tutorTurns.length > 0 && !tutorStreaming && (
+                    <button
+                      onClick={() => {
+                        setTutorTurns([]);
+                        setTutorError(null);
+                      }}
+                      className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-primary-600"
+                    >
+                      <RotateCcw className="h-3 w-3" /> Start over
+                    </button>
                   )}
                 </div>
-              )}
 
-              {tutorError && (
-                <p className="mb-3 text-sm font-medium text-danger-600" role="alert">
-                  {tutorError}
-                </p>
-              )}
+                {tutorTurns.length > 0 && (
+                  <div
+                    ref={transcriptRef}
+                    className="mb-3 max-h-72 space-y-3 overflow-y-auto pr-1"
+                    aria-live="polite"
+                  >
+                    {tutorTurns.map((turn, i) =>
+                      turn.role === 'user' ? (
+                        <p
+                          key={i}
+                          className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
+                        >
+                          {turn.content}
+                        </p>
+                      ) : (
+                        <div
+                          key={i}
+                          className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
+                        >
+                          {turn.content ? (
+                            <RichText>{turn.content}</RichText>
+                          ) : (
+                            <span className="flex gap-1" aria-label="Thinking">
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:150ms]" />
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:300ms]" />
+                            </span>
+                          )}
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
 
-              <div className="flex gap-2">
-                <input
-                  value={tutorQuery}
-                  onChange={(e) => setTutorQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
-                  disabled={tutorStreaming}
-                  placeholder={
-                    tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'
-                  }
-                  aria-label="Ask the tutor"
-                  className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
-                />
-                <Button
-                  onClick={handleTutorAsk}
-                  variant="primary"
-                  size="sm"
-                  disabled={tutorStreaming || !tutorQuery.trim()}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+                {tutorError && (
+                  <p className="mb-3 text-sm font-medium text-danger-600" role="alert">
+                    {tutorError}
+                  </p>
+                )}
+
+                <div className="flex gap-2">
+                  <input
+                    value={tutorQuery}
+                    onChange={(e) => setTutorQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
+                    disabled={tutorStreaming}
+                    placeholder={
+                      tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'
+                    }
+                    aria-label="Ask the tutor"
+                    className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
+                  />
+                  <Button
+                    onClick={handleTutorAsk}
+                    variant="primary"
+                    size="sm"
+                    disabled={tutorStreaming || !tutorQuery.trim()}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
