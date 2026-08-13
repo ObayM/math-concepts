@@ -35,6 +35,7 @@ model User {
   auditEntries    AuditLog[]
   warmupSessions  WarmupSession[]
   warmupAnswers   WarmupAnswer[]
+  slideNotes      UserSlideNote[]
 
   @@map("user")
 }
@@ -126,10 +127,11 @@ model Lesson {
   updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")
   publishedAt     DateTime?     @map("published_at")
 
-  course   Course?              @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  author   User?                @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  progress UserLessonProgress[]
-  attempts LessonAttempt[]
+  course     Course?              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  author     User?                @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  progress   UserLessonProgress[]
+  attempts   LessonAttempt[]
+  slideNotes UserSlideNote[]
 
   @@index([courseId])
   @@index([status])
@@ -165,6 +167,22 @@ model UserLessonProgress {
 
   @@id([userId, lessonId])
   @@map("user_lesson_progress")
+}
+
+model UserSlideNote {
+  userId    String   @map("user_id")
+  lessonId  String   @map("lesson_id")
+  slideId   String   @map("slide_id")
+  notes     String   @default("")
+  strokes   Json?
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId, slideId])
+  @@index([userId, lessonId])
+  @@map("user_slide_notes")
 }
 
 model LessonAttempt {
