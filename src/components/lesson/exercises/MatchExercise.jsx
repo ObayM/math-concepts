@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
 import { hashStr, seededShuffle } from './shuffle';
+import { sameAnswer } from './answers';
 import { useTokenDrag, DragGhost } from './dnd';
 
 const PAIR = [
@@ -110,7 +111,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
           {ex.pairs.map((p, i) => {
             const hue = hueOf(i);
             const matched = matches[i] != null;
-            const isCorrect = checked && matches[i] === p.right;
+            const isCorrect = checked && sameAnswer(matches[i], p.right);
             const isWrong = checked && matched && !isCorrect;
             let cls = 'border-2 border-neutral-200 bg-white hover:border-neutral-300';
             if (matched) cls = `border-2 ${hue.box}`;
@@ -148,7 +149,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
             const owner = matches.findIndex((m) => m === text);
             const used = owner !== -1;
             const hue = used ? hueOf(owner) : null;
-            const isCorrect = checked && used && ex.pairs[owner].right === text;
+            const isCorrect = checked && used && sameAnswer(text, ex.pairs[owner].right);
             const isWrong = checked && used && !isCorrect;
             let cls = 'border-2 border-neutral-200 bg-white hover:border-neutral-300';
             if (used) cls = `border-2 ${hue.box}`;

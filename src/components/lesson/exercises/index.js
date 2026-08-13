@@ -10,6 +10,7 @@ import {
   distToPolyline,
   slope as slopeOf,
 } from '@/engine/checks/geometry';
+import { sameAnswer } from './answers';
 
 const sameSequence = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 
@@ -71,7 +72,8 @@ export const exercises = {
     initial: (slide) => new Array(slide.exercise.pairs.length).fill(null),
     isComplete: (slide, v) =>
       Array.isArray(v) && v.length === slide.exercise.pairs.length && v.every((x) => x != null),
-    check: (slide, v) => Array.isArray(v) && slide.exercise.pairs.every((p, i) => v[i] === p.right),
+    check: (slide, v) =>
+      Array.isArray(v) && slide.exercise.pairs.every((p, i) => sameAnswer(v[i], p.right)),
   },
   order: {
     initial: () => [],

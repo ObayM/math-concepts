@@ -82,4 +82,28 @@ describe('exercises.match', () => {
     expect(exercises.match.check(slide, ['2', '1'])).toBe(false);
     expect(exercises.match.check(slide, [null, null])).toBe(false);
   });
+
+  describe('when two left items share an answer', () => {
+    const shared = {
+      id: 'logs',
+      title: 'Logs',
+      exercise: {
+        kind: 'match',
+        pairs: [
+          { left: '$\\log_3 27$', right: '$3$' },
+          { left: '$\\log_{10} 1000$', right: '$3$ ' },
+        ],
+      },
+    };
+
+    it('takes either card for either item, so it is not a coin flip', () => {
+      expect(exercises.match.check(shared, ['$3$', '$3$ '])).toBe(true);
+      expect(exercises.match.check(shared, ['$3$ ', '$3$'])).toBe(true);
+    });
+
+    it('still refuses an answer that is genuinely wrong', () => {
+      expect(exercises.match.check(shared, ['$3$', '$4$'])).toBe(false);
+      expect(exercises.match.check(shared, ['$3$', null])).toBe(false);
+    });
+  });
 });
