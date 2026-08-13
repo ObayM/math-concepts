@@ -19,6 +19,7 @@ export const TIERS = {
   warmup: { max: 60, perMin: 60 },
   'warmup-export': { max: 5, perMin: 5 },
   progress: { max: 60, perMin: 60 },
+  notes: { max: 60, perMin: 60 },
   activity: { max: 60, perMin: 60 },
   profile: { max: 10, perMin: 10 },
   settings: { max: 10, perMin: 10 },
