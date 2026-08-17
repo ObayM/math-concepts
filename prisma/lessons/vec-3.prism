@@ -20,24 +20,26 @@ lesson "Adding and Scaling Vectors" {
     >
     > $$(3\mathbf{i} + 1\mathbf{j}) + (1\mathbf{i} + 3\mathbf{j}) = 4\mathbf{i} + 4\mathbf{j}$$
     >
-    > Drag the second vector and watch both stay in step.
+    > Drag the hollow handle, which is **b drawn from the origin**. The solid copy of
+    > b sitting on a's tip moves with it, because it is the same vector. That is the
+    > whole licence for tip-to-tail: sliding an arrow does not change it.
 
     scene plane {
-      x: [-2, 9]
-      y: [-2, 7]
+      x: [-4, 9]
+      y: [-3, 7]
       aspect: equal
       grid
       axes
       param bx = 1 { range: [-3, 5], step: 1 }
       param by = 3 { range: [-2, 5], step: 1 }
       vector a = (0, 0) -> (3, 1) { color: primary, width: 4 }
+      vector bAtOrigin = (0, 0) -> (bx, by) { color: accent, width: 2, style: dashed }
       vector b = (3, 1) -> (3 + bx, 1 + by) { color: accent, width: 4 }
       vector sum = (0, 0) -> (3 + bx, 1 + by) { color: success, width: 5 }
-      vector bAtOrigin = (0, 0) -> (bx, by) { color: accent, width: 2, style: dashed }
-      point tip = (3 + bx, 1 + by) { drag: xy -> (bx, by), color: neutral, r: 8, snap: 1 }
-      label at (-1.8, 6.4) = "a = 3i + j" { color: primary }
-      label at (-1.8, 5.6) = "b = ${bx}i + ${by}j" { color: accent }
-      label at (-1.8, 4.8) = "a + b = ${3 + bx}i + ${1 + by}j" { color: success }
+      point handle = (bx, by) { drag: xy -> (bx, by), color: neutral, r: 8, snap: 1 }
+      label at (-3.9, 6.4) = "a = 3i + j" { color: primary }
+      label at (-3.9, 5.6) = "b = ${bx}i + ${by}j" { color: accent }
+      label at (-3.9, 4.8) = "a + b = ${3 + bx}i + ${1 + by}j" { color: success }
     }
 
     goal "Choose a b that cancels a completely" {
