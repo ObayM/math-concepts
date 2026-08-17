@@ -23,13 +23,13 @@ function renderInline(text) {
     } else if (m[3] != null) {
       parts.push(
         <strong key={key++} className="font-bold text-neutral-900">
-          {m[3]}
+          {renderInline(m[3])}
         </strong>
       );
     } else if (m[4] != null) {
       parts.push(
         <em key={key++} className="italic text-neutral-800">
-          {m[4]}
+          {renderInline(m[4])}
         </em>
       );
     }
