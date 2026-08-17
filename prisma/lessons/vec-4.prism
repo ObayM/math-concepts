@@ -25,7 +25,7 @@ lesson "The Dot Product" {
     > and the biggest possible value. At right angles $\cos 90° = 0$ and the product
     > vanishes. Pointing oppositely gives $\cos 180° = -1$ and it goes negative.
     >
-    > Swing the second vector and watch the number.
+    > Swing the second vector, and stretch it too. Both dials feed the same number.
 
     scene plane {
       x: [-6, 6]
@@ -34,20 +34,109 @@ lesson "The Dot Product" {
       grid
       axes
       param th = 45 { range: [0, 180], step: 5 }
+      param bl = 3 { range: [0.5, 4], step: 0.1 }
       vector a = (0, 0) -> (4, 0) { color: primary, width: 4 }
-      vector b = (0, 0) -> (3*cos(rad(th)), 3*sin(rad(th))) { color: accent, width: 4 }
+      vector b = (0, 0) -> (bl*cos(rad(th)), bl*sin(rad(th))) { color: accent, width: 4 }
       arc ang = (0, 0) { r: 1.2, from: 0, to: th, color: neutral, width: 3 }
-      label at (-5.7, 4.4) = "angle between them: ${th}°" { color: neutral }
-      label at (-5.7, 3.5) = "a · b = ${4*3*cos(rad(th))}" { color: primary }
-      label at (-5.7, 2.6) = "they agree" { color: success, show: cos(rad(th)) > 0.02 }
-      label at (-5.7, 2.6) = "perpendicular: the product is zero" { color: warning, show: abs(cos(rad(th))) <= 0.02 }
-      label at (-5.7, 2.6) = "they oppose" { color: danger, show: cos(rad(th)) < 0 - 0.02 }
+      label at (-5.7, 4.4) = "|a| = 4  ·  |b| = ${bl}" { color: neutral }
+      label at (-5.7, 3.6) = "angle ${th}°" { color: neutral }
+      label at (-5.7, 2.8) = "a · b = ${4*bl*cos(rad(th))}" { color: primary }
+      label at (-5.7, 2) = "they agree" { color: success, show: cos(rad(th)) > 0.02 }
+      label at (-5.7, 2) = "perpendicular: zero" { color: warning, show: abs(cos(rad(th))) <= 0.02 }
+      label at (-5.7, 2) = "they oppose" { color: danger, show: cos(rad(th)) < 0 - 0.02 }
       slider th { label: "angle between the vectors" }
+      slider bl { label: "length of b" }
     }
 
     goal "Find the angle that makes the dot product exactly zero" {
       when: abs(cos(rad(th))) < 0.02
       hint: "Perpendicular. A right angle means no agreement at all."
+    }
+
+    goal "Now make the dot product zero a completely different way" {
+      when: bl < 0.55
+      hint: "If one of the vectors has no length, there is nothing to agree about."
+    }
+  }
+
+  slide "The Shadow One Vector Casts on the Other" {
+    id: "v4-projection"
+    cat: "Two Formulas"
+    > Here is the picture that makes $|\mathbf{a}||\mathbf{b}|\cos\theta$ stop being a
+    > formula and start being obvious.
+    >
+    > Shine a light straight down onto $\mathbf{a}$. The **shadow** $\mathbf{b}$ casts
+    > has length $|\mathbf{b}|\cos\theta$ — that is just the adjacent side of the right
+    > triangle. So
+    >
+    > $$\mathbf{a}\cdot\mathbf{b} = |\mathbf{a}| \times (\text{the shadow of } \mathbf{b} \text{ on } \mathbf{a})$$
+    >
+    > The dot product asks **how much of b goes a's way**, and then multiplies by how
+    > long $\mathbf{a}$ is. That is all it has ever asked.
+    >
+    > Swing $\mathbf{b}$ up towards the vertical and watch the shadow shrink to
+    > nothing. Push past that and it reappears on the *other side*, which is exactly
+    > where the minus sign comes from.
+
+    scene plane {
+      x: [-6.5, 7]
+      y: [-3, 5]
+      aspect: equal
+      grid
+      axes
+      param th = 50 { range: [0, 180], step: 1 }
+      param bl = 3.5 { range: [1, 4.5], step: 0.1 }
+      vector a = (0, 0) -> (5, 0) { color: primary, width: 8, opacity: 0.25 }
+      line shadow = (0, 0) -> (bl*cos(rad(th)), 0) { color: success, width: 8 }
+      line drop = (bl*cos(rad(th)), bl*sin(rad(th))) -> (bl*cos(rad(th)), 0) { color: neutral, style: dashed, width: 2 }
+      vector b = (0, 0) -> (bl*cos(rad(th)), bl*sin(rad(th))) { color: accent, width: 4 }
+      arc ang = (0, 0) { r: 1, from: 0, to: th, color: neutral, width: 2 }
+      label at (-6.4, 4.4) = "shadow = |b| cos ${th}° = ${bl*cos(rad(th))}" { color: success }
+      label at (-6.4, 3.6) = "a · b = 5 × ${bl*cos(rad(th))} = ${5*bl*cos(rad(th))}" { color: primary }
+      label at (-6.4, -2.4) = "the shadow has flipped to the far side, so the product is negative" { color: danger, show: cos(rad(th)) < 0 - 0.02 }
+      slider th { label: "swing b" }
+      slider bl { label: "length of b" }
+    }
+
+    goal "Swing b past the right angle until its shadow falls on the wrong side" {
+      when: cos(rad(th)) < 0 - 0.05
+      hint: "Past 90°. The shadow shrinks to zero first, then reappears pointing backwards."
+    }
+  }
+
+  slide "Both Formulas, One Number" {
+    id: "v4-two-formulas"
+    cat: "Two Formulas"
+    > The claim was that $a_1b_1 + a_2b_2$ and $|\mathbf{a}||\mathbf{b}|\cos\theta$ are
+    > the same number. Worth checking rather than believing.
+    >
+    > Drag either arrowhead. The top line multiplies components and adds; the bottom
+    > line multiplies lengths and scales by the angle. They never disagree.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5.5]
+      aspect: equal
+      grid
+      axes
+      param ax = 4 { range: [-5, 5], step: 1 }
+      param ay = 1 { range: [-4, 4], step: 1 }
+      param bx = 1 { range: [-5, 5], step: 1 }
+      param by = 3 { range: [-4, 4], step: 1 }
+      vector a = (0, 0) -> (ax, ay) { color: primary, width: 4 }
+      vector b = (0, 0) -> (bx, by) { color: accent, width: 4 }
+      point ta = (ax, ay) { drag: xy -> (ax, ay), color: primary, r: 8, snap: 1 }
+      point tb = (bx, by) { drag: xy -> (bx, by), color: accent, r: 8, snap: 1 }
+      label at (-5.9, -2.6) = "${ax}×${bx} + ${ay}×${by} = ${ax*bx + ay*by}" { color: primary }
+      label at (-5.9, -3.5) = "|a| = ${hypot(ax, ay)}  ·  |b| = ${hypot(bx, by)}" { color: accent }
+      label at (-5.9, -4.4) = "× cos ${deg(acos((ax*bx + ay*by)/(hypot(ax, ay)*hypot(bx, by))))}° = ${ax*bx + ay*by}" { color: accent, show: hypot(ax, ay) > 0.5 and hypot(bx, by) > 0.5 }
+      label at (-5.9, -4.4) = "give both arrows a length" { color: neutral, show: hypot(ax, ay) <= 0.5 or hypot(bx, by) <= 0.5 }
+      label at (-5.9, 4.8) = "perpendicular" { color: warning, show: ax*bx + ay*by == 0 and hypot(ax, ay) > 0.5 and hypot(bx, by) > 0.5 }
+    }
+
+    goal "Make the dot product exactly zero, with both vectors still having a length" {
+      when: ax*bx + ay*by == 0 and hypot(ax, ay) > 0.5 and hypot(bx, by) > 0.5
+      hint: "Swap the two components of one vector and negate one of them. 4 and 1 becomes -1 and 4."
     }
   }
 
