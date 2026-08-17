@@ -79,6 +79,7 @@ const COURSES = [
       'vec-3',
       'vec-4',
       'vec-5',
+      'vec-6',
       'calcess-1',
       'calcess-2',
       'calcess-3',

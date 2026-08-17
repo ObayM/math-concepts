@@ -1,0 +1,270 @@
+lesson "Resolving a Vector" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Intermediate"
+  icon: "Triangle"
+  summary: "The world hands you vectors as a size and an angle. Components are what you can actually calculate with, and one right triangle converts between them in both directions."
+  skills: ["vec-resolve", "vec-bearings", "vec-components"]
+
+  slide "Twenty Newtons, But Which Way?" {
+    id: "v6-hook"
+    cat: "Into Components"
+    > Nobody hands you a vector in $\mathbf{i}$ and $\mathbf{j}$ form. Real problems
+    > describe them the way a person would:
+    >
+    > > *a rope pulls with a force of $20$ N at $35°$ above the horizontal*
+    >
+    > That is a perfectly complete description. It is also useless for arithmetic,
+    > because you cannot add "$20$ N at $35°$" to "$14$ N at $80°$" by collecting like
+    > terms. Components you can add; angles you cannot.
+    >
+    > So the first move in almost every mechanics problem is the same: **turn the
+    > size-and-angle description into components.** The picture below is the whole
+    > method, and it is one right triangle.
+
+    scene plane {
+      x: [-1.2, 8]
+      y: [-1.6, 5.2]
+      aspect: equal
+      axes: false
+      vector f = (0, 0) -> (20*cos(rad(35))/4, 20*sin(rad(35))/4) { color: primary, width: 5 }
+      line across = (0, 0) -> (20*cos(rad(35))/4, 0) { color: warning, width: 5 }
+      line up = (20*cos(rad(35))/4, 0) -> (20*cos(rad(35))/4, 20*sin(rad(35))/4) { color: success, width: 5 }
+      arc ang = (0, 0) { r: 0.9, from: 0, to: 35, color: neutral, width: 2 }
+      label at (1.2, 0.35) = "35°" { color: neutral }
+      label at (2.4, 3.2) = "20 N" { color: primary }
+      label at (1.1, -0.75) = "across = 16.4 N" { color: warning }
+      label at (4.4, 1.4) = "up = 11.5 N" { color: success }
+    }
+
+    quiz {
+      ask "Why bother converting \"$20$ N at $35°$\" into components at all?"
+      skill: "vec-resolve"
+      * "Because components add separately, and angled descriptions cannot be added"
+      - "Because components are more accurate" { why: "They carry exactly the same information. Nothing is gained in accuracy, only in what you can do with it." }
+      - "Because forces must always be horizontal or vertical" { why: "Forces point wherever they like. Splitting one into a horizontal and a vertical part is a choice we make because it makes the algebra work, not a fact about the force." }
+      hint "What went wrong when you tried to add two forces given as sizes and angles?"
+      ! "Two horizontal numbers add. Two vertical numbers add. Two angles do not. That is the entire reason components exist."
+    }
+  }
+
+  slide "Drop a Perpendicular" {
+    id: "v6-resolve"
+    cat: "Into Components"
+    > Draw the vector, then drop a line straight down to the horizontal axis. You now
+    > have a right triangle whose **hypotenuse is the vector itself**.
+    >
+    > SOHCAHTOA does the rest. The horizontal part is the adjacent side and the
+    > vertical part is the opposite side, so
+    >
+    > $$a_x = |\mathbf{a}|\cos\theta \qquad a_y = |\mathbf{a}|\sin\theta$$
+    >
+    > $$\mathbf{a} = |\mathbf{a}|\cos\theta\,\mathbf{i} + |\mathbf{a}|\sin\theta\,\mathbf{j}$$
+    >
+    > There is nothing new here. It is the unit circle scaled up: on a circle of
+    > radius $1$ the point sat at $(\cos\theta, \sin\theta)$, and a vector of length
+    > $|\mathbf{a}|$ is that same point stretched by $|\mathbf{a}|$.
+    >
+    > Move both dials and watch the two components respond.
+
+    scene plane {
+      x: [-7.5, 8]
+      y: [-2, 7]
+      aspect: equal
+      grid
+      axes
+      param mag = 5 { range: [1, 7], step: 0.5 }
+      param th = 35 { range: [0, 90], step: 1 }
+      vector f = (0, 0) -> (mag*cos(rad(th)), mag*sin(rad(th))) { color: primary, width: 5 }
+      line across = (0, 0) -> (mag*cos(rad(th)), 0) { color: warning, width: 6 }
+      line up = (mag*cos(rad(th)), 0) -> (mag*cos(rad(th)), mag*sin(rad(th))) { color: success, width: 6 }
+      arc ang = (0, 0) { r: 0.8, from: 0, to: th, color: neutral, width: 2 }
+      label at (-7.4, 6.4) = "length ${mag} at ${th}°" { color: primary }
+      label at (-7.4, 5.5) = "across = ${mag} cos ${th}° = ${mag*cos(rad(th))}" { color: warning }
+      label at (-7.4, 4.6) = "up = ${mag} sin ${th}° = ${mag*sin(rad(th))}" { color: success }
+      slider mag { label: "magnitude" }
+      slider th { label: "angle above the horizontal" }
+    }
+
+    goal "Tilt it until the vertical part is bigger than the horizontal part" {
+      when: mag*sin(rad(th)) > mag*cos(rad(th))
+      hint: "Past 45° a vector climbs faster than it travels, whatever its length."
+    }
+  }
+
+  slide "Resolve One Yourself" {
+    id: "v6-numeric"
+    cat: "Into Components"
+    > A velocity of $12$ m/s at $60°$ above the horizontal.
+
+    numeric {
+      ask "What is the horizontal component, in m/s, to 2 decimal places?"
+      skill: "vec-resolve"
+      answer: 6
+      expect: 12*cos(rad(60))
+      tolerance: 0.02
+      hint "Horizontal is the adjacent side, so it takes the cosine: $12\cos 60°$."
+      onwrong: "v6-which-angle" retry
+      ! "$12\cos 60° = 12 \times 0.5 = 6$ m/s. The vertical component is $12\sin 60° \approx 10.39$ m/s, and notice it is the bigger of the two because $60°$ is a steep angle."
+    }
+  }
+
+  slide "Cos Goes With the Angle You Are Given" {
+    id: "v6-which-angle"
+    hidden: true
+    cat: "Into Components"
+    > "Horizontal always takes cos" is a rule that will betray you, because it is only
+    > true when the angle is measured **from the horizontal**.
+    >
+    > The reliable version: **cosine belongs to the side next to the angle**, whichever
+    > side that happens to be.
+    >
+    > Both arrows below are identical. The left one has its angle marked from the
+    > horizontal, the right one from the vertical. Same vector, and the two formulas
+    > come out swapped.
+
+    scene plane {
+      x: [-1.5, 11]
+      y: [-2.2, 6]
+      aspect: equal
+      axes: false
+      vector fL = (0, 0) -> (4*cos(rad(35)), 4*sin(rad(35))) { color: primary, width: 5 }
+      line baseL = (0, 0) -> (4, 0) { color: neutral, width: 2 }
+      line acrossL = (0, 0) -> (4*cos(rad(35)), 0) { color: warning, width: 5 }
+      line upL = (4*cos(rad(35)), 0) -> (4*cos(rad(35)), 4*sin(rad(35))) { color: success, width: 5 }
+      arc angL = (0, 0) { r: 1, from: 0, to: 35, color: neutral, width: 2 }
+      label at (1.15, 0.35) = "35°" { color: neutral }
+      label at (0, -1.1) = "angle from the horizontal" { color: neutral }
+      label at (0, -1.9) = "across = a cos 35°" { color: warning }
+
+      vector fR = (6.5, 0) -> (6.5 + 4*cos(rad(35)), 4*sin(rad(35))) { color: primary, width: 5 }
+      line vertR = (6.5, 0) -> (6.5, 4) { color: neutral, width: 2 }
+      line acrossR = (6.5, 0) -> (6.5 + 4*cos(rad(35)), 0) { color: warning, width: 5 }
+      line upR = (6.5 + 4*cos(rad(35)), 0) -> (6.5 + 4*cos(rad(35)), 4*sin(rad(35))) { color: success, width: 5 }
+      arc angR = (6.5, 0) { r: 1.2, from: 35, to: 90, color: neutral, width: 2 }
+      label at (6.7, 1.5) = "55°" { color: neutral }
+      label at (6.5, -1.1) = "same arrow, angle from the vertical" { color: neutral }
+      label at (6.5, -1.9) = "across = a sin 55°" { color: warning }
+    }
+
+    numeric {
+      ask "A force of $10$ N acts at $30°$ **to the vertical**. What is its horizontal component, in N?"
+      skill: "vec-resolve"
+      answer: 5
+      expect: 10*sin(rad(30))
+      tolerance: 0.02
+      hint "The horizontal side is now the one *opposite* the marked angle, so it takes the sine."
+      ! "$10\sin 30° = 5$ N. Measured from the vertical the roles swap, which is why sketching the triangle beats memorising which function goes where."
+    }
+  }
+
+  slide "Back the Other Way" {
+    id: "v6-reverse"
+    cat: "Out of Components"
+    > The conversion runs in both directions, and you have already met the return
+    > journey. Given the components, Pythagoras gives the size and the tangent gives
+    > the angle:
+    >
+    > $$|\mathbf{a}| = \sqrt{a_x^2 + a_y^2} \qquad \theta = \tan^{-1}\!\left(\frac{a_y}{a_x}\right)$$
+    >
+    > One warning that costs marks every year. $\tan^{-1}$ only ever returns an angle
+    > between $-90°$ and $90°$, so it cannot tell $(-3, -4)$ from $(3, 4)$. **Sketch
+    > the vector first**, see which quadrant it lands in, and correct the calculator's
+    > answer if it disagrees.
+    >
+    > Drag the arrowhead into each quadrant and watch what the readout does.
+
+    scene plane {
+      x: [-6, 6]
+      y: [-5, 5]
+      aspect: equal
+      grid
+      axes
+      param ax = 3 { range: [-5, 5], step: 1 }
+      param ay = 4 { range: [-4, 4], step: 1 }
+      vector a = (0, 0) -> (ax, ay) { color: primary, width: 5 }
+      line across = (0, 0) -> (ax, 0) { color: warning, width: 3, style: dashed }
+      line up = (ax, 0) -> (ax, ay) { color: success, width: 3, style: dashed }
+      point tip = (ax, ay) { drag: xy -> (ax, ay), color: accent, r: 9, snap: 1 }
+      arc ang = (0, 0) { r: 1.4, from: 0, to: mod(deg(atan2(ay, ax)), 360), color: neutral, width: 2 }
+      label at (-5.9, 4.2) = "${ax}i + ${ay}j" { color: primary }
+      label at (-5.9, 3.4) = "magnitude ${hypot(ax, ay)}" { color: accent }
+      label at (-5.9, 2.6) = "direction ${mod(deg(atan2(ay, ax)), 360)}°" { color: neutral }
+      label at (-5.9, -4.4) = "but tan⁻¹ alone says ${deg(atan(ay/ax))}°" { color: danger, show: ax < 0 }
+    }
+
+    goal "Put the arrow in the third quadrant, where tan⁻¹ alone gets it wrong" {
+      when: ax < 0 and ay < 0
+      hint: "Down and to the left. The true direction is past 180°, but tan⁻¹ never returns anything past 90°."
+    }
+  }
+
+  slide "Bearings Measure From North" {
+    id: "v6-bearings"
+    cat: "Out of Components"
+    > Navigation questions use **bearings**, and they follow different rules from
+    > everything above. A bearing is measured
+    >
+    > - from **north**, not from east,
+    > - **clockwise**, not anticlockwise,
+    > - and always written with three digits: $060°$, not $60°$.
+    >
+    > That flips the two formulas over. With $\theta$ a bearing, north is the
+    > $\mathbf{j}$ direction and east is $\mathbf{i}$, so
+    >
+    > $$\mathbf{a} = |\mathbf{a}|\sin\theta\,\mathbf{i} + |\mathbf{a}|\cos\theta\,\mathbf{j}$$
+    >
+    > Sine and cosine have traded places. Not a new formula, just the same right
+    > triangle with the angle marked at the other end.
+
+    scene plane {
+      x: [-9, 5]
+      y: [-4.5, 4.5]
+      aspect: equal
+      grid
+      axes
+      param bear = 60 { range: [0, 360], step: 5 }
+      param mag = 3 { range: [1, 4], step: 0.5 }
+      line northline = (0, 0) -> (0, 4.2) { color: neutral, style: dashed, width: 2 }
+      arc sweep = (0, 0) { r: 1.2, from: 90 - bear, to: 90, color: warning, width: 3 }
+      vector v = (0, 0) -> (mag*sin(rad(bear)), mag*cos(rad(bear))) { color: primary, width: 5 }
+      line east = (0, 0) -> (mag*sin(rad(bear)), 0) { color: warning, width: 4 }
+      line north = (mag*sin(rad(bear)), 0) -> (mag*sin(rad(bear)), mag*cos(rad(bear))) { color: success, width: 4 }
+      label at (0.25, 3.5) = "N" { color: neutral }
+      label at (-8.9, 4) = "bearing ${bear}°, distance ${mag}" { color: primary }
+      label at (-8.9, 3.2) = "east = ${mag} sin ${bear}° = ${mag*sin(rad(bear))}" { color: warning }
+      label at (-8.9, 2.4) = "north = ${mag} cos ${bear}° = ${mag*cos(rad(bear))}" { color: success }
+      slider bear { label: "bearing, clockwise from north" }
+      slider mag { label: "distance" }
+    }
+
+    goal "Set a bearing that takes you south-west" {
+      when: sin(rad(bear)) < 0 - 0.05 and cos(rad(bear)) < 0 - 0.05
+      hint: "South-west is between south and west, so somewhere between 180° and 270°."
+    }
+  }
+
+  slide "Two Legs of a Journey" {
+    id: "v6-synth"
+    cat: "Out of Components"
+    > This is what the whole lesson was for. A walker goes $6$ km on a bearing of
+    > $090°$ (due east), then $8$ km on a bearing of $000°$ (due north).
+    >
+    > Resolve each leg, add the components, and the resultant falls out:
+    >
+    > $$6\mathbf{i} + 8\mathbf{j}, \qquad \text{magnitude } \sqrt{36 + 64} = 10 \text{ km}$$
+    >
+    > Two angled descriptions could not be added. Two component descriptions added in
+    > one line.
+
+    numeric {
+      ask "The walker's resultant displacement is $6\mathbf{i} + 8\mathbf{j}$ km. What is the bearing of the finish from the start, in degrees to the nearest degree?"
+      skill: "vec-bearings"
+      answer: 37
+      expect: deg(atan2(6, 8))
+      tolerance: 1
+      hint "Bearing is measured from north, clockwise. You went $8$ north and $6$ east, so it is $\tan^{-1}(6/8)$ round from north."
+      ! "$\tan^{-1}(6/8) \approx 36.9°$, so a bearing of $037°$. Note it is $\tan^{-1}(\text{east}/\text{north})$, not the other way up, because bearings start at north."
+    }
+  }
+}
