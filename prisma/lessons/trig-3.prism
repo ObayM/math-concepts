@@ -62,6 +62,28 @@ lesson "Trig Identities" {
     >
     > $$\sin(a - b) = \sin a\cos b - \cos a\sin b$$
     > $$\cos(a - b) = \cos a\cos b + \sin a\sin b$$
+    >
+    > Do not take it on faith. The left bar below is $\sin(a+b)$, measured directly.
+    > The right bar is the formula's two pieces stacked on top of each other. Move
+    > either angle: the stack always comes out level with the bar.
+
+    scene plane {
+      x: [-0.2, 2.6]
+      y: [-0.5, 1.35]
+      grid
+      param a = 0.6 { range: [0, 1.5], step: 0.01 }
+      param b = 0.5 { range: [0, 1.5], step: 0.01 }
+      rect truth = (0.25, 0) { w: 0.55, h: sin(a+b), color: primary }
+      rect piece1 = (1.5, 0) { w: 0.55, h: sin(a)*cos(b), color: success }
+      rect piece2 = (1.5, sin(a)*cos(b)) { w: 0.55, h: cos(a)*sin(b), color: warning }
+      line level = (0.1, sin(a+b)) -> (2.5, sin(a+b)) { color: neutral, style: dashed, width: 2 }
+      label at (0.2, -0.35) = "sin(a+b) = ${sin(a+b)}" { color: primary }
+      label at (1.45, -0.35) = "the pieces add to ${sin(a)*cos(b) + cos(a)*sin(b)}" { color: neutral }
+      label at (1.55, sin(a)*cos(b)/2) = "sin a cos b" { color: success }
+      label at (1.55, sin(a)*cos(b) + cos(a)*sin(b)/2) = "cos a sin b" { color: warning }
+      slider a { label: "angle a" }
+      slider b { label: "angle b" }
+    }
 
     build {
       ask "Assemble the expansion of $\cos(a+b)$."
@@ -121,6 +143,40 @@ lesson "Trig Identities" {
     > All three are the same identity. You pick whichever leaves you with the
     > function you actually want — that flexibility is the whole reason for keeping
     > three versions around.
+    >
+    > And notice what doubling the angle actually does. It does **not** double the
+    > height. Drag the point and watch the two curves disagree.
+
+    scene plane {
+      x: [-0.2, 6.6]
+      y: [-2.4, 2.4]
+      grid
+      axes
+      param t = 0.6 { range: [0.05, 6.2], step: 0.01 }
+      curve truth = sin(2*x) { where: x > 0, color: primary, width: 3 }
+      curve wish = 2*sin(x) { where: x > 0, color: danger, width: 3, style: dashed }
+      line ceiling = (0, 1) -> (6.5, 1) { color: neutral, style: dotted, width: 2 }
+      line floor = (0, -1) -> (6.5, -1) { color: neutral, style: dotted, width: 2 }
+      line gap = (t, sin(2*t)) -> (t, 2*sin(t)) { color: neutral, width: 2 }
+      point A = (t, sin(2*t)) { drag: x -> t, color: primary, r: 8 }
+      point B = (t, 2*sin(t)) { color: danger, r: 8 }
+      label at (0.5, 2.15) = "sin 2x = ${sin(2*t)}  (twice as fast)" { color: primary }
+      label at (0.5, -2.15) = "2 sin x = ${2*sin(t)}  (twice as tall, and out of bounds)" { color: danger }
+      slider t { label: "walk along the curves" }
+    }
+
+    goal "Find a place where the two curves finally agree" {
+      when: abs(sin(2*t) - 2*sin(t)) < 0.05
+      hint: "They can only meet where both are zero. There is one such spot in the middle."
+    }
+  }
+
+  slide "Three Faces of the Same Identity" {
+    id: "t3-double-sort"
+    cat: "Double Angles"
+    > The dotted lines at $\pm 1$ are the giveaway: $2\sin x$ climbs straight past
+    > them, and no sine ever does that. Doubling the angle changes how *often* the
+    > wave repeats, never how *tall* it gets.
 
     sort {
       ask "Sort each expression by what it simplifies to."
@@ -133,11 +189,47 @@ lesson "Trig Identities" {
     }
   }
 
+  slide "What Does sin²x Even Look Like?" {
+    id: "t3-predict"
+    cat: "Double Angles"
+    > Before any algebra, a prediction. The grey dashed curve is $\sin x$, the one you
+    > already know. Now picture squaring every one of its heights.
+    >
+    > Squaring destroys every minus sign, so everything below the axis flips up. And
+    > squaring a number smaller than $1$ makes it *smaller*, so the humps shrink.
+    >
+    > Draw what you think is left, from $0$ to $2\pi$. Then check.
+
+    scene plane {
+      x: [-0.3, 6.7]
+      y: [-1.25, 1.5]
+      grid
+      axes
+      curve guide = sin(x) { where: x > 0, color: neutral, style: dashed, width: 2 }
+      reveal {
+        curve real = (1 - cos(2*x)) / 2 { color: primary, width: 4 }
+        label at (0.45, 1.33) = "a wave again: twice as fast, half as tall, lifted clear of the axis" { color: primary }
+      }
+    }
+
+    sketch curve {
+      ask "Sketch $\sin^2 x$ from $0$ to $2\pi$."
+      skill: "trig-double-angle"
+      near (0, 0)
+      near (1.57, 1)
+      near (3.14, 0)
+      near (4.71, 1)
+      near (6.28, 0)
+      tol: 0.45
+      hint "It can never dip below the axis, and it still touches zero everywhere $\sin x$ does."
+      ! "Two humps instead of one up-and-down, never negative, peaking at $1$. It is a wave again, which is the whole point of the next slide: a squared trig function is secretly a plain one."
+    }
+  }
+
   slide "Halving the Power" {
     id: "t3-power"
     cat: "Double Angles"
-    > Here is what those identities are genuinely **for**, and textbooks rarely say
-    > it out loud.
+    > You just drew a cosine wave without meaning to, and that is the identity.
     >
     > Rearrange $\cos 2a = 1 - 2\sin^2 a$:
     >
@@ -174,6 +266,27 @@ lesson "Trig Identities" {
     >
     > which works out to $\dfrac{\sqrt6 + \sqrt2}{4} \approx 0.966$ — an exact value
     > for an angle no one memorises.
+    >
+    > The picture is just the two known angles stacked. The green arc is $45°$, the
+    > orange one is a further $30°$ on top, and the blue ray lands on $75°$.
+
+    scene plane {
+      x: [-0.5, 1.6]
+      y: [-0.3, 1.35]
+      aspect: equal
+      grid
+      axes
+      circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
+      arc a45 = (0, 0) { r: 0.42, from: 0, to: 45, color: success, width: 5 }
+      arc a30 = (0, 0) { r: 0.55, from: 45, to: 75, color: warning, width: 5 }
+      line r45 = (0, 0) -> (cos(rad(45)), sin(rad(45))) { color: success, width: 2, style: dashed }
+      line r75 = (0, 0) -> (cos(rad(75)), sin(rad(75))) { color: primary, width: 3 }
+      line height = (cos(rad(75)), 0) -> (cos(rad(75)), sin(rad(75))) { color: primary, width: 4 }
+      point P = (cos(rad(75)), sin(rad(75))) { color: primary, r: 8 }
+      label at (0.5, 0.22) = "45°" { color: success }
+      label at (0.28, 0.6) = "+ 30°" { color: warning }
+      label at (0.34, 1.05) = "sin 75° = 0.966" { color: primary }
+    }
 
     numeric {
       ask "Work out $\sin 75°$ using $\sin(45° + 30°)$. Give your answer to 3 decimal places."
@@ -183,6 +296,44 @@ lesson "Trig Identities" {
       tolerance: 0.005
       hint "$\sin 45° = \cos 45° \approx 0.7071$, $\cos 30° \approx 0.8660$, $\sin 30° = 0.5$."
       ! "$0.7071 \times 0.8660 + 0.7071 \times 0.5 \approx 0.966$. Adding the sines instead would have given $1.207$, which is impossible for a sine."
+    }
+  }
+
+  slide "Two Waves Make One Wave" {
+    id: "t3-combine"
+    cat: "Using Them"
+    > One last thing the sum formulas buy you, and it is the one working engineers
+    > actually use.
+    >
+    > Add a sine and a cosine of the same angle and you do not get a lumpy mess. You
+    > get **another pure wave**, just stretched and shifted along:
+    >
+    > $$A\sin x + B\cos x = R\sin(x + \alpha), \qquad R = \sqrt{A^2 + B^2}$$
+    >
+    > That is $\sin(a+b) = \sin a\cos b + \cos a\sin b$ read backwards. Drag the two
+    > dials: the dashed waves add together, and what comes out is always a clean sine
+    > whose height is the hypotenuse of $A$ and $B$.
+
+    scene plane {
+      x: [-0.3, 6.7]
+      y: [-5.8, 5.8]
+      grid
+      axes
+      param A = 3 { range: [0, 4], step: 0.1 }
+      param B = 1 { range: [0, 4], step: 0.1 }
+      curve first = A*sin(x) { where: x > 0, color: success, style: dashed, width: 2 }
+      curve second = B*cos(x) { where: x > 0, color: warning, style: dashed, width: 2 }
+      curve total = A*sin(x) + B*cos(x) { where: x > 0, color: primary, width: 4 }
+      line amp = (0, sqrt(A*A + B*B)) -> (6.6, sqrt(A*A + B*B)) { color: neutral, style: dotted, width: 2 }
+      label at (0.5, 5.3) = "the two dashed waves add up to the solid one, peaking at ${sqrt(A*A + B*B)}" { color: primary }
+      label at (0.5, -5.2) = "green = A sin x   ·   orange = B cos x" { color: neutral }
+      slider A { label: "A, how much sine" }
+      slider B { label: "B, how much cosine" }
+    }
+
+    goal "Make the combined wave peak at exactly 5" {
+      when: abs(sqrt(A*A + B*B) - 5) < 0.05
+      hint: "R is the hypotenuse of A and B. Which famous pair of whole numbers gives 5?"
     }
   }
 

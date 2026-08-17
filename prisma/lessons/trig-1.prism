@@ -28,14 +28,14 @@ lesson "Radian Measure" {
       aspect: equal
       grid
       axes
-      param th = 0.6 { range: [0, 6.28], step: 0.01 }
+      param th = 0.6 { range: [-3.14, 3.14], step: 0.01 }
       circle unit = (0, 0) { r: 1, color: neutral, opacity: 0 }
       line radius = (0, 0) -> (1, 0) { color: warning, width: 5 }
-      arc swept = (0, 0) { r: 1, from: 0, to: deg(th), color: primary, width: 6 }
+      arc swept = (0, 0) { r: 1, from: 0, to: mod(deg(th), 360), color: primary, width: 6 }
       line ray = (0, 0) -> (cos(th), sin(th)) { color: neutral, width: 2 }
       point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary, r: 8 }
-      label at (0, 1.42) = "arc = ${th} radii, so the angle is ${th} rad" { anchor: middle, color: primary }
-      label at (0, -1.45) = "which is ${deg(th)}°" { anchor: middle, color: neutral }
+      label at (-1.85, 1.42) = "arc = ${mod(th, 6.2832)} radii, so the angle is ${mod(th, 6.2832)} rad" { color: primary }
+      label at (-1.85, -1.45) = "which is ${mod(deg(th), 360)}°" { color: neutral }
       slider th { label: "sweep the angle" }
     }
 
@@ -106,7 +106,45 @@ lesson "Radian Measure" {
     > arc is radius times angle. All the clutter in the degree version was conversion
     > factors, and choosing the right unit deleted them.
     >
-    > The area of a sector gets the same treatment: $A = \tfrac12 r^2\theta$.
+    > Both dials below are yours. Change the radius, change the angle, and watch the
+    > arc length follow.
+
+    scene plane {
+      x: [-3.2, 3.2]
+      y: [-3.2, 3.2]
+      aspect: equal
+      grid
+      axes
+      param r = 1.5 { range: [0.5, 3], step: 0.1 }
+      param th = 1 { range: [0.1, 6.28], step: 0.05 }
+      circle rim = (0, 0) { r: r, color: neutral, opacity: 0 }
+      line arm0 = (0, 0) -> (r, 0) { color: warning, width: 4 }
+      line arm1 = (0, 0) -> (r*cos(th), r*sin(th)) { color: warning, width: 4 }
+      arc swept = (0, 0) { r: r, from: 0, to: deg(th), color: primary, width: 7 }
+      point tip = (r*cos(th), r*sin(th)) { color: primary, r: 7 }
+      label at (-3.1, 2.9) = "r = ${r}" { color: warning }
+      label at (-3.1, 2.5) = "angle = ${th} rad" { color: warning }
+      label at (-3.1, 2.1) = "arc = ${r*th}" { color: primary }
+      slider r { label: "radius" }
+      slider th { label: "angle in radians" }
+    }
+
+    goal "Make the arc exactly 3 units long" {
+      when: abs(r*th - 3) < 0.06
+      hint: "More than one pair works. A small radius needs a big angle, and the other way round."
+    }
+  }
+
+  slide "Same Arc, Two Ways" {
+    id: "t1-arc-check"
+    cat: "Why Bother"
+    > Notice there was no single right answer up there. A radius of $3$ with an angle
+    > of $1$ gives the same arc as a radius of $1.5$ with an angle of $2$. The two
+    > dials trade off against each other, because $s$ is just their product.
+    >
+    > The area of a sector behaves the same way, with one extra factor of $r$:
+    >
+    > $$A = \tfrac12 r^2\theta$$
 
     numeric {
       ask "A circle has radius $6$ cm. What is the length of an arc subtending an angle of $1.5$ radians, in cm?"
