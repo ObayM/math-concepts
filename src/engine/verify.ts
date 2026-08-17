@@ -248,6 +248,29 @@ function checkBuild(slide: SlideIR, out: Finding[]) {
   }
 }
 
+function checkAlongDragRange(slide: SlideIR, out: Finding[]) {
+  const objects = slide.scene?.objects ?? [];
+  const circles = new Set(objects.filter((o) => o.type === 'circle').map((o) => o.id));
+
+  for (const o of objects) {
+    if (o.type !== 'point') continue;
+    const ref = o.draggable?.along?.ref;
+    if (!ref || !circles.has(ref)) continue;
+
+    const def = slide.scene?.state?.[o.draggable!.bind];
+    if (def?.type !== 'number') continue;
+    const { min, max } = def;
+    if (min == null && max == null) continue;
+    if ((min ?? -Math.PI) >= -Math.PI - 1e-6 && (max ?? Math.PI) <= Math.PI + 1e-6) continue;
+
+    out.push({
+      slideId: slide.id,
+      code: 'V_ALONG_RANGE',
+      message: `"${o.draggable!.bind}" is dragged along circle "${ref}", which writes an angle in (-π, π], but its range is [${min ?? '-inf'}, ${max ?? 'inf'}] — the clamp will jam the point instead of letting it round the circle. Declare [-3.14, 3.14] and display with mod(deg(...), 360)`,
+    });
+  }
+}
+
 function checkDetourReachable(lesson: LessonIR, out: Finding[]) {
   const targeted = new Set<string>();
   for (const s of lesson.slides) {
@@ -275,6 +298,7 @@ export function verifyLesson(lesson: LessonIR): Finding[] {
     checkMatchOrder(slide, out);
     checkSort(slide, out);
     checkBuild(slide, out);
+    checkAlongDragRange(slide, out);
   }
   checkDetourReachable(lesson, out);
   return out;

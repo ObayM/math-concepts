@@ -191,6 +191,40 @@ describe('build reachability', () => {
   });
 });
 
+describe('along-drag range', () => {
+  const scene = (range: string) =>
+    wrap(
+      `    scene plane {
+      x: [-2, 2]
+      y: [-2, 2]
+      param th = 0.6 { range: ${range}, step: 0.01 }
+      circle unit = (0, 0) { r: 1, color: neutral }
+      point P = (cos(th), sin(th)) { drag: along(unit) -> th, color: primary }
+    }`
+    );
+
+  it('flags a range the atan2 drag can never write', () => {
+    expect(codes(scene('[0, 6.28]'))).toContain('V_ALONG_RANGE');
+  });
+
+  it('accepts the range atan2 actually produces', () => {
+    expect(codes(scene('[-3.14, 3.14]'))).toEqual([]);
+  });
+
+  it('leaves a drag along a line segment alone', () => {
+    const src = wrap(
+      `    scene plane {
+      x: [-2, 2]
+      y: [-2, 2]
+      param t = 0.5 { range: [0, 1], step: 0.01 }
+      line seg = (-1, 0) -> (1, 0) { color: neutral }
+      point P = (0 - 1 + 2*t, 0) { drag: along(seg) -> t, color: primary }
+    }`
+    );
+    expect(codes(src)).toEqual([]);
+  });
+});
+
 describe('detour reachability', () => {
   it('flags a hidden slide nothing points at', () => {
     const src = `lesson "L" {
