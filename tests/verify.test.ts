@@ -225,6 +225,34 @@ describe('along-drag range', () => {
   });
 });
 
+describe('free-drag anchoring', () => {
+  const scene = (pos: string) =>
+    wrap(
+      `    scene plane {
+      x: [-6, 6]
+      y: [-6, 6]
+      param bx = 1 { range: [-3, 5], step: 1 }
+      param by = 3 { range: [-2, 5], step: 1 }
+      point h = ${pos} { drag: xy -> (bx, by), color: primary }
+    }`
+    );
+
+  it('flags a handle drawn at an offset from the params it writes', () => {
+    expect(codes(scene('(3 + bx, 1 + by)'))).toContain('V_DRAG_ANCHOR');
+  });
+
+  it('accepts a handle drawn exactly at its binds', () => {
+    expect(codes(scene('(bx, by)'))).toEqual([]);
+  });
+
+  it('flags only the axis that actually drifts', () => {
+    const found = verifyLesson(lessonSchema.parse(compileLesson(scene('(bx, 1 + by)'))));
+    expect(found.map((f) => f.code)).toEqual(['V_DRAG_ANCHOR']);
+    expect(found[0].message).toContain('y is not by');
+    expect(found[0].message).not.toContain('x is not');
+  });
+});
+
 describe('detour reachability', () => {
   it('flags a hidden slide nothing points at', () => {
     const src = `lesson "L" {

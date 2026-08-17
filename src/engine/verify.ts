@@ -271,6 +271,30 @@ function checkAlongDragRange(slide: SlideIR, out: Finding[]) {
   }
 }
 
+function checkFreeDragAnchor(slide: SlideIR, out: Finding[]) {
+  for (const o of slide.scene?.objects ?? []) {
+    if (o.type !== 'point' || !o.draggable || o.draggable.along) continue;
+    const { axis, bind, bindY } = o.draggable;
+
+    const drifts: string[] = [];
+    if ((axis === 'x' || axis === 'xy') && !isBareRef(o.x, bind)) drifts.push(`x is not ${bind}`);
+    if (axis === 'y' && !isBareRef(o.y, bind)) drifts.push(`y is not ${bind}`);
+    if (axis === 'xy' && bindY && !isBareRef(o.y, bindY)) drifts.push(`y is not ${bindY}`);
+    if (!drifts.length) continue;
+
+    out.push({
+      slideId: slide.id,
+      code: 'V_DRAG_ANCHOR',
+      message: `point "${o.id}" writes the raw pointer position into its bind, but ${drifts.join(' and ')}, so the point re-renders away from the cursor on every drag. Draw the handle at exactly its bound params, or constrain it with along()`,
+    });
+  }
+}
+
+function isBareRef(expr: unknown, name: string): boolean {
+  const e = expr as { k?: string; name?: string } | null | undefined;
+  return e?.k === 'id' && e.name === name;
+}
+
 function checkDetourReachable(lesson: LessonIR, out: Finding[]) {
   const targeted = new Set<string>();
   for (const s of lesson.slides) {
@@ -299,6 +323,7 @@ export function verifyLesson(lesson: LessonIR): Finding[] {
     checkSort(slide, out);
     checkBuild(slide, out);
     checkAlongDragRange(slide, out);
+    checkFreeDragAnchor(slide, out);
   }
   checkDetourReachable(lesson, out);
   return out;
