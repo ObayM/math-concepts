@@ -10,9 +10,8 @@ lesson "Resolving a Vector" {
     id: "v6-hook"
     cat: "Into Components"
     > Nobody hands you a vector in $\mathbf{i}$ and $\mathbf{j}$ form. Real problems
-    > describe them the way a person would:
-    >
-    > > *a rope pulls with a force of $20$ N at $35°$ above the horizontal*
+    > describe them the way a person would: *a rope pulls with a force of $20$ N at
+    > $35°$ above the horizontal.*
     >
     > That is a perfectly complete description. It is also useless for arithmetic,
     > because you cannot add "$20$ N at $35°$" to "$14$ N at $80°$" by collecting like
