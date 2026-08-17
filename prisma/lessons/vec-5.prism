@@ -170,7 +170,44 @@ lesson "Position and Displacement" {
     > $$\mathbf{m} = \mathbf{a} + \tfrac12(\mathbf{b} - \mathbf{a}) = \tfrac12\mathbf{a} + \tfrac12\mathbf{b}$$
     >
     > That trick generalises. To get a third of the way along, use $\tfrac13$ instead,
-    > and the same reasoning handles any fraction you like.
+    > and the same reasoning handles any fraction you like:
+    >
+    > $$\mathbf{p} = \mathbf{a} + t(\mathbf{b} - \mathbf{a})$$
+    >
+    > Slide $t$ from $0$ to $1$ below. At $t = 0$ you are still at $A$, at $t = 1$ you
+    > have arrived at $B$, and every value in between is a point on the line. One
+    > expression describes the entire segment.
+
+    scene plane {
+      x: [-9, 10]
+      y: [-1.5, 8]
+      aspect: equal
+      grid
+      axes
+      param t = 0.3 { range: [0, 1], step: 0.05 }
+      point A = (2, 6) { color: primary, r: 8, label: "A(2, 6)" }
+      point B = (8, 2) { color: accent, r: 8, label: "B(8, 2)" }
+      line seg = (2, 6) -> (8, 2) { color: neutral, width: 2, style: dashed }
+      vector travelled = (2, 6) -> (2 + 6*t, 6 - 4*t) { color: success, width: 5 }
+      point P = (2 + 6*t, 6 - 4*t) { color: success, r: 9 }
+      label at (-8.9, 7.4) = "t = ${t}" { color: neutral }
+      label at (-8.9, 6.6) = "a + t(b - a) = ${2 + 6*t}i + ${6 - 4*t}j" { color: success }
+      label at (-8.9, 5.8) = "the midpoint" { color: primary, show: abs(t - 0.5) < 0.001 }
+      slider t { label: "fraction of the way from A to B" }
+    }
+
+    goal "Stop exactly halfway" {
+      when: abs(t - 0.5) < 0.001
+      hint: "Half of the journey from A to B, so t is 0.5."
+    }
+  }
+
+  slide "Halve and Add" {
+    id: "v5-midpoint-check"
+    cat: "Getting Between Points"
+    > At $t = \tfrac12$ the formula collapses to the familiar one:
+    >
+    > $$\mathbf{a} + \tfrac12(\mathbf{b} - \mathbf{a}) = \tfrac12\mathbf{a} + \tfrac12\mathbf{b} = \frac{\mathbf{a} + \mathbf{b}}{2}$$
 
     numeric {
       ask "$A$ has position vector $2\mathbf{i} + 6\mathbf{j}$ and $B$ has $8\mathbf{i} + 2\mathbf{j}$. What is the $\mathbf{i}$ component of the midpoint's position vector?"

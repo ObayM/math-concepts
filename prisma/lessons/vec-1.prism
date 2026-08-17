@@ -19,6 +19,27 @@ lesson "What a Vector Is" {
     >
     > You have been using vectors all through mechanics without the label. Every
     > force arrow was one.
+    >
+    > Below, every arrow is a $5$ km walk from the same front door. The **size** is
+    > identical in all of them and the dashed circle is every place you could possibly
+    > end up. Swing the direction round: the number $5$ never changes, and where you
+    > finish changes completely. That difference is the entire lesson.
+
+    scene plane {
+      x: [-7, 7]
+      y: [-6, 6]
+      aspect: equal
+      axes: false
+      param th = 40 { range: [0, 360], step: 5 }
+      circle reach = (0, 0) { r: 5, color: neutral, style: dashed, opacity: 0 }
+      vector walk = (0, 0) -> (5*cos(rad(th)), 5*sin(rad(th))) { color: primary, width: 5 }
+      point home = (0, 0) { color: neutral, r: 8 }
+      label at (-1.1, -0.9) = "front door" { color: neutral }
+      point end = (5*cos(rad(th)), 5*sin(rad(th))) { color: accent, r: 9 }
+      label at (-6.9, 5.4) = "distance walked: 5 km, always" { color: neutral }
+      label at (-6.9, 4.6) = "finishing at ${5*cos(rad(th))} east, ${5*sin(rad(th))} north" { color: accent }
+      slider th { label: "which way did you set off?" }
+    }
 
     sort {
       ask "Sort each quantity by whether it needs a direction to be fully described."
