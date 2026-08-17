@@ -62,7 +62,7 @@ lesson "Implicit Differentiation" {
       grid
       axes
       circle c = (0, 0) { r: 5, color: neutral, style: dashed }
-      param theta = 0.9 { range: [0, 6.28], step: 0.02 }
+      param theta = 0.9 { range: [-3.14, 3.14], step: 0.02 }
       point P = (5 * cos(theta), 5 * sin(theta)) { drag: along(c) -> theta, color: primary, r: 7, label: "(x, y)" }
       line tangent { through: P, slope: 0 - (5 * cos(theta)) / (5 * sin(theta)), color: accent, width: 2 }
       slider theta { label: "angle" }
