@@ -5,26 +5,43 @@ import { nextCookies } from 'better-auth/next-js';
 import { prisma } from './prisma';
 import { sendEmail } from './email';
 import { ac, roles, ROLES, ADMIN_ROLES } from './permissions';
+import { hostsForDomain } from './locale';
 
 const adminUserIds = (process.env.ADMIN_USER_IDS ?? '')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
 
-const trustedOrigins = [
-  ...new Set([
-    process.env.NEXT_PUBLIC_APP_URL,
-    process.env.BETTER_AUTH_URL,
-    ...(process.env.TRUSTED_ORIGINS ?? '').split(','),
-  ]),
-]
-  .map((url) => (url ?? '').trim().replace(/\/$/, ''))
+const appDomain = (process.env.APP_DOMAIN ?? '').trim();
+const cookieDomain = (process.env.COOKIE_DOMAIN ?? '').trim();
+
+const trustedOrigins = (process.env.TRUSTED_ORIGINS ?? '')
+  .split(',')
+  .map((url) => url.trim().replace(/\/$/, ''))
   .filter(Boolean);
+
+const allowedHosts = hostsForDomain(appDomain);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
 
+  ...(allowedHosts.length && {
+    baseURL: {
+      allowedHosts,
+      fallback: `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${allowedHosts[0]}`,
+      protocol: process.env.NODE_ENV === 'production' ? 'https' : 'auto',
+    },
+    trustedProxyHeaders: true,
+  }),
+
   ...(trustedOrigins.length && { trustedOrigins }),
+
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: Boolean(cookieDomain),
+      ...(cookieDomain && { domain: cookieDomain }),
+    },
+  },
 
   // better-auth rate limits by default in production only, and its defaults are
   // strict (3 per 10s on sign-in/sign-up). pin them here so the behaviour is a
