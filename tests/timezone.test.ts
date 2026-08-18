@@ -126,3 +126,16 @@ describe('localHour', () => {
     expect(localHour('Not/AZone', at)).toBe(localHour(undefined, at));
   });
 });
+
+describe('the day key is a database key, not display text', () => {
+  it('is always YYYY-MM-DD with western digits', () => {
+    for (const tz of ['UTC', 'Africa/Cairo', 'Asia/Riyadh', 'America/New_York']) {
+      expect(localDayKey(tz, new Date('2026-08-18T12:00:00Z'))).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  it('round-trips through Date without becoming Invalid Date', () => {
+    const key = localDayKey('Africa/Cairo', new Date('2026-08-18T12:00:00Z'));
+    expect(Number.isNaN(new Date(`${key}T00:00:00.000Z`).getTime())).toBe(false);
+  });
+});

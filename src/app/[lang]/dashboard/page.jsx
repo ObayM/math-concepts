@@ -193,7 +193,7 @@ const HeroContinue = ({ course, nextLesson, completed }) => {
             <p className="mt-4 text-neutral-600 line-clamp-2">{nextLesson.description}</p>
           )}
         </div>
-        <div className="w-full shrink-0 sm:w-40 sm:text-right">
+        <div className="w-full shrink-0 sm:w-40 sm:text-end">
           <p className="text-3xl font-extrabold leading-none text-neutral-900">{progress}%</p>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-neutral-100">
             <div

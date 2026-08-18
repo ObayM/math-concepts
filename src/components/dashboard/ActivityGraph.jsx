@@ -7,6 +7,7 @@ const DAY_LABELS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa'];
 const dayKey = (d) => d.toISOString().slice(0, 10);
 
 function localToday(timezone) {
+  // en-CA is the YYYY-MM-DD serializer, not a display locale. see src/lib/timezone.ts
   const key = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone || undefined,
     year: 'numeric',

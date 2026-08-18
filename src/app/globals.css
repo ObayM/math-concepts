@@ -110,7 +110,7 @@
   @keyframes slideInRight {
     from {
       opacity: 0;
-      transform: translateX(40px);
+      transform: translateX(calc(40px * var(--dir)));
     }
     to {
       opacity: 1;
@@ -121,7 +121,7 @@
   @keyframes slideInLeft {
     from {
       opacity: 0;
-      transform: translateX(-40px);
+      transform: translateX(calc(-40px * var(--dir)));
     }
     to {
       opacity: 1;
@@ -131,6 +131,9 @@
 }
 
 :root {
+  /* flips every translateX in the slide transitions without duplicating a
+     single keyframe */
+  --dir: 1;
   --nav-h: 73px;
   --tab-h: 58px;
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -158,28 +161,28 @@
 @keyframes vtSlideOutLeft {
   to {
     opacity: 0;
-    transform: translateX(-40px);
+    transform: translateX(calc(-40px * var(--dir)));
   }
 }
 
 @keyframes vtSlideOutRight {
   to {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(calc(40px * var(--dir)));
   }
 }
 
 @keyframes vtSlideInRight {
   from {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(calc(40px * var(--dir)));
   }
 }
 
 @keyframes vtSlideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-40px);
+    transform: translateX(calc(-40px * var(--dir)));
   }
 }
 
@@ -287,8 +290,34 @@
   margin-bottom: var(--safe-b);
 }
 
+body {
+  font-family: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+}
+
 .font-display {
   font-family: var(--font-fraunces), ui-serif, Georgia, 'Times New Roman', serif;
+}
+
+/* fraunces has no arabic glyphs at all, so the display face has to change
+   outright rather than fall back */
+html[dir='rtl'] {
+  --dir: -1;
+}
+
+html[dir='rtl'] body {
+  font-family: var(--font-ar-body), var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* an arrow means "forward", and forward is leftwards here. `scale` is its own
+   property, so this composes with tailwind transform utilities instead of
+   overwriting them. */
+html[dir='rtl']
+  :is(.lucide-arrow-right, .lucide-arrow-left, .lucide-chevron-right, .lucide-chevron-left) {
+  scale: -1 1;
+}
+
+html[dir='rtl'] .font-display {
+  font-family: var(--font-ar-display), var(--font-nunito), ui-sans-serif, sans-serif;
 }
 
 .bg-app {

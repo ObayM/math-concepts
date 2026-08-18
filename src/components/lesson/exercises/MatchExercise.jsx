@@ -127,7 +127,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
                 disabled={checked}
                 aria-pressed={armed === i}
                 aria-label={matched ? `paired with ${matches[i]}` : undefined}
-                className={`p-4 rounded-2xl text-left font-bold transition-all flex items-center gap-3 active:scale-95 disabled:cursor-default ${cls}`}
+                className={`p-4 rounded-2xl text-start font-bold transition-all flex items-center gap-3 active:scale-95 disabled:cursor-default ${cls}`}
               >
                 <span
                   aria-hidden
@@ -162,7 +162,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
                 onClick={() => pickRight(text)}
                 disabled={checked}
                 aria-pressed={used}
-                className={`p-4 rounded-2xl text-left font-bold transition-all flex items-center gap-3 active:scale-95 disabled:cursor-default ${cls}`}
+                className={`p-4 rounded-2xl text-start font-bold transition-all flex items-center gap-3 active:scale-95 disabled:cursor-default ${cls}`}
               >
                 <span
                   aria-hidden

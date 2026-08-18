@@ -50,7 +50,7 @@ export default function Scratchpad({
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose();
       }}
-      className="flex w-[21rem] min-h-[32rem] shrink-0 flex-col border-l border-neutral-200 bg-neutral-50/60 p-4"
+      className="flex w-[21rem] min-h-[32rem] shrink-0 flex-col border-s border-neutral-200 bg-neutral-50/60 p-4"
     >
       <div className="mb-3 flex items-center justify-between">
         <div className="flex gap-1 rounded-xl bg-neutral-200/60 p-1">

@@ -9,7 +9,9 @@ const keyClass =
 
 export default function Keypad({ onPress, submitLabel = 'Check', className = '' }) {
   return (
-    <div className={clsx('select-none', className)}>
+    // grid flips its inline axis under rtl, which would deal the keys out
+    // 9-8-7. a numeric keypad reads left to right in every language.
+    <div dir="ltr" className={clsx('select-none', className)}>
       <div className="grid grid-cols-3 gap-2">
         {KEYS.map((key) => (
           <button

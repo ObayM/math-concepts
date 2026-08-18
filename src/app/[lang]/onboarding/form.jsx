@@ -107,12 +107,12 @@ export default function OnboardingForm() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g obay :)"
-              className="w-full pl-4 pr-10 py-2.5 bg-surface border border-neutral-200 rounded-xl text-neutral-900 font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full ps-4 pe-10 py-2.5 bg-surface border border-neutral-200 rounded-xl text-neutral-900 font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               maxLength={39}
               autoComplete="off"
               aria-describedby="username-hint"
             />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 end-0 pe-3 flex items-center pointer-events-none">
               {isChecking && <LoaderCircle className="h-5 w-5 text-neutral-400 animate-spin" />}
               {!isChecking && isAvailable === true && (
                 <Check className="h-6 w-6 text-success-500" />
@@ -129,7 +129,7 @@ export default function OnboardingForm() {
 
         {error && (
           <div
-            className="bg-danger-50 border-l-4 border-danger-400 text-danger-700 p-4 rounded-xl"
+            className="bg-danger-50 border-s-4 border-danger-400 text-danger-700 p-4 rounded-xl"
             role="alert"
           >
             <p className="font-bold">Error</p>

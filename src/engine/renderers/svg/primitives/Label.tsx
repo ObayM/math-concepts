@@ -28,10 +28,12 @@ export default function Label({ obj, scope, cx }: PrimProps) {
         overflow="visible"
       >
         <div
+          dir="ltr"
           style={{
             fontSize,
             color: resolveColor(obj.color ?? 'neutral'),
             whiteSpace: 'nowrap',
+            unicodeBidi: 'isolate',
             lineHeight: 1.35,
             display: 'inline-block',
             background: 'rgba(255, 255, 255, 0.82)',
@@ -45,9 +47,13 @@ export default function Label({ obj, scope, cx }: PrimProps) {
   }
 
   return (
+    // the scene is an ltr island whatever the page direction, so `start` keeps
+    // meaning the left edge and a label never reflows into its own diagram
     <text
       x={px}
       y={py}
+      direction="ltr"
+      style={{ unicodeBidi: 'isolate' }}
       textAnchor={obj.anchor ?? 'start'}
       fontSize={obj.fontSize ?? 16}
       fontWeight={600}

@@ -84,7 +84,7 @@ export default async function ProfilePage({ params }) {
                       </span>
                       <span className={`font-semibold ${tone.text}`}>
                         {mastery}%
-                        <span className="ml-2 font-normal text-neutral-400">{tone.label}</span>
+                        <span className="ms-2 font-normal text-neutral-400">{tone.label}</span>
                       </span>
                     </div>
                     <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">

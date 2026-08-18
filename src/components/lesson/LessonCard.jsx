@@ -52,7 +52,7 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
       </div>
 
       <div
-        className={`card-soft flex-1 mb-3 ml-3 rounded-xl border p-4 transition-colors ${
+        className={`card-soft flex-1 mb-3 ms-3 rounded-xl border p-4 transition-colors ${
           isLocked
             ? 'border-neutral-200 bg-white opacity-60'
             : 'border-neutral-200 bg-white group-hover:border-primary-200 group-hover:bg-primary-50'
@@ -92,7 +92,7 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
         </div>
 
         {difficulty && (
-          <p className="text-xs text-neutral-400 font-medium mt-2 ml-11">{difficulty}</p>
+          <p className="text-xs text-neutral-400 font-medium mt-2 ms-11">{difficulty}</p>
         )}
       </div>
     </div>

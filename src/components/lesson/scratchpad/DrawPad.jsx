@@ -176,7 +176,7 @@ export default function DrawPad({ strokes, onChange }) {
         <button
           onClick={clear}
           disabled={!strokes.length}
-          className="ml-auto flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-bold text-neutral-400 transition-colors hover:bg-danger-50 hover:text-danger-600 disabled:pointer-events-none disabled:opacity-40"
+          className="ms-auto flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-bold text-neutral-400 transition-colors hover:bg-danger-50 hover:text-danger-600 disabled:pointer-events-none disabled:opacity-40"
         >
           <Trash2 className="h-3.5 w-3.5" />
           Clear

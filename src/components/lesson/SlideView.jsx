@@ -58,14 +58,18 @@ export default function SlideView({
       {slide.prose && <RichText className={proseClass}>{slide.prose}</RichText>}
 
       {slide.scene && (
-        <Scene
-          ir={slide.scene}
-          onScopeChange={onScopeChange}
-          onTap={onTap}
-          marker={marker}
-          revealed={checked}
-          inputLayer={inputLayer}
-        />
+        // a diagram is left-to-right in every language: x grows rightwards and
+        // the axes are not mirrored, so the scene opts out of the page direction
+        <div dir="ltr">
+          <Scene
+            ir={slide.scene}
+            onScopeChange={onScopeChange}
+            onTap={onTap}
+            marker={marker}
+            revealed={checked}
+            inputLayer={inputLayer}
+          />
+        </div>
       )}
 
       {slide.goals && <GoalBanner goals={slide.goals} goalsMet={goalsMet} />}

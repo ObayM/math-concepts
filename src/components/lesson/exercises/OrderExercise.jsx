@@ -72,7 +72,7 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
               aria-label={
                 filled ? `position ${i + 1}, filled, tap to remove` : `position ${i + 1}, empty`
               }
-              className={`w-full min-h-12 px-4 py-2 rounded-xl border-2 flex items-center gap-3 text-left font-bold text-neutral-700 transition-all disabled:cursor-default ${cls}`}
+              className={`w-full min-h-12 px-4 py-2 rounded-xl border-2 flex items-center gap-3 text-start font-bold text-neutral-700 transition-all disabled:cursor-default ${cls}`}
             >
               <span className="text-neutral-400 text-sm shrink-0">{i + 1}.</span>
               {filled && <RichText>{bank[idx]}</RichText>}

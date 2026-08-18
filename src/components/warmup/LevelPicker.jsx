@@ -25,7 +25,7 @@ function LevelRow({ level }) {
           {level.blurb}
         </span>
       </span>
-      <span className="hidden shrink-0 text-right sm:block">
+      <span className="hidden shrink-0 text-end sm:block">
         {played ? (
           <>
             <span className="block text-sm font-extrabold tabular-nums text-neutral-800">
@@ -76,7 +76,7 @@ export default function LevelPicker({ overview, totals }) {
 
         {totals.answered > 0 && (
           <Card className="card-soft animate-fade-in-up mt-8 grid grid-cols-2 gap-6 p-6 opacity-0 [animation-delay:80ms] sm:grid-cols-4">
-            <Stat label="Answered" value={totals.answered.toLocaleString()} />
+            <Stat label="Answered" value={totals.answered.toLocaleString('en-US')} />
             <Stat label="Accuracy" value={`${totals.accuracy}%`} />
             <Stat label="Per question" value={formatPace(totals.pace)} />
             <Stat label="Sessions" value={totals.sessions} />

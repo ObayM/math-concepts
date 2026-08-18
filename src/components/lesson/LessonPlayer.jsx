@@ -420,7 +420,7 @@ export default function LessonPlayer({
     >
       <PencilLine className="h-5 w-5" />
       {pad.hasWork && !showPad && (
-        <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary-500" />
+        <span className="absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary-500" />
       )}
     </button>
   );
@@ -439,7 +439,7 @@ export default function LessonPlayer({
   return (
     <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden max-md:px-0 max-md:pb-0 max-md:items-stretch max-md:overflow-visible">
       {saveError && (
-        <div className="absolute left-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10 max-md:left-0 max-md:right-0 max-md:top-[var(--nav-h)] max-md:justify-center max-md:rounded-none">
+        <div className="absolute start-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10 max-md:start-0 max-md:end-0 max-md:top-[var(--nav-h)] max-md:justify-center max-md:rounded-none">
           Couldn&apos;t save your progress.
           <button onClick={handleRetrySave} className="underline hover:no-underline">
             Retry
@@ -447,7 +447,7 @@ export default function LessonPlayer({
         </div>
       )}
       {!showPad && (
-        <div className="absolute right-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10 max-md:hidden">
+        <div className="absolute end-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 z-10 max-md:hidden">
           {lessonChrome}
         </div>
       )}
@@ -581,21 +581,21 @@ export default function LessonPlayer({
                 {tutorTurns.length > 0 && (
                   <div
                     ref={transcriptRef}
-                    className="mb-3 max-h-72 space-y-3 overflow-y-auto pr-1"
+                    className="mb-3 max-h-72 space-y-3 overflow-y-auto pe-1"
                     aria-live="polite"
                   >
                     {tutorTurns.map((turn, i) =>
                       turn.role === 'user' ? (
                         <p
                           key={i}
-                          className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
+                          className="ms-auto w-fit max-w-[85%] rounded-2xl rounded-ee-sm bg-primary-600 px-4 py-2 text-sm font-medium text-white"
                         >
                           {turn.content}
                         </p>
                       ) : (
                         <div
                           key={i}
-                          className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
+                          className="w-fit max-w-[92%] rounded-2xl rounded-es-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
                         >
                           {turn.content ? (
                             <RichText>{turn.content}</RichText>

@@ -151,7 +151,7 @@ export default function Navbar() {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
+                  <div className="absolute end-0 mt-2 w-56 origin-top-end rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
                     <div className="py-1">
                       <div className="px-4 py-3 border-b border-neutral-100">
                         <p className="text-sm font-semibold text-neutral-900 truncate">
@@ -167,7 +167,7 @@ export default function Navbar() {
                         <Link
                           href={`/@${user.username}`}
                           onClick={() => setIsProfileOpen(false)}
-                          className="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50"
+                          className="block w-full px-4 py-2 text-start text-sm text-neutral-700 hover:bg-neutral-50"
                         >
                           Your Profile
                         </Link>
@@ -175,13 +175,13 @@ export default function Navbar() {
                       <Link
                         href="/settings"
                         onClick={() => setIsProfileOpen(false)}
-                        className="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50"
+                        className="block w-full px-4 py-2 text-start text-sm text-neutral-700 hover:bg-neutral-50"
                       >
                         Settings
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="text-danger-600 block w-full px-4 py-2 text-left text-sm hover:bg-neutral-50"
+                        className="text-danger-600 block w-full px-4 py-2 text-start text-sm hover:bg-neutral-50"
                       >
                         Log Out
                       </button>
@@ -216,7 +216,7 @@ export default function Navbar() {
             className="fixed inset-0 z-50 bg-black/30"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-black/5">
+          <div className="fixed inset-y-0 end-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-black/5">
             <div className="flex items-center justify-between">
               <Link href="/" className="-m-1.5 p-1.5" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="font-display text-2xl font-bold tracking-tight text-neutral-900">

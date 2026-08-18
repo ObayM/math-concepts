@@ -1,4 +1,4 @@
-import { Nunito, Fraunces } from 'next/font/google';
+import { fontVars } from '@/lib/fonts';
 import '../globals.css';
 import 'katex/dist/katex.min.css';
 import Navbar from '@/components/layout/navbar';
@@ -13,19 +13,6 @@ import { redirect, notFound } from 'next/navigation';
 import { LOCALES, DEFAULT_LOCALE, dirFor, isLocale } from '@/lib/locale';
 import { getOrigin, originForLocale, hasLocaleOrigins } from '@/lib/origin';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
-
-const nunito = Nunito({
-  variable: '--font-nunito',
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-});
-
-const fraunces = Fraunces({
-  variable: '--font-fraunces',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '900'],
-  display: 'swap',
-});
 
 export const viewport = {
   width: 'device-width',
@@ -101,9 +88,7 @@ export default async function RootLayout({ children, params }) {
 
   return (
     <html lang={lang} dir={dirFor(lang)} suppressHydrationWarning>
-      <body
-        className={`${nunito.variable} ${fraunces.variable} font-[family-name:var(--font-nunito)] antialiased`}
-      >
+      <body className={`${fontVars} antialiased`}>
         <LocaleProvider lang={lang}>
           <AuthProvider initialUser={userInfo}>
             <ServiceWorker />

@@ -1,9 +1,18 @@
 export const DEFAULT_TIMEZONE = 'UTC';
 
+// not a display locale. en-CA is the one common locale that formats YYYY-MM-DD,
+// and this output is a database key (user_daily_activity.activity_date) that
+// feeds streaks, the heatmap and the xp cap. localizing it yields arabic-indic
+// digits and every downstream `new Date(...)` becomes Invalid Date.
+const ISO_DAY_LOCALE = 'en-CA';
+
+// likewise fixed, chosen for hour12: false
+const HOUR24_LOCALE = 'en-GB';
+
 export function isValidTimeZone(tz: unknown): tz is string {
   if (typeof tz !== 'string' || !tz) return false;
   try {
-    new Intl.DateTimeFormat('en-CA', { timeZone: tz });
+    new Intl.DateTimeFormat(ISO_DAY_LOCALE, { timeZone: tz });
     return true;
   } catch {
     return false;
@@ -15,7 +24,7 @@ export function normalizeTimeZone(tz: unknown): string {
 }
 
 export function localDayKey(timezone?: string | null, at: Date = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', {
+  return new Intl.DateTimeFormat(ISO_DAY_LOCALE, {
     timeZone: normalizeTimeZone(timezone),
     year: 'numeric',
     month: '2-digit',
@@ -24,7 +33,7 @@ export function localDayKey(timezone?: string | null, at: Date = new Date()): st
 }
 
 export function localHour(timezone?: string | null, at: Date = new Date()): number {
-  const hour = new Intl.DateTimeFormat('en-GB', {
+  const hour = new Intl.DateTimeFormat(HOUR24_LOCALE, {
     timeZone: normalizeTimeZone(timezone),
     hour: '2-digit',
     hour12: false,

@@ -29,7 +29,7 @@ export default function TableExercise({ slide, value, checked, onChange }) {
       </RichText>
 
       <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden" />
+        <div className="pointer-events-none absolute inset-y-0 end-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden" />
         <div className="overflow-x-auto">
           <table className="border-collapse">
             {ex.header && (
@@ -38,7 +38,7 @@ export default function TableExercise({ slide, value, checked, onChange }) {
                   {ex.header.map((h, i) => (
                     <th
                       key={i}
-                      className="px-4 py-2 text-sm font-bold text-neutral-500 border-b border-neutral-200 text-left"
+                      className="px-4 py-2 text-sm font-bold text-neutral-500 border-b border-neutral-200 text-start"
                     >
                       <RichText>{h}</RichText>
                     </th>

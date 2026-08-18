@@ -91,7 +91,7 @@ export default function HistoryView({ level, levels, totals, trend, weakSpots, s
         ) : (
           <div className="animate-fade-in-up mt-6 space-y-6 opacity-0 [animation-delay:140ms]">
             <Card className="card-soft grid grid-cols-2 gap-6 p-6 sm:grid-cols-4">
-              <Stat label="Answered" value={totals.answered.toLocaleString()} />
+              <Stat label="Answered" value={totals.answered.toLocaleString('en-US')} />
               <Stat label="Accuracy" value={`${totals.accuracy}%`} />
               <Stat label="Per question" value={formatPace(totals.pace)} />
               <Stat label="Sessions" value={totals.sessions} />
@@ -121,7 +121,7 @@ export default function HistoryView({ level, levels, totals, trend, weakSpots, s
                       <span className="text-sm font-bold tabular-nums text-neutral-700">
                         {formatPace(fact.avgMs)}
                       </span>
-                      <span className="w-24 text-right text-xs tabular-nums text-neutral-400">
+                      <span className="w-24 text-end text-xs tabular-nums text-neutral-400">
                         {fact.misses > 0
                           ? `${fact.misses} of ${fact.attempts} missed`
                           : `${fact.attempts} seen`}
@@ -134,31 +134,31 @@ export default function HistoryView({ level, levels, totals, trend, weakSpots, s
 
             <Section title="Every session" hint={`${sessions.length} shown`}>
               <div className="-mx-2 overflow-x-auto px-2">
-                <table className="w-full min-w-[38rem] text-left text-sm">
+                <table className="w-full min-w-[38rem] text-start text-sm">
                   <thead>
                     <tr className={eyebrow}>
-                      <th className="py-2 pr-4 font-bold">When</th>
-                      <th className="py-2 pr-4 font-bold">Lvl</th>
-                      <th className="py-2 pr-4 font-bold">Answered</th>
-                      <th className="py-2 pr-4 font-bold">Right</th>
-                      <th className="py-2 pr-4 font-bold">Streak</th>
-                      <th className="py-2 pr-4 font-bold">Sat for</th>
-                      <th className="py-2 pr-4 font-bold">Answering</th>
+                      <th className="py-2 pe-4 font-bold">When</th>
+                      <th className="py-2 pe-4 font-bold">Lvl</th>
+                      <th className="py-2 pe-4 font-bold">Answered</th>
+                      <th className="py-2 pe-4 font-bold">Right</th>
+                      <th className="py-2 pe-4 font-bold">Streak</th>
+                      <th className="py-2 pe-4 font-bold">Sat for</th>
+                      <th className="py-2 pe-4 font-bold">Answering</th>
                       <th className="py-2 font-bold">Each</th>
                     </tr>
                   </thead>
                   <tbody className="tabular-nums text-neutral-600">
                     {sessions.map((session) => (
                       <tr key={session.id} className="border-t border-neutral-100">
-                        <td className="whitespace-nowrap py-2.5 pr-4 font-bold text-neutral-800">
+                        <td className="whitespace-nowrap py-2.5 pe-4 font-bold text-neutral-800">
                           {session.label}
                         </td>
-                        <td className="py-2.5 pr-4">{session.level}</td>
-                        <td className="py-2.5 pr-4">{session.answered}</td>
-                        <td className="py-2.5 pr-4">{session.accuracy}%</td>
-                        <td className="py-2.5 pr-4">{session.bestStreak}</td>
-                        <td className="py-2.5 pr-4">{formatDuration(session.durationMs)}</td>
-                        <td className="py-2.5 pr-4">{formatDuration(session.totalMs)}</td>
+                        <td className="py-2.5 pe-4">{session.level}</td>
+                        <td className="py-2.5 pe-4">{session.answered}</td>
+                        <td className="py-2.5 pe-4">{session.accuracy}%</td>
+                        <td className="py-2.5 pe-4">{session.bestStreak}</td>
+                        <td className="py-2.5 pe-4">{formatDuration(session.durationMs)}</td>
+                        <td className="py-2.5 pe-4">{formatDuration(session.totalMs)}</td>
                         <td className="py-2.5">{formatPace(session.pace)}</td>
                       </tr>
                     ))}

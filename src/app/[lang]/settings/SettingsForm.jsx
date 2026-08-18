@@ -96,7 +96,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
           >
             <span
               className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${
-                reminders ? 'left-6' : 'left-1'
+                reminders ? 'start-6' : 'start-1'
               }`}
             />
           </button>

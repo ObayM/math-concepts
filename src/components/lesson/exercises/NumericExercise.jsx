@@ -23,6 +23,9 @@ export default function NumericExercise({ slide, value, checked, correct, onChan
           <input
             type="text"
             inputMode="decimal"
+            // a number is ltr in every language; typing "-7" into an rtl field
+            // puts the minus on the wrong side
+            dir="ltr"
             value={text}
             disabled={checked}
             onChange={(e) => onChange(e.target.value)}
@@ -30,7 +33,7 @@ export default function NumericExercise({ slide, value, checked, correct, onChan
             className={`w-full p-4 rounded-2xl border-2 text-lg font-bold text-neutral-800 outline-none transition-all ${cls}`}
           />
           {ex.unit && (
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 font-bold pointer-events-none">
+            <span className="absolute end-4 top-1/2 -translate-y-1/2 text-neutral-400 font-bold pointer-events-none">
               {ex.unit}
             </span>
           )}

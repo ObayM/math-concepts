@@ -34,7 +34,7 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
                 aria-checked={isSelected}
                 disabled={checked}
                 onClick={() => !checked && onChange(idx)}
-                className={`w-full p-5 rounded-2xl text-left text-lg font-bold transition-all flex items-center justify-between active:scale-95 disabled:cursor-default ${cls}`}
+                className={`w-full p-5 rounded-2xl text-start text-lg font-bold transition-all flex items-center justify-between active:scale-95 disabled:cursor-default ${cls}`}
               >
                 <span
                   className={

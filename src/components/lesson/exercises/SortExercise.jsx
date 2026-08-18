@@ -116,7 +116,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
                 }}
                 disabled={checked}
                 aria-label={`${bin.label}, holds ${mine.length}. Pick an item first, then choose this bin.`}
-                className="text-left text-sm font-bold text-neutral-500 uppercase tracking-wide disabled:cursor-default"
+                className="text-start text-sm font-bold text-neutral-500 uppercase tracking-wide disabled:cursor-default"
               >
                 {bin.label}
               </button>
