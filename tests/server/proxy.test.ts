@@ -286,6 +286,21 @@ describe('the apex', () => {
     expect(res.status).toBe(405);
   });
 
+  it('redirects to the host the visitor typed, not the internal one', async () => {
+    const proxyAt = await apexProxy();
+    const res = proxyAt(
+      new NextRequest('http://internal:3000/', {
+        headers: {
+          host: 'internal:3000',
+          'x-forwarded-host': 'mathly.com',
+          'x-forwarded-proto': 'https',
+          'accept-language': 'ar',
+        },
+      })
+    );
+    expect(res.headers.get('location')).toBe('https://ar.mathly.com/');
+  });
+
   it('never redirects a real locale host', async () => {
     const proxyAt = await apexProxy();
     const res = proxyAt(

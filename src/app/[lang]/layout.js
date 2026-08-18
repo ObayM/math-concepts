@@ -10,7 +10,8 @@ import BottomNav from '@/components/layout/BottomNav';
 import ServiceWorker from '@/components/layout/ServiceWorker';
 import { headers } from 'next/headers';
 import { redirect, notFound } from 'next/navigation';
-import { LOCALES, dirFor, isLocale } from '@/lib/locale';
+import { LOCALES, DEFAULT_LOCALE, dirFor, isLocale } from '@/lib/locale';
+import { getOrigin, originForLocale, hasLocaleOrigins } from '@/lib/origin';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 
 const nunito = Nunito({
@@ -26,8 +27,6 @@ const fraunces = Fraunces({
   display: 'swap',
 });
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -35,29 +34,49 @@ export const viewport = {
   themeColor: '#ffffff',
 };
 
-export const metadata = {
-  metadataBase: new URL(appUrl),
-  title: {
-    default: 'Mathly — make math click',
-    template: '%s · Mathly',
-  },
-  description:
-    'Interactive math lessons you can drag, build and poke at, with a tutor that can see the question you are stuck on.',
-  applicationName: 'Mathly',
-  openGraph: {
-    type: 'website',
-    siteName: 'Mathly',
-    title: 'Mathly — make math click',
-    description:
-      'Interactive math lessons you can drag, build and poke at, with a tutor that can see the question you are stuck on.',
-    url: appUrl,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Mathly — make math click',
-    description: 'Interactive math lessons that respond to you.',
-  },
+const TITLE = {
+  en: 'Mathly — make math click',
+  ar: 'ماثلي — خلي الرياضيات تبان',
 };
+
+const DESCRIPTION = {
+  en: 'Interactive math lessons you can drag, build and poke at, with a tutor that can see the question you are stuck on.',
+  ar: 'دروس رياضيات تفاعلية تقدر تسحبها وتبنيها وتجرب فيها، ومعها مدرّس يشوف السؤال اللي واقف عنده.',
+};
+
+export async function generateMetadata({ params }) {
+  const { lang } = await params;
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const origin = await getOrigin();
+  const title = TITLE[locale];
+  const description = DESCRIPTION[locale];
+
+  return {
+    metadataBase: new URL(origin),
+    title: { default: title, template: '%s · Mathly' },
+    description,
+    applicationName: 'Mathly',
+    // without per-locale hosts every entry would resolve to the same url, which
+    // tells a crawler the two languages are the same page
+    ...(hasLocaleOrigins && {
+      alternates: {
+        languages: {
+          ...Object.fromEntries(LOCALES.map((l) => [l, `${originForLocale(l)}/`])),
+          'x-default': `${originForLocale(DEFAULT_LOCALE)}/`,
+        },
+      },
+    }),
+    openGraph: {
+      type: 'website',
+      siteName: 'Mathly',
+      locale,
+      title,
+      description,
+      url: origin,
+    },
+    twitter: { card: 'summary_large_image', title, description },
+  };
+}
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));

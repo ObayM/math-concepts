@@ -135,7 +135,13 @@ export function proxy(request) {
     }
     const locale = acceptedLocale(request);
     const url = request.nextUrl.clone();
-    url.host = `${locale}.${url.host}`;
+    // nextUrl carries the internal host, not the one the visitor typed. set
+    // hostname and port apart: the host setter keeps the old port when the new
+    // value has none
+    const [targetHost, targetPort = ''] = hostOf(request).split(':');
+    url.hostname = `${locale}.${targetHost}`;
+    url.port = targetPort;
+    url.protocol = request.headers.get('x-forwarded-proto') ?? url.protocol;
     const redirect = harden(NextResponse.redirect(url), nonce);
     redirect.cookies.set(LANG_COOKIE, locale, { path: '/', maxAge: 60 * 60 * 24 * 365 });
     return redirect;
