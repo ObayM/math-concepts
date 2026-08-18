@@ -71,13 +71,15 @@ export default function SlideView({
       {slide.goals && <GoalBanner goals={slide.goals} goalsMet={goalsMet} />}
 
       {Exercise && (
-        <Exercise
-          slide={slide}
-          value={value}
-          checked={checked}
-          correct={correct}
-          onChange={onChange}
-        />
+        <div data-feedback={checked ? (correct ? 'correct' : 'wrong') : undefined}>
+          <Exercise
+            slide={slide}
+            value={value}
+            checked={checked}
+            correct={correct}
+            onChange={onChange}
+          />
+        </div>
       )}
     </div>
   );
