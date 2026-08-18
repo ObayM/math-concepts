@@ -98,7 +98,7 @@ export default function ResetPasswordPage() {
           <p className="mt-2 text-sm text-neutral-500">Choose a new password for your account.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form method="post" onSubmit={handleSubmit} className="space-y-4">
           <PasswordInput
             id="password"
             name="password"

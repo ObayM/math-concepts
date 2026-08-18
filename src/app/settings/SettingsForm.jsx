@@ -126,7 +126,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
 
       <Card className="card-soft p-6">
         <h2 className="font-display text-xl font-bold text-neutral-900">Password</h2>
-        <form onSubmit={submitPassword} className="mt-5 space-y-4">
+        <form method="post" onSubmit={submitPassword} className="mt-5 space-y-4">
           <div>
             <label htmlFor="current" className="text-sm font-semibold text-neutral-700">
               Current password

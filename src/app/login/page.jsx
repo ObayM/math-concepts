@@ -70,7 +70,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-neutral-500">Sign in to access your account.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form method="post" onSubmit={handleSubmit} className="space-y-4">
           <Input
             id="email"
             name="email"

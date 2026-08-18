@@ -93,6 +93,7 @@ export default function OnboardingForm() {
   return (
     <div className="animate-fade-in-up w-full max-w-md mx-auto">
       <form
+        method="post"
         onSubmit={handleSubmit}
         className="bg-white border border-neutral-200 rounded-2xl p-8 space-y-6"
       >

@@ -59,7 +59,7 @@ export default function SignupPage() {
           <p className="mt-2 text-sm text-neutral-500">Join us and start your journey!</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form method="post" onSubmit={handleSubmit} className="space-y-4">
           <Input
             id="email"
             name="email"
