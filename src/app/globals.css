@@ -315,6 +315,15 @@
   font-size: 1.08em;
 }
 
+/* katex ships no direction of its own, so inside an rtl paragraph the bidi
+   algorithm reorders its inline spans and a formula comes out backwards.
+   isolate also keeps the neutrals around it (spaces, commas, a trailing full
+   stop) on the side the sentence expects. */
+.katex {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
 .card-soft {
   box-shadow:
     0 1px 2px rgba(15, 23, 42, 0.04),

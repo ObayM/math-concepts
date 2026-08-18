@@ -1,0 +1,94 @@
+lesson "المشتقة كميل" {
+  course: "foundations-ar"
+  unit: "المشتقات"
+  difficulty: "Beginner"
+  icon: "TrendingUp"
+  summary: "من القاطع إلى المماس: كيف يتحول متوسط معدل التغير إلى معدل لحظي، وماذا يعني ذلك بيانيًا."
+  skills: ["deriv-definition", "deriv-power-rule"]
+
+  slide "ميل بين نقطتين" {
+    id: "ar-d1-secant"
+    cat: "المشتقات"
+    > ميل الخط الواصل بين نقطتين على منحنى يعطيك **متوسط** معدل التغير بينهما.
+    > قرّب النقطتين من بعضهما ولاحظ ماذا يحدث للميل.
+    >
+    > الصيغة هي $\dfrac{f(1+h) - f(1)}{h}$. صغّر $h$ وسيقترب الميل من **2**، وهو
+    > معدل التغير اللحظي عند $x = 1$.
+
+    scene plane {
+      x: [-1, 4]
+      y: [-1, 9]
+      grid
+      axes
+      param h = 2 { range: [0.1, 3], step: 0.1 }
+      curve f = x^2 { color: primary, width: 3 }
+      point A = (1, 1) { color: success, r: 6, label: "x = 1" }
+      point B = (1 + h, (1 + h)^2) { color: accent, r: 6 }
+      line tangent { through: A, slope: 2, color: success, style: dashed, width: 2 }
+      line sec = (1, 1) -> (1 + h, (1 + h)^2) { color: accent, width: 2 }
+      label at (1.4, 8) = "secant = ${((1 + h)^2 - 1) / h}" { color: accent }
+      slider h { label: "h" }
+      button "شاهدها تصغر" { animate: { h: 0.1 }, dur: 1500, ease: easeInOut }
+    }
+
+    goal "صغّر h إلى أقل من 0.3 وشاهد القاطع يصير مماسًا" {
+      when: h < 0.3
+      hint: "اسحب المؤشر إلى أقصى اليسار، أو اضغط الزر."
+    }
+  }
+
+  slide "المشتقة دالة" {
+    id: "ar-d1-function"
+    cat: "المشتقات"
+    > المشتقة ليست رقمًا واحدًا فقط. عند كل قيمة لـ $x$ هناك ميل، وهذه الميول
+    > تكوّن دالة جديدة نسميها $f'(x)$.
+    >
+    > للدالة $f(x) = x^{2}$ تكون المشتقة $f'(x) = 2x$، وهي المنحنى المتقطع.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-6, 9]
+      grid
+      axes
+      param a = 1 { range: [-3, 3], step: 0.1 }
+      curve f = x^2 { color: primary, width: 3 }
+      curve fprime = 2*x { color: accent, width: 3, style: dashed }
+      point on_f = (a, a^2) { drag: x -> a, color: primary, r: 6 }
+      point on_fp = (a, 2*a) { color: accent, r: 6, label: "f'(a) = ${2*a}" }
+      slider a { label: "a" }
+    }
+  }
+
+  slide "قاعدة القوة" {
+    id: "ar-d1-power"
+    cat: "المشتقات"
+    > بدل حساب النهاية في كل مرة، هناك اختصار: مشتقة $x^{n}$ هي $n x^{n-1}$.
+
+    quiz {
+      ask "ما مشتقة $f(x) = x^{5}$؟"
+      skill: "deriv-power-rule"
+      - "$5x^{4}$ ثم نضيف ثابتًا" { why: "الثابت يظهر في التكامل، لا في الاشتقاق." }
+      * "$5x^{4}$"
+      - "$x^{4}$" { why: "نسيت ضرب الأس القديم في المقدمة." }
+      - "$4x^{5}$" { why: "الأس هو ما ينزل ويقل بواحد، لا المعامل." }
+      hint "أنزل الأس إلى الأمام، ثم أنقصه بواحد."
+      ! "بتطبيق القاعدة على n = 5: ينزل الأس 5 إلى الأمام ويصبح الأس 4، فتكون المشتقة 5x⁴."
+    }
+  }
+
+  slide "طبّقها" {
+    id: "ar-d1-numeric"
+    cat: "المشتقات"
+    > احسب ميلًا بعينه.
+
+    numeric {
+      ask "إذا كانت $f(x) = x^{3}$، فما قيمة $f'(2)$؟"
+      skill: "deriv-power-rule"
+      answer: 12
+      tolerance: 0.001
+      expect: 3 * 2^2
+      hint "المشتقة هي 3x²، ثم عوّض x = 2."
+      ! "مشتقة x³ هي 3x²، وعند x = 2 تكون 3 × 4 = 12."
+    }
+  }
+}

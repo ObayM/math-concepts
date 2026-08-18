@@ -115,6 +115,12 @@ function LessonRow({ lesson, courses }) {
           </Button>
         </Link>
 
+        <Link href={`/admin/preview/${lesson.id}`}>
+          <Button variant="outline" size="sm">
+            Preview
+          </Button>
+        </Link>
+
         {lesson.status === 'published' ? (
           <form action={unpublishLessonAction}>
             <input type="hidden" name="id" value={lesson.id} />

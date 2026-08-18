@@ -111,6 +111,14 @@ const COURSES = [
       'kin-4',
     ],
   },
+  {
+    name: 'الأساسيات',
+    slug: 'foundations-ar',
+    description: 'أساسيات التفاضل والتكامل، مشروحة بالعربية.',
+    lang: 'ar',
+    sortOrder: 3,
+    lessons: ['ar-limits-1', 'ar-deriv-1'],
+  },
 ];
 
 async function main() {

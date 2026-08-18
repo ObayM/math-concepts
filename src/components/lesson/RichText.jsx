@@ -17,9 +17,13 @@ function renderInline(text) {
   while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     if (m[1] != null) {
-      parts.push(<span key={key++} dangerouslySetInnerHTML={{ __html: tex(m[1], true) }} />);
+      parts.push(
+        <span key={key++} dir="ltr" dangerouslySetInnerHTML={{ __html: tex(m[1], true) }} />
+      );
     } else if (m[2] != null) {
-      parts.push(<span key={key++} dangerouslySetInnerHTML={{ __html: tex(m[2], false) }} />);
+      parts.push(
+        <span key={key++} dir="ltr" dangerouslySetInnerHTML={{ __html: tex(m[2], false) }} />
+      );
     } else if (m[3] != null) {
       parts.push(
         <strong key={key++} className="font-bold text-neutral-900">
@@ -39,7 +43,7 @@ function renderInline(text) {
   return parts;
 }
 
-export default function RichText({ children, className }) {
+export default function RichText({ children, className = '' }) {
   const text = typeof children === 'string' ? children : '';
   const cls = className ? `rich-text ${className}` : 'rich-text';
   const paragraphs = text.split(/\n\n+/);
@@ -56,6 +60,7 @@ export default function RichText({ children, className }) {
           return (
             <div
               key={i}
+              dir="ltr"
               className={i > 0 ? 'mt-5 text-center' : 'text-center'}
               dangerouslySetInnerHTML={{ __html: tex(dm[1], true) }}
             />

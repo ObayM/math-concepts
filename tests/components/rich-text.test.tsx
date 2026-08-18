@@ -35,3 +35,37 @@ describe('RichText', () => {
     expect(out).not.toContain('$$');
   });
 });
+
+describe('math inside right-to-left prose', () => {
+  // katex sets no direction of its own. without an ltr island the bidi
+  // algorithm reorders its spans and the formula renders backwards.
+  it('isolates every math span from the surrounding direction', () => {
+    const { container } = render(
+      <div dir="rtl">
+        <RichText>{'نكتبها $\\lim_{x \\to a} f(x) = L$ ومعناها'}</RichText>
+      </div>
+    );
+    const math = container.querySelector('span[dir="ltr"]');
+    expect(math).not.toBeNull();
+    expect(math?.querySelector('.katex')).not.toBeNull();
+  });
+
+  it('isolates display math too', () => {
+    const { container } = render(
+      <div dir="rtl">
+        <RichText>{'مقدمة\n\n$$x^2 + 1$$\n\nخاتمة'}</RichText>
+      </div>
+    );
+    expect(container.querySelector('div[dir="ltr"] .katex')).not.toBeNull();
+  });
+
+  it('leaves the arabic prose itself alone', () => {
+    const { container } = render(
+      <div dir="rtl">
+        <RichText>{'المشتقة تقيس معدل التغير'}</RichText>
+      </div>
+    );
+    expect(container.textContent).toContain('المشتقة تقيس معدل التغير');
+    expect(container.querySelector('span[dir="ltr"]')).toBeNull();
+  });
+});
