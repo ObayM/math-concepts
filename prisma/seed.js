@@ -116,11 +116,11 @@ const COURSES = [
 async function main() {
   const dir = path.join(__dirname, 'lessons');
 
-  for (const { name, slug, description, sortOrder, lessons } of COURSES) {
+  for (const { name, slug, description, sortOrder, lang = 'en', lessons } of COURSES) {
     const course = await prisma.course.upsert({
       where: { name },
       update: {},
-      create: { name, slug, description, sortOrder },
+      create: { name, slug, description, sortOrder, lang },
     });
 
     for (const [i, lessonKey] of lessons.entries()) {

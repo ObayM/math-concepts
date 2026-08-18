@@ -30,8 +30,17 @@ export function refreshLessonIr(lesson) {
   return { ...lesson, ...patch };
 }
 
-export async function getLessonByKey(lessonKey) {
-  return refreshLessonIr(await prisma.lesson.findUnique({ where: { lessonKey } }));
+// lessonKey is globally unique, so the language is a guard rather than part of
+// the lookup: the route ignores its own [course] segment, and this is what
+// stops an english url from serving an arabic lesson
+export async function getLessonByKey(lessonKey, lang) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { lessonKey },
+    include: { course: { select: { lang: true } } },
+  });
+  if (!lesson) return null;
+  if (lang && lesson.course && lesson.course.lang !== lang) return null;
+  return refreshLessonIr(lesson);
 }
 
 export async function getLessonById(id) {

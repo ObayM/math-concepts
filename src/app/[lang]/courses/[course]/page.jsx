@@ -8,9 +8,9 @@ import { resolveCourseBySlug, courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
 export default async function CoursePage({ params }) {
-  const { course: courseSlug } = await params;
+  const { course: courseSlug, lang } = await params;
 
-  const course = await resolveCourseBySlug(courseSlug);
+  const course = await resolveCourseBySlug(courseSlug, lang);
   if (!course) notFound();
 
   const session = await getFullSession();

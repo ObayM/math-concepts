@@ -7,11 +7,11 @@ import PracticeRunner from '@/components/lesson/PracticeRunner';
 import Button from '@/components/ui/Button';
 
 export default async function PracticePage({ params }) {
-  const { course: courseSlug } = await params;
+  const { course: courseSlug, lang } = await params;
   const user = await requireUser();
   if (!user) redirect('/login');
 
-  const course = await resolveCourseBySlug(courseSlug);
+  const course = await resolveCourseBySlug(courseSlug, lang);
   if (!course) notFound();
 
   const [pool, mastery] = await Promise.all([

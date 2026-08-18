@@ -112,7 +112,7 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) 
   const [lesson, timezone] = await Promise.all([
     prisma.lesson.findUnique({
       where: { lessonKey },
-      select: { id: true, status: true, publishedData: true },
+      select: { id: true, status: true, publishedData: true, course: { select: { lang: true } } },
     }),
     getUserTimeZone(userId),
   ]);
@@ -133,6 +133,7 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) 
         slideId,
         exerciseKind: slide.exercise.kind,
         skill,
+        lang: lesson.course?.lang ?? null,
         question: slide.exercise.prompt ?? slide.title ?? '',
         correct,
       },
@@ -170,7 +171,7 @@ export async function upsertLessonProgress(
   const [lesson, timezone] = await Promise.all([
     prisma.lesson.findUnique({
       where: { lessonKey },
-      select: { id: true, publishedData: true },
+      select: { id: true, publishedData: true, course: { select: { lang: true } } },
     }),
     getUserTimeZone(userId),
   ]);
@@ -203,6 +204,7 @@ export async function upsertLessonProgress(
             slideId: v.slideId,
             exerciseKind: v.kind,
             skill: v.skill,
+            lang: lesson.course?.lang ?? null,
             question: v.question,
             correct: v.correct,
           })),

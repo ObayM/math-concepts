@@ -4,9 +4,10 @@ import { prisma } from '@/lib/prisma';
 import { courseUrlSlug } from '@/lib/db/courseService';
 import Card from '@/components/ui/Card';
 
-export default async function CoursesPage() {
+export default async function CoursesPage({ params }) {
+  const { lang } = await params;
   const courses = await prisma.course.findMany({
-    where: { status: 'published' },
+    where: { status: 'published', lang },
     orderBy: { sortOrder: 'asc' },
     include: {
       _count: { select: { lessons: { where: { status: 'published' } } } },

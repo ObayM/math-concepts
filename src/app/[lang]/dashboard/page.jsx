@@ -44,7 +44,8 @@ function withLessonStatus(lessons, progressByLessonKey) {
   });
 }
 
-const DashboardPage = async () => {
+const DashboardPage = async ({ params }) => {
+  const { lang } = await params;
   const user = await requireUser();
   if (!user) redirect('/login');
 
@@ -54,7 +55,10 @@ const DashboardPage = async () => {
     getStreak(user.id, timezone),
     getActivityHeatmap(user.id),
     getTodayXp(user.id, timezone),
-    prisma.course.findMany({ where: { status: 'published' }, orderBy: { sortOrder: 'asc' } }),
+    prisma.course.findMany({
+      where: { status: 'published', lang },
+      orderBy: { sortOrder: 'asc' },
+    }),
     prisma.userLessonProgress.findMany({
       where: { userId: user.id },
       select: {

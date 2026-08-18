@@ -19,6 +19,7 @@ model User {
   reminderEmails  Boolean   @default(true) @map("reminder_emails")
   lastRemindedAt  DateTime? @map("last_reminded_at")
   timezone        String?
+  locale          String?
   banned          Boolean   @default(false)
   banReason       String?
   banExpires      DateTime?
@@ -97,6 +98,7 @@ model Course {
   name        String        @unique
   slug        String?       @unique
   description String?
+  lang        String        @default("en")
   status      ContentStatus @default(published)
   sortOrder   Int           @default(0) @map("sort_order")
   createdAt   DateTime      @default(now()) @map("created_at")
@@ -104,6 +106,7 @@ model Course {
 
   lessons Lesson[]
 
+  @@index([lang])
   @@map("courses")
 }
 
@@ -192,6 +195,7 @@ model LessonAttempt {
   slideId      String?  @map("slide_id")
   exerciseKind String?  @map("exercise_kind")
   skill        String?  @map("skill")
+  lang         String?  @map("lang")
   question     String
   correct      Boolean
   createdAt    DateTime @default(now()) @map("created_at")

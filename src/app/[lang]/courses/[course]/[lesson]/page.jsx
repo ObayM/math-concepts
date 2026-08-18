@@ -7,10 +7,10 @@ import { getLessonByKey, getNextLessonKey } from '@/lib/db/lessonService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
 export default async function LessonPage({ params, searchParams }) {
-  const { course, lesson: lessonSlug } = await params;
+  const { course, lesson: lessonSlug, lang } = await params;
   const { preview } = await searchParams;
 
-  const lessonRow = await getLessonByKey(lessonSlug);
+  const lessonRow = await getLessonByKey(lessonSlug, lang);
   if (!lessonRow) notFound();
 
   let wantsDraft = preview === 'draft';
