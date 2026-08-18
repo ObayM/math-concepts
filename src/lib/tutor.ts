@@ -1,4 +1,5 @@
 import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
+import { DEFAULT_LOCALE, type Locale } from './locale';
 
 export const MAX_QUESTION_CHARS = 500;
 export const MAX_HISTORY_TURNS = 6;
@@ -52,6 +53,20 @@ How to answer:
 - Write math with $...$ inline and $$...$$ on its own line. **bold** and *italic* work. Nothing else renders.
 - If they ask about something outside this slide's math, answer in one sentence and bring them back.
 - You cannot see their screen, run code, or change the lesson. Don't pretend otherwise.`;
+
+// arabic says the same thing in fewer words, so the english budget would let the
+// model ramble. the maths itself stays latin, matching how the lessons are written.
+const LOCALE_DIRECTIVE: Record<Locale, string> = {
+  en: '',
+  ar: `
+Answer in Arabic. Use simple Modern Standard Arabic, the way a confident student explains something to a friend: short sentences, second person, no classical flourishes and nothing that reads like a textbook.
+Keep every formula, variable and digit exactly as it appears in the lesson: latin letters, western numerals, inside $...$. Never transliterate maths into Arabic script and never switch to Arabic-Indic numerals.
+Stay under 60 words, which is the Arabic equivalent of the limit above.`,
+};
+
+export function tutorSystemPrompt(lang: Locale = DEFAULT_LOCALE): string {
+  return `${TUTOR_SYSTEM_PROMPT}${LOCALE_DIRECTIVE[lang] ?? ''}`;
+}
 
 export function sanitizeScope(
   slide: SlideIR | null | undefined,
@@ -237,10 +252,11 @@ export function renderContext(ctx: TutorContext): string {
 export function buildTutorRequest(
   ctx: TutorContext,
   history: unknown,
-  question: string
+  question: string,
+  lang: Locale = DEFAULT_LOCALE
 ): { instructions: string; messages: TutorTurn[] } {
   return {
-    instructions: `${TUTOR_SYSTEM_PROMPT}\n\n${renderContext(ctx)}`,
+    instructions: `${tutorSystemPrompt(lang)}\n\n${renderContext(ctx)}`,
     messages: [
       ...trimHistory(history),
       { role: 'user', content: question.slice(0, MAX_QUESTION_CHARS) },

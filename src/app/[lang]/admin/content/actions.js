@@ -37,9 +37,11 @@ export async function createCourseAction(formData) {
   const user = await requireContentPermission('create');
   const name = formData.get('name')?.toString().trim();
   const description = formData.get('description')?.toString().trim() || null;
+  const slug = formData.get('slug')?.toString().trim() || null;
+  const lang = formData.get('lang')?.toString().trim() || 'en';
   if (!name) throw new Error('Course name is required');
 
-  const course = await createCourse({ name, description });
+  const course = await createCourse({ name, description, slug, lang });
   await recordAudit({
     action: AUDIT.COURSE_CREATED,
     target: { type: 'course', id: course.id, label: course.name },

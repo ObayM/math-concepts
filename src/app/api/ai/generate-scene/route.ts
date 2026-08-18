@@ -6,6 +6,8 @@ import { consume, tooManyRequests } from '@/lib/rate-limit';
 import { SCENE_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compile, CompileError, formatCompileError } from '@/engine';
 import { toAIContext } from '@/engine/lang/docs';
+import { authoringDirective, REGISTERS } from '@/lib/ai-authoring';
+import { LOCALES } from '@/lib/locale';
 
 const INSTRUCTIONS = toAIContext();
 
@@ -13,6 +15,8 @@ const bodySchema = z.object({
   concept: z.string().min(1).max(300),
   difficulty: z.string().max(50).optional().default('intermediate'),
   context: z.string().max(4000).optional().default(''),
+  lang: z.enum(LOCALES).optional().default('en'),
+  register: z.enum(REGISTERS).optional().default('msa-simple'),
 });
 
 export async function POST(req: Request) {
@@ -28,7 +32,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const { concept, difficulty, context } = parsed.data;
+  const { concept, difficulty, context, lang, register } = parsed.data;
 
   let prism: string;
   try {
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
 Difficulty: ${difficulty}.${context ? `\nLesson context: ${context}` : ''}
 
 Make it genuinely interactive — the learner should manipulate something and see math respond.
-Return ONLY the Prism source. No markdown, no explanation.`,
+Return ONLY the Prism source. No markdown, no explanation.${authoringDirective(lang, register)}`,
       maxOutputTokens: 2048,
       abortSignal: AbortSignal.timeout(45_000),
     });

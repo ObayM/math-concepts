@@ -10,6 +10,7 @@ import {
   renderContext,
   sanitizeScope,
   trimHistory,
+  tutorSystemPrompt,
 } from '@/lib/tutor';
 
 const SOURCE = `
@@ -247,5 +248,27 @@ describe('buildTutorRequest', () => {
   it('truncates an over-long question', () => {
     const { messages } = buildTutorRequest(ctx, [], 'q'.repeat(MAX_QUESTION_CHARS + 500));
     expect(messages.at(-1)!.content).toHaveLength(MAX_QUESTION_CHARS);
+  });
+});
+
+describe('the tutor speaks the lesson language', () => {
+  it('adds nothing at all for english', () => {
+    expect(tutorSystemPrompt('en')).toBe(TUTOR_SYSTEM_PROMPT);
+  });
+
+  it('asks for arabic prose but keeps the maths latin', () => {
+    const prompt = tutorSystemPrompt('ar');
+    expect(prompt).toContain(TUTOR_SYSTEM_PROMPT);
+    expect(prompt).toMatch(/Answer in Arabic/);
+    expect(prompt).toMatch(/western numerals/i);
+    expect(prompt).toMatch(/never transliterate maths/i);
+  });
+
+  it('gives arabic its own word budget rather than reusing the english one', () => {
+    expect(tutorSystemPrompt('ar')).toMatch(/60 words/);
+  });
+
+  it('defaults to english when no language is passed', () => {
+    expect(tutorSystemPrompt()).toBe(TUTOR_SYSTEM_PROMPT);
   });
 });

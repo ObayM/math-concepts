@@ -191,6 +191,15 @@ export default async function AdminContentPage({ searchParams }) {
         <h2 className="text-sm font-bold text-neutral-700">New course</h2>
         <form action={createCourseAction} className="mt-3 flex flex-wrap gap-2">
           <Input name="name" placeholder="Course name" required />
+          <Input name="slug" placeholder="url slug (required if the name is not latin)" />
+          <select
+            name="lang"
+            defaultValue="en"
+            className="border border-neutral-300 px-2 py-1.5 text-sm"
+          >
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+          </select>
           <Input
             name="description"
             placeholder="Description (optional)"

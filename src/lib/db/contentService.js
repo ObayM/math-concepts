@@ -179,8 +179,12 @@ export async function moveLesson(id, direction) {
   return lesson.courseId;
 }
 
-async function generateUniqueCourseSlug(name) {
-  const base = slugify(name) || 'course';
+async function generateUniqueCourseSlug(name, requested) {
+  // a non-latin name slugs to nothing, and "course-2" is a url nobody can read
+  const base = slugify(requested ?? '') || slugify(name);
+  if (!base) {
+    throw new Error('This course name has no url-safe form. Give it an explicit slug.');
+  }
   let slug = base;
   let i = 1;
   while (await prisma.course.findFirst({ where: { slug }, select: { id: true } })) {
@@ -189,11 +193,19 @@ async function generateUniqueCourseSlug(name) {
   return slug;
 }
 
-export async function createCourse({ name, description }) {
-  const slug = await generateUniqueCourseSlug(name);
+/** @param {{ name: string, description?: string | null, slug?: string | null, lang?: string }} input */
+export async function createCourse({ name, description, slug: requested = null, lang = 'en' }) {
+  const slug = await generateUniqueCourseSlug(name, requested);
   const agg = await prisma.course.aggregate({ _max: { sortOrder: true } });
   return prisma.course.create({
-    data: { name, slug, description, status: 'draft', sortOrder: (agg._max.sortOrder ?? 0) + 1 },
+    data: {
+      name,
+      slug,
+      description,
+      lang,
+      status: 'draft',
+      sortOrder: (agg._max.sortOrder ?? 0) + 1,
+    },
   });
 }
 

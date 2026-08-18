@@ -67,3 +67,31 @@ describe('attempts record the language they were answered in', () => {
     expect(attempt?.lang).toBe('ar');
   });
 });
+
+describe('creating a course in the cms', () => {
+  it('refuses a name with no url-safe form instead of inventing "course-2"', async () => {
+    const { createCourse } = await import('@/lib/db/contentService');
+    await expect(createCourse({ name: 'الأساسيات', description: null })).rejects.toThrow(
+      /explicit slug/
+    );
+  });
+
+  it('takes the slug and language it is given', async () => {
+    const { createCourse } = await import('@/lib/db/contentService');
+    const course = await createCourse({
+      name: `الجبر ${Date.now()}`,
+      description: null,
+      slug: `algebra-ar-${Date.now()}`,
+      lang: 'ar',
+    });
+    expect(course.lang).toBe('ar');
+    expect(course.slug).toMatch(/^algebra-ar-/);
+  });
+
+  it('still derives a slug from a latin name', async () => {
+    const { createCourse } = await import('@/lib/db/contentService');
+    const course = await createCourse({ name: `Linear Algebra ${Date.now()}`, description: null });
+    expect(course.slug).toMatch(/^linear-algebra-/);
+    expect(course.lang).toBe('en');
+  });
+});

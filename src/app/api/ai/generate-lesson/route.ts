@@ -7,6 +7,8 @@ import { LESSON_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 import { verifyLesson } from '@/engine/verify';
 import { toAIContext } from '@/engine/lang/docs';
+import { authoringDirective, REGISTERS } from '@/lib/ai-authoring';
+import { LOCALES } from '@/lib/locale';
 
 const INSTRUCTIONS = toAIContext();
 
@@ -14,6 +16,8 @@ const bodySchema = z.object({
   topic: z.string().min(1).max(300),
   course: z.string().max(100).optional().default(''),
   difficulty: z.string().max(50).optional().default('intermediate'),
+  lang: z.enum(LOCALES).optional().default('en'),
+  register: z.enum(REGISTERS).optional().default('msa-simple'),
 });
 
 export async function POST(req: Request) {
@@ -29,7 +33,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const { topic, course, difficulty } = parsed.data;
+  const { topic, course, difficulty, lang, register } = parsed.data;
 
   let prism: string;
   try {
@@ -44,7 +48,7 @@ that build understanding step by step, the way the cookbook patterns do. Every
 slide with a scene should be genuinely interactive — the learner manipulates
 something and sees math respond, not a static picture.
 
-Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markdown, no explanation.`,
+Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markdown, no explanation.${authoringDirective(lang, register)}`,
       maxOutputTokens: 4096,
       abortSignal: AbortSignal.timeout(60_000),
     });

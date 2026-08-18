@@ -32,6 +32,8 @@ export default function AiPanel({ source, onApply, onInsertScene }) {
   const [error, setError] = useState(null);
   const [findings, setFindings] = useState([]);
   const [retries, setRetries] = useState(0);
+  const [lang, setLang] = useState('en');
+  const [register, setRegister] = useState('msa-simple');
   const abortRef = useRef(null);
 
   const working = status === 'working';
@@ -66,7 +68,12 @@ export default function AiPanel({ source, onApply, onInsertScene }) {
           body,
         } = await post(
           '/api/ai/generate-scene',
-          { concept: instruction, context: hasRealSource ? source.slice(0, 4000) : '' },
+          {
+            concept: instruction,
+            context: hasRealSource ? source.slice(0, 4000) : '',
+            lang,
+            register,
+          },
           signal
         );
         if (!ok) return fail(code, body);
@@ -76,7 +83,11 @@ export default function AiPanel({ source, onApply, onInsertScene }) {
       }
 
       const topic = buildTopic(instruction, priorSource, priorDetail);
-      const { ok, status: code, body } = await post('/api/ai/generate-lesson', { topic }, signal);
+      const {
+        ok,
+        status: code,
+        body,
+      } = await post('/api/ai/generate-lesson', { topic, lang, register }, signal);
       if (!ok) return fail(code, body);
       onApply(body.prism);
       setFindings(body.findings ?? []);
@@ -143,6 +154,28 @@ export default function AiPanel({ source, onApply, onInsertScene }) {
           setRetries(0);
         }}
       />
+
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+          className="border border-neutral-300 px-2 py-1.5 text-sm"
+        >
+          <option value="en">English</option>
+          <option value="ar">العربية</option>
+        </select>
+        {lang === 'ar' && (
+          <select
+            value={register}
+            onChange={(e) => setRegister(e.target.value)}
+            className="border border-neutral-300 px-2 py-1.5 text-sm"
+          >
+            <option value="msa-simple">Simple MSA</option>
+            <option value="egyptian">Egyptian</option>
+            <option value="msa-formal">Formal MSA</option>
+          </select>
+        )}
+      </div>
 
       <div className="flex gap-2">
         <Button onClick={handleGenerate} isLoading={working} disabled={!instruction.trim()}>

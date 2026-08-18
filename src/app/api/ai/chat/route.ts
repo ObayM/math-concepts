@@ -7,6 +7,7 @@ import { TUTOR_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { getLessonByKey } from '@/lib/db/lessonService';
 import { getMyMastery } from '@/lib/db/progressService';
 import { lessonSchema } from '@/engine/ir/lesson';
+import { DEFAULT_LOCALE, isLocale } from '@/lib/locale';
 import {
   MAX_QUESTION_CHARS,
   MAX_HISTORY_TURNS,
@@ -64,7 +65,8 @@ export async function POST(req: Request) {
   const ctx = buildTutorContext(ir.data, slideId, { checked, correct, answer, scope, mastery });
   if (!ctx) return NextResponse.json({ error: 'Slide not found' }, { status: 404 });
 
-  const { instructions, messages } = buildTutorRequest(ctx, history, question);
+  const lang = isLocale(row.course?.lang) ? row.course.lang : DEFAULT_LOCALE;
+  const { instructions, messages } = buildTutorRequest(ctx, history, question, lang);
 
   try {
     const result = streamText({
