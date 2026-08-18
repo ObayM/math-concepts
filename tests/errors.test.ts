@@ -112,3 +112,30 @@ describe('formatCompileError caret frame', () => {
     expect(formatCompileError('whatever', err)).toBe('something went wrong');
   });
 });
+
+describe('non-ascii slide titles', () => {
+  const wrap = (slides: string) => `lesson "دورة" {\n  unit: "وحدة"\n\n${slides}\n}\n`;
+
+  it('refuses to derive an id from a title it cannot slug', () => {
+    const src = wrap('  slide "المشتقة تقيس معدل التغير" {\n    > نص\n  }');
+    expect(() => compileLesson(src)).toThrow(CompileError);
+    expect(() => compileLesson(src)).toThrow(/needs an explicit id/);
+  });
+
+  it('catches a mixed title before it collides on its latin scraps', () => {
+    const src = wrap(
+      '  slide "النهايات و f(x)" {\n    > نص\n  }\n\n  slide "الاشتقاق و f(x)" {\n    > نص\n  }'
+    );
+    expect(() => compileLesson(src)).toThrow(/needs an explicit id/);
+  });
+
+  it('accepts the title once an id is written out', () => {
+    const src = wrap('  slide "المشتقة" {\n    id: "derivative-intro"\n    > نص\n  }');
+    expect(compileLesson(src).slides[0].id).toBe('derivative-intro');
+  });
+
+  it('leaves ascii titles deriving exactly as before', () => {
+    const src = wrap('  slide "Limits and continuity" {\n    > text\n  }');
+    expect(compileLesson(src).slides[0].id).toBe('limits-and-continuity');
+  });
+});

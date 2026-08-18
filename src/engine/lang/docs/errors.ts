@@ -107,4 +107,12 @@ export const PRISM_ERRORS: DocError[] = [
     bad: 'numeric {\n  ask "What is 3/8 as a decimal?"\n  answer: 0.385\n  tolerance: 0.0001\n  expect: 3/8\n}',
     good: 'numeric {\n  ask "What is 3/8 as a decimal?"\n  answer: 0.375\n  tolerance: 0.0001\n  expect: 3/8\n}',
   },
+  {
+    code: 'E_SLIDE_ID_REQUIRED',
+    title: 'A non-ascii title needs an explicit id',
+    explanation:
+      'Slide ids are derived from the title by keeping `[a-z0-9]` and nothing else, so an Arabic (or any non-latin) title leaves nothing to build an id from. The compiler would fall back to a positional `slide-2`, which silently changes the moment you reorder slides, and slide ids are a durable key: saved notes, recorded attempts and every `onwrong:` target point at them. A title mixing Arabic with latin math is worse, because it keeps only the scraps, so two different slides can both end up as `f-x`. Write the id yourself.',
+    bad: 'lesson "\u0627\u0644\u0646\u0647\u0627\u064a\u0627\u062a" {\n  slide "\u0627\u0644\u0645\u0634\u062a\u0642\u0629 \u062a\u0642\u064a\u0633 \u0645\u0639\u062f\u0644 \u0627\u0644\u062a\u063a\u064a\u0631" {\n    > \u0646\u0635\n  }\n}',
+    good: 'lesson "\u0627\u0644\u0646\u0647\u0627\u064a\u0627\u062a" {\n  slide "\u0627\u0644\u0645\u0634\u062a\u0642\u0629 \u062a\u0642\u064a\u0633 \u0645\u0639\u062f\u0644 \u0627\u0644\u062a\u063a\u064a\u0631" {\n    id: "derivative-intro"\n    > \u0646\u0635\n  }\n}',
+  },
 ];

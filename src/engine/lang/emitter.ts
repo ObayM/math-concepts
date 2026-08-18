@@ -1466,6 +1466,15 @@ function emitGoal(s: Extract<Stmt, { k: 'goal' }>, allowedIds: string[]) {
 }
 
 function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
+  // slug() keeps [a-z0-9] only, so a non-latin title either collapses to
+  // nothing (leaving a positional id that moves when slides are reordered) or
+  // survives as its latin scraps, which collide. slide ids are a database key.
+  if (!pStr(s.props, 'id') && /[^\x00-\x7F]/.test(s.title)) {
+    throw new CompileError(
+      `slide "${s.title}" needs an explicit id: because its title is not ascii, and ids are derived from the title`,
+      s.ln
+    );
+  }
   const id = slideIdFor(s.props, s.title, i);
   const prose: string[] = [];
   let scene: SceneIR | undefined;
