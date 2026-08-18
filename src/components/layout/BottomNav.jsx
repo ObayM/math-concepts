@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, BookOpen, User, Zap } from 'lucide-react';
+import { useT } from '@/components/i18n/LocaleProvider';
 import clsx from 'clsx';
 import { useAuth } from '@/components/auth/AuthProvider';
 
@@ -10,17 +11,18 @@ function ownsTheBottom(pathname) {
 }
 
 export default function BottomNav() {
+  const t = useT();
   const pathname = usePathname() ?? '';
   const { user } = useAuth();
 
   if (!user || ownsTheBottom(pathname)) return null;
 
   const tabs = [
-    { name: 'Learn', href: '/dashboard', icon: Home },
-    { name: 'Courses', href: '/courses', icon: BookOpen },
-    { name: 'Warm up', href: '/warmup', icon: Zap },
+    { name: t('nav.learn'), href: '/dashboard', icon: Home },
+    { name: t('nav.courses'), href: '/courses', icon: BookOpen },
+    { name: t('nav.warmup'), href: '/warmup', icon: Zap },
     {
-      name: 'You',
+      name: t('nav.you'),
       href: user.username ? `/@${user.username}` : '/settings',
       icon: User,
       match: ['/u/', '/settings'],
@@ -31,7 +33,7 @@ export default function BottomNav() {
     <>
       <div className="h-[calc(var(--tab-h)+var(--safe-b))] md:hidden" aria-hidden />
       <nav
-        aria-label="Primary"
+        aria-label={t('nav.primary')}
         className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white pb-safe md:hidden"
       >
         <ul className="flex">

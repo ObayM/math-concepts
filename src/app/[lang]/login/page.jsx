@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useT } from '@/components/i18n/LocaleProvider';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Loader2, LogIn } from 'lucide-react';
@@ -14,22 +15,23 @@ import Card from '@/components/ui/Card';
 
 // telling someone their password is wrong when they are actually rate limited,
 // unverified or banned sends them in circles.
-function signInMessage(error) {
-  if (error.status === 429) return 'Too many attempts. Wait a minute and try again.';
+function signInMessage(error, t) {
+  if (error.status === 429) return t('auth.tooManyAttempts');
   switch (error.code) {
     case 'EMAIL_NOT_VERIFIED':
-      return 'Check your inbox and verify your email before signing in.';
+      return t('auth.verifyFirst');
     case 'USER_BANNED':
     case 'BANNED_USER':
-      return 'This account has been suspended.';
+      return t('auth.suspended');
     case 'INVALID_EMAIL_OR_PASSWORD':
-      return 'Invalid credentials. Please try again.';
+      return t('auth.invalid');
     default:
-      return error.message || 'Something went wrong. Please try again.';
+      return error.message || t('error.generic');
   }
 }
 
 export default function LoginPage() {
+  const t = useT();
   const { user } = useAuth();
   const router = useRouter();
 
@@ -65,9 +67,9 @@ export default function LoginPage() {
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
-            Welcome Back!
+            {t('auth.welcomeBack')}
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">Sign in to access your account.</p>
+          <p className="mt-2 text-sm text-neutral-500">{t('auth.signInBlurb')}</p>
         </div>
 
         <form method="post" onSubmit={handleSubmit} className="space-y-4">
@@ -77,8 +79,8 @@ export default function LoginPage() {
             type="email"
             autoComplete="email"
             required
-            placeholder="Email address"
-            aria-label="Email address"
+            placeholder={t('auth.emailAddress')}
+            aria-label={t('auth.emailAddress')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail className="w-5 h-5" />}
@@ -89,7 +91,7 @@ export default function LoginPage() {
             name="password"
             autoComplete="current-password"
             required
-            placeholder="Password"
+            placeholder={t('auth.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -99,7 +101,7 @@ export default function LoginPage() {
               href="/forgot-password"
               className="text-sm font-semibold text-primary-600 hover:text-primary-500 hover:underline"
             >
-              Forgot password?
+              {t('auth.forgot')}
             </Link>
           </div>
 
@@ -109,24 +111,24 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Signing In...
+                {t('auth.signingIn')}
               </>
             ) : (
               <>
                 <LogIn className="w-5 h-5" />
-                Sign In
+                {t('auth.signIn')}
               </>
             )}
           </Button>
         </form>
 
         <p className="text-sm text-center text-neutral-500">
-          Don&apos;t have an account?{' '}
+          {t('auth.noAccount')}{' '}
           <Link
             href="/signup"
             className="font-bold text-primary-600 hover:text-primary-500 hover:underline"
           >
-            Sign Up
+            {t('auth.signUpCta')}
           </Link>
         </p>
       </Card>

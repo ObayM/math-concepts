@@ -163,6 +163,7 @@ export function proxy(request) {
     const url = request.nextUrl.clone();
     url.pathname = localized(`/u/${atMatch[1]}`);
     headers.set('x-pathname', `/u/${atMatch[1]}`);
+    headers.set('x-locale', locale);
     const response = NextResponse.rewrite(url, { request: { headers } });
     response.headers.set('x-pathname', `/u/${atMatch[1]}`);
     return harden(response, nonce);
@@ -184,6 +185,9 @@ export function proxy(request) {
   // every check above runs on the unprefixed path, so PUBLIC_PATHS and the
   // layout's own startsWith checks never learn about the locale segment
   headers.set('x-pathname', pathname);
+  // server components that sit below the [lang] segment read the locale from
+  // here rather than threading params through every level
+  headers.set('x-locale', locale);
 
   if (pathname.startsWith('/api/') || ROOT_ROUTES.includes(pathname)) {
     const response = NextResponse.next({ request: { headers } });

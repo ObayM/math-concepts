@@ -312,7 +312,15 @@ html[dir='rtl'] body {
    property, so this composes with tailwind transform utilities instead of
    overwriting them. */
 html[dir='rtl']
-  :is(.lucide-arrow-right, .lucide-arrow-left, .lucide-chevron-right, .lucide-chevron-left) {
+  :is(
+    .lucide-arrow-right,
+    .lucide-arrow-left,
+    .lucide-chevron-right,
+    .lucide-chevron-left,
+    .lucide-log-in,
+    .lucide-log-out,
+    .lucide-corner-down-left
+  ) {
   scale: -1 1;
 }
 

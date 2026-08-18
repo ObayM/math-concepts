@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { requireUser } from '@/lib/session';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
-import { updateReminderPreference } from '@/lib/db/userService';
+import { updateLocale, updateReminderPreference } from '@/lib/db/userService';
+import { LOCALES } from '@/lib/locale';
 
 const bodySchema = z.object({
-  reminderEmails: z.boolean(),
+  reminderEmails: z.boolean().optional(),
+  locale: z.enum(LOCALES).optional(),
 });
 
 export async function PUT(request) {
@@ -19,6 +21,19 @@ export async function PUT(request) {
     return Response.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  await updateReminderPreference(user.id, parsed.data.reminderEmails);
-  return Response.json({ success: true, reminderEmails: parsed.data.reminderEmails });
+  const { reminderEmails, locale } = parsed.data;
+  if (reminderEmails !== undefined) await updateReminderPreference(user.id, reminderEmails);
+  if (locale !== undefined) await updateLocale(user.id, locale);
+
+  const res = Response.json({ success: true, reminderEmails, locale });
+  // the apex reads this cookie instead of guessing again, and it has to be
+  // visible on the sibling subdomain, so the server owns it rather than the client
+  if (locale !== undefined) {
+    const domain = (process.env.COOKIE_DOMAIN ?? '').trim();
+    res.headers.append(
+      'set-cookie',
+      `mathly-lang=${locale}; Path=/; Max-Age=31536000; SameSite=Lax${domain ? `; Domain=${domain}` : ''}`
+    );
+  }
+  return res;
 }

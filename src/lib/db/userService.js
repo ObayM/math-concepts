@@ -79,12 +79,22 @@ export async function updateUserProfile(userId, { name, image }) {
 export async function getUserSettings(userId) {
   return prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, reminderEmails: true, emailVerified: true, timezone: true },
+    select: {
+      email: true,
+      reminderEmails: true,
+      emailVerified: true,
+      timezone: true,
+      locale: true,
+    },
   });
 }
 
 export async function updateReminderPreference(userId, reminderEmails) {
   await prisma.user.update({ where: { id: userId }, data: { reminderEmails } });
+}
+
+export async function updateLocale(userId, locale) {
+  await prisma.user.update({ where: { id: userId }, data: { locale } });
 }
 
 export async function getUsersCompletedCounts(userIds) {

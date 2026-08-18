@@ -21,6 +21,7 @@ import {
 } from '@/engine/runtime/flow';
 
 import RichText from './RichText';
+import { useT } from '@/components/i18n/LocaleProvider';
 import SlideView from './SlideView';
 import Scratchpad from './scratchpad/Scratchpad';
 import useScratchpad from './scratchpad/useScratchpad';
@@ -37,6 +38,7 @@ export default function LessonPlayer({
   nextLessonId,
 }) {
   const router = useRouter();
+  const t = useT();
 
   const [flow, setFlow] = useState(() => initialFlow(0));
   const [slideDir, setSlideDir] = useState('right');
@@ -330,7 +332,7 @@ export default function LessonPlayer({
   const handleBackToCourse = () => router.push(`/courses/${coursePath}`);
 
   const handleReset = () => {
-    if (!confirm('Restart this lesson from the beginning? Your progress will be cleared.')) return;
+    if (!confirm(t('lesson.restart'))) return;
     fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
     setFlow(initialFlow(0));
     setResetForKey(null);
@@ -348,7 +350,7 @@ export default function LessonPlayer({
           <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">Loading lesson...</h2>
           <p className="text-neutral-500 mt-2">Hang tight while we get things ready.</p>
           <Button onClick={handleBackToCourse} variant="ghost" className="mt-6">
-            Back to Course
+            {t('lesson.back')}
           </Button>
         </Card>
       </div>
@@ -379,14 +381,14 @@ export default function LessonPlayer({
   const canAdvance = (!checker || checked) && goalsSatisfied;
   const correct = checked && checker ? checker.check(slide, answer) : null;
   const nextLabel = flow.pending
-    ? "Let's back up"
+    ? t('lesson.backUp')
     : inDetour
       ? flow.detour.retry
-        ? 'Try it again'
-        : 'Got it'
+        ? t('lesson.tryAgain')
+        : t('lesson.gotIt')
       : isLast
-        ? 'Complete!'
-        : 'Continue';
+        ? t('lesson.complete')
+        : t('lesson.continue');
 
   const restartButton = (
     <button
@@ -440,9 +442,9 @@ export default function LessonPlayer({
     <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden max-md:px-0 max-md:pb-0 max-md:items-stretch max-md:overflow-visible">
       {saveError && (
         <div className="absolute start-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10 max-md:start-0 max-md:end-0 max-md:top-[var(--nav-h)] max-md:justify-center max-md:rounded-none">
-          Couldn&apos;t save your progress.
+          {t('lesson.saveFailed')}
           <button onClick={handleRetrySave} className="underline hover:no-underline">
-            Retry
+            {t('lesson.retry')}
           </button>
         </div>
       )}
@@ -497,7 +499,7 @@ export default function LessonPlayer({
               <div className="mb-8">
                 <div className="flex items-center space-x-2 mb-3">
                   <span className="text-primary-500 font-bold text-sm tracking-wider uppercase">
-                    {inDetour ? 'Quick detour' : slide?.category || 'Concept'}
+                    {inDetour ? t('lesson.detour') : slide?.category || t('lesson.concept')}
                   </span>
                 </div>
                 <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight">
@@ -518,7 +520,7 @@ export default function LessonPlayer({
                 <div aria-live="polite" className="sr-only">
                   {checked &&
                     correct !== null &&
-                    (correct ? 'Correct.' : 'Not quite. Review the explanation and try again.')}
+                    (correct ? t('lesson.correct') : t('lesson.wrong'))}
                 </div>
               </div>
             </div>
@@ -526,15 +528,15 @@ export default function LessonPlayer({
 
           <div className="px-10 py-6 border-t border-neutral-100 flex items-center justify-between gap-4 max-md:px-4 max-md:py-3 max-md:pb-[calc(0.75rem+var(--safe-b))]">
             <Button onClick={handleBack} variant="ghost" disabled={!canGoBack(flow)}>
-              Back
+              {t('lesson.prev')}
             </Button>
 
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setTutorOpen((o) => !o)}
                 className="text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
-                title="Ask AI Tutor"
-                aria-label="Ask AI Tutor"
+                title={t('lesson.askTutor')}
+                aria-label={t('lesson.askTutor')}
               >
                 <Sparkles className="w-5 h-5" />
               </button>
@@ -624,9 +626,7 @@ export default function LessonPlayer({
                     onChange={(e) => setTutorQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
                     disabled={tutorStreaming}
-                    placeholder={
-                      tutorTurns.length ? 'Ask a follow up' : 'Stuck? Ask about this slide'
-                    }
+                    placeholder={tutorTurns.length ? t('lesson.followUp') : t('lesson.stuck')}
                     aria-label="Ask the tutor"
                     className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
                   />

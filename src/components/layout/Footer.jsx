@@ -1,20 +1,25 @@
 import Link from 'next/link';
+import { getLocale, getT } from '@/lib/i18n/server';
+import { LOCALES } from '@/lib/locale';
+import { hasLocaleOrigins, originForLocale } from '@/lib/origin';
 
-const links = [
-  { href: '/courses', label: 'Courses' },
-  { href: '/prism', label: 'Prism' },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/terms', label: 'Terms' },
-];
+export default async function Footer() {
+  const t = await getT();
+  const locale = await getLocale();
+  const other = LOCALES.find((l) => l !== locale);
 
-export default function Footer() {
+  const links = [
+    { href: '/courses', label: t('nav.courses') },
+    { href: '/prism', label: t('footer.prism') },
+    { href: '/privacy', label: t('footer.privacy') },
+    { href: '/terms', label: t('footer.terms') },
+  ];
+
   return (
     <footer className="border-t border-neutral-200/70 bg-white/60">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <p className="text-sm text-neutral-400">
-          <span className="font-display font-bold text-neutral-600">Mathly</span> — make math click.
-        </p>
-        <nav className="flex flex-wrap gap-x-5 gap-y-2">
+        <p className="text-sm text-neutral-400">{t('footer.tagline')}</p>
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -24,6 +29,18 @@ export default function Footer() {
               {link.label}
             </Link>
           ))}
+          {/* settings owns the real preference, but a logged out visitor on the
+              wrong subdomain has no settings page to reach it from */}
+          {hasLocaleOrigins && other && (
+            <a
+              href={originForLocale(other)}
+              lang={other}
+              aria-label={t('lang.switchLabel')}
+              className="tap-target-h flex items-center text-sm font-semibold text-neutral-500 transition-colors hover:text-primary-600"
+            >
+              {t('lang.switch')}
+            </a>
+          )}
         </nav>
       </div>
     </footer>

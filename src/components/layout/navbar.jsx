@@ -5,6 +5,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useT } from '@/components/i18n/LocaleProvider';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
@@ -80,14 +81,15 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  const t = useT();
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
   const navLinks = [
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Courses', href: '/courses' },
-    { name: 'Warm up', href: '/warmup' },
-    { name: 'Sandbox', href: '/prism/play' },
-    ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
+    { name: t('nav.dashboard'), href: '/dashboard' },
+    { name: t('nav.courses'), href: '/courses' },
+    { name: t('nav.warmup'), href: '/warmup' },
+    { name: t('nav.sandbox'), href: '/prism/play' },
+    ...(isAdmin ? [{ name: t('nav.admin'), href: '/admin' }] : []),
   ];
 
   return (
@@ -95,7 +97,7 @@ export default function Navbar() {
       <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:pt-4">
         <nav
           className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-neutral-200/80 bg-white px-4 py-2.5 shadow-[0_4px_16px_-6px_rgba(15,23,42,0.12)] lg:px-5"
-          aria-label="Global"
+          aria-label={t('nav.global')}
         >
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
@@ -111,7 +113,7 @@ export default function Navbar() {
               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-neutral-700"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">{t('nav.open')}</span>
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
@@ -169,7 +171,7 @@ export default function Navbar() {
                           onClick={() => setIsProfileOpen(false)}
                           className="block w-full px-4 py-2 text-start text-sm text-neutral-700 hover:bg-neutral-50"
                         >
-                          Your Profile
+                          {t('nav.profile')}
                         </Link>
                       )}
                       <Link
@@ -177,13 +179,13 @@ export default function Navbar() {
                         onClick={() => setIsProfileOpen(false)}
                         className="block w-full px-4 py-2 text-start text-sm text-neutral-700 hover:bg-neutral-50"
                       >
-                        Settings
+                        {t('nav.settings')}
                       </Link>
                       <button
                         onClick={handleLogout}
                         className="text-danger-600 block w-full px-4 py-2 text-start text-sm hover:bg-neutral-50"
                       >
-                        Log Out
+                        {t('nav.logout')}
                       </button>
                     </div>
                   </div>
@@ -195,14 +197,14 @@ export default function Navbar() {
                   href="/login"
                   className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
                 >
-                  Log in
+                  {t('nav.login')}
                 </Link>
 
                 <Link
                   href="/signup"
                   className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
                 >
-                  Sign up
+                  {t('nav.signup')}
                 </Link>
               </div>
             )}
@@ -229,7 +231,7 @@ export default function Navbar() {
                 className="-m-2.5 rounded-md p-2.5 text-neutral-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span className="sr-only">Close menu</span>
+                <span className="sr-only">{t('nav.close')}</span>
                 <X className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>
@@ -262,7 +264,7 @@ export default function Navbar() {
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-neutral-900 hover:bg-neutral-100"
                         >
-                          Your Profile
+                          {t('nav.profile')}
                         </Link>
                       )}
                       <Link
@@ -270,13 +272,13 @@ export default function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-neutral-900 hover:bg-neutral-100"
                       >
-                        Settings
+                        {t('nav.settings')}
                       </Link>
                       <button
                         onClick={handleLogout}
                         className="w-full rounded-md bg-danger-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-danger-500"
                       >
-                        Log Out
+                        {t('nav.logout')}
                       </button>
                     </div>
                   ) : (
@@ -286,7 +288,7 @@ export default function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-neutral-900 hover:bg-neutral-100"
                       >
-                        Log in
+                        {t('nav.login')}
                       </Link>
 
                       <Link
@@ -294,7 +296,7 @@ export default function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="block w-full rounded-md bg-primary-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
                       >
-                        Sign up
+                        {t('nav.signup')}
                       </Link>
                     </div>
                   )}
