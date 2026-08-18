@@ -55,6 +55,7 @@ export default function CourseHeaderRow({
             <Input
               name="name"
               defaultValue={course.name}
+              dir="auto"
               className="w-48"
               aria-label="Course name"
             />
@@ -75,7 +76,9 @@ export default function CourseHeaderRow({
         ) : (
           <>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-neutral-900">{course.name}</h2>
+              <h2 dir="auto" className="text-lg font-bold text-neutral-900">
+                {course.name}
+              </h2>
               <Badge variant={course.status === 'published' ? 'success' : 'neutral'}>
                 {course.status}
               </Badge>

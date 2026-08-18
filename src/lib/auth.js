@@ -22,14 +22,19 @@ const trustedOrigins = (process.env.TRUSTED_ORIGINS ?? '')
 
 const allowedHosts = hostsForDomain(appDomain);
 
+// this decides both which origins are trusted and whether the session cookie
+// gets the __Secure- prefix, so it follows the scheme the app is actually
+// served over rather than NODE_ENV
+const protocol = (process.env.APP_PROTOCOL ?? 'auto').trim();
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
 
   ...(allowedHosts.length && {
     baseURL: {
       allowedHosts,
-      fallback: `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${allowedHosts[0]}`,
-      protocol: process.env.NODE_ENV === 'production' ? 'https' : 'auto',
+      fallback: `${protocol === 'http' ? 'http' : 'https'}://${allowedHosts[0]}`,
+      protocol,
     },
     trustedProxyHeaders: true,
   }),

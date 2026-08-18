@@ -48,7 +48,9 @@ function LessonRow({ lesson, courses }) {
     <div className="flex flex-wrap items-start justify-between gap-3 py-3">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold text-neutral-800">{lesson.title ?? lesson.lessonKey}</span>
+          <span dir="auto" className="font-semibold text-neutral-800">
+            {lesson.title ?? lesson.lessonKey}
+          </span>
           <Badge variant={lesson.status === 'published' ? 'success' : 'neutral'}>
             {lesson.status}
           </Badge>

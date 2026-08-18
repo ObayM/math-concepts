@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { DEFAULT_LOCALE, type Locale } from './locale';
 
 const APP_DOMAIN = (process.env.APP_DOMAIN ?? '').trim().toLowerCase();
-const PROTOCOL = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+const PROTOCOL = (process.env.APP_PROTOCOL ?? '').trim() === 'http' ? 'http' : 'https';
 
 export const hasLocaleOrigins = Boolean(APP_DOMAIN);
 

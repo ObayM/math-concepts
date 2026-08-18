@@ -167,7 +167,9 @@ export default async function StudentDetailPage({ params }) {
                     {a.lesson.title ?? a.lesson.lessonKey}
                   </td>
                   <td className="px-4 py-2 font-mono text-xs text-neutral-500">{a.skill ?? '—'}</td>
-                  <td className="max-w-md truncate px-4 py-2 text-neutral-600">{a.question}</td>
+                  <td dir="auto" className="max-w-md truncate px-4 py-2 text-neutral-600">
+                    {a.question}
+                  </td>
                   <td className="px-4 py-2">
                     <Badge variant={a.correct ? 'success' : 'danger'}>
                       {a.correct ? 'correct' : 'wrong'}

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const ENV_KEYS = ['APP_DOMAIN', 'COOKIE_DOMAIN', 'TRUSTED_ORIGINS', 'NODE_ENV'] as const;
+const ENV_KEYS = ['APP_DOMAIN', 'COOKIE_DOMAIN', 'TRUSTED_ORIGINS', 'APP_PROTOCOL'] as const;
 
 async function loadAuth(env: Partial<Record<(typeof ENV_KEYS)[number], string>>) {
   vi.resetModules();
@@ -34,16 +34,21 @@ describe('auth config', () => {
     expect(options.trustedProxyHeaders).toBe(true);
   });
 
-  it('pins https in production, so http origins are not also trusted', async () => {
-    const options = await loadAuth({ APP_DOMAIN: 'mathly.com', NODE_ENV: 'production' });
-    expect(options.baseURL.protocol).toBe('https');
+  it('defaults to auto, letting x-forwarded-proto decide behind a tls proxy', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.com' });
+    expect(options.baseURL.protocol).toBe('auto');
     expect(options.baseURL.fallback).toBe('https://mathly.com');
   });
 
-  it('allows http off production so local hosts work', async () => {
-    const options = await loadAuth({ APP_DOMAIN: 'mathly.local:3000' });
-    expect(options.baseURL.protocol).toBe('auto');
-    expect(options.baseURL.fallback).toBe('http://mathly.local:3000');
+  it('honours an explicit http, which is what keeps the cookie settable over plain http', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.local:3100', APP_PROTOCOL: 'http' });
+    expect(options.baseURL.protocol).toBe('http');
+    expect(options.baseURL.fallback).toBe('http://mathly.local:3100');
+  });
+
+  it('honours an explicit https', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.com', APP_PROTOCOL: 'https' });
+    expect(options.baseURL.protocol).toBe('https');
   });
 
   it('leaves baseURL alone when APP_DOMAIN is unset', async () => {
