@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isSameOriginRequest } from '@/lib/same-origin';
+import { DEFAULT_LOCALE, isLocale, localeFromHost } from '@/lib/locale';
 
 const PUBLIC_PATHS = [
   '/login',
@@ -29,6 +30,18 @@ const PUBLIC_PATHS = [
 
 const CROSS_ORIGIN_EXEMPT = ['/api/auth', '/api/cron/'];
 
+// internal tooling and the language reference stay english whichever host they
+// are reached from
+const FORCED_EN = ['/admin', '/prism', '/dsl-preview'];
+
+// these live at the app root and have no locale segment to rewrite into
+const ROOT_ROUTES = ['/manifest.webmanifest', '/robots.txt', '/sitemap.xml', '/sw.js'];
+
+const LANG_COOKIE = 'mathly-lang';
+
+const APP_DOMAIN = (process.env.APP_DOMAIN ?? '').trim().toLowerCase();
+const APEX_HOST = APP_DOMAIN.split(':')[0];
+
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
@@ -36,6 +49,40 @@ const SECURITY_HEADERS = {
 };
 
 const DEV = process.env.NODE_ENV !== 'production';
+
+function hostOf(request) {
+  const raw = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? '';
+  return raw.trim().toLowerCase();
+}
+
+function acceptedLocale(request) {
+  const cookie = request.cookies.get(LANG_COOKIE)?.value;
+  if (isLocale(cookie)) return cookie;
+  const header = request.headers.get('accept-language') ?? '';
+  const primary = header.split(',')[0]?.trim().split('-')[0]?.toLowerCase();
+  return isLocale(primary) ? primary : DEFAULT_LOCALE;
+}
+
+// the host is the only locale source that can be trusted in production. the
+// query/cookie fallbacks exist so localhost and preview urls, which carry no
+// locale subdomain, can still reach both languages.
+function resolveLocale(request) {
+  const fromHost = localeFromHost(hostOf(request));
+  if (fromHost) return fromHost;
+
+  const override = request.nextUrl.searchParams.get('lang');
+  if (isLocale(override)) return override;
+
+  const cookie = request.cookies.get(LANG_COOKIE)?.value;
+  if (isLocale(cookie)) return cookie;
+
+  return DEFAULT_LOCALE;
+}
+
+function isApexRequest(request) {
+  if (!APEX_HOST) return false;
+  return hostOf(request).split(':')[0] === APEX_HOST;
+}
 
 function newNonce() {
   return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
@@ -79,6 +126,26 @@ export function proxy(request) {
     );
   }
 
+  // the apex picks a language once and hands the visitor to that subdomain.
+  // a redirect defaults to 307, which replays the body, so a POST bounced here
+  // would arrive cross-subdomain and trip the gate above.
+  if (isApexRequest(request) && !pathname.startsWith('/api/')) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      return harden(NextResponse.json({ error: 'Method not allowed' }, { status: 405 }), nonce);
+    }
+    const locale = acceptedLocale(request);
+    const url = request.nextUrl.clone();
+    url.host = `${locale}.${url.host}`;
+    const redirect = harden(NextResponse.redirect(url), nonce);
+    redirect.cookies.set(LANG_COOKIE, locale, { path: '/', maxAge: 60 * 60 * 24 * 365 });
+    return redirect;
+  }
+
+  const locale = FORCED_EN.some((p) => pathname.startsWith(p))
+    ? DEFAULT_LOCALE
+    : resolveLocale(request);
+  const localized = (to) => `/${locale}${to}`;
+
   // next reads the nonce back out of this request header and stamps it onto
   // its own hydration scripts, which is what keeps script-src free of
   // 'unsafe-inline'
@@ -88,8 +155,11 @@ export function proxy(request) {
   const atMatch = pathname.match(/^\/@([a-z0-9][a-z0-9-]*)$/);
   if (atMatch) {
     const url = request.nextUrl.clone();
-    url.pathname = `/u/${atMatch[1]}`;
-    return harden(NextResponse.rewrite(url, { request: { headers } }), nonce);
+    url.pathname = localized(`/u/${atMatch[1]}`);
+    headers.set('x-pathname', `/u/${atMatch[1]}`);
+    const response = NextResponse.rewrite(url, { request: { headers } });
+    response.headers.set('x-pathname', `/u/${atMatch[1]}`);
+    return harden(response, nonce);
   }
 
   const isPublic = pathname === '/' || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
@@ -105,8 +175,19 @@ export function proxy(request) {
     }
   }
 
+  // every check above runs on the unprefixed path, so PUBLIC_PATHS and the
+  // layout's own startsWith checks never learn about the locale segment
   headers.set('x-pathname', pathname);
-  const response = NextResponse.next({ request: { headers } });
+
+  if (pathname.startsWith('/api/') || ROOT_ROUTES.includes(pathname)) {
+    const response = NextResponse.next({ request: { headers } });
+    response.headers.set('x-pathname', pathname);
+    return harden(response, nonce);
+  }
+
+  const url = request.nextUrl.clone();
+  url.pathname = localized(pathname);
+  const response = NextResponse.rewrite(url, { request: { headers } });
   response.headers.set('x-pathname', pathname);
   return harden(response, nonce);
 }

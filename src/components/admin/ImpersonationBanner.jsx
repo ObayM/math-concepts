@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Eye } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import Button from '@/components/admin/ui/Button';
-import { stopImpersonatingAction } from '@/app/admin/users/actions';
+import { stopImpersonatingAction } from '@/app/[lang]/admin/users/actions';
 
 export default function ImpersonationBanner() {
   const { user, isImpersonating } = useAuth();

@@ -8,7 +8,7 @@ import {
   banUserAction,
   unbanUserAction,
   impersonateUserAction,
-} from '@/app/admin/users/actions';
+} from '@/app/[lang]/admin/users/actions';
 
 const ROLE_OPTIONS = ['student', 'admin', 'super_admin'];
 

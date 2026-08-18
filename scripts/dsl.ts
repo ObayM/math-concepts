@@ -6,7 +6,7 @@ import { PRISM_DOCS } from '@/engine/lang/docs';
 import { PRISM_COOKBOOK } from '@/engine/lang/docs/cookbook';
 import { PRISM_ERRORS } from '@/engine/lang/docs/errors';
 import { compileAny } from '@/components/prism/compileAny';
-import { EXAMPLES } from '@/app/prism/(guide)/examples/examples-data';
+import { EXAMPLES } from '@/app/[lang]/prism/(guide)/examples/examples-data';
 
 const G = '\x1b[32m';
 const R = '\x1b[31m';
