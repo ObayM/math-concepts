@@ -11,9 +11,15 @@ const adminUserIds = (process.env.ADMIN_USER_IDS ?? '')
   .map((s) => s.trim())
   .filter(Boolean);
 
-const trustedOrigins = [...new Set([process.env.NEXT_PUBLIC_APP_URL, process.env.BETTER_AUTH_URL])]
-  .filter(Boolean)
-  .map((url) => url.replace(/\/$/, ''));
+const trustedOrigins = [
+  ...new Set([
+    process.env.NEXT_PUBLIC_APP_URL,
+    process.env.BETTER_AUTH_URL,
+    ...(process.env.TRUSTED_ORIGINS ?? '').split(','),
+  ]),
+]
+  .map((url) => (url ?? '').trim().replace(/\/$/, ''))
+  .filter(Boolean);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
