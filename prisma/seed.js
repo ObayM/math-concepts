@@ -112,6 +112,14 @@ const COURSES = [
     ],
   },
   {
+    name: 'الهندسة الفراغية',
+    slug: 'solid-geometry-ar',
+    description: 'الهندسة الفراغية للثانوية العامة: الفراغ والمتجهات والمستقيمات والمستويات.',
+    lang: 'ar',
+    sortOrder: 4,
+    lessons: ['ar-sg-1'],
+  },
+  {
     name: 'الأساسيات',
     slug: 'foundations-ar',
     description: 'أساسيات التفاضل والتكامل، مشروحة بالعربية.',

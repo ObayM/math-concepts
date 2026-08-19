@@ -64,6 +64,6 @@ exports[`scene compile errors > unknown function in expr 1`] = `"line 5: unknown
 
 exports[`scene compile errors > unknown id in for bound 1`] = `"line 4: "n" is not a compile-time value here"`;
 
-exports[`scene compile errors > unknown space type 1`] = `"invalid scene IR: space.type - Invalid option: expected one of "plane"|"numberline"|"geometry"|"free""`;
+exports[`scene compile errors > unknown space type 1`] = `"invalid scene IR: space.type - Invalid option: expected one of "plane"|"numberline"|"geometry"|"free"|"space3""`;
 
 exports[`scene compile errors > unknown statement keyword 1`] = `"line 4:10: expected LP, got "p""`;

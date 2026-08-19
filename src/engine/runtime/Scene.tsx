@@ -3,6 +3,7 @@ import { SceneProvider } from './SceneProvider';
 import Timeline from './Timeline';
 import SvgRenderer from '@/engine/renderers/svg/SvgRenderer';
 import NumberlineRenderer from '@/engine/renderers/svg/NumberlineRenderer';
+import Space3Renderer from '@/engine/renderers/svg/Space3Renderer';
 import { controlRegistry } from '@/engine/controls/registry';
 import type { InputLayerConfig } from '@/engine/renderers/svg/InputLayer';
 import type { SceneIR, Scope } from '@/engine/ir/types';
@@ -22,7 +23,12 @@ export function Scene({
   revealed?: boolean;
   inputLayer?: InputLayerConfig;
 }) {
-  const Renderer = ir.space.type === 'numberline' ? NumberlineRenderer : SvgRenderer;
+  const Renderer =
+    ir.space.type === 'numberline'
+      ? NumberlineRenderer
+      : ir.space.type === 'space3'
+        ? Space3Renderer
+        : SvgRenderer;
   return (
     <SceneProvider ir={ir} onScopeChange={onScopeChange}>
       <div className="flex flex-col gap-4">

@@ -2,6 +2,7 @@ import { lessonSection } from './sections/lesson';
 import { exercisesSection } from './sections/exercises';
 import { sceneSection } from './sections/scene';
 import { objectsSection } from './sections/objects';
+import { space3Section } from './sections/space3';
 import { controlsSection } from './sections/controls';
 import { timelineSection } from './sections/timeline';
 import { logicSection } from './sections/logic';
@@ -28,6 +29,7 @@ Block structure is brace-delimited. Object/control properties go in a trailing
     exercisesSection,
     sceneSection,
     objectsSection,
+    space3Section,
     controlsSection,
     timelineSection,
     logicSection,

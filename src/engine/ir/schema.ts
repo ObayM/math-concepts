@@ -28,9 +28,12 @@ const stateVar = z.discriminatedUnion('type', [numberVar, booleanVar, enumVar]);
 // yDomain is required for everything except numberline (which is 1D)
 const space = z
   .object({
-    type: z.enum(['plane', 'numberline', 'geometry', 'free']),
+    type: z.enum(['plane', 'numberline', 'geometry', 'free', 'space3']),
     xDomain: z.tuple([z.number(), z.number()]),
     yDomain: z.tuple([z.number(), z.number()]).optional(),
+    zDomain: z.tuple([z.number(), z.number()]).optional(),
+    // azimuth and elevation in degrees. exprs, so a slider can spin the scene.
+    camera: z.tuple([expr, expr]).optional(),
     grid: z.boolean().optional(),
     axes: z.boolean().optional(),
     aspect: z.literal('equal').optional(),
@@ -38,6 +41,10 @@ const space = z
   .refine((s) => s.type === 'numberline' || s.yDomain !== undefined, {
     message: 'yDomain is required unless type is "numberline"',
     path: ['yDomain'],
+  })
+  .refine((s) => s.type !== 'space3' || s.zDomain !== undefined, {
+    message: 'zDomain is required when type is "space3"',
+    path: ['zDomain'],
   });
 
 // objects = the visual stuff, props are exprs over state
@@ -198,6 +205,66 @@ const repeatObj = z.object({
   ...objBase,
 });
 
+// --- three dimensions -------------------------------------------------------
+// every 3d object carries world coordinates; the renderer projects and depth
+// sorts them. they are only legal inside a space3 scene.
+const point3Obj = z.object({
+  type: z.literal('point3'),
+  x: expr,
+  y: expr,
+  z: expr,
+  r: z.number().optional(),
+  open: z.boolean().optional(),
+  label: liveText.optional(),
+  // drop dashed rails down to the coordinate planes, the standard way a textbook
+  // shows where a point sits
+  guides: z.boolean().optional(),
+  ...objBase,
+});
+const segment3Obj = z.object({
+  type: z.literal('segment3'),
+  x1: expr,
+  y1: expr,
+  z1: expr,
+  x2: expr,
+  y2: expr,
+  z2: expr,
+  arrow: z.boolean().optional(),
+  label: liveText.optional(),
+  ...objBase,
+});
+const polygon3Obj = z.object({
+  type: z.literal('polygon3'),
+  points: z.array(z.tuple([expr, expr, expr])).min(3),
+  fill: z.string().optional(),
+  opacity: z.number().optional(),
+  ...objBase,
+});
+// a plane drawn as a bounded patch around `through`, spanned by two directions
+// the emitter derives from the normal
+const plane3Obj = z.object({
+  type: z.literal('plane3'),
+  nx: expr,
+  ny: expr,
+  nz: expr,
+  through: z.tuple([expr, expr, expr]),
+  size: z.number().optional(),
+  fill: z.string().optional(),
+  opacity: z.number().optional(),
+  label: liveText.optional(),
+  ...objBase,
+});
+const label3Obj = z.object({
+  type: z.literal('label3'),
+  x: expr,
+  y: expr,
+  z: expr,
+  text: liveText,
+  fontSize: z.number().optional(),
+  tex: z.boolean().optional(),
+  ...objBase,
+});
+
 const sceneObject = z.discriminatedUnion('type', [
   curveObj,
   areaObj,
@@ -210,6 +277,11 @@ const sceneObject = z.discriminatedUnion('type', [
   vectorObj,
   arcObj,
   imageObj,
+  point3Obj,
+  segment3Obj,
+  polygon3Obj,
+  plane3Obj,
+  label3Obj,
   repeatObj,
 ]);
 

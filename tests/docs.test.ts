@@ -35,6 +35,13 @@ const GRAMMAR_KEYWORDS = [
   'vector',
   'arc',
   'image',
+  // three dimensions
+  'space3',
+  'point3',
+  'segment3',
+  'polygon3',
+  'plane3',
+  'label3',
   // controls
   'slider',
   'toggle',
@@ -87,6 +94,6 @@ describe('toAIContext', () => {
 
   it('is a reasonable size (not empty, not runaway)', () => {
     expect(ctx.length).toBeGreaterThan(1000);
-    expect(ctx.length).toBeLessThan(50000);
+    expect(ctx.length).toBeLessThan(60000);
   });
 });

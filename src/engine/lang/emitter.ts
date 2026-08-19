@@ -387,6 +387,17 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
     return [lowerR(expr.items[0], cScope, ln), lowerR(expr.items[1], cScope, ln)];
   }
 
+  function lowerTripleR(expr: Expr, cScope: CompileScope, ln: number): [NumExpr, NumExpr, NumExpr] {
+    if (expr.k !== 'tuple' || expr.items.length !== 3) {
+      throw new CompileError('expected an (x, y, z) triple', ln);
+    }
+    return [
+      lowerR(expr.items[0], cScope, ln),
+      lowerR(expr.items[1], cScope, ln),
+      lowerR(expr.items[2], cScope, ln),
+    ];
+  }
+
   function propLowerR(
     props: PropMap,
     key: string,
@@ -563,6 +574,20 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
           yV && yV !== true && yV.k === 'list'
             ? (yV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number])
             : undefined;
+        const is3 = s.spaceType === 'space3';
+        const zV = s.props.get('z');
+        if (is3 && (!zV || zV === true || zV.k !== 'list'))
+          throw new CompileError('a space3 scene needs z: [min, max]', s.ln);
+        if (!is3 && zV) throw new CompileError('z: only means something in a space3 scene', s.ln);
+        const zD =
+          zV && zV !== true && zV.k === 'list'
+            ? (zV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number])
+            : undefined;
+        const camRaw = s.props.get('camera');
+        if (camRaw && !is3)
+          throw new CompileError('camera: only means something in a space3 scene', s.ln);
+        if (camRaw && camRaw !== true && (camRaw.k !== 'list' || camRaw.items.length !== 2))
+          throw new CompileError('camera: [azimuth, elevation] in degrees', s.ln);
         const axesRaw = s.props.get('axes');
         const axesV =
           axesRaw === undefined || axesRaw === true ? true : cBool(axesRaw, cScope, s.ln);
@@ -577,11 +602,20 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
           type: s.spaceType,
           xDomain: xD,
           ...(yD && { yDomain: yD }),
+          ...(zD && { zDomain: zD }),
           ...(s.props.has('grid') && { grid: true }),
           ...(s.props.has('axes') && { axes: axesV !== false }),
           ...(aspectV !== undefined && { aspect: 'equal' }),
         };
         run(s.children, cScope);
+        // the camera usually spins on a param declared inside the scene, so it
+        // can only be lowered once the children have registered their state
+        if (camRaw && camRaw !== true && camRaw.k === 'list') {
+          ir.space.camera = [
+            lowerR(camRaw.items[0], cScope, s.ln),
+            lowerR(camRaw.items[1], cScope, s.ln),
+          ];
+        }
         break;
       }
 
@@ -856,6 +890,100 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         if (rotate != null) obj.rotate = rotate;
         const opacity = propNum(s.props, 'opacity', s.ln, cScope);
         if (opacity != null) obj.opacity = opacity;
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'point3': {
+        const id = evalId(s.id, cScope, s.ln);
+        const [x, y, z] = lowerTripleR(s.pos, cScope, s.ln);
+        const obj: any = { id, type: 'point3', x, y, z };
+        const r = propNum(s.props, 'r', s.ln, cScope);
+        if (r != null) obj.r = r;
+        if (s.props.has('open')) obj.open = true;
+        if (s.props.has('guides')) obj.guides = true;
+        const label = propStr(s.props, 'label', cScope);
+        if (label) obj.label = liveText(label, cScope, s.ln);
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'segment3': {
+        const id = evalId(s.id, cScope, s.ln);
+        const [x1, y1, z1] = lowerTripleR(s.from, cScope, s.ln);
+        const [x2, y2, z2] = lowerTripleR(s.to, cScope, s.ln);
+        const obj: any = { id, type: 'segment3', x1, y1, z1, x2, y2, z2 };
+        if (s.props.has('arrow')) obj.arrow = true;
+        const label = propStr(s.props, 'label', cScope);
+        if (label) obj.label = liveText(label, cScope, s.ln);
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'polygon3': {
+        const id = evalId(s.id, cScope, s.ln);
+        const points = s.pts.map((pt) => lowerTripleR(pt, cScope, s.ln));
+        const obj: any = { id, type: 'polygon3', points };
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
+        if (opacity != null) obj.opacity = opacity;
+        const fill = propStr(s.props, 'fill', cScope);
+        if (fill) obj.fill = fill;
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'plane3': {
+        const id = evalId(s.id, cScope, s.ln);
+        const normal = s.props.get('normal');
+        const through = s.props.get('through');
+        if (!normal || normal === true)
+          throw new CompileError('plane3 needs a normal: (a, b, c)', s.ln);
+        if (!through || through === true)
+          throw new CompileError('plane3 needs a through: (x, y, z) point on it', s.ln);
+        const [nx, ny, nz] = lowerTripleR(normal, cScope, s.ln);
+        if ([nx, ny, nz].every((v) => v === 0))
+          throw new CompileError('plane3 normal cannot be the zero vector', s.ln);
+        const obj: any = {
+          id,
+          type: 'plane3',
+          nx,
+          ny,
+          nz,
+          through: lowerTripleR(through, cScope, s.ln),
+        };
+        const size = propNum(s.props, 'size', s.ln, cScope);
+        if (size != null) obj.size = size;
+        const opacity = propNum(s.props, 'opacity', s.ln, cScope);
+        if (opacity != null) obj.opacity = opacity;
+        const fill = propStr(s.props, 'fill', cScope);
+        if (fill) obj.fill = fill;
+        const label = propStr(s.props, 'label', cScope);
+        if (label) obj.label = liveText(label, cScope, s.ln);
+        applyCommon(obj, s.props, cScope, s.ln);
+        ir.objects.push(obj);
+        break;
+      }
+
+      case 'label3': {
+        const [x, y, z] = lowerTripleR(s.at, cScope, s.ln);
+        const obj: any = {
+          id: s.id ? evalId(s.id, cScope, s.ln) : `label3-${ir.objects.length}`,
+          type: 'label3',
+          x,
+          y,
+          z,
+          text:
+            s.text.k === 'str'
+              ? liveText(s.text.fstr ? evalFstr(s.text.v, cScope) : s.text.v, cScope, s.ln)
+              : { parts: [asIR(lowerR(s.text, cScope, s.ln))] },
+        };
+        const fontSize = propNum(s.props, 'fontSize', s.ln, cScope);
+        if (fontSize != null) obj.fontSize = fontSize;
+        if (s.props.has('tex')) obj.tex = true;
         applyCommon(obj, s.props, cScope, s.ln);
         ir.objects.push(obj);
         break;

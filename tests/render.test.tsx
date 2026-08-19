@@ -220,3 +220,54 @@ describe('curve breaks its stroke across a vertical asymptote', () => {
     expect((d.match(/M/g) ?? []).length).toBe(1);
   });
 });
+
+describe('space3 render (SSR smoke)', () => {
+  const ir = compile(`scene space3 {
+  x: [-4, 4]
+  y: [-4, 4]
+  z: [-4, 4]
+  param az = 55 { range: [0, 360], step: 5 }
+  camera: [az, 26]
+  point3 A = (3, 2, 2) { label: "A(3, 2, 2)", guides, color: accent }
+  segment3 v = (0, 0, 0) -> (3, 2, 2) { arrow, color: primary }
+  polygon3 base = [(0,0,0), (3,0,0), (3,2,0), (0,2,0)] { color: primary }
+  plane3 p { normal: (0, 0, 1), through: (0, 0, 0), size: 2 }
+  label3 at (0, 0, 3.4) = "top"
+  slider az { label: "spin" }
+}`);
+
+  const html = renderToStaticMarkup(<Scene ir={ir} />);
+
+  it('draws an svg with every 3d primitive in it', () => {
+    expect(html).toContain('<svg');
+    expect(html).toContain('circle');
+    expect(html).toContain('polygon');
+    expect(html).toContain('A(3, 2, 2)');
+    expect(html).toContain('top');
+  });
+
+  it('labels all three axes', () => {
+    for (const axis of ['>x<', '>y<', '>z<']) expect(html).toContain(axis);
+  });
+
+  it('emits no NaN coordinates', () => {
+    expect(html).not.toContain('NaN');
+  });
+
+  it('keeps 3d text left to right even inside an rtl page', () => {
+    expect(html).toContain('direction="ltr"');
+  });
+
+  it('survives a camera that evaluates to nonsense', () => {
+    const bad = compile(`scene space3 {
+  x: [-1, 1]
+  y: [-1, 1]
+  z: [-1, 1]
+  camera: [0/0, 0/0]
+  point3 A = (1, 1, 1)
+}`);
+    const out = renderToStaticMarkup(<Scene ir={bad} />);
+    expect(out).toContain('<svg');
+    expect(out).not.toContain('NaN');
+  });
+});

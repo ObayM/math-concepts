@@ -38,6 +38,11 @@ export type Stmt =
   | { k: 'vector'; id: Expr; from: Expr; to: Expr; props: PropMap; ln: number }
   | { k: 'arc'; id: Expr; center: Expr; props: PropMap; ln: number }
   | { k: 'image'; id: Expr; pos: Expr; props: PropMap; ln: number }
+  | { k: 'point3'; id: Expr; pos: Expr; props: PropMap; ln: number }
+  | { k: 'segment3'; id: Expr; from: Expr; to: Expr; props: PropMap; ln: number }
+  | { k: 'polygon3'; id: Expr; pts: Expr[]; props: PropMap; ln: number }
+  | { k: 'plane3'; id: Expr; props: PropMap; ln: number }
+  | { k: 'label3'; id: Expr | null; at: Expr; text: Expr; props: PropMap; ln: number }
   | { k: 'slider'; bind: string; props: PropMap; ln: number }
   | { k: 'toggle'; bind: string; props: PropMap; ln: number }
   | { k: 'stepper'; bind: string; props: PropMap; ln: number }

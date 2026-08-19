@@ -11,7 +11,7 @@ import type {
 } from './ast';
 import { CompileError } from './errors';
 
-const SPACE_PROPS = new Set(['x', 'y', 'grid', 'axes', 'aspect']);
+const SPACE_PROPS = new Set(['x', 'y', 'z', 'camera', 'grid', 'axes', 'aspect']);
 
 // the whole parser lives in one closure over (tokens, pos); makeParser exposes
 // the two entry points — a full file, or a bare expression (f-string fragments etc.)
@@ -334,6 +334,16 @@ function makeParser(tokens: Token[]) {
         return parseArc(ln);
       case 'image':
         return parseImage(ln);
+      case 'point3':
+        return parsePoint3(ln);
+      case 'segment3':
+        return parseSegment3(ln);
+      case 'polygon3':
+        return parsePolygon3(ln);
+      case 'plane3':
+        return parsePlane3(ln);
+      case 'label3':
+        return parseLabel3(ln);
       case 'slider':
         return parseSlider(ln);
       case 'toggle':
@@ -1122,6 +1132,63 @@ function makeParser(tokens: Token[]) {
     const props = parsePropsBlock();
     endStmt();
     return { k: 'polygon', id, pts: listExpr.items, props, ln };
+  }
+
+  function parsePoint3(ln: number): Stmt {
+    eat('IDENT', 'point3');
+    const id = parseId();
+    eat('ASSIGN');
+    const pos_ = parseExpr();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'point3', id, pos: pos_, props, ln };
+  }
+
+  function parseSegment3(ln: number): Stmt {
+    eat('IDENT', 'segment3');
+    const id = parseId();
+    eat('ASSIGN');
+    const e = parseExpr();
+    if (e.k !== 'arrow') throw new CompileError('segment3 must be (x1,y1,z1) -> (x2,y2,z2)', ln);
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'segment3', id, from: e.from, to: e.to, props, ln };
+  }
+
+  function parsePolygon3(ln: number): Stmt {
+    eat('IDENT', 'polygon3');
+    const id = parseId();
+    eat('ASSIGN');
+    const listExpr = parseExpr();
+    if (listExpr.k !== 'list') throw new CompileError('polygon3 needs [...] point list', ln);
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'polygon3', id, pts: listExpr.items, props, ln };
+  }
+
+  function parsePlane3(ln: number): Stmt {
+    eat('IDENT', 'plane3');
+    const id = parseId();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'plane3', id, props, ln };
+  }
+
+  function parseLabel3(ln: number): Stmt {
+    eat('IDENT', 'label3');
+    let id: Expr | null = null;
+    if (check('IDENT') && tokens[pos].raw !== 'at') {
+      id = parseId();
+    } else if (check('FSTR') || check('STR')) {
+      id = parseId();
+    }
+    eat('IDENT', 'at');
+    const at = parseExpr();
+    eat('ASSIGN');
+    const text = parseExpr();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'label3', id, at, text, props, ln };
   }
 
   function parseVector(ln: number): Stmt {
