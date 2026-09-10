@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Loader2, LogIn, User } from 'lucide-react';
+import { useT } from '@/components/i18n/LocaleProvider';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
 import { PASSWORD_MIN } from '@/lib/password';
@@ -15,6 +16,7 @@ import PasswordInput from '@/components/ui/PasswordInput';
 import Card from '@/components/ui/Card';
 
 export default function SignupPage() {
+  const t = useT();
   const { user } = useAuth();
   const router = useRouter();
 
@@ -37,7 +39,7 @@ export default function SignupPage() {
     }
 
     if (password.length < PASSWORD_MIN) {
-      setError(`Password must be at least ${PASSWORD_MIN} characters long.`);
+      setError(t('auth.passwordShort', { count: PASSWORD_MIN }));
       return;
     }
 
@@ -74,7 +76,7 @@ export default function SignupPage() {
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
-            Create an Account
+            {t('auth.createAccount')}
           </h1>
           <p className="mt-2 text-sm text-neutral-500">Join us and start your journey!</p>
         </div>
@@ -100,8 +102,8 @@ export default function SignupPage() {
             type="email"
             autoComplete="email"
             required
-            placeholder="Email address"
-            aria-label="Email address"
+            placeholder={t('auth.emailAddress')}
+            aria-label={t('auth.emailAddress')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail className="w-5 h-5" />}
@@ -112,8 +114,8 @@ export default function SignupPage() {
             name="password"
             autoComplete="new-password"
             required
-            placeholder="Password"
-            aria-label="Password"
+            placeholder={t('auth.password')}
+            aria-label={t('auth.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

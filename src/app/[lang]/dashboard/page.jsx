@@ -15,6 +15,7 @@ import ActivityGraph from '@/components/dashboard/ActivityGraph';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { firstName } from '@/lib/user-name';
+import { getT } from '@/lib/i18n/server';
 
 const eyebrow = 'text-xs font-bold uppercase tracking-[0.12em] text-neutral-400';
 
@@ -109,16 +110,17 @@ const DashboardPage = async ({ params }) => {
   const todayStr = localDayKey(timezone);
   const hasActivityToday = activityData.some((a) => a.date === todayStr);
   const greetingName = firstName(user);
+  const t = await getT();
 
   return (
     <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <header className="animate-fade-in-up">
           <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-neutral-900">
-            Hey, {greetingName}.
+            {t('dashboard.greeting', { name: greetingName })}
           </h1>
           <p className="mt-2 text-lg text-neutral-500">
-            {getSubheadline({
+            {getSubheadline(t, {
               completed: completedInCourse,
               courseName: currentCourse?.name,
               streak: streak ?? 0,
@@ -128,6 +130,7 @@ const DashboardPage = async ({ params }) => {
         </header>
 
         <HeroContinue
+          t={t}
           course={currentCourse}
           nextLesson={nextLesson}
           completed={completedInCourse}
@@ -135,18 +138,19 @@ const DashboardPage = async ({ params }) => {
 
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <UpNextPath course={currentCourse} />
+            <UpNextPath t={t} course={currentCourse} />
           </div>
           <div>
             <MomentumCard
+              t={t}
               streak={streak ?? 0}
               activityData={activityData}
               hasActivityToday={hasActivityToday}
               todayXp={todayXp}
               timezone={timezone}
             />
-            <PracticeCard course={currentCourse} />
-            <WarmupCard />
+            <PracticeCard t={t} course={currentCourse} />
+            <WarmupCard t={t} />
           </div>
         </div>
       </div>
@@ -154,21 +158,31 @@ const DashboardPage = async ({ params }) => {
   );
 };
 
-function getSubheadline({ completed, courseName, streak, hasActivityToday }) {
-  if (!courseName) return 'Nothing here yet. Pick a course to get going.';
-  if (completed === 0) return `Ready when you are. ${courseName} starts right below.`;
-  const lessonWord = `${completed} lesson${completed !== 1 ? 's' : ''}`;
-  if (hasActivityToday) return `Nice work today. You're ${lessonWord} into ${courseName}.`;
-  if (streak > 0)
-    return `You're ${lessonWord} into ${courseName}. One more keeps your streak alive.`;
-  return `You're ${lessonWord} into ${courseName}. Solve one to start a streak.`;
+function difficultyLabel(t, difficulty) {
+  const key = `difficulty.${difficulty}`;
+  const label = t(key);
+  return label === key ? difficulty : label;
 }
 
-const HeroContinue = ({ course, nextLesson, completed }) => {
+function getSubheadline(t, { completed, courseName, streak, hasActivityToday }) {
+  if (!courseName) return t('dashboard.empty');
+  if (completed === 0) return t('dashboard.ready', { course: courseName });
+
+  const progress = t('dashboard.progress', {
+    lessons: t('courses.lessonCount', { count: completed }),
+    course: courseName,
+  });
+
+  if (hasActivityToday) return `${t('dashboard.niceToday')} ${progress}`;
+  if (streak > 0) return `${progress} ${t('dashboard.keepAlive')}`;
+  return `${progress} ${t('dashboard.startStreak')}`;
+}
+
+const HeroContinue = ({ t, course, nextLesson, completed }) => {
   if (!course || !nextLesson) {
     return (
       <Card className="card-soft mt-8 p-8 text-center animate-fade-in-up [animation-delay:80ms] opacity-0">
-        <p className="text-neutral-500">No lessons published yet. Check back soon.</p>
+        <p className="text-neutral-500">{t('dashboard.noLessons')}</p>
       </Card>
     );
   }
@@ -182,13 +196,15 @@ const HeroContinue = ({ course, nextLesson, completed }) => {
     <div className="card-hero mt-8 rounded-3xl border border-neutral-200/80 bg-white p-7 animate-fade-in-up [animation-delay:80ms] opacity-0 sm:p-9">
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-2xl">
-          <p className={eyebrow}>{started ? 'Jump back in' : 'Start here'}</p>
+          <p className={eyebrow}>
+            {started ? t('dashboard.jumpBackIn') : t('dashboard.startHere')}
+          </p>
           <h2 className="mt-3 font-display text-3xl font-bold leading-tight text-neutral-900 sm:text-4xl">
             {nextLesson.title}
           </h2>
           <p className="mt-2 text-sm text-neutral-500">
-            {course.name} · Lesson {nextLesson.number} ·{' '}
-            <span className="capitalize">{nextLesson.difficulty}</span>
+            {course.name} · {t('dashboard.lessonMeta', { number: nextLesson.number })} ·{' '}
+            <span>{difficultyLabel(t, nextLesson.difficulty)}</span>
           </p>
           {nextLesson.description && (
             <p className="mt-4 text-neutral-600 line-clamp-2">{nextLesson.description}</p>
@@ -203,7 +219,7 @@ const HeroContinue = ({ course, nextLesson, completed }) => {
             />
           </div>
           <p className="mt-2.5 text-xs text-neutral-400">
-            {completed} of {total} lessons done
+            {t('dashboard.doneOfTotal', { completed, total })}
           </p>
         </div>
       </div>
@@ -216,20 +232,20 @@ const HeroContinue = ({ course, nextLesson, completed }) => {
         icon={<PlayCircle size={20} />}
         className="mt-8"
       >
-        {started ? 'Continue' : 'Start lesson'}
+        {started ? t('dashboard.continue') : t('dashboard.start')}
       </Button>
     </div>
   );
 };
 
-const UpNextPath = ({ course }) => {
+const UpNextPath = ({ t, course }) => {
   if (!course) return null;
   const coursePath = courseUrlSlug(course);
   const lessons = course.lessons.slice(0, 5);
 
   return (
     <section className="animate-fade-in-up [animation-delay:160ms] opacity-0">
-      <h3 className={clsx(eyebrow, 'mb-3')}>Up next in {course.name}</h3>
+      <h3 className={clsx(eyebrow, 'mb-3')}>{t('dashboard.upNextIn', { course: course.name })}</h3>
       {lessons.length > 0 ? (
         <Card className="card-soft divide-y divide-neutral-100 overflow-hidden">
           {lessons.map((lesson) => (
@@ -239,13 +255,13 @@ const UpNextPath = ({ course }) => {
             href={`/courses/${coursePath}`}
             className="flex items-center justify-center gap-1.5 px-5 py-3.5 text-sm font-semibold text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-800"
           >
-            View all {course.lessons.length} lessons
+            {t('dashboard.viewAll', { count: course.lessons.length })}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </Card>
       ) : (
         <Card className="card-soft p-6">
-          <p className="text-sm text-neutral-400">No lessons in this course yet.</p>
+          <p className="text-sm text-neutral-400">{t('dashboard.noLessonsInCourse')}</p>
         </Card>
       )}
     </section>
@@ -295,19 +311,19 @@ const LessonRow = ({ lesson, coursePath }) => {
   );
 };
 
-const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp, timezone }) => {
+const MomentumCard = ({ t, streak, activityData, hasActivityToday, todayXp, timezone }) => {
   const goal = goalProgress(todayXp);
   const caption = goal.met
-    ? 'Daily goal done. Anything past this is a bonus.'
+    ? t('dashboard.goalDone')
     : streak === 0
-      ? 'Solve a problem to start your streak.'
+      ? t('dashboard.startStreak')
       : hasActivityToday
-        ? `${goal.remaining} XP to go today.`
-        : 'Take one lesson to keep it alive.';
+        ? t('dashboard.xpToGo', { xp: goal.remaining })
+        : t('dashboard.keepAlive');
 
   return (
     <section className="animate-fade-in-up [animation-delay:220ms] opacity-0">
-      <h3 className={clsx(eyebrow, 'mb-3')}>This week</h3>
+      <h3 className={clsx(eyebrow, 'mb-3')}>{t('dashboard.thisWeek')}</h3>
       <Card className="card-soft p-6">
         <div className="flex items-end gap-2">
           <Flame className="mb-1 h-7 w-7 text-orange-500" />
@@ -351,7 +367,7 @@ const MomentumCard = ({ streak, activityData, hasActivityToday, todayXp, timezon
   );
 };
 
-const WarmupCard = () => (
+const WarmupCard = ({ t }) => (
   <Link
     href="/warmup"
     className="group mt-4 block animate-fade-in-up [animation-delay:320ms] opacity-0"
@@ -362,8 +378,8 @@ const WarmupCard = () => (
           <Zap className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-bold text-neutral-800">Warm up</p>
-          <p className="text-sm text-neutral-500">Fast arithmetic, as long as you feel like it.</p>
+          <p className="font-bold text-neutral-800">{t('dashboard.warmup')}</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.warmupBlurb')}</p>
         </div>
         <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-neutral-600" />
       </div>
@@ -371,7 +387,7 @@ const WarmupCard = () => (
   </Link>
 );
 
-const PracticeCard = ({ course }) => {
+const PracticeCard = ({ t, course }) => {
   if (!course) return null;
   const coursePath = courseUrlSlug(course);
 
@@ -386,8 +402,10 @@ const PracticeCard = ({ course }) => {
             <Target className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-bold text-neutral-800">Practice</p>
-            <p className="text-sm text-neutral-500">Mixed problems from {course.name}.</p>
+            <p className="font-bold text-neutral-800">{t('dashboard.practice')}</p>
+            <p className="text-sm text-neutral-500">
+              {t('dashboard.practiceBlurb', { course: course.name })}
+            </p>
           </div>
           <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-neutral-600" />
         </div>

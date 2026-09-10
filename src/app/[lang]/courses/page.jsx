@@ -3,9 +3,11 @@ import { BookOpen, ArrowRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { courseUrlSlug } from '@/lib/db/courseService';
 import Card from '@/components/ui/Card';
+import { getT } from '@/lib/i18n/server';
 
 export default async function CoursesPage({ params }) {
   const { lang } = await params;
+  const t = await getT();
   const courses = await prisma.course.findMany({
     where: { status: 'published', lang },
     orderBy: { sortOrder: 'asc' },
@@ -31,11 +33,9 @@ export default async function CoursesPage({ params }) {
       <main className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <header className="animate-fade-in-up">
           <h1 className="font-display text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
-            Our courses
+            {t('courses.title')}
           </h1>
-          <p className="mt-3 text-lg text-neutral-500">
-            Visual, interactive tracks that make the math actually click.
-          </p>
+          <p className="mt-3 text-lg text-neutral-500">{t('courses.subtitle')}</p>
         </header>
 
         <div className="mt-10 space-y-4">
@@ -43,8 +43,8 @@ export default async function CoursesPage({ params }) {
             const lessonCount = course._count.lessons;
             const unitCount = unitsByCourse.get(course.id)?.size ?? 0;
             const meta = [
-              lessonCount ? `${lessonCount} lesson${lessonCount === 1 ? '' : 's'}` : null,
-              unitCount ? `${unitCount} unit${unitCount === 1 ? '' : 's'}` : null,
+              lessonCount ? t('courses.lessonCount', { count: lessonCount }) : null,
+              unitCount ? t('courses.unitCount', { count: unitCount }) : null,
             ]
               .filter(Boolean)
               .join(' · ');
@@ -81,14 +81,12 @@ export default async function CoursesPage({ params }) {
 
           {courses.length === 0 && (
             <Card className="card-soft p-8 text-center">
-              <p className="text-neutral-400">No courses published yet. Check back soon.</p>
+              <p className="text-neutral-400">{t('courses.empty')}</p>
             </Card>
           )}
         </div>
 
-        {courses.length > 0 && (
-          <p className="mt-8 text-sm text-neutral-400">More tracks coming soon.</p>
-        )}
+        {courses.length > 0 && <p className="mt-8 text-sm text-neutral-400">{t('courses.more')}</p>}
       </main>
     </div>
   );
