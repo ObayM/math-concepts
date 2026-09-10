@@ -1,0 +1,21 @@
+name: Reminder emails
+
+# the route only mails users whose local hour is 19, so it has to be asked
+# every hour for any timezone to ever match
+on:
+  schedule:
+    - cron: '5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask the app to send whatever is due
+        run: |
+          code=$(curl -sS -o /tmp/out.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://en.${{ secrets.APP_DOMAIN }}/api/cron/reminders")
+          echo "status: $code"
+          cat /tmp/out.json
+          test "$code" = "200"
