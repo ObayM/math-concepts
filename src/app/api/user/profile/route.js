@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { requireUser } from '@/lib/session';
+import { requireUser, refreshSessionCache } from '@/lib/session';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
 import { updateUserProfile } from '@/lib/db/userService';
 
@@ -35,5 +35,6 @@ export async function PUT(request) {
     ...(image !== undefined && { image: image || null }),
   });
 
+  await refreshSessionCache();
   return Response.json({ ok: true });
 }

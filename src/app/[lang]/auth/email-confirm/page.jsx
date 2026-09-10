@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Loader2 } from 'lucide-react';
@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 
 const COOLDOWN_SECONDS = 60;
 
-export default function AuthConfirmPage() {
+function ConfirmCard() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
 
@@ -106,5 +106,13 @@ export default function AuthConfirmPage() {
         </div>
       </Card>
     </main>
+  );
+}
+
+export default function AuthConfirmPage() {
+  return (
+    <Suspense fallback={<main className="min-h-[calc(100dvh-var(--nav-h))]" />}>
+      <ConfirmCard />
+    </Suspense>
   );
 }

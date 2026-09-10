@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { displayName } from '@/lib/user-name';
+import { displayName as nameFor } from '@/lib/user-name';
 
 export function avatarColor(str) {
   const colors = [
@@ -95,7 +95,7 @@ export default function ProfileHeaderCard({ profile, isOwn }) {
 
   const displayName = editing
     ? nameVal || profile.displayUsername
-    : displayName(profile, profile.displayUsername ?? '');
+    : nameFor(profile, profile.displayUsername ?? '');
   const displayImage = editing ? imageVal || null : profile.image;
 
   return (

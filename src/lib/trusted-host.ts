@@ -1,7 +1,6 @@
 import { hostsForDomain } from './locale';
 
 const APP_DOMAIN = (process.env.APP_DOMAIN ?? '').trim().toLowerCase();
-
 const ALLOWED = new Set(hostsForDomain(APP_DOMAIN).map((h) => h.toLowerCase()));
 
 const clean = (value: string | null | undefined) => (value ?? '').trim().toLowerCase();
@@ -15,12 +14,9 @@ export function trustedHost(
   forwarded: string | null | undefined,
   host: string | null | undefined
 ): string {
-  const candidates = [clean(forwarded), clean(host)];
-  for (const candidate of candidates) {
-    if (candidate && isTrustedHost(candidate)) return candidate;
-  }
-  if (ALLOWED.size) return APP_DOMAIN;
-  return candidates.find(Boolean) ?? '';
+  const proxied = clean(forwarded);
+  if (proxied && isTrustedHost(proxied)) return proxied;
+  return clean(host) || proxied || '';
 }
 
 export function trustedProto(

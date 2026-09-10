@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { requireUser } from '@/lib/session';
+import { requireUser, refreshSessionCache } from '@/lib/session';
 import { isUsernameAvailable, setUsername, USERNAME_REGEX } from '@/lib/db/userService';
 import { NextResponse } from 'next/server';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
@@ -34,5 +34,7 @@ export async function POST(request) {
     }
     throw err;
   }
+
+  await refreshSessionCache();
   return NextResponse.json({ success: true });
 }

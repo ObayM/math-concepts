@@ -22,14 +22,20 @@ describe('with APP_DOMAIN set', () => {
     expect(trustedHost('evil.com', 'en.mathly.com')).toBe('en.mathly.com');
   });
 
-  it('falls back to the apex when neither header can be trusted', async () => {
+  it('ignores an untrusted forwarded host and uses the real one', async () => {
     const { trustedHost } = await load('mathly.com');
-    expect(trustedHost('evil.com', 'also-evil.com')).toBe('mathly.com');
+    expect(trustedHost('evil.com', 'also-evil.com')).toBe('also-evil.com');
   });
 
   it('is not fooled by a lookalike suffix', async () => {
     const { trustedHost } = await load('mathly.com');
-    expect(trustedHost('en.mathly.com.evil.com', null)).toBe('mathly.com');
+    expect(trustedHost('en.mathly.com.evil.com', 'en.mathly.com')).toBe('en.mathly.com');
+  });
+
+  it('leaves loopback alone, so a health check is never mistaken for the apex', async () => {
+    const { trustedHost } = await load('mathly.com');
+    expect(trustedHost(null, 'localhost:3000')).toBe('localhost:3000');
+    expect(trustedHost(null, '127.0.0.1:3000')).toBe('127.0.0.1:3000');
   });
 
   it('normalises case', async () => {
@@ -40,7 +46,7 @@ describe('with APP_DOMAIN set', () => {
   it('keeps the port when the domain carries one', async () => {
     const { trustedHost } = await load('mathly.local:3100');
     expect(trustedHost('ar.mathly.local:3100', null)).toBe('ar.mathly.local:3100');
-    expect(trustedHost('evil.local:3100', null)).toBe('mathly.local:3100');
+    expect(trustedHost('evil.local:3100', 'ar.mathly.local:3100')).toBe('ar.mathly.local:3100');
   });
 });
 
