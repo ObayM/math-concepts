@@ -5,6 +5,15 @@ import { courseUrlSlug } from '@/lib/db/courseService';
 import Card from '@/components/ui/Card';
 import { getT } from '@/lib/i18n/server';
 
+export async function generateMetadata() {
+  const t = await getT();
+  return {
+    title: t('courses.title'),
+    description: t('courses.subtitle'),
+    alternates: { canonical: '/courses' },
+  };
+}
+
 export default async function CoursesPage({ params }) {
   const { lang } = await params;
   const t = await getT();

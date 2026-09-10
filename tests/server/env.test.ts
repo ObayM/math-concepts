@@ -19,9 +19,19 @@ describe('production env validation', () => {
 
   it('names every missing variable rather than the first one', () => {
     const problems = envProblems({});
-    expect(problems).toHaveLength(7);
     expect(problems.join('\n')).toContain('SMTP_HOST');
-    expect(problems.join('\n')).toContain('COOKIE_DOMAIN');
+    expect(problems.join('\n')).toContain('DATABASE_URL');
+    expect(problems.join('\n')).toContain('BETTER_AUTH_SECRET');
+  });
+
+  it('only asks for a cookie domain once there are locale subdomains to share across', () => {
+    expect(envProblems({}).join()).not.toContain('COOKIE_DOMAIN');
+    expect(envProblems({ APP_DOMAIN: 'mathly.com' }).join()).toContain('COOKIE_DOMAIN');
+  });
+
+  it('downgrades to a warning for a test harness that opts in explicitly', () => {
+    const env = { ...GOOD, SMTP_HOST: '', ALLOW_INCOMPLETE_ENV: '1' };
+    expect(() => assertProductionEnv(env)).not.toThrow();
   });
 
   it('rejects a cookie domain with no leading dot, which silently breaks the language switch', () => {

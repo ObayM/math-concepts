@@ -13,6 +13,7 @@ env:
   GEMINI_API_KEY: ci-placeholder-key
   CRON_SECRET: ci-cron-secret
   DISABLE_HIBP: '1'
+  ALLOW_INCOMPLETE_ENV: '1'
 
 jobs:
   test:

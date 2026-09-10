@@ -1,9 +1,14 @@
+type Env = Record<string, string | undefined>;
+
 interface Requirement {
   name: string;
   why: string;
+  when?: (env: Env) => boolean;
   ok?: (value: string) => boolean;
   hint?: string;
 }
+
+const hasDomain = (env: Env) => Boolean(env.APP_DOMAIN?.trim());
 
 const REQUIRED: Requirement[] = [
   { name: 'DATABASE_URL', why: 'nothing can read or write without it' },
@@ -25,7 +30,8 @@ const REQUIRED: Requirement[] = [
   },
   {
     name: 'COOKIE_DOMAIN',
-    why: 'without it a session made on en. is invisible on ar.',
+    why: 'with locale subdomains, a session made on en. is invisible on ar. without it',
+    when: hasDomain,
     ok: (v) => v.startsWith('.'),
     hint: 'needs a leading dot, e.g. .mathly.com',
   },
@@ -36,11 +42,10 @@ const REQUIRED: Requirement[] = [
   { name: 'CRON_SECRET', why: 'the reminder endpoint refuses to run without it' },
 ];
 
-type Env = Record<string, string | undefined>;
-
 export function envProblems(env: Env = process.env): string[] {
   const problems: string[] = [];
-  for (const { name, why, ok, hint } of REQUIRED) {
+  for (const { name, why, when, ok, hint } of REQUIRED) {
+    if (when && !when(env)) continue;
     const value = env[name]?.trim();
     if (!value) {
       problems.push(`${name} is not set: ${why}`);
@@ -53,13 +58,24 @@ export function envProblems(env: Env = process.env): string[] {
 
 export function assertProductionEnv(env: Env = process.env): void {
   if (env.NODE_ENV !== 'production') return;
+
   const problems = envProblems(env);
   if (!problems.length) return;
 
   const list = problems.map((p) => `  - ${p}`).join('\n');
+
+  if (env.ALLOW_INCOMPLETE_ENV === '1') {
+    console.warn(
+      `[env] running a production build with an incomplete environment:\n${list}\n` +
+        'ALLOW_INCOMPLETE_ENV=1 is set, so this is a warning. never set it on a real deploy.'
+    );
+    return;
+  }
+
   throw new Error(
     `refusing to start: the production environment is incomplete.\n${list}\n\n` +
       'see .env.example. every one of these fails silently or confusingly at runtime,\n' +
-      'and two of them make signup impossible, so this is a hard stop.'
+      'and two of them make signup impossible, so this is a hard stop.\n' +
+      'set ALLOW_INCOMPLETE_ENV=1 only for a test harness running a production build.'
   );
 }

@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 
+export const metadata = {
+  title: 'Page not found',
+  robots: { index: false, follow: false },
+};
+
 export default function NotFound() {
   return (
     <div className="min-h-[calc(100dvh-var(--nav-h))] bg-surface flex items-center justify-center px-6">

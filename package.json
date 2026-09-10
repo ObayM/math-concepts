@@ -16,6 +16,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:studio": "prisma studio",
     "build:lessons": "node scripts/build-lessons.mjs",
+    "build:og": "node scripts/build-og-images.mjs",
     "db:seed": "npm run build:lessons && node prisma/seed.js",
     "prepare": "husky",
     "dsl": "tsx scripts/dsl.ts",

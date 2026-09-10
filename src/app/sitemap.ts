@@ -13,25 +13,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const host = (await headers()).get('x-forwarded-host') ?? (await headers()).get('host');
   const lang = localeFromHost(host) ?? DEFAULT_LOCALE;
 
-  const staticRoutes = ['', '/login', '/signup', '/privacy', '/terms', '/prism'].map((path) => ({
+  const staticRoutes = [
+    '',
+    '/login',
+    '/signup',
+    '/courses',
+    '/warmup',
+    '/privacy',
+    '/terms',
+    '/prism',
+  ].map((path) => ({
     url: `${base}${path}`,
     lastModified: new Date(),
   }));
 
-  let courseRoutes: MetadataRoute.Sitemap = [];
+  let contentRoutes: MetadataRoute.Sitemap = [];
   try {
-    const courses: { name: string; slug: string | null; updatedAt: Date }[] =
-      await prisma.course.findMany({
-        where: { status: 'published', lang },
-        select: { name: true, slug: true, updatedAt: true },
-      });
-    courseRoutes = courses.map((course) => ({
-      url: `${base}/courses/${courseUrlSlug(course)}`,
-      lastModified: course.updatedAt,
-    }));
+    const courses = await prisma.course.findMany({
+      where: { status: 'published', lang },
+      select: {
+        name: true,
+        slug: true,
+        updatedAt: true,
+        lessons: {
+          where: { status: 'published' },
+          select: { lessonKey: true, publishedAt: true, updatedAt: true },
+        },
+      },
+    });
+
+    contentRoutes = courses.flatMap((course) => {
+      const path = `${base}/courses/${courseUrlSlug(course)}`;
+      return [
+        { url: path, lastModified: course.updatedAt },
+        ...course.lessons.map((lesson) => ({
+          url: `${path}/${lesson.lessonKey}`,
+          lastModified: lesson.publishedAt ?? lesson.updatedAt,
+        })),
+      ];
+    });
   } catch {
     // a sitemap should never take the build down over a database blip
   }
 
-  return [...staticRoutes, ...courseRoutes];
+  return [...staticRoutes, ...contentRoutes];
 }

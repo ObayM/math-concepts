@@ -61,6 +61,7 @@ export default defineConfig({
       // __Secure- prefixed and therefore unsettable
       APP_PROTOCOL: 'http',
       DISABLE_HIBP: '1',
+      ALLOW_INCOMPLETE_ENV: '1',
     },
   },
 });

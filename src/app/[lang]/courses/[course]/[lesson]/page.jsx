@@ -7,6 +7,30 @@ import { getLessonByKey, getNextLessonKey } from '@/lib/db/lessonService';
 import { courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
+export async function generateMetadata({ params }) {
+  const { course, lesson: lessonSlug, lang } = await params;
+  const row = await getLessonByKey(lessonSlug, lang);
+  if (!row || row.status !== 'published') return { title: 'Lesson not found' };
+
+  const canonical = `/courses/${row.course ? courseUrlSlug(row.course) : course}/${lessonSlug}`;
+  return {
+    title: row.title,
+    description: row.summary ?? undefined,
+    alternates: { canonical },
+    openGraph: {
+      type: 'article',
+      title: row.title,
+      description: row.summary ?? undefined,
+      url: canonical,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: row.title,
+      description: row.summary ?? undefined,
+    },
+  };
+}
+
 export default async function LessonPage({ params, searchParams }) {
   const { course, lesson: lessonSlug, lang } = await params;
   const { preview } = await searchParams;

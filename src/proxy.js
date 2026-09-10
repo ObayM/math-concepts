@@ -21,6 +21,7 @@ const PUBLIC_PATHS = [
   '/api/dsl-preview',
   '/robots.txt',
   '/sitemap.xml',
+  '/opengraph-image',
   '/u/',
   // a logged-out browser fetches these before it can install the app, and the
   // matcher's extension list does not cover .js or .webmanifest
@@ -36,7 +37,13 @@ const CROSS_ORIGIN_EXEMPT = ['/api/auth', '/api/cron/'];
 const FORCED_EN = ['/admin', '/prism', '/dsl-preview'];
 
 // these live at the app root and have no locale segment to rewrite into
-const ROOT_ROUTES = ['/manifest.webmanifest', '/robots.txt', '/sitemap.xml', '/sw.js'];
+const ROOT_ROUTES = [
+  '/manifest.webmanifest',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/sw.js',
+  '/opengraph-image',
+];
 
 const LANG_COOKIE = 'mathly-lang';
 
