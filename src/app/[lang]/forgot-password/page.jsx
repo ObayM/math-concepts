@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { Mail, Loader2, Send, MailCheck } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import Button from '@/components/ui/Button';
+import { useT } from '@/components/i18n/LocaleProvider';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 
 export default function ForgotPasswordPage() {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -42,7 +44,7 @@ export default function ForgotPasswordPage() {
             </div>
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
-            Check Your Inbox
+            {t('forgot.sent')}
           </h1>
           <p className="text-sm text-neutral-500">
             If an account exists for <span className="font-semibold text-neutral-800">{email}</span>
@@ -52,7 +54,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="inline-block text-sm font-bold text-primary-600 hover:text-primary-500 hover:underline"
           >
-            Back to Sign In
+            {t('forgot.backToSignIn')}
           </Link>
         </Card>
       </main>
@@ -64,11 +66,9 @@ export default function ForgotPasswordPage() {
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
-            Forgot Password?
+            {t('forgot.title')}
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">
-            Enter your email and we&apos;ll send you a reset link.
-          </p>
+          <p className="mt-2 text-sm text-neutral-500">{t('forgot.blurb')}</p>
         </div>
 
         <form method="post" onSubmit={handleSubmit} className="space-y-4">
@@ -78,8 +78,8 @@ export default function ForgotPasswordPage() {
             type="email"
             autoComplete="email"
             required
-            placeholder="Email address"
-            aria-label="Email address"
+            placeholder={t('auth.emailAddress')}
+            aria-label={t('auth.emailAddress')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail className="w-5 h-5" />}
@@ -91,19 +91,19 @@ export default function ForgotPasswordPage() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Sending...
+                {t('forgot.sending')}
               </>
             ) : (
               <>
                 <Send className="w-5 h-5" />
-                Send Reset Link
+                {t('forgot.send')}
               </>
             )}
           </Button>
         </form>
 
         <p className="text-sm text-center text-neutral-500">
-          Remembered it?{' '}
+          {t('auth.rememberedIt')}{' '}
           <Link
             href="/login"
             className="font-bold text-primary-600 hover:text-primary-500 hover:underline"

@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
+import { getT } from '@/lib/i18n/server';
 
 export const metadata = {
   title: 'Page not found',
   robots: { index: false, follow: false },
 };
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getT();
   return (
     <div className="min-h-[calc(100dvh-var(--nav-h))] bg-surface flex items-center justify-center px-6">
       <div className="animate-fade-in-up max-w-md w-full text-center">
@@ -22,17 +24,15 @@ export default function NotFound() {
 
         <div className="w-10 h-px bg-neutral-200 mx-auto mb-8" />
 
-        <p className="text-lg font-semibold text-neutral-900 mb-2">This page doesn&apos;t exist.</p>
-        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
-          Looks like it was moved, deleted, or never existed. Try browsing courses instead.
-        </p>
+        <p className="text-lg font-semibold text-neutral-900 mb-2">{t('notFound.title')}</p>
+        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">{t('notFound.body')}</p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button as={Link} href="/courses" variant="primary">
-            Browse Courses
+            {t('notFound.browse')}
           </Button>
           <Button as={Link} href="/" variant="outline">
-            Go Home
+            {t('notFound.home')}
           </Button>
         </div>
       </div>

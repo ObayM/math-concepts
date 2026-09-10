@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle2, ArrowRight, Home, RotateCcw, Star, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function LessonCompletion({
   onContinue,
@@ -13,6 +14,7 @@ export default function LessonCompletion({
   xpEarned,
   quizHistory = [],
 }) {
+  const t = useT();
   const quizCount = quizHistory.length;
   const correctCount = quizHistory.filter((q) => q.correct).length;
   const accuracy = quizCount > 0 ? Math.round((correctCount / quizCount) * 100) : null;
@@ -26,8 +28,10 @@ export default function LessonCompletion({
       </div>
 
       <div className="animate-fade-in-up [animation-delay:300ms] opacity-0">
-        <h2 className="font-display text-4xl font-bold text-neutral-900 mb-4">Lesson complete</h2>
-        <p className="text-xl text-neutral-500 mb-6">Nice work. That one&apos;s in the bank.</p>
+        <h2 className="font-display text-4xl font-bold text-neutral-900 mb-4">
+          {t('complete.title')}
+        </h2>
+        <p className="text-xl text-neutral-500 mb-6">{t('complete.blurb')}</p>
         {xpEarned > 0 && (
           <p className="mb-8 inline-flex items-center gap-2 rounded-full bg-success-50 border-2 border-success-100 px-4 py-2 text-sm font-bold text-success-700">
             <Zap className="h-4 w-4 fill-current" />+{xpEarned} XP
@@ -39,7 +43,7 @@ export default function LessonCompletion({
         <div className="bg-warning-50 border-2 border-warning-100 p-4 rounded-2xl flex flex-col items-center">
           <span className="text-3xl font-bold text-warning-600 mb-1">{streak ?? 0}</span>
           <span className="text-xs font-bold text-warning-600 uppercase tracking-wider flex items-center gap-1">
-            <span className="text-lg">🔥</span> Day Streak
+            <span className="text-lg">🔥</span> {t('complete.dayStreak')}
           </span>
         </div>
 
@@ -48,7 +52,7 @@ export default function LessonCompletion({
             {accuracy !== null ? `${accuracy}%` : '—'}
           </span>
           <span className="text-xs font-bold text-primary-500 uppercase tracking-wider flex items-center gap-1">
-            <Star className="w-4 h-4 fill-current" /> Accuracy
+            <Star className="w-4 h-4 fill-current" /> {t('complete.accuracy')}
           </span>
         </div>
       </div>
@@ -61,16 +65,17 @@ export default function LessonCompletion({
           onClick={onContinue}
           className="rounded-2xl font-extrabold"
         >
-          {nextLessonId ? 'Next lesson' : 'Finish course'} <ArrowRight className="w-5 h-5" />
+          {nextLessonId ? t('complete.next') : t('complete.finish')}{' '}
+          <ArrowRight className="w-5 h-5" />
         </Button>
 
         <Button variant="ghost" size="lg" fullWidth onClick={onBack}>
-          <Home className="w-5 h-5" /> Back to Course
+          <Home className="w-5 h-5" /> {t('complete.backToCourse')}
         </Button>
 
         {onRetake && (
           <Button variant="ghost" size="sm" fullWidth onClick={onRetake}>
-            <RotateCcw className="w-4 h-4" /> Retake Lesson
+            <RotateCcw className="w-4 h-4" /> {t('complete.retake')}
           </Button>
         )}
       </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Check, X, LoaderCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { USERNAME_REGEX, USERNAME_MIN, USERNAME_MAX } from '@/lib/username';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -16,6 +17,7 @@ function useDebounce(value, delay) {
 }
 
 export default function OnboardingForm() {
+  const t = useT();
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
@@ -60,7 +62,7 @@ export default function OnboardingForm() {
     const candidate = username.trim().toLowerCase();
 
     if (!isAvailable) {
-      setError('This username is unavailable or invalid. Please choose another.');
+      setError(t('onboarding.invalid'));
       return;
     }
 
@@ -98,7 +100,7 @@ export default function OnboardingForm() {
       >
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-1">
-            Choose a username
+            {t('onboarding.label')}
           </label>
           <div className="relative">
             <input
@@ -122,7 +124,7 @@ export default function OnboardingForm() {
             </div>
           </div>
           <p id="username-hint" className="mt-2 text-xs text-neutral-500">
-            Lowercase letters, numbers and hyphens. {USERNAME_MIN} to {USERNAME_MAX} characters.
+            {t('onboarding.hint', { min: USERNAME_MIN, max: USERNAME_MAX })}
           </p>
         </div>
 
@@ -137,11 +139,11 @@ export default function OnboardingForm() {
         )}
 
         {!error && isAvailable === false && !isChecking && username.length > 0 && (
-          <p className="text-sm text-danger-600">This username has already been taken.</p>
+          <p className="text-sm text-danger-600">{t('onboarding.taken')}</p>
         )}
 
         {!error && hasValidationError && (
-          <p className="text-sm text-danger-600">Invalid format. Please follow the rules above.</p>
+          <p className="text-sm text-danger-600">{t('onboarding.invalid')}</p>
         )}
 
         <Button
@@ -152,10 +154,10 @@ export default function OnboardingForm() {
           {loading ? (
             <>
               <LoaderCircle className="h-5 w-5 animate-spin" />
-              Finalizing...
+              {t('onboarding.submitting')}
             </>
           ) : (
-            'Complete Profile'
+            t('onboarding.submit')
           )}
         </Button>
       </form>

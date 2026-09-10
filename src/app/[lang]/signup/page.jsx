@@ -34,7 +34,7 @@ export default function SignupPage() {
     setError('');
 
     if (nameProblem(name)) {
-      setError('Tell us what to call you.');
+      setError(t('auth.nameRequired'));
       return;
     }
 
@@ -44,7 +44,7 @@ export default function SignupPage() {
     }
 
     if (!accepted) {
-      setError('Please accept the terms and privacy policy to continue.');
+      setError(t('auth.mustAgree'));
       return;
     }
 
@@ -78,7 +78,7 @@ export default function SignupPage() {
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
             {t('auth.createAccount')}
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">Join us and start your journey!</p>
+          <p className="mt-2 text-sm text-neutral-500">{t('auth.signupBlurb')}</p>
         </div>
 
         <form method="post" onSubmit={handleSubmit} className="space-y-4">
@@ -89,8 +89,8 @@ export default function SignupPage() {
             autoComplete="name"
             required
             maxLength={NAME_MAX}
-            placeholder="What should we call you?"
-            aria-label="What should we call you?"
+            placeholder={t('auth.namePlaceholder')}
+            aria-label={t('auth.namePlaceholder')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             icon={<User className="w-5 h-5" />}
@@ -129,21 +129,21 @@ export default function SignupPage() {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
             />
             <span>
-              I agree to the{' '}
+              {t('auth.agreePrefix')}{' '}
               <Link
                 href="/terms"
                 target="_blank"
                 className="font-semibold text-primary-600 hover:underline"
               >
-                terms
+                {t('auth.terms')}
               </Link>{' '}
-              and{' '}
+              {t('auth.agreeAnd')}{' '}
               <Link
                 href="/privacy"
                 target="_blank"
                 className="font-semibold text-primary-600 hover:underline"
               >
-                privacy policy
+                {t('auth.privacy')}
               </Link>
               .
             </span>
@@ -155,24 +155,24 @@ export default function SignupPage() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Signing Up...
+                {t('auth.signingUp')}
               </>
             ) : (
               <>
                 <LogIn className="w-5 h-5" />
-                Create Account
+                {t('auth.createAccount')}
               </>
             )}
           </Button>
         </form>
 
         <p className="text-sm text-center text-neutral-500">
-          Already have an account?{' '}
+          {t('auth.haveAccount')}{' '}
           <Link
             href="/login"
             className="font-bold text-primary-600 hover:text-primary-500 hover:underline"
           >
-            Sign In
+            {t('auth.signIn')}
           </Link>
         </p>
       </Card>

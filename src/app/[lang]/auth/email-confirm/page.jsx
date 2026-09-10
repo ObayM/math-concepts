@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { Mail, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const COOLDOWN_SECONDS = 60;
 
 function ConfirmCard() {
+  const t = useT();
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
 
@@ -38,15 +40,15 @@ function ConfirmCard() {
       });
 
       if (res.status === 429) {
-        setProblem('That is a lot of emails. Wait a minute and try again.');
+        setProblem(t('confirm.tooMany'));
       } else if (!res.ok) {
-        setProblem("Couldn't send it. Try again shortly.");
+        setProblem(t('confirm.failed'));
       } else {
-        setNotice('Sent. Give it a minute, then check your spam folder too.');
+        setNotice(t('confirm.resent'));
         setCooldown(COOLDOWN_SECONDS);
       }
     } catch {
-      setProblem("Couldn't reach us. Check your connection.");
+      setProblem(t('confirm.offline'));
     } finally {
       setSending(false);
     }
@@ -63,18 +65,16 @@ function ConfirmCard() {
 
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">
-            Check your inbox
+            {t('confirm.title')}
           </h1>
           <p className="mt-3 text-sm text-neutral-500">
-            We sent a confirmation link to
-            {email ? '' : ' your email address'}
+            {t('confirm.sentTo')}
+            {email ? '' : ` ${t('confirm.yourEmail')}`}
           </p>
           {email && <p className="mt-1 font-semibold text-neutral-800">{email}</p>}
         </div>
 
-        <p className="text-sm text-neutral-500">
-          Click it to finish signing up. Nothing there? It is probably in spam.
-        </p>
+        <p className="text-sm text-neutral-500">{t('confirm.spam')}</p>
 
         {email && (
           <div className="space-y-2">
@@ -82,12 +82,12 @@ function ConfirmCard() {
               {sending ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Sending...
+                  {t('confirm.resending')}
                 </>
               ) : cooldown > 0 ? (
-                `Resend in ${cooldown}s`
+                t('confirm.resendIn', { seconds: cooldown })
               ) : (
-                'Resend the email'
+                t('confirm.resend')
               )}
             </Button>
             {notice && <p className="text-sm font-medium text-success-600">{notice}</p>}
@@ -97,11 +97,11 @@ function ConfirmCard() {
 
         <div className="flex items-center justify-center gap-4 text-sm text-neutral-500">
           <Link href="/signup" className="font-semibold text-primary-600 hover:underline">
-            Wrong email? Start over
+            {t('confirm.wrongEmail')}
           </Link>
           <span aria-hidden>·</span>
           <Link href="/login" className="font-semibold text-primary-600 hover:underline">
-            Already verified? Sign in
+            {t('confirm.alreadyVerified')}
           </Link>
         </div>
       </Card>

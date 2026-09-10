@@ -6,9 +6,11 @@ import LessonCard from '@/components/lesson/LessonCard';
 import Button from '@/components/ui/Button';
 import { resolveCourseBySlug, courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
+import { getT } from '@/lib/i18n/server';
 
 export default async function CoursePage({ params }) {
   const { course: courseSlug, lang } = await params;
+  const t = await getT();
 
   const course = await resolveCourseBySlug(courseSlug, lang);
   if (!course) notFound();
@@ -88,7 +90,7 @@ export default async function CoursePage({ params }) {
             {course.name}
           </h1>
           <p className="mt-3 text-lg text-neutral-500">
-            {course.description || 'Complete each lesson to unlock the next.'}
+            {course.description || t('course.defaultBlurb')}
           </p>
 
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
