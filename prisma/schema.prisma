@@ -37,6 +37,7 @@ model User {
   warmupSessions  WarmupSession[]
   warmupAnswers   WarmupAnswer[]
   slideNotes      UserSlideNote[]
+  aiUsage         AiUsage[]
 
   @@map("user")
 }
@@ -292,4 +293,30 @@ model UserSkillMastery {
   @@id([userId, skill])
   @@index([skill])
   @@map("user_skill_mastery")
+}
+
+model AiUsage {
+  userId       String   @map("user_id")
+  day          String
+  feature      String
+  calls        Int      @default(0)
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, day, feature])
+  @@index([day])
+  @@map("ai_usage")
+}
+
+model AiSpend {
+  day          String   @id
+  calls        Int      @default(0)
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("ai_spend")
 }

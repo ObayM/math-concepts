@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { assertPermission } from '@/lib/authz';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
+import { spendQuota, quotaExceeded } from '@/lib/ai-quota';
 import { LESSON_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 import { verifyLesson } from '@/engine/verify';
@@ -29,6 +30,9 @@ export async function POST(req: Request) {
 
   const limit = await consume(user.id, 'generate-lesson');
   if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
+
+  const quota = await spendQuota(user.id, 'generate-lesson');
+  if (!quota.ok) return quotaExceeded(quota);
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

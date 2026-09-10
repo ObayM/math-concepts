@@ -11,7 +11,7 @@ export interface RateLimitStore {
 }
 
 export const TIERS = {
-  chat: { max: 20, perMin: 20 },
+  chat: { max: 6, perMin: 6 },
   generate: { max: 5, perMin: 5 },
   'generate-lesson': { max: 2, perMin: 2 },
   'content-save': { max: 30, perMin: 30 },

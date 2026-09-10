@@ -13,7 +13,17 @@ export async function askTutor(body, { onChunk, signal } = {}) {
     throw new TutorError("Couldn't reach the tutor. Check your connection.");
   }
 
+  const scope = res.headers.get('x-quota-scope');
+  if (res.status === 429 && scope === 'day') {
+    throw new TutorError("That's your tutor questions for today. Fresh batch tomorrow.");
+  }
+  if (res.status === 429 && scope === 'month') {
+    throw new TutorError("That's your tutor questions for this month.");
+  }
   if (res.status === 429) throw new TutorError('Slow down a moment, then ask again.');
+  if (res.status === 503 && scope === 'budget') {
+    throw new TutorError('The tutor is resting. Try again tomorrow.');
+  }
   if (!res.ok || !res.body) throw new TutorError("The tutor isn't available right now.");
 
   const reader = res.body.getReader();

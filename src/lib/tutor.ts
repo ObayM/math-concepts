@@ -2,8 +2,8 @@ import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
 import { DEFAULT_LOCALE, type Locale } from './locale';
 
 export const MAX_QUESTION_CHARS = 500;
-export const MAX_HISTORY_TURNS = 6;
-export const MAX_TURN_CHARS = 1500;
+export const MAX_HISTORY_TURNS = 4;
+export const MAX_TURN_CHARS = 800;
 
 export type TutorRole = 'user' | 'assistant';
 

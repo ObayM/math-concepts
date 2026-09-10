@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireUser } from '@/lib/session';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
+import { spendQuota, recordTokens, quotaExceeded } from '@/lib/ai-quota';
 import { TUTOR_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { getLessonByKey } from '@/lib/db/lessonService';
 import { getMyMastery } from '@/lib/db/progressService';
@@ -44,6 +45,9 @@ export async function POST(req: Request) {
   const limit = await consume(user.id, 'chat');
   if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
+  const quota = await spendQuota(user.id, 'chat');
+  if (!quota.ok) return quotaExceeded(quota);
+
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
@@ -76,6 +80,11 @@ export async function POST(req: Request) {
       maxOutputTokens: 400,
       abortSignal: AbortSignal.timeout(30_000),
       onError: ({ error }) => console.error('tutor stream failed', error),
+      onFinish: ({ usage }) =>
+        recordTokens(user.id, 'chat', {
+          inputTokens: usage?.inputTokens,
+          outputTokens: usage?.outputTokens,
+        }),
     });
     return result.toTextStreamResponse();
   } catch {
