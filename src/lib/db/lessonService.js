@@ -31,12 +31,14 @@ export function refreshLessonIr(lesson) {
 }
 
 // lessonKey is globally unique, so the language is a guard rather than part of
-// the lookup: the route ignores its own [course] segment, and this is what
-// stops an english url from serving an arabic lesson
+// the lookup, and this is what stops an english url from serving an arabic
+// lesson. the course comes back too so the route can redirect a mismatched
+// [course] segment to the canonical one rather than serve it under the wrong
+// breadcrumb.
 export async function getLessonByKey(lessonKey, lang) {
   const lesson = await prisma.lesson.findUnique({
     where: { lessonKey },
-    include: { course: { select: { lang: true } } },
+    include: { course: { select: { lang: true, slug: true, name: true } } },
   });
   if (!lesson) return null;
   if (lang && lesson.course && lesson.course.lang !== lang) return null;

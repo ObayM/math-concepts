@@ -118,6 +118,34 @@ describe('match and order ambiguity', () => {
     ).toContain('V_MATCH_AMBIGUOUS');
   });
 
+  it('sees through a trailing space, which is how the duplicate got authored', () => {
+    expect(
+      codes(
+        wrap('    match {\n      ask "match"\n      pair "a" -> "$3$"\n      pair "b" -> "$3$ "\n}')
+      )
+    ).toContain('V_MATCH_AMBIGUOUS');
+  });
+
+  it('flags a decoy that only differs from a real answer by whitespace', () => {
+    expect(
+      codes(
+        wrap(
+          '    match {\n      ask "match"\n      pair "a" -> "1"\n      pair "b" -> "2"\n      decoy " 2"\n    }'
+        )
+      )
+    ).toContain('V_MATCH_DECOY_REAL');
+  });
+
+  it('flags an order item duplicated only by whitespace', () => {
+    expect(
+      codes(
+        wrap(
+          '    order {\n      ask "order"\n      item "x"\n      item "y"\n      item "x "\n    }'
+        )
+      )
+    ).toContain('V_ORDER_AMBIGUOUS');
+  });
+
   it('flags a match decoy that is really an answer', () => {
     expect(
       codes(

@@ -141,44 +141,58 @@ function checkTargetsInDomain(slide: SlideIR, out: Finding[]) {
   }
 }
 
+// answer checking trims, and so does the student's eye: two cards that differ
+// only by whitespace are the same card as far as both are concerned.
+function firstDupe(values: string[]): string | undefined {
+  const seen = new Set<string>();
+  for (const v of values) {
+    const key = v.trim();
+    if (seen.has(key)) return v;
+    seen.add(key);
+  }
+  return undefined;
+}
+
 function checkMatchOrder(slide: SlideIR, out: Finding[]) {
   const ex = slide.exercise;
   if (ex?.kind === 'match') {
     const rights = ex.pairs.map((p) => p.right);
-    const dupe = rights.find((r, i) => rights.indexOf(r) !== i);
+    const dupe = firstDupe(rights);
     if (dupe !== undefined) {
       out.push({
         slideId: slide.id,
         code: 'V_MATCH_AMBIGUOUS',
-        message: `two pairs share the right-hand side "${dupe}", so more than one arrangement is correct`,
+        message: `two pairs share the right-hand side "${dupe.trim()}", so the student sees identical cards and more than one arrangement is correct`,
       });
     }
+    const trimmedRights = rights.map((r) => r.trim());
     for (const d of ex.decoys ?? []) {
-      if (rights.includes(d)) {
+      if (trimmedRights.includes(d.trim())) {
         out.push({
           slideId: slide.id,
           code: 'V_MATCH_DECOY_REAL',
-          message: `decoy "${d}" is also a real answer, so it isn't a decoy`,
+          message: `decoy "${d.trim()}" is also a real answer, so it isn't a decoy`,
         });
       }
     }
   }
 
   if (ex?.kind === 'order') {
-    const dupe = ex.items.find((it, i) => ex.items.indexOf(it) !== i);
+    const dupe = firstDupe(ex.items);
     if (dupe !== undefined) {
       out.push({
         slideId: slide.id,
         code: 'V_ORDER_AMBIGUOUS',
-        message: `item "${dupe}" appears twice, so the correct order is ambiguous`,
+        message: `item "${dupe.trim()}" appears twice, so the correct order is ambiguous`,
       });
     }
+    const trimmedItems = ex.items.map((it) => it.trim());
     for (const d of ex.decoys ?? []) {
-      if (ex.items.includes(d)) {
+      if (trimmedItems.includes(d.trim())) {
         out.push({
           slideId: slide.id,
           code: 'V_ORDER_DECOY_REAL',
-          message: `decoy "${d}" is also one of the real items`,
+          message: `decoy "${d.trim()}" is also one of the real items`,
         });
       }
     }

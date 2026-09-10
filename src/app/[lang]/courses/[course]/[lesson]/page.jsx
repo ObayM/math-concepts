@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { lessonSchema } from '@/engine/ir/lesson';
 import LessonPlayer from '@/components/lesson/LessonPlayer';
 import { getLessonByKey, getNextLessonKey } from '@/lib/db/lessonService';
+import { courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 
 export default async function LessonPage({ params, searchParams }) {
@@ -12,6 +13,12 @@ export default async function LessonPage({ params, searchParams }) {
 
   const lessonRow = await getLessonByKey(lessonSlug, lang);
   if (!lessonRow) notFound();
+
+  const canonicalCourse = lessonRow.course ? courseUrlSlug(lessonRow.course) : course;
+  if (canonicalCourse.toLowerCase() !== course.toLowerCase()) {
+    const query = preview ? `?preview=${encodeURIComponent(preview)}` : '';
+    redirect(`/courses/${canonicalCourse}/${lessonSlug}${query}`);
+  }
 
   let wantsDraft = preview === 'draft';
   if (wantsDraft) {

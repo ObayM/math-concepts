@@ -29,9 +29,9 @@ lesson "Laws of Logarithms" {
       pair "$\log 6 + \log 5$" -> "$\log 30$"
       pair "$\log 12 - \log 4$" -> "$\log 3$"
       pair "$3\log 2$" -> "$\log 8$"
-      pair "$\tfrac12 \log 9$" -> "$\log 3$ "
+      pair "$\tfrac12 \log 16$" -> "$\log 4$"
       hint "Addition of logs is multiplication inside; a multiple in front is a power inside."
-      ! "$\tfrac12\log 9 = \log 9^{1/2} = \log 3$, since a half power is a square root. The power law works for fractional powers just as happily as whole ones."
+      ! "$\tfrac12\log 16 = \log 16^{1/2} = \log 4$, since a half power is a square root. The power law works for fractional powers just as happily as whole ones."
     }
   }
 

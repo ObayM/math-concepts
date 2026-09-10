@@ -455,9 +455,9 @@ export default function LessonPlayer({
       )}
 
       <div
-        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-4xl'} transition-[max-width] duration-300 bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex relative max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
+        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-4xl'} transition-[max-width] duration-300 bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex relative md:max-h-[calc(100dvh-var(--nav-h)-1.5rem)] max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
       >
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
             <div
               className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
@@ -491,7 +491,7 @@ export default function LessonPlayer({
             </div>
           </div>
 
-          <div className="relative flex-1 overflow-y-auto px-10 py-6 max-md:px-4 max-md:py-4">
+          <div className="relative min-h-0 flex-1 overflow-y-auto px-10 py-6 max-md:px-4 max-md:py-4">
             <div
               key={currentKey}
               className={`slide-stage h-full flex flex-col ${slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}

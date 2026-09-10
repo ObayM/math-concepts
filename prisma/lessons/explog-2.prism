@@ -27,7 +27,7 @@ lesson "Logarithms as Inverses" {
       skill: "explog-log-definition"
       pair "$\log_2 16$" -> "$4$"
       pair "$\log_3 27$" -> "$3$"
-      pair "$\log_{10} 1000$" -> "$3$ "
+      pair "$\log_{10} 100$" -> "$2$"
       pair "$\log_5 1$" -> "$0$"
       hint "Each time ask: what power of the base gives that number?"
       ! "$\log_5 1 = 0$ is the one worth pausing on. Anything to the power zero is $1$, so the log of $1$ is always zero, whatever the base."
