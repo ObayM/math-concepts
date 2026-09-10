@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { changePassword } from '@/lib/auth-client';
+import { authClient, changePassword } from '@/lib/auth-client';
+import { PASSWORD_MIN } from '@/lib/password';
 
 export default function SettingsForm({ reminderEmails, emailVerified }) {
   const [reminders, setReminders] = useState(reminderEmails);
@@ -17,6 +18,33 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
   const [pwBusy, setPwBusy] = useState(false);
   const [pwNote, setPwNote] = useState('');
   const [pwError, setPwError] = useState('');
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const canDelete = deleteConfirm.trim().toLowerCase() === 'delete' && deletePassword.length > 0;
+
+  const deleteAccount = async (e) => {
+    e.preventDefault();
+    if (!canDelete || deleteBusy) return;
+    setDeleteBusy(true);
+    setDeleteError('');
+    try {
+      const { error } = await authClient.deleteUser({ password: deletePassword });
+      if (error) {
+        setDeleteError(error.message ?? "That didn't work. Check your password.");
+        setDeleteBusy(false);
+        return;
+      }
+      window.location.href = '/';
+    } catch {
+      setDeleteError('Something went wrong. Try again.');
+      setDeleteBusy(false);
+    }
+  };
 
   const toggleReminders = async () => {
     const value = !reminders;
@@ -151,7 +179,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
               value={next}
               onChange={(e) => setNext(e.target.value)}
               autoComplete="new-password"
-              minLength={6}
+              minLength={PASSWORD_MIN}
               required
               className="mt-1.5 w-full rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-2 focus:ring-primary-500"
             />
@@ -168,6 +196,79 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
             {pwBusy ? 'Changing...' : 'Change password'}
           </Button>
         </form>
+      </Card>
+
+      <Card className="border-danger-200 p-6">
+        <h2 className="font-display text-xl font-bold text-neutral-900">Delete account</h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          This removes your account, your progress, your notes and your streak. It cannot be undone.
+        </p>
+
+        {!deleteOpen ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-4 border-danger-300 text-danger-600 hover:bg-danger-50"
+            onClick={() => setDeleteOpen(true)}
+          >
+            Delete my account
+          </Button>
+        ) : (
+          <form onSubmit={deleteAccount} className="mt-4 space-y-4">
+            <div>
+              <label htmlFor="delete-password" className="text-sm font-semibold text-neutral-700">
+                Your password
+              </label>
+              <input
+                id="delete-password"
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                autoComplete="current-password"
+                className="mt-1.5 w-full rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-2 focus:ring-danger-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="delete-confirm" className="text-sm font-semibold text-neutral-700">
+                Type <span className="font-mono font-bold">delete</span> to confirm
+              </label>
+              <input
+                id="delete-confirm"
+                type="text"
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                autoComplete="off"
+                className="mt-1.5 w-full rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-2 focus:ring-danger-500"
+              />
+            </div>
+
+            {deleteError && <p className="text-sm font-semibold text-danger-600">{deleteError}</p>}
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={!canDelete || deleteBusy}
+                className="bg-danger-600 border-danger-800 hover:bg-danger-500"
+              >
+                {deleteBusy ? 'Deleting...' : 'Delete for good'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setDeleteOpen(false);
+                  setDeletePassword('');
+                  setDeleteConfirm('');
+                  setDeleteError('');
+                }}
+              >
+                Keep my account
+              </Button>
+            </div>
+          </form>
+        )}
       </Card>
     </div>
   );

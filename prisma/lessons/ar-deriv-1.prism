@@ -26,7 +26,7 @@ lesson "المشتقة كميل" {
       point B = (1 + h, (1 + h)^2) { color: accent, r: 6 }
       line tangent { through: A, slope: 2, color: success, style: dashed, width: 2 }
       line sec = (1, 1) -> (1 + h, (1 + h)^2) { color: accent, width: 2 }
-      label at (1.4, 8) = "secant = ${((1 + h)^2 - 1) / h}" { color: accent }
+      label at (1.4, 8) = "القاطع = ${((1 + h)^2 - 1) / h}" { color: accent }
       slider h { label: "h" }
       button "شاهدها تصغر" { animate: { h: 0.1 }, dur: 1500, ease: easeInOut }
     }

@@ -16,6 +16,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { firstName } from '@/lib/user-name';
 import { getT } from '@/lib/i18n/server';
+import BetaBanner from '@/components/i18n/BetaBanner';
 
 const eyebrow = 'text-xs font-bold uppercase tracking-[0.12em] text-neutral-400';
 
@@ -128,6 +129,8 @@ const DashboardPage = async ({ params }) => {
             })}
           </p>
         </header>
+
+        <BetaBanner className="mt-8" />
 
         <HeroContinue
           t={t}

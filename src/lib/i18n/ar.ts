@@ -107,6 +107,9 @@ const ar: Dictionary = {
     other: '{count} يوم متواصل. كمّل.',
   },
 
+  'beta.title': 'النسخة العربية لسه في أولها',
+  'beta.body': 'ثلاثة دروس متاحة دلوقتي، وفي غيرها بيتكتب. باقي الموقع شغال عادي.',
+  'beta.notify': 'قولّي لما ينزل جديد',
   'courses.title': 'دوراتنا',
   'courses.subtitle': 'مسارات مرئية وتفاعلية تخلي الرياضيات تبان فعلًا.',
   'courses.lessonCount': {

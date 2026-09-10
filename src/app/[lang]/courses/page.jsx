@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { courseUrlSlug } from '@/lib/db/courseService';
 import Card from '@/components/ui/Card';
 import { getT } from '@/lib/i18n/server';
+import BetaBanner from '@/components/i18n/BetaBanner';
 
 export async function generateMetadata() {
   const t = await getT();
@@ -46,6 +47,8 @@ export default async function CoursesPage({ params }) {
           </h1>
           <p className="mt-3 text-lg text-neutral-500">{t('courses.subtitle')}</p>
         </header>
+
+        <BetaBanner className="mt-8" />
 
         <div className="mt-10 space-y-4">
           {courses.map((course, i) => {

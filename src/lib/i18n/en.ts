@@ -94,6 +94,10 @@ const en = {
     other: '{count} days straight. Keep it going.',
   },
 
+  'beta.title': 'Arabic is just getting started',
+  'beta.body':
+    'Three lessons are live right now, and more are being written. Everything else here already works.',
+  'beta.notify': 'Tell me when there is more',
   'courses.title': 'Our courses',
   'courses.subtitle': 'Visual, interactive tracks that make the math actually click.',
   'courses.lessonCount': { one: '1 lesson', other: '{count} lessons' },

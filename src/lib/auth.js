@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth';
+import { APIError } from 'better-auth/api';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { username, admin, haveIBeenPwned } from 'better-auth/plugins';
 import { nextCookies } from 'better-auth/next-js';
@@ -63,6 +64,22 @@ export const auth = betterAuth({
       '/forget-password': { window: 60, max: 3 },
       '/request-password-reset': { window: 60, max: 3 },
       '/send-verification-email': { window: 60, max: 3 },
+    },
+  },
+
+  user: {
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async (user) => {
+        if (adminUserIds.includes(user.id)) {
+          throw new APIError('BAD_REQUEST', {
+            message: 'This account is pinned as an administrator and cannot delete itself.',
+          });
+        }
+      },
+      afterDelete: async (user) => {
+        console.info('[account] deleted %s', user.id);
+      },
     },
   },
 
