@@ -14,6 +14,7 @@ import { goalProgress } from '@/lib/xp';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import { firstName } from '@/lib/user-name';
 
 const eyebrow = 'text-xs font-bold uppercase tracking-[0.12em] text-neutral-400';
 
@@ -107,14 +108,14 @@ const DashboardPage = async ({ params }) => {
 
   const todayStr = localDayKey(timezone);
   const hasActivityToday = activityData.some((a) => a.date === todayStr);
-  const firstName = (user.name || user.displayUsername || user.username || 'there').split(' ')[0];
+  const greetingName = firstName(user);
 
   return (
     <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <header className="animate-fade-in-up">
           <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-neutral-900">
-            Hey, {firstName}.
+            Hey, {greetingName}.
           </h1>
           <p className="mt-2 text-lg text-neutral-500">
             {getSubheadline({

@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, X, LoaderCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
-
-const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/;
+import { USERNAME_REGEX, USERNAME_MIN, USERNAME_MAX } from '@/lib/username';
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -106,9 +105,9 @@ export default function OnboardingForm() {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="e.g obay :)"
+              placeholder="yourname"
               className="w-full ps-4 pe-10 py-2.5 bg-surface border border-neutral-200 rounded-xl text-neutral-900 font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              maxLength={39}
+              maxLength={USERNAME_MAX}
               autoComplete="off"
               aria-describedby="username-hint"
             />
@@ -123,7 +122,7 @@ export default function OnboardingForm() {
             </div>
           </div>
           <p id="username-hint" className="mt-2 text-xs text-neutral-500">
-            Lowercase letters, numbers, and hyphens. 3–39 characters.
+            Lowercase letters, numbers and hyphens. {USERNAME_MIN} to {USERNAME_MAX} characters.
           </p>
         </div>
 

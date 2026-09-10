@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { getStreak } from '@/lib/db/activityService';
 import { pickReminders, reminderBody, REMINDER_HOUR } from '@/lib/reminders';
+import { firstName } from '@/lib/user-name';
 
 import { dayKeyOf, daysBetween, localDayKey, localHour } from '@/lib/timezone';
 
@@ -70,12 +71,12 @@ export async function POST(request) {
   let sent = 0;
   const failed = [];
   for (const r of reminders) {
-    const firstName = (byId.get(r.userId)?.name || 'there').split(' ')[0];
+    const greetingName = firstName(byId.get(r.userId));
     try {
       await sendEmail({
         to: r.email,
         subject: r.subject,
-        html: reminderBody(r, firstName, appUrl),
+        html: reminderBody(r, greetingName, appUrl),
       });
       await prisma.user.update({ where: { id: r.userId }, data: { lastRemindedAt: now } });
       sent++;

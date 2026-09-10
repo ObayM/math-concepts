@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { getStreak, getActivityHeatmap, getTotalXp } from '@/lib/db/activityService';
 import { isValidTimeZone } from '@/lib/timezone';
+import { USERNAME_REGEX, isValidUsername } from '@/lib/username';
 
-export const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/;
+export { USERNAME_REGEX };
 
 export async function isUsernameAvailable(username) {
   const existing = await prisma.user.findFirst({
@@ -13,9 +14,15 @@ export async function isUsernameAvailable(username) {
 }
 
 export async function setUsername(userId, username, timezone) {
+  if (!isValidUsername(username)) throw new Error('invalid username');
+  const name = username.trim();
   await prisma.user.update({
     where: { id: userId },
-    data: { username, ...(isValidTimeZone(timezone) && { timezone }) },
+    data: {
+      username: name,
+      displayUsername: name,
+      ...(isValidTimeZone(timezone) && { timezone }),
+    },
   });
 }
 

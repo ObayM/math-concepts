@@ -15,8 +15,10 @@ test('a visitor cannot reach the app, then signs up and can', async ({ page }) =
   await expect(page).toHaveURL(/\/login/);
 
   await page.goto('/signup');
+  await page.locator('#name').fill('E2E Journey');
   await page.locator('#email').fill(email);
   await page.locator('#password').fill(password);
+  await page.locator('#terms').check();
   await page.getByRole('button', { name: /sign up|create/i }).click();
 
   // wait for the credential row, not just the user: better-auth writes the
@@ -52,7 +54,7 @@ test('a visitor cannot reach the app, then signs up and can', async ({ page }) =
 
   if (page.url().includes('/onboarding')) {
     const username = `e2e${Date.now().toString().slice(-8)}`;
-    await page.getByPlaceholder(/obay/i).fill(username);
+    await page.locator('#username').fill(username);
     const submit = page.getByRole('button', { name: /complete profile/i });
     await expect(submit).toBeEnabled({ timeout: 15_000 });
     await submit.click();

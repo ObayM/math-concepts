@@ -66,6 +66,14 @@ export const auth = betterAuth({
     },
   },
 
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => ({ data: { ...user, termsAcceptedAt: new Date() } }),
+      },
+    },
+  },
+
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,

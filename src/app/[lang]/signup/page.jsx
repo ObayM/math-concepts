@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Loader2, LogIn } from 'lucide-react';
+import { Mail, Loader2, LogIn, User } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
 import { PASSWORD_MIN } from '@/lib/password';
+import { NAME_MAX, nameProblem } from '@/lib/user-name';
 import { redirect } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -19,6 +20,8 @@ export default function SignupPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -28,8 +31,18 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
 
+    if (nameProblem(name)) {
+      setError('Tell us what to call you.');
+      return;
+    }
+
     if (password.length < PASSWORD_MIN) {
       setError(`Password must be at least ${PASSWORD_MIN} characters long.`);
+      return;
+    }
+
+    if (!accepted) {
+      setError('Please accept the terms and privacy policy to continue.');
       return;
     }
 
@@ -39,7 +52,7 @@ export default function SignupPage() {
       const { error: authError } = await authClient.signUp.email({
         email,
         password,
-        name: email,
+        name: name.trim(),
         callbackURL: '/onboarding',
       });
 
@@ -68,6 +81,20 @@ export default function SignupPage() {
 
         <form method="post" onSubmit={handleSubmit} className="space-y-4">
           <Input
+            id="name"
+            name="name"
+            type="text"
+            autoComplete="name"
+            required
+            maxLength={NAME_MAX}
+            placeholder="What should we call you?"
+            aria-label="What should we call you?"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            icon={<User className="w-5 h-5" />}
+          />
+
+          <Input
             id="email"
             name="email"
             type="email"
@@ -91,9 +118,38 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          <label className="flex items-start gap-3 text-sm text-neutral-500">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={accepted}
+              onChange={(e) => setAccepted(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span>
+              I agree to the{' '}
+              <Link
+                href="/terms"
+                target="_blank"
+                className="font-semibold text-primary-600 hover:underline"
+              >
+                terms
+              </Link>{' '}
+              and{' '}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="font-semibold text-primary-600 hover:underline"
+              >
+                privacy policy
+              </Link>
+              .
+            </span>
+          </label>
+
           {error && <p className="text-sm font-medium text-center text-danger-600">{error}</p>}
 
-          <Button type="submit" fullWidth disabled={loading}>
+          <Button type="submit" fullWidth disabled={loading || !accepted}>
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />

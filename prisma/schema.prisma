@@ -20,6 +20,7 @@ model User {
   lastRemindedAt  DateTime? @map("last_reminded_at")
   timezone        String?
   locale          String?
+  termsAcceptedAt DateTime? @map("terms_accepted_at")
   banned          Boolean   @default(false)
   banReason       String?
   banExpires      DateTime?
