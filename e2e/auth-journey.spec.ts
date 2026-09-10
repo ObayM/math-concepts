@@ -36,9 +36,17 @@ test('a visitor cannot reach the app, then signs up and can', async ({ page }) =
   await prisma.user.update({ where: { email }, data: { emailVerified: true } });
 
   await page.goto('/login');
+  const signIn = page.getByRole('button', { name: /sign in|log in/i });
+
   await page.locator('#email').fill(email);
+  await page.locator('#password').fill('not-the-right-password');
+  await signIn.click();
+
+  await expect(page.getByText(/invalid credentials/i)).toBeVisible({ timeout: 15_000 });
+  await expect(signIn).toBeEnabled();
+
   await page.locator('#password').fill(password);
-  await page.getByRole('button', { name: /sign in|log in/i }).click();
+  await signIn.click();
 
   await expect(page).toHaveURL(/\/onboarding|\/dashboard/, { timeout: 20_000 });
 

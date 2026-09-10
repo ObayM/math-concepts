@@ -34,18 +34,24 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    const { error: authError } = await authClient.signUp.email({
-      email,
-      password,
-      name: email,
-      callbackURL: '/onboarding',
-    });
+    try {
+      const { error: authError } = await authClient.signUp.email({
+        email,
+        password,
+        name: email,
+        callbackURL: '/onboarding',
+      });
 
-    if (authError) {
-      setError(authError.message ?? 'Something went wrong. Please try again.');
-      setLoading(false);
-    } else {
+      if (authError) {
+        setError(authError.message ?? 'Something went wrong. Please try again.');
+        setLoading(false);
+        return;
+      }
+
       router.push(`/auth/email-confirm?email=${encodeURIComponent(email)}`);
+    } catch {
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
     }
   }
 

@@ -47,18 +47,24 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    const { error: authError } = await authClient.signIn.email({
-      email,
-      password,
-      callbackURL: '/dashboard',
-    });
+    try {
+      const { error: authError } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: '/dashboard',
+      });
 
-    if (authError) {
-      setError(signInMessage(authError));
-      setLoading(false);
-    } else {
+      if (authError) {
+        setError(signInMessage(authError, t));
+        setLoading(false);
+        return;
+      }
+
       router.push('/dashboard');
       router.refresh();
+    } catch {
+      setError(t('error.generic'));
+      setLoading(false);
     }
   }
 
