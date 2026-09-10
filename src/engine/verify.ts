@@ -141,8 +141,6 @@ function checkTargetsInDomain(slide: SlideIR, out: Finding[]) {
   }
 }
 
-// answer checking trims, and so does the student's eye: two cards that differ
-// only by whitespace are the same card as far as both are concerned.
 function firstDupe(values: string[]): string | undefined {
   const seen = new Set<string>();
   for (const v of values) {

@@ -167,3 +167,26 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the production image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: mathly:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: The image must carry compiled lessons, or a fresh deploy is empty
+        run: |
+          count=$(docker run --rm --entrypoint sh mathly:ci -c 'ls prisma/lessons/*.json | wc -l')
+          echo "compiled lessons in image: $count"
+          test "$count" -gt 50
