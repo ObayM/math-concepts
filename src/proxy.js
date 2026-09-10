@@ -60,6 +60,8 @@ const SECURITY_HEADERS = {
 
 const DEV = process.env.NODE_ENV !== 'production';
 
+const VARY_ON = 'Host, Accept-Language, Cookie';
+
 function underPrefix(pathname, prefix) {
   if (prefix.endsWith('/')) return pathname.startsWith(prefix);
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
@@ -125,7 +127,14 @@ function harden(response, nonce) {
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(name, value);
   }
-  if (nonce) response.headers.set('Content-Security-Policy', csp(nonce));
+  if (nonce) {
+    response.headers.set('Content-Security-Policy', csp(nonce));
+    if (!response.headers.has('Cache-Control')) {
+      response.headers.set('Cache-Control', 'private, no-store');
+    }
+  }
+  const vary = response.headers.get('Vary');
+  response.headers.set('Vary', vary ? `${vary}, ${VARY_ON}` : VARY_ON);
   return response;
 }
 

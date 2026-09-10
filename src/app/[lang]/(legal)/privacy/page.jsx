@@ -1,3 +1,5 @@
+import { supportEmail } from '@/lib/support';
+
 export const metadata = {
   title: 'Privacy — Mathly',
   description: 'What Mathly stores about you, and why.',
@@ -40,7 +42,11 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="Contact">
-        Questions about any of this: get in touch and we will answer properly.
+        Questions about any of this, or you want your account and data deleted: email{' '}
+        <a href={`mailto:${supportEmail()}`} className="font-semibold text-primary-600 underline">
+          {supportEmail()}
+        </a>{' '}
+        and we will answer properly.
       </Section>
     </>
   );

@@ -60,8 +60,9 @@ these is missing or malformed, naming all of them at once (`src/lib/env.ts`):
 | `SMTP_HOST`           | without it nobody can sign up at all                       |
 | `CRON_SECRET`         |                                                            |
 
-Also set `POSTGRES_PASSWORD` (generate one), `GEMINI_API_KEY`, `TRUSTED_PROXY_HOPS=1`, and
-optionally `AI_DAILY_CALL_BUDGET`. Leave `APP_PROTOCOL` unset behind Caddy. Clear
+Also set `POSTGRES_PASSWORD` (generate one), `GEMINI_API_KEY`, `TRUSTED_PROXY_HOPS=1`,
+`SUPPORT_EMAIL` (the privacy policy tells people to write to it, so it must be a real
+mailbox), and optionally `AI_DAILY_CALL_BUDGET`. Leave `APP_PROTOCOL` unset behind Caddy. Clear
 `TRUSTED_ORIGINS` of any dev tunnel value.
 
 `ALLOW_INCOMPLETE_ENV=1` downgrades the boot check to a warning. It exists for test
@@ -137,3 +138,5 @@ just as well.
   caps cannot save you from a bug in the app
 - sign in on `en.`, switch to `ar.`, confirm you are still signed in
 - paste a lesson URL into Slack and check the card renders
+- send a message to `SUPPORT_EMAIL` and confirm somebody receives it. The privacy policy
+  promises deletion through that address, and there is no self-serve delete yet

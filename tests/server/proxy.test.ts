@@ -319,3 +319,23 @@ describe('the apex', () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe('caching a nonce or a language would be a disaster', () => {
+  it('never lets a nonce-bearing page be cached', () => {
+    const res = proxy(request('/login'));
+    expect(res.headers.get('content-security-policy')).toMatch(/nonce-/);
+    expect(res.headers.get('cache-control')).toContain('no-store');
+  });
+
+  it('varies on everything the locale is resolved from', () => {
+    const vary = proxy(request('/login')).headers.get('vary') ?? '';
+    for (const field of ['Host', 'Accept-Language', 'Cookie']) {
+      expect(vary, field).toContain(field);
+    }
+  });
+
+  it('leaves an explicit cache-control alone', () => {
+    const res = proxy(request('/opengraph-image'));
+    expect(res.headers.get('vary')).toContain('Host');
+  });
+});
