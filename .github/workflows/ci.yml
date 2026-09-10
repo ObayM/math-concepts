@@ -12,6 +12,7 @@ env:
   NEXT_PUBLIC_APP_URL: http://localhost:3000
   GEMINI_API_KEY: ci-placeholder-key
   CRON_SECRET: ci-cron-secret
+  DISABLE_HIBP: '1'
 
 jobs:
   test:

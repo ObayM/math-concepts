@@ -1,3 +1,5 @@
+import { timingSafeEqual, createHash } from 'node:crypto';
+
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { getStreak } from '@/lib/db/activityService';
@@ -5,12 +7,20 @@ import { pickReminders, reminderBody, REMINDER_HOUR } from '@/lib/reminders';
 
 import { dayKeyOf, daysBetween, localDayKey, localHour } from '@/lib/timezone';
 
+function bearerMatches(given, expected) {
+  const digest = (value) =>
+    createHash('sha256')
+      .update(String(value ?? ''))
+      .digest();
+  return timingSafeEqual(digest(given), digest(expected));
+}
+
 export async function POST(request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     return Response.json({ error: 'CRON_SECRET is not configured' }, { status: 503 });
   }
-  if (request.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!bearerMatches(request.headers.get('authorization'), `Bearer ${secret}`)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

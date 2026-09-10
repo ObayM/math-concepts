@@ -1,10 +1,10 @@
 import { isUsernameAvailable, USERNAME_REGEX } from '@/lib/db/userService';
 import { NextResponse } from 'next/server';
 import { consume, tooManyRequests } from '@/lib/rate-limit';
-import { firstHopIp } from '@/lib/request-ip';
+import { clientIp } from '@/lib/request-ip';
 
 export async function GET(request) {
-  const limit = await consume(firstHopIp(request), 'check-username');
+  const limit = await consume(clientIp(request), 'check-username');
   if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
 
   const username = request.nextUrl.searchParams.get('username');

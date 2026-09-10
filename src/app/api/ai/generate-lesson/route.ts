@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -54,8 +55,9 @@ Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markd
     });
     prism = result.text;
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: 'AI generation failed', detail: message }, { status: 502 });
+    const reference = randomUUID();
+    console.error(`[ai/generate-lesson] %s`, reference, err);
+    return NextResponse.json({ error: 'AI generation failed', reference }, { status: 502 });
   }
 
   try {

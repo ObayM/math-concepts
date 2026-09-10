@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Mail, Loader2, LogIn } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { authClient } from '@/lib/auth-client';
+import { PASSWORD_MIN } from '@/lib/password';
 import { redirect } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -27,8 +28,8 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (password.length < PASSWORD_MIN) {
+      setError(`Password must be at least ${PASSWORD_MIN} characters long.`);
       return;
     }
 

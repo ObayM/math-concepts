@@ -1,3 +1,5 @@
+import { trustedHost } from '@/lib/trusted-host';
+
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 function hostOf(value) {
@@ -14,7 +16,7 @@ export function isSameOriginRequest(request) {
   const site = request.headers.get('sec-fetch-site');
   if (site) return site === 'same-origin' || site === 'none';
 
-  const target = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  const target = trustedHost(request.headers.get('x-forwarded-host'), request.headers.get('host'));
   if (!target) return false;
 
   const origin = request.headers.get('origin');

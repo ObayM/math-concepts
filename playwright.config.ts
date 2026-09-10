@@ -60,6 +60,7 @@ export default defineConfig({
       // the suite runs over plain http, and https would make the session cookie
       // __Secure- prefixed and therefore unsettable
       APP_PROTOCOL: 'http',
+      DISABLE_HIBP: '1',
     },
   },
 });

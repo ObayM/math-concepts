@@ -160,7 +160,11 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
           {pwError && <p className="text-sm font-semibold text-danger-600">{pwError}</p>}
           {pwNote && <p className="text-sm font-semibold text-success-600">{pwNote}</p>}
 
-          <Button type="submit" variant="primary" disabled={pwBusy || !current || next.length < 6}>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={pwBusy || !current || next.length < PASSWORD_MIN}
+          >
             {pwBusy ? 'Changing...' : 'Change password'}
           </Button>
         </form>

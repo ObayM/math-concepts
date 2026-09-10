@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isSameOriginRequest } from '@/lib/same-origin';
 import { DEFAULT_LOCALE, isLocale, localeFromHost } from '@/lib/locale';
+import { trustedHost, trustedProto } from '@/lib/trusted-host';
 
 const PUBLIC_PATHS = [
   '/login',
@@ -46,13 +47,19 @@ const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Frame-Options': 'DENY',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+  'Cross-Origin-Opener-Policy': 'same-origin',
 };
 
 const DEV = process.env.NODE_ENV !== 'production';
 
+function underPrefix(pathname, prefix) {
+  if (prefix.endsWith('/')) return pathname.startsWith(prefix);
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
 function hostOf(request) {
-  const raw = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? '';
-  return raw.trim().toLowerCase();
+  return trustedHost(request.headers.get('x-forwarded-host'), request.headers.get('host'));
 }
 
 function acceptedLocale(request) {
@@ -119,7 +126,7 @@ export function proxy(request) {
   const { pathname } = request.nextUrl;
   const nonce = newNonce();
 
-  if (!CROSS_ORIGIN_EXEMPT.some((p) => pathname.startsWith(p)) && !isSameOriginRequest(request)) {
+  if (!CROSS_ORIGIN_EXEMPT.some((p) => underPrefix(pathname, p)) && !isSameOriginRequest(request)) {
     return harden(
       NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 }),
       nonce
@@ -141,13 +148,13 @@ export function proxy(request) {
     const [targetHost, targetPort = ''] = hostOf(request).split(':');
     url.hostname = `${locale}.${targetHost}`;
     url.port = targetPort;
-    url.protocol = request.headers.get('x-forwarded-proto') ?? url.protocol;
+    url.protocol = trustedProto(request.headers.get('x-forwarded-proto'), url.protocol);
     const redirect = harden(NextResponse.redirect(url), nonce);
     redirect.cookies.set(LANG_COOKIE, locale, { path: '/', maxAge: 60 * 60 * 24 * 365 });
     return redirect;
   }
 
-  const locale = FORCED_EN.some((p) => pathname.startsWith(p))
+  const locale = FORCED_EN.some((p) => underPrefix(pathname, p))
     ? DEFAULT_LOCALE
     : resolveLocale(request);
   const localized = (to) => `/${locale}${to}`;
@@ -169,7 +176,7 @@ export function proxy(request) {
     return harden(response, nonce);
   }
 
-  const isPublic = pathname === '/' || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  const isPublic = pathname === '/' || PUBLIC_PATHS.some((p) => underPrefix(pathname, p));
 
   if (!isPublic) {
     const sessionToken =

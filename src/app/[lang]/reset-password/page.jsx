@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2, KeyRound, CheckCircle2 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import { PASSWORD_MIN } from '@/lib/password';
 import Button from '@/components/ui/Button';
 import PasswordInput from '@/components/ui/PasswordInput';
 import Card from '@/components/ui/Card';
@@ -45,8 +46,8 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError('');
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (password.length < PASSWORD_MIN) {
+      setError(`Password must be at least ${PASSWORD_MIN} characters long.`);
       return;
     }
     if (password !== confirm) {

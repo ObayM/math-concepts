@@ -60,7 +60,7 @@ const ar: Dictionary = {
   'auth.verifyFirst': 'افتح بريدك وفعّل حسابك قبل تسجيل الدخول.',
   'auth.suspended': 'هذا الحساب موقوف.',
   'auth.invalid': 'بيانات غير صحيحة. حاول مرة أخرى.',
-  'auth.passwordShort': 'كلمة المرور لا تقل عن 6 أحرف.',
+  'auth.passwordShort': 'كلمة المرور لا تقل عن {count} أحرف.',
   'auth.signInBlurb': 'سجّل دخولك للوصول إلى حسابك.',
   'auth.emailAddress': 'البريد الإلكتروني',
   'auth.noAccount': 'ليس لديك حساب؟',

@@ -58,7 +58,7 @@ const en = {
   'auth.verifyFirst': 'Check your inbox and verify your email before signing in.',
   'auth.suspended': 'This account has been suspended.',
   'auth.invalid': 'Invalid credentials. Please try again.',
-  'auth.passwordShort': 'Password must be at least 6 characters long.',
+  'auth.passwordShort': 'Password must be at least {count} characters long.',
   'auth.signInBlurb': 'Sign in to access your account.',
   'auth.emailAddress': 'Email address',
   'auth.noAccount': "Don't have an account?",

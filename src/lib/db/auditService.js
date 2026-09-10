@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getFullSession } from '@/lib/authz';
-import { firstHopIp } from '@/lib/request-ip';
+import { clientIp } from '@/lib/request-ip';
 
 export const AUDIT = {
   ROLE_SET: 'role.set',
@@ -49,7 +49,7 @@ export async function recordAudit({ action, target, meta }) {
             impersonatedBy: session.session.impersonatedBy,
           }),
         },
-        ip: firstHopIp({ headers: h }),
+        ip: clientIp({ headers: h }),
         userAgent: h.get('user-agent'),
       },
     });

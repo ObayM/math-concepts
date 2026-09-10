@@ -72,8 +72,16 @@ describe('the page gate', () => {
     }
   });
 
-  it('treats PUBLIC_PATHS as prefixes, which is worth knowing', () => {
-    expect(proxy(request('/loginsomething')).status).toBe(200);
+  it('does not let a public prefix leak onto a longer path', () => {
+    for (const path of ['/loginsomething', '/prismatic', '/termsandmore', '/authorise']) {
+      expect(proxy(request(path)).status, path).toBe(307);
+    }
+  });
+
+  it('still lets real paths under a public prefix through', () => {
+    for (const path of ['/login', '/auth/email-confirm', '/prism/play', '/u/someone']) {
+      expect(proxy(request(path)).status, path).toBe(200);
+    }
   });
 });
 

@@ -75,3 +75,32 @@ describe('auth config', () => {
     expect(options.advanced.cookiePrefix).toBeUndefined();
   });
 });
+
+describe('session lifetime is a decision, not an inherited default', () => {
+  it('pins expiry, refresh and freshness', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.com' });
+    expect(options.session.expiresIn).toBe(60 * 60 * 24 * 30);
+    expect(options.session.updateAge).toBe(60 * 60 * 24);
+    expect(options.session.freshAge).toBe(60 * 15);
+  });
+
+  it('caps the cookie cache, because a cached session keeps a banned user signed in', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.com' });
+    expect(options.session.cookieCache.enabled).toBe(true);
+    expect(options.session.cookieCache.maxAge).toBeLessThanOrEqual(60);
+  });
+});
+
+describe('password policy', () => {
+  it('asks for real length rather than six characters', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.com' });
+    expect(options.emailAndPassword.minPasswordLength).toBeGreaterThanOrEqual(10);
+    expect(options.emailAndPassword.maxPasswordLength).toBe(128);
+  });
+
+  it('checks new passwords against known breaches', async () => {
+    const options = await loadAuth({ APP_DOMAIN: 'mathly.com' });
+    const ids = options.plugins.map((p: { id: string }) => p.id);
+    expect(ids).toContain('have-i-been-pwned');
+  });
+});

@@ -1,11 +1,12 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { username, admin } from 'better-auth/plugins';
+import { username, admin, haveIBeenPwned } from 'better-auth/plugins';
 import { nextCookies } from 'better-auth/next-js';
 import { prisma } from './prisma';
 import { sendEmail } from './email';
 import { ac, roles, ROLES, ADMIN_ROLES } from './permissions';
 import { hostsForDomain } from './locale';
+import { PASSWORD_MIN, PASSWORD_MAX } from './password';
 
 const adminUserIds = (process.env.ADMIN_USER_IDS ?? '')
   .split(',')
@@ -65,10 +66,18 @@ export const auth = betterAuth({
     },
   },
 
+  session: {
+    expiresIn: 60 * 60 * 24 * 30,
+    updateAge: 60 * 60 * 24,
+    freshAge: 60 * 15,
+    cookieCache: { enabled: true, maxAge: 60 },
+  },
+
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    minPasswordLength: 6,
+    minPasswordLength: PASSWORD_MIN,
+    maxPasswordLength: PASSWORD_MAX,
     revokeSessionsOnPasswordReset: true,
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
@@ -124,6 +133,11 @@ export const auth = betterAuth({
       defaultRole: ROLES.STUDENT,
       adminRoles: ADMIN_ROLES,
       adminUserIds,
+    }),
+    haveIBeenPwned({
+      enabled: process.env.DISABLE_HIBP !== '1',
+      customPasswordCompromisedMessage:
+        'That password has turned up in a known data breach. Pick a different one.',
     }),
     nextCookies(),
   ],
