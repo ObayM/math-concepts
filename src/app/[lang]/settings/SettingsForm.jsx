@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { authClient, changePassword } from '@/lib/auth-client';
@@ -9,6 +10,7 @@ import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function SettingsForm({ reminderEmails, emailVerified }) {
   const t = useT();
+  const router = useRouter();
   const [reminders, setReminders] = useState(reminderEmails);
   const [savingReminders, setSavingReminders] = useState(false);
   const [reminderNote, setReminderNote] = useState('');
@@ -41,7 +43,8 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
         setDeleteBusy(false);
         return;
       }
-      window.location.href = '/';
+      router.replace('/');
+      router.refresh();
     } catch {
       setDeleteError(t('error.generic'));
       setDeleteBusy(false);
