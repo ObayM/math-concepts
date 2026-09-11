@@ -322,6 +322,36 @@ const en = {
   'practice.next': 'Next',
   'lesson.dayStreak': '{count} day streak',
   'lesson.aiTutor': 'AI tutor',
+  'home.heroLead': 'Master math with',
+  'home.heroAccent': 'visual intuition',
+  'home.heroBlurb':
+    'Stop memorising formulas. Start seeing the patterns. Lessons you can drag, build and poke at.',
+  'home.startFree': 'Start learning free',
+  'home.continue': 'Continue learning',
+  'home.logIn': 'Log in',
+  'home.demoEyebrow': 'Try it right here',
+  'home.demoTitle': 'This is a lesson slide. Not a picture of one.',
+  'home.demoBlurb':
+    'Drag the point along the curve and watch the tangent follow. Every lesson is built out of pieces like this.',
+  'home.demoLoad': 'Load the interactive slide',
+  'home.demoLoading': 'Loading...',
+  'home.featuresEyebrow': 'What makes it different',
+  'home.f1Title': 'Diagrams that answer back',
+  'home.f1Body':
+    'Drag a point, move a slider, sketch a curve. The maths updates while you watch, so the idea lands before the formula does.',
+  'home.f2Title': 'It notices when you are stuck',
+  'home.f2Body':
+    'Get one wrong and the lesson detours into a smaller explanation built for that exact mistake, then puts you back where you were.',
+  'home.f3Title': 'A tutor that can see your screen',
+  'home.f3Body':
+    'Ask a question and the tutor already knows which slide you are on, what you answered and where you went wrong.',
+  'home.coursesEyebrow': 'What you can learn',
+  'home.coursesAll': 'See all courses',
+  'home.pricingTitle': 'Free while it is in beta.',
+  'home.pricingBlurb':
+    'No card, no trial timer. We will say so clearly and well in advance if that ever changes.',
+  'home.ctaTitle': 'Ready to see it click?',
+  'home.ctaBlurb': 'Make an account and start the first lesson in under a minute.',
   'courses.title': 'Our courses',
   'courses.subtitle': 'Visual, interactive tracks that make the math actually click.',
   'courses.lessonCount': { one: '1 lesson', other: '{count} lessons' },
