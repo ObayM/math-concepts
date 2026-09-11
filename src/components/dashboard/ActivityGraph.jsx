@@ -1,8 +1,7 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 import { Zap, Calendar } from 'lucide-react';
-
-const DAY_LABELS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa'];
+import { useT, useLocale } from '@/components/i18n/LocaleProvider';
 
 const dayKey = (d) => d.toISOString().slice(0, 10);
 
@@ -24,6 +23,12 @@ const ActivityGraph = ({
   showCaption = true,
   timezone,
 }) => {
+  const t = useT();
+  const locale = useLocale();
+  const dayLabels = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: 'narrow', timeZone: 'UTC' });
+    return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(Date.UTC(2024, 0, 7 + i))));
+  }, [locale]);
   const [view, setView] = useState('week');
 
   const activityMap = useMemo(() => {
@@ -46,12 +51,12 @@ const ActivityGraph = ({
       d.setUTCDate(d.getUTCDate() - dow + i);
       days.push({
         date: dayKey(d),
-        label: DAY_LABELS[d.getUTCDay()],
+        label: dayLabels[d.getUTCDay()],
         isToday: dayKey(d) === todayKey,
       });
     }
     return days;
-  }, [timezone]);
+  }, [timezone, dayLabels]);
 
   const monthDays = useMemo(() => {
     const base = localToday(timezone);
@@ -82,8 +87,8 @@ const ActivityGraph = ({
         <button
           onClick={() => setView(view === 'week' ? 'month' : 'week')}
           className="tap-target flex items-center justify-center p-1 rounded-lg text-neutral-300/60 hover:text-neutral-400 transition-colors cursor-pointer"
-          title={view === 'week' ? 'Monthly' : 'Weekly'}
-          aria-label="Toggle view"
+          title={view === 'week' ? t('activity.monthly') : t('activity.weekly')}
+          aria-label={t('activity.toggle')}
         >
           <Calendar className="w-3 h-3" />
         </button>
@@ -92,57 +97,61 @@ const ActivityGraph = ({
   );
 };
 
-const StreakView = ({ weekDays, activityMap, streak, hasActivityToday, showCaption }) => (
-  <div>
-    {showCaption && (
-      <p className="text-center text-sm text-neutral-500 mb-6">
-        {streak === 0 ? (
-          <>Solve a problem to start a streak</>
-        ) : hasActivityToday ? (
-          <>
-            <span className="font-bold text-neutral-800">
-              {streak} day{streak !== 1 ? 's' : ''}
-            </span>{' '}
-            strong. Keep it going.
-          </>
-        ) : (
-          <>Keep your streak alive by taking one lesson</>
-        )}
-      </p>
-    )}
+const StreakView = ({ weekDays, activityMap, streak, hasActivityToday, showCaption }) => {
+  const t = useT();
+  return (
+    <div>
+      {showCaption && (
+        <p className="text-center text-sm text-neutral-500 mb-6">
+          {streak === 0 ? (
+            <>{t('activity.startStreak')}</>
+          ) : hasActivityToday ? (
+            <>
+              <span className="font-bold text-neutral-800">
+                {streak} day{streak !== 1 ? 's' : ''}
+              </span>{' '}
+              strong. Keep it going.
+            </>
+          ) : (
+            <>{t('activity.keepAlive')}</>
+          )}
+        </p>
+      )}
 
-    <div className="flex items-end justify-between">
-      {weekDays.map((day) => {
-        const count = activityMap[day.date] || 0;
-        const active = count > 0;
+      <div className="flex items-end justify-between">
+        {weekDays.map((day) => {
+          const count = activityMap[day.date] || 0;
+          const active = count > 0;
 
-        return (
-          <div key={day.date} className="flex flex-col items-center gap-2">
-            <div
-              className={[
-                'w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200',
-                active
-                  ? 'bg-success-500 text-white'
-                  : day.isToday
-                    ? 'ring-2 ring-primary-300 bg-white text-primary-500'
-                    : 'bg-neutral-100 text-neutral-300',
-              ].join(' ')}
-            >
-              <Zap className={`w-4 h-4 ${active ? 'fill-white' : ''}`} />
+          return (
+            <div key={day.date} className="flex flex-col items-center gap-2">
+              <div
+                className={[
+                  'w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200',
+                  active
+                    ? 'bg-success-500 text-white'
+                    : day.isToday
+                      ? 'ring-2 ring-primary-300 bg-white text-primary-500'
+                      : 'bg-neutral-100 text-neutral-300',
+                ].join(' ')}
+              >
+                <Zap className={`w-4 h-4 ${active ? 'fill-white' : ''}`} />
+              </div>
+              <span
+                className={`text-xs font-medium ${day.isToday ? 'text-neutral-700' : 'text-neutral-400'}`}
+              >
+                {day.label}
+              </span>
             </div>
-            <span
-              className={`text-xs font-medium ${day.isToday ? 'text-neutral-700' : 'text-neutral-400'}`}
-            >
-              {day.label}
-            </span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const GridView = ({ monthDays, activityMap }) => {
+  const t = useT();
   const color = (count) => {
     if (!count) return 'bg-neutral-100';
     if (count <= 1) return 'bg-neutral-300';
@@ -152,7 +161,7 @@ const GridView = ({ monthDays, activityMap }) => {
 
   return (
     <div>
-      <p className="text-xs text-neutral-400 mb-3">Last 4 weeks</p>
+      <p className="text-xs text-neutral-400 mb-3">{t('activity.lastFourWeeks')}</p>
       <div className="grid grid-cols-7 gap-1.5">
         {monthDays.map((date) => (
           <div
@@ -163,12 +172,12 @@ const GridView = ({ monthDays, activityMap }) => {
         ))}
       </div>
       <div className="flex items-center justify-end gap-1.5 mt-3 text-xs text-neutral-400">
-        <span>Less</span>
+        <span>{t('activity.less')}</span>
         <div className="w-2.5 h-2.5 rounded bg-neutral-100" />
         <div className="w-2.5 h-2.5 rounded bg-neutral-300" />
         <div className="w-2.5 h-2.5 rounded bg-neutral-500" />
         <div className="w-2.5 h-2.5 rounded bg-neutral-700" />
-        <span>More</span>
+        <span>{t('activity.more')}</span>
       </div>
     </div>
   );

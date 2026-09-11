@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Check, Lock, ChevronRight } from 'lucide-react';
 import { iconMap } from '@/components/lib/IconMap';
 import Badge from '@/components/ui/Badge';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const statusConfig = {
   locked: {
@@ -10,7 +11,7 @@ const statusConfig = {
     nodeBorder: 'border-neutral-300',
     nodeIcon: <Lock size={16} className="text-neutral-400" />,
     badgeVariant: 'neutral',
-    label: 'Locked',
+    labelKey: 'lesson.locked',
     dim: true,
   },
   unlocked: {
@@ -18,7 +19,7 @@ const statusConfig = {
     nodeBorder: 'border-primary-700',
     nodeIcon: <span className="w-3 h-3 rounded-full bg-white" />,
     badgeVariant: 'primary',
-    label: 'Up Next',
+    labelKey: 'lesson.upNext',
     dim: false,
   },
   completed: {
@@ -26,12 +27,13 @@ const statusConfig = {
     nodeBorder: 'border-success-600',
     nodeIcon: <Check size={16} className="text-white" strokeWidth={3} />,
     badgeVariant: 'success',
-    label: 'Completed',
+    labelKey: 'lesson.completed',
     dim: false,
   },
 };
 
 export default function LessonCard({ lesson, courseSlug, index, isLast = false }) {
+  const t = useT();
   const { id, title, description, difficulty, status, iconName, isDraft } = lesson;
   const Icon = iconMap[iconName] || iconMap['FunctionSquare'];
   const config = statusConfig[status] || statusConfig.locked;
@@ -80,7 +82,7 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
               </Badge>
             )}
             <Badge variant={config.badgeVariant} className="text-xs whitespace-nowrap">
-              {config.label}
+              {t(config.labelKey)}
             </Badge>
             {!isLocked && (
               <ChevronRight
@@ -92,7 +94,11 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
         </div>
 
         {difficulty && (
-          <p className="text-xs text-neutral-400 font-medium mt-2 ms-11">{difficulty}</p>
+          <p className="text-xs text-neutral-400 font-medium mt-2 ms-11">
+            {t(`difficulty.${difficulty}`) === `difficulty.${difficulty}`
+              ? difficulty
+              : t(`difficulty.${difficulty}`)}
+          </p>
         )}
       </div>
     </div>

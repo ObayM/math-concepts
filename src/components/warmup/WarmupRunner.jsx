@@ -11,6 +11,7 @@ import StopScreen from '@/components/warmup/StopScreen';
 import { questionAt } from '@/lib/warmup/questions';
 import { gradeAnswer } from '@/lib/warmup/grade';
 import { accuracyPct, formatDuration } from '@/lib/warmup/stats';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const FLUSH_EVERY = 10;
 const FLUSH_AFTER_MS = 10_000;
@@ -21,6 +22,7 @@ const SESSION_CAP = 500;
 const EMPTY_STATS = { answered: 0, correct: 0, streak: 0, bestStreak: 0, totalMs: 0 };
 
 export default function WarmupRunner({ level, levelName, levelBlurb }) {
+  const t = useT();
   const [session, setSession] = useState(null);
   const [status, setStatus] = useState('starting');
   const [idx, setIdx] = useState(0);
@@ -269,7 +271,9 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
     return (
       <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center pt-[var(--nav-h)]">
         <Card className="card-soft p-8 text-center">
-          <h1 className="font-display text-2xl font-bold text-neutral-900">Could not start</h1>
+          <h1 className="font-display text-2xl font-bold text-neutral-900">
+            {t('warmup.couldNotStart')}
+          </h1>
           <p className="mt-2 text-neutral-500">
             Something went wrong setting up the drill. Try again in a moment.
           </p>
@@ -298,7 +302,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
   if (!question) {
     return (
       <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center pt-[var(--nav-h)]">
-        <p className="animate-pulse font-bold text-neutral-400">Warming up...</p>
+        <p className="animate-pulse font-bold text-neutral-400">{t('warmup.warmingUp')}</p>
       </div>
     );
   }
@@ -318,7 +322,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
             className="tap-target-h flex items-center gap-1.5 text-sm font-bold text-neutral-500 transition-colors hover:text-neutral-700"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
-            <span className="max-sm:hidden">Levels</span>
+            <span className="max-sm:hidden">{t('warmup.levels')}</span>
           </Link>
           <p className="text-sm font-bold text-neutral-400">{levelName}</p>
           <button
@@ -326,7 +330,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
             onClick={stop}
             className="tap-target-h rounded-lg px-3 text-sm font-bold text-neutral-500 transition-colors hover:text-neutral-800"
           >
-            Stop
+            {t('warmup.stop')}
           </button>
         </div>
 
@@ -403,21 +407,24 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
 
         {touch ? (
           <div className="shrink-0">
-            <Keypad onPress={press} submitLabel={verdict && !verdict.correct ? 'Next' : 'Check'} />
+            <Keypad
+              onPress={press}
+              submitLabel={verdict && !verdict.correct ? t('warmup.next') : t('warmup.check')}
+            />
           </div>
         ) : (
           <div className="shrink-0">
             {verdict && !verdict.correct ? (
               <Button onClick={advance} variant="primary" fullWidth>
-                Next
+                {t('warmup.next')}
               </Button>
             ) : (
               <Button onClick={submit} variant="primary" fullWidth disabled={Boolean(verdict)}>
-                Check
+                {t('warmup.check')}
               </Button>
             )}
             <p className="mt-3 text-center text-xs text-neutral-400">
-              {levelBlurb} Press Enter to answer.
+              {levelBlurb} {t('warmup.pressEnter')}
             </p>
           </div>
         )}

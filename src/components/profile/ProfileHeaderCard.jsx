@@ -7,6 +7,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { displayName as nameFor } from '@/lib/user-name';
+import { useT, useLocale } from '@/components/i18n/LocaleProvider';
 
 export function avatarColor(str) {
   const colors = [
@@ -53,6 +54,8 @@ export function Avatar({ name, image, size = 'lg' }) {
 }
 
 export default function ProfileHeaderCard({ profile, isOwn }) {
+  const t = useT();
+  const locale = useLocale();
   const [editing, setEditing] = useState(false);
   const [nameVal, setNameVal] = useState(profile.name || '');
   const [imageVal, setImageVal] = useState(profile.image || '');
@@ -81,13 +84,13 @@ export default function ProfileHeaderCard({ profile, isOwn }) {
       });
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Failed to save');
+        setError(data.error || t('profile.saveFailed'));
         return;
       }
       setEditing(false);
       router.refresh();
     } catch {
-      setError('Network error');
+      setError(t('profile.networkError'));
     } finally {
       setSaving(false);
     }
@@ -106,10 +109,11 @@ export default function ProfileHeaderCard({ profile, isOwn }) {
           <h1 className="text-2xl font-bold text-neutral-900 truncate">{displayName}</h1>
           <p className="text-neutral-400 text-sm">@{profile.displayUsername}</p>
           <p className="text-neutral-400 text-xs mt-1">
-            Member since{' '}
-            {new Date(profile.createdAt).toLocaleDateString('en-US', {
-              month: 'long',
-              year: 'numeric',
+            {t('profile.memberSince', {
+              date: new Date(profile.createdAt).toLocaleDateString(locale, {
+                month: 'long',
+                year: 'numeric',
+              }),
             })}
           </p>
         </div>
@@ -119,7 +123,7 @@ export default function ProfileHeaderCard({ profile, isOwn }) {
             className="shrink-0 flex items-center gap-1.5 text-xs text-neutral-400 hover:text-neutral-700 transition-colors px-2 py-1.5 rounded-md hover:bg-neutral-100"
           >
             <Edit2 className="w-3.5 h-3.5" />
-            Edit
+            {t('profile.edit')}
           </button>
         )}
       </div>
@@ -134,7 +138,7 @@ export default function ProfileHeaderCard({ profile, isOwn }) {
               <Input
                 value={nameVal}
                 onChange={(e) => setNameVal(e.target.value)}
-                placeholder="Your name"
+                placeholder={t('profile.yourName')}
               />
             </div>
             <div>

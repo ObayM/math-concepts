@@ -82,7 +82,7 @@ export default async function CoursePage({ params }) {
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-400 transition-colors hover:text-neutral-700"
         >
           <ArrowLeft className="h-4 w-4" />
-          All courses
+          {t('course.allCourses')}
         </Link>
 
         <header className="mt-5 animate-fade-in-up">
@@ -97,7 +97,7 @@ export default async function CoursePage({ params }) {
             <div className="min-w-0 flex-1">
               <div className="mb-1.5 flex items-center justify-between text-sm">
                 <span className="text-neutral-500">
-                  {completedCount} of {lessons.length} completed
+                  {t('course.completedOf', { done: completedCount, total: lessons.length })}
                 </span>
                 <span className="font-bold text-neutral-700">{pct}%</span>
               </div>
@@ -117,7 +117,7 @@ export default async function CoursePage({ params }) {
                 icon={<Zap className="h-4 w-4" />}
                 className="shrink-0"
               >
-                Practice
+                {t('course.practice')}
               </Button>
             )}
           </div>
@@ -134,7 +134,7 @@ export default async function CoursePage({ params }) {
                   >
                     <div>
                       <p className="text-xs font-bold uppercase tracking-[0.12em] text-neutral-400">
-                        Unit {gi + 1}
+                        {t('course.unit', { n: gi + 1 })}
                       </p>
                       <h2 className="mt-1 font-display text-xl font-bold text-neutral-900">
                         {group.unit}
@@ -158,7 +158,7 @@ export default async function CoursePage({ params }) {
             );
           })}
           {lessons.length === 0 && (
-            <p className="text-center text-neutral-400">No lessons in this course yet.</p>
+            <p className="text-center text-neutral-400">{t('course.noLessons')}</p>
           )}
         </div>
       </main>

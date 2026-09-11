@@ -5,18 +5,20 @@ import { getUserProfile } from '@/lib/db/userService';
 import Card from '@/components/ui/Card';
 import ProfileHeaderCard from '@/components/profile/ProfileHeaderCard';
 import ActivityGraph from '@/components/dashboard/ActivityGraph';
+import { getT } from '@/lib/i18n/server';
 
 const MAX_SKILLS = 12;
 
 const band = (score) =>
   score >= 0.75
-    ? { label: 'solid', bar: 'bg-success-500', text: 'text-success-600' }
+    ? { label: 'profile.solid', bar: 'bg-success-500', text: 'text-success-600' }
     : score >= 0.4
-      ? { label: 'getting there', bar: 'bg-primary-500', text: 'text-primary-600' }
-      : { label: 'shaky', bar: 'bg-warning-500', text: 'text-warning-600' };
+      ? { label: 'profile.gettingThere', bar: 'bg-primary-500', text: 'text-primary-600' }
+      : { label: 'profile.shaky', bar: 'bg-warning-500', text: 'text-warning-600' };
 
 export default async function ProfilePage({ params }) {
   const { username } = await params;
+  const t = await getT();
 
   const [profile, viewer] = await Promise.all([getUserProfile(username), requireUser()]);
 
@@ -34,24 +36,24 @@ export default async function ProfilePage({ params }) {
           <StatCard
             icon={<Flame className="w-5 h-5 text-orange-500" />}
             value={profile.streak}
-            label="day streak"
+            label={t('profile.dayStreak')}
           />
           <StatCard
             icon={<BookOpen className="w-5 h-5 text-primary-500" />}
             value={profile.completedCount}
-            label="lessons done"
+            label={t('profile.lessonsDone')}
           />
           <StatCard
             icon={<Zap className="w-5 h-5 text-warning-500" />}
             value={profile.totalXp}
-            label="total xp"
+            label={t('profile.totalXp')}
           />
         </div>
 
         {profile.heatmap.length > 0 && (
           <Card className="p-6">
             <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-5">
-              Activity
+              {t('profile.activity')}
             </h2>
             <ActivityGraph
               activityData={profile.heatmap}
@@ -84,7 +86,7 @@ export default async function ProfilePage({ params }) {
                       </span>
                       <span className={`font-semibold ${tone.text}`}>
                         {mastery}%
-                        <span className="ms-2 font-normal text-neutral-400">{tone.label}</span>
+                        <span className="ms-2 font-normal text-neutral-400">{t(tone.label)}</span>
                       </span>
                     </div>
                     <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
@@ -109,7 +111,7 @@ export default async function ProfilePage({ params }) {
         ) : (
           <Card className="p-8 text-center">
             <Award className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
-            <p className="text-sm text-neutral-400">No skills tracked yet, keep learning!</p>
+            <p className="text-sm text-neutral-400">{t('profile.noSkills')}</p>
           </Card>
         )}
       </div>

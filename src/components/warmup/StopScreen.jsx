@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { accuracyPct, paceMs, formatPace, formatDuration } from '@/lib/warmup/stats';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 function Figure({ label, value }) {
   return (
@@ -14,15 +15,16 @@ function Figure({ label, value }) {
   );
 }
 
-function verdict(answered, accuracy) {
-  if (!answered) return 'Nothing logged this time. The keypad is right there when you want it.';
-  if (accuracy >= 95) return 'Almost nothing got past you. That is what reflex looks like.';
-  if (accuracy >= 80) return 'Sharp. Nudge the level up when this starts feeling slow.';
-  if (accuracy >= 55) return 'Solid middle ground. Speed comes after the misses stop.';
-  return 'Rough round. Drop a level and build the reflex from underneath.';
+function verdict(t, answered, accuracy) {
+  if (!answered) return t('warmup.verdictNone');
+  if (accuracy >= 95) return t('warmup.verdictGreat');
+  if (accuracy >= 80) return t('warmup.verdictSharp');
+  if (accuracy >= 55) return t('warmup.verdictMiddling');
+  return t('warmup.verdictRough');
 }
 
 export default function StopScreen({ stats, xpEarned, capped, levelName, onAgain }) {
+  const t = useT();
   const accuracy = accuracyPct(stats.correct, stats.answered);
   const pace = paceMs(stats.totalMs, stats.answered);
 
@@ -34,12 +36,12 @@ export default function StopScreen({ stats, xpEarned, capped, levelName, onAgain
       <h1 className="font-display mb-2 text-4xl font-bold tracking-tight text-neutral-900">
         {stats.correct} out of {stats.answered}
       </h1>
-      <p className="mb-8 text-neutral-500">{verdict(stats.answered, accuracy)}</p>
+      <p className="mb-8 text-neutral-500">{verdict(t, stats.answered, accuracy)}</p>
 
       <div className="mb-8 grid grid-cols-2 gap-6 border-y border-neutral-100 py-6 sm:grid-cols-4">
-        <Figure label="Accuracy" value={`${accuracy}%`} />
-        <Figure label="Best run" value={stats.bestStreak} />
-        <Figure label="Per question" value={formatPace(pace)} />
+        <Figure label={t('warmup.accuracy')} value={`${accuracy}%`} />
+        <Figure label={t('warmup.bestRun')} value={stats.bestStreak} />
+        <Figure label={t('warmup.perQuestion')} value={formatPace(pace)} />
         <Figure label="Time" value={formatDuration(stats.sittingMs)} />
       </div>
 

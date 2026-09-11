@@ -5,8 +5,10 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { authClient, changePassword } from '@/lib/auth-client';
 import { PASSWORD_MIN } from '@/lib/password';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function SettingsForm({ reminderEmails, emailVerified }) {
+  const t = useT();
   const [reminders, setReminders] = useState(reminderEmails);
   const [savingReminders, setSavingReminders] = useState(false);
   const [reminderNote, setReminderNote] = useState('');
@@ -35,13 +37,13 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
     try {
       const { error } = await authClient.deleteUser({ password: deletePassword });
       if (error) {
-        setDeleteError(error.message ?? "That didn't work. Check your password.");
+        setDeleteError(error.message ?? t('settings.deleteFailed'));
         setDeleteBusy(false);
         return;
       }
       window.location.href = '/';
     } catch {
-      setDeleteError('Something went wrong. Try again.');
+      setDeleteError(t('error.generic'));
       setDeleteBusy(false);
     }
   };
@@ -58,10 +60,10 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
         body: JSON.stringify({ reminderEmails: value }),
       });
       if (!res.ok) throw new Error('failed');
-      setReminderNote('Saved.');
+      setReminderNote(t('settings.saved'));
     } catch {
       setReminders(!value);
-      setReminderNote("Couldn't save that. Try again?");
+      setReminderNote(t('settings.saveFailed'));
     } finally {
       setSavingReminders(false);
     }
@@ -79,12 +81,12 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
     });
     setPwBusy(false);
     if (error) {
-      setPwError(error.message ?? "That didn't work. Check your current password.");
+      setPwError(error.message ?? t('settings.wrongCurrent'));
       return;
     }
     setCurrent('');
     setNext('');
-    setPwNote('Password changed. Other devices have been signed out.');
+    setPwNote(t('settings.passwordChanged'));
   };
 
   async function resendVerification() {
@@ -93,9 +95,9 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
     try {
       const res = await fetch('/api/user/resend-verification', { method: 'POST' });
       const body = await res.json().catch(() => ({}));
-      setResendNote(res.ok ? 'Sent. Check your inbox.' : (body.error ?? "Couldn't send it."));
+      setResendNote(res.ok ? t('settings.resent') : (body.error ?? t('settings.resendFailed')));
     } catch {
-      setResendNote("Couldn't send it. Check your connection.");
+      setResendNote(t('settings.offline'));
     } finally {
       setResending(false);
     }
@@ -104,18 +106,18 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
   return (
     <div className="mt-8 space-y-6">
       <Card className="card-soft p-6">
-        <h2 className="font-display text-xl font-bold text-neutral-900">Reminders</h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          An occasional nudge when your streak is about to lapse. Nothing else, ever.
-        </p>
+        <h2 className="font-display text-xl font-bold text-neutral-900">
+          {t('settings.reminders')}
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">{t('settings.remindersBlurb')}</p>
 
         <div className="mt-5 flex items-center justify-between gap-4">
-          <span className="font-semibold text-neutral-700">Email me reminders</span>
+          <span className="font-semibold text-neutral-700">{t('settings.remindersLabel')}</span>
           <button
             type="button"
             role="switch"
             aria-checked={reminders}
-            aria-label="Email me reminders"
+            aria-label={t('settings.remindersLabel')}
             disabled={savingReminders}
             onClick={toggleReminders}
             className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-60 ${
@@ -143,7 +145,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
                 onClick={resendVerification}
                 disabled={resending}
               >
-                {resending ? 'Sending...' : 'Resend the email'}
+                {resending ? t('settings.sending') : t('settings.resend')}
               </Button>
               {resendNote && <span className="text-sm text-neutral-600">{resendNote}</span>}
             </div>
@@ -153,11 +155,13 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
       </Card>
 
       <Card className="card-soft p-6">
-        <h2 className="font-display text-xl font-bold text-neutral-900">Password</h2>
+        <h2 className="font-display text-xl font-bold text-neutral-900">
+          {t('settings.password')}
+        </h2>
         <form method="post" onSubmit={submitPassword} className="mt-5 space-y-4">
           <div>
             <label htmlFor="current" className="text-sm font-semibold text-neutral-700">
-              Current password
+              {t('settings.currentPasswordLabel')}
             </label>
             <input
               id="current"
@@ -171,7 +175,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
           </div>
           <div>
             <label htmlFor="next" className="text-sm font-semibold text-neutral-700">
-              New password
+              {t('settings.newPasswordLabel')}
             </label>
             <input
               id="next"
@@ -193,16 +197,16 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
             variant="primary"
             disabled={pwBusy || !current || next.length < PASSWORD_MIN}
           >
-            {pwBusy ? 'Changing...' : 'Change password'}
+            {pwBusy ? t('settings.changing') : t('settings.changePassword')}
           </Button>
         </form>
       </Card>
 
       <Card className="border-danger-200 p-6">
-        <h2 className="font-display text-xl font-bold text-neutral-900">Delete account</h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          This removes your account, your progress, your notes and your streak. It cannot be undone.
-        </p>
+        <h2 className="font-display text-xl font-bold text-neutral-900">
+          {t('settings.deleteTitle')}
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">{t('settings.deleteBlurb')}</p>
 
         {!deleteOpen ? (
           <Button
@@ -211,13 +215,13 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
             className="mt-4 border-danger-300 text-danger-600 hover:bg-danger-50"
             onClick={() => setDeleteOpen(true)}
           >
-            Delete my account
+            {t('settings.deleteCta')}
           </Button>
         ) : (
           <form onSubmit={deleteAccount} className="mt-4 space-y-4">
             <div>
               <label htmlFor="delete-password" className="text-sm font-semibold text-neutral-700">
-                Your password
+                {t('settings.deletePassword')}
               </label>
               <input
                 id="delete-password"
@@ -231,7 +235,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
 
             <div>
               <label htmlFor="delete-confirm" className="text-sm font-semibold text-neutral-700">
-                Type <span className="font-mono font-bold">delete</span> to confirm
+                {t('settings.deleteConfirmLabel', { word: t('settings.deleteConfirmWord') })}
               </label>
               <input
                 id="delete-confirm"
@@ -252,7 +256,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
                 disabled={!canDelete || deleteBusy}
                 className="bg-danger-600 border-danger-800 hover:bg-danger-500"
               >
-                {deleteBusy ? 'Deleting...' : 'Delete for good'}
+                {deleteBusy ? t('settings.deleting') : t('settings.deleteGo')}
               </Button>
               <Button
                 type="button"
@@ -264,7 +268,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
                   setDeleteError('');
                 }}
               >
-                Keep my account
+                {t('settings.deleteKeep')}
               </Button>
             </div>
           </form>

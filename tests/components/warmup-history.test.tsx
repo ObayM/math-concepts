@@ -1,6 +1,12 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
+import { makeT } from '@/lib/i18n';
+
+vi.mock('@/lib/i18n/server', () => ({
+  getT: async () => makeT('en'),
+  getLocale: async () => 'en',
+}));
 import userEvent from '@testing-library/user-event';
 import SpeedChart from '@/components/warmup/SpeedChart';
 import HistoryView from '@/components/warmup/HistoryView';
@@ -153,35 +159,35 @@ describe('HistoryView', () => {
     return tag!.parentElement!.querySelector('p')!.textContent;
   };
 
-  it('leads with the lifetime numbers', () => {
-    render(<HistoryView {...props} />);
+  it('leads with the lifetime numbers', async () => {
+    render(await HistoryView({ ...props }));
     expect(statValue('Answered')).toBe('120');
     expect(statValue('Accuracy')).toBe('93%');
     expect(statValue('Per question')).toBe('1.6s');
     expect(statValue('Sessions')).toBe('4');
   });
 
-  it('spells out that lower is better on the pace chart', () => {
-    render(<HistoryView {...props} />);
+  it('spells out that lower is better on the pace chart', async () => {
+    render(await HistoryView({ ...props }));
     expect(screen.getByText(/lower is better/i)).toBeInTheDocument();
   });
 
-  it('lists the weak facts with how often they were missed', () => {
-    render(<HistoryView {...props} />);
+  it('lists the weak facts with how often they were missed', async () => {
+    render(await HistoryView({ ...props }));
     expect(screen.getByText('7 × 8')).toBeInTheDocument();
     expect(screen.getByText('5 of 12 missed')).toBeInTheDocument();
     expect(screen.getByText('10 seen')).toBeInTheDocument();
   });
 
-  it('shows both the wall clock time and the time actually answering', () => {
-    render(<HistoryView {...props} />);
+  it('shows both the wall clock time and the time actually answering', async () => {
+    render(await HistoryView({ ...props }));
     expect(screen.getByText('Sat for')).toBeInTheDocument();
     expect(screen.getByText('Answering')).toBeInTheDocument();
     expect(screen.getByText('1:35')).toBeInTheDocument();
   });
 
-  it('offers both csv exports as real downloads', () => {
-    render(<HistoryView {...props} />);
+  it('offers both csv exports as real downloads', async () => {
+    render(await HistoryView({ ...props }));
     const sessionsCsv = screen.getByRole('link', { name: /Sessions CSV/i });
     expect(sessionsCsv).toHaveAttribute('href', '/api/warmup/export?scope=sessions');
     expect(sessionsCsv).toHaveAttribute('download');
@@ -191,8 +197,8 @@ describe('HistoryView', () => {
     );
   });
 
-  it('filters by level through the url, so it works without javascript', () => {
-    render(<HistoryView {...props} />);
+  it('filters by level through the url, so it works without javascript', async () => {
+    render(await HistoryView({ ...props }));
     expect(screen.getByRole('link', { name: 'All levels' })).toHaveAttribute(
       'href',
       '/warmup/history'
@@ -203,23 +209,23 @@ describe('HistoryView', () => {
     );
   });
 
-  it('sends a student with no history somewhere useful', () => {
+  it('sends a student with no history somewhere useful', async () => {
     render(
-      <HistoryView
-        {...props}
-        totals={{ ...TOTALS, answered: 0 }}
-        trend={[]}
-        weakSpots={[]}
-        sessions={[]}
-      />
+      await HistoryView({
+        ...props,
+        totals: { ...TOTALS, answered: 0 },
+        trend: [],
+        weakSpots: [],
+        sessions: [],
+      })
     );
     expect(screen.getByText(/Nothing here yet/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Pick a level/i })).toHaveAttribute('href', '/warmup');
     expect(screen.queryByRole('link', { name: /Sessions CSV/i })).toBeNull();
   });
 
-  it('explains an empty weak spot list rather than showing a blank box', () => {
-    render(<HistoryView {...props} weakSpots={[]} />);
+  it('explains an empty weak spot list rather than showing a blank box', async () => {
+    render(await HistoryView({ ...props, weakSpots: [] }));
     expect(screen.getByText(/needs a few attempts/i)).toBeInTheDocument();
   });
 });

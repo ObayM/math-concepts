@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="font-bold text-primary-600 hover:text-primary-500 hover:underline"
           >
-            Sign In
+            {t('auth.signIn')}
           </Link>
         </p>
       </Card>

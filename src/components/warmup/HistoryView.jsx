@@ -3,6 +3,7 @@ import { Download, TrendingDown, Target } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import SpeedChart from '@/components/warmup/SpeedChart';
 import { formatPace, formatDuration, factLabel } from '@/lib/warmup/stats';
+import { getT } from '@/lib/i18n/server';
 
 const eyebrow = 'text-xs font-bold uppercase tracking-[0.12em] text-neutral-400';
 
@@ -30,7 +31,7 @@ function Section({ title, hint, icon: Icon, children }) {
   );
 }
 
-function FilterChips({ levels, active }) {
+function FilterChips({ levels, active, t }) {
   const chip = (isActive) =>
     `tap-target-h inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold transition-colors ${
       isActive
@@ -41,7 +42,7 @@ function FilterChips({ levels, active }) {
   return (
     <div className="flex flex-wrap gap-2">
       <Link href="/warmup/history" className={chip(!active)}>
-        All levels
+        {t('warmup.allLevels')}
       </Link>
       {levels.map((level) => (
         <Link
@@ -56,56 +57,52 @@ function FilterChips({ levels, active }) {
   );
 }
 
-export default function HistoryView({ level, levels, totals, trend, weakSpots, sessions }) {
+export default async function HistoryView({ level, levels, totals, trend, weakSpots, sessions }) {
+  const t = await getT();
   return (
     <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="animate-fade-in-up">
-          <p className={eyebrow}>Warm up</p>
+          <p className={eyebrow}>{t('warmup.title')}</p>
           <h1 className="font-display mt-2 text-4xl font-bold tracking-tight text-neutral-900">
-            Your history
+            {t('warmup.historyTitle')}
           </h1>
-          <p className="mt-3 text-neutral-500">
-            Every session you have ever run, and the facts still slowing you down.
-          </p>
+          <p className="mt-3 text-neutral-500">{t('warmup.historyBlurb')}</p>
         </div>
 
         <div className="animate-fade-in-up mt-8 opacity-0 [animation-delay:80ms]">
-          <FilterChips levels={levels} active={level} />
+          <FilterChips levels={levels} active={level} t={t} />
         </div>
 
         {totals.answered === 0 ? (
           <Card className="card-soft mt-6 p-8 text-center">
-            <p className="font-bold text-neutral-900">Nothing here yet.</p>
-            <p className="mt-2 text-neutral-500">
-              Run a drill and this fills up with your times, your accuracy and the facts you keep
-              missing.
-            </p>
+            <p className="font-bold text-neutral-900">{t('warmup.nothingYet')}</p>
+            <p className="mt-2 text-neutral-500">{t('warmup.historyEmpty')}</p>
             <Link
               href="/warmup"
               className="mt-6 inline-block font-bold text-primary-600 hover:text-primary-700"
             >
-              Pick a level
+              {t('warmup.pickALevel')}
             </Link>
           </Card>
         ) : (
           <div className="animate-fade-in-up mt-6 space-y-6 opacity-0 [animation-delay:140ms]">
             <Card className="card-soft grid grid-cols-2 gap-6 p-6 sm:grid-cols-4">
-              <Stat label="Answered" value={totals.answered.toLocaleString('en-US')} />
-              <Stat label="Accuracy" value={`${totals.accuracy}%`} />
-              <Stat label="Per question" value={formatPace(totals.pace)} />
-              <Stat label="Sessions" value={totals.sessions} />
+              <Stat label={t('warmup.answered')} value={totals.answered.toLocaleString('en-US')} />
+              <Stat label={t('warmup.accuracy')} value={`${totals.accuracy}%`} />
+              <Stat label={t('warmup.perQuestion')} value={formatPace(totals.pace)} />
+              <Stat label={t('warmup.sessions')} value={totals.sessions} />
             </Card>
 
             <Section
-              title="Are you getting faster?"
+              title={t('warmup.gettingFaster')}
               hint="seconds per question, lower is better"
               icon={TrendingDown}
             >
               <SpeedChart trend={trend} />
             </Section>
 
-            <Section title="Slowest facts" hint="last 30 days" icon={Target}>
+            <Section title={t('warmup.slowestFacts')} hint="last 30 days" icon={Target}>
               {weakSpots.length === 0 ? (
                 <p className="text-sm text-neutral-500">
                   Nothing stands out yet. A fact needs a few attempts before it counts as a weak
@@ -132,19 +129,19 @@ export default function HistoryView({ level, levels, totals, trend, weakSpots, s
               )}
             </Section>
 
-            <Section title="Every session" hint={`${sessions.length} shown`}>
+            <Section title={t('warmup.everySession')} hint={`${sessions.length} shown`}>
               <div className="-mx-2 overflow-x-auto px-2">
                 <table className="w-full min-w-[38rem] text-start text-sm">
                   <thead>
                     <tr className={eyebrow}>
-                      <th className="py-2 pe-4 font-bold">When</th>
+                      <th className="py-2 pe-4 font-bold">{t('warmup.when')}</th>
                       <th className="py-2 pe-4 font-bold">Lvl</th>
-                      <th className="py-2 pe-4 font-bold">Answered</th>
-                      <th className="py-2 pe-4 font-bold">Right</th>
-                      <th className="py-2 pe-4 font-bold">Streak</th>
-                      <th className="py-2 pe-4 font-bold">Sat for</th>
-                      <th className="py-2 pe-4 font-bold">Answering</th>
-                      <th className="py-2 font-bold">Each</th>
+                      <th className="py-2 pe-4 font-bold">{t('warmup.answered')}</th>
+                      <th className="py-2 pe-4 font-bold">{t('warmup.right')}</th>
+                      <th className="py-2 pe-4 font-bold">{t('warmup.streak')}</th>
+                      <th className="py-2 pe-4 font-bold">{t('warmup.satFor')}</th>
+                      <th className="py-2 pe-4 font-bold">{t('warmup.answering')}</th>
+                      <th className="py-2 font-bold">{t('warmup.each')}</th>
                     </tr>
                   </thead>
                   <tbody className="tabular-nums text-neutral-600">

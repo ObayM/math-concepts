@@ -252,7 +252,7 @@ const UpNextPath = ({ t, course }) => {
       {lessons.length > 0 ? (
         <Card className="card-soft divide-y divide-neutral-100 overflow-hidden">
           {lessons.map((lesson) => (
-            <LessonRow key={lesson.id} lesson={lesson} coursePath={coursePath} />
+            <LessonRow key={lesson.id} lesson={lesson} coursePath={coursePath} t={t} />
           ))}
           <Link
             href={`/courses/${coursePath}`}
@@ -271,7 +271,7 @@ const UpNextPath = ({ t, course }) => {
   );
 };
 
-const LessonRow = ({ lesson, coursePath }) => {
+const LessonRow = ({ lesson, coursePath, t }) => {
   const isLocked = lesson.status === 'locked';
   const isCompleted = lesson.status === 'completed';
 
@@ -296,7 +296,7 @@ const LessonRow = ({ lesson, coursePath }) => {
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate font-bold text-neutral-800">{lesson.title}</p>
-        <p className="mt-0.5 text-xs capitalize text-neutral-400">{lesson.difficulty}</p>
+        <p className="mt-0.5 text-xs text-neutral-400">{difficultyLabel(t, lesson.difficulty)}</p>
       </div>
       {isLocked ? (
         <Lock className="h-4 w-4 shrink-0 text-neutral-300" />
@@ -332,13 +332,13 @@ const MomentumCard = ({ t, streak, activityData, hasActivityToday, todayXp, time
           <Flame className="mb-1 h-7 w-7 text-orange-500" />
           <span className="text-4xl font-extrabold leading-none text-neutral-900">{streak}</span>
           <span className="mb-0.5 font-semibold text-neutral-400">
-            day{streak !== 1 ? 's' : ''}
+            {t('dashboard.dayCount', { count: streak })}
           </span>
         </div>
 
         <div className="mt-6">
           <div className="mb-2 flex items-baseline justify-between">
-            <span className="text-sm font-semibold text-neutral-500">Today</span>
+            <span className="text-sm font-semibold text-neutral-500">{t('dashboard.today')}</span>
             <span className="text-sm font-bold text-neutral-900">
               {goal.xp}
               <span className="font-semibold text-neutral-400"> / {goal.goal} XP</span>

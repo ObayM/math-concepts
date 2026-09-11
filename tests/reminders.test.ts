@@ -1,9 +1,9 @@
+import { reminderEmail } from '@/lib/email-templates';
 import { describe, it, expect } from 'vitest';
 import {
   isEligible,
   reminderFor,
   pickReminders,
-  reminderBody,
   REMINDER_HOUR,
   type ReminderCandidate,
 } from '@/lib/reminders';
@@ -118,15 +118,28 @@ describe('which reminder fires', () => {
 
 describe('the email body', () => {
   it('always carries a way to turn reminders off', () => {
-    const r = reminderFor(user())!;
-    const html = reminderBody(r, 'Ada', 'https://mathly.test');
+    const { html } = reminderEmail('en', 'streak-at-risk', 'Ada', 'https://mathly.test');
     expect(html).toContain('https://mathly.test/settings');
     expect(html).toMatch(/turn reminders off/i);
   });
 
   it('greets by first name and links the dashboard', () => {
-    const html = reminderBody(reminderFor(user())!, 'Ada', 'https://mathly.test');
+    const { html } = reminderEmail('en', 'streak-at-risk', 'Ada', 'https://mathly.test');
     expect(html).toContain('Ada');
     expect(html).toContain('https://mathly.test/dashboard');
+  });
+
+  it('speaks arabic and reads right to left when that is the reader', () => {
+    const { subject, html } = reminderEmail('ar', 'gone-quiet', 'Ada', 'https://ar.mathly.test');
+    expect(html).toContain('dir="rtl"');
+    expect(html).toContain('Ada');
+    expect(subject).not.toMatch(/[A-Za-z]{4}/);
+  });
+
+  it('sends each reason its own opening line', () => {
+    const risk = reminderEmail('en', 'streak-at-risk', 'Ada', 'https://mathly.test').html;
+    const quiet = reminderEmail('en', 'gone-quiet', 'Ada', 'https://mathly.test').html;
+    expect(risk).not.toBe(quiet);
+    expect(risk).toMatch(/streak/i);
   });
 });

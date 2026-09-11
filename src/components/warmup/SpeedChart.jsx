@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { formatPace } from '@/lib/warmup/stats';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const W = 640;
 const H = 190;
@@ -22,6 +23,7 @@ function columnPath(x, y, w, h) {
 }
 
 export default function SpeedChart({ trend }) {
+  const t = useT();
   const [active, setActive] = useState(null);
 
   if (trend.length < 2) {
@@ -159,11 +161,11 @@ export default function SpeedChart({ trend }) {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="text-neutral-400">
-                <th className="py-1 pr-4 font-bold">Session</th>
-                <th className="py-1 pr-4 font-bold">Level</th>
-                <th className="py-1 pr-4 font-bold">Answered</th>
-                <th className="py-1 pr-4 font-bold">Right</th>
-                <th className="py-1 font-bold">Per question</th>
+                <th className="py-1 pr-4 font-bold">{t('warmup.session')}</th>
+                <th className="py-1 pr-4 font-bold">{t('warmup.level')}</th>
+                <th className="py-1 pr-4 font-bold">{t('warmup.answered')}</th>
+                <th className="py-1 pr-4 font-bold">{t('warmup.right')}</th>
+                <th className="py-1 font-bold">{t('warmup.perQuestion')}</th>
               </tr>
             </thead>
             <tbody className="tabular-nums text-neutral-600">

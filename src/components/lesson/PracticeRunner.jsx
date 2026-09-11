@@ -10,12 +10,14 @@ import SlideView from '@/components/lesson/SlideView';
 import { exercises } from '@/components/lesson/exercises';
 import { evalGoals } from '@/engine/runtime/goals';
 import { weightedPick, slideSkill } from '@/lib/practice';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const SESSION_LENGTH = 10;
 
 const playable = (slide) => (slide && exercises[slide.exercise?.kind] ? slide : null);
 
 export default function PracticeRunner({ pool, mastery = {}, coursePath, courseName }) {
+  const t = useT();
   const router = useRouter();
 
   const [slide, setSlide] = useState(null);
@@ -44,12 +46,14 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="card-soft p-8 text-center">
-          <h1 className="font-display text-2xl font-bold text-neutral-900">Nothing to practice</h1>
+          <h1 className="font-display text-2xl font-bold text-neutral-900">
+            {t('practice.nothing')}
+          </h1>
           <p className="mt-2 text-neutral-500">
             {courseName} has no questions ready yet. Try a lesson first.
           </p>
           <Link href={`/courses/${coursePath}`} className="mt-6 inline-block">
-            <Button variant="secondary">Back to {courseName}</Button>
+            <Button variant="secondary">{t('practice.backTo', { course: courseName })}</Button>
           </Link>
         </Card>
       </div>
@@ -60,7 +64,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
     return (
       <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
         <Card className="card-soft p-8">
-          <p className="text-neutral-500 animate-pulse">Loading practice...</p>
+          <p className="text-neutral-500 animate-pulse">{t('practice.loading')}</p>
         </Card>
       </div>
     );
@@ -158,14 +162,14 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
             Session done
           </p>
           <h1 className="font-display text-4xl font-bold text-neutral-900 tracking-tight mb-2">
-            {stats.correct} out of {stats.attempted}
+            {t('practice.outOf', { correct: stats.correct, total: stats.attempted })}
           </h1>
           <p className="text-neutral-500 mb-6">
             {pct >= 80
-              ? 'Sharp work. That stuff is sticking.'
+              ? t('practice.sharp')
               : pct >= 50
-                ? 'Solid middle ground. Another round will tighten it up.'
-                : 'Rough round, but this is exactly where the practice pays off.'}
+                ? t('practice.middling')
+                : t('practice.rough')}
           </p>
           {xpEarned > 0 && (
             <p className="mb-8 inline-flex items-center gap-1.5 rounded-full bg-warning-100 px-4 py-1.5 text-sm font-bold text-warning-600">
@@ -177,7 +181,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
               Go again
             </Button>
             <Button onClick={() => router.push(`/courses/${coursePath}`)} variant="ghost">
-              Back to {courseName}
+              {t('practice.backTo', { course: courseName })}
             </Button>
           </div>
         </Card>
@@ -191,11 +195,11 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => router.push(`/courses/${coursePath}`)}
-            aria-label={`Back to ${courseName}`}
+            aria-label={t('practice.backTo', { course: courseName })}
             className="flex items-center gap-1.5 text-neutral-500 hover:text-neutral-700 font-bold text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="max-sm:hidden">Back to {courseName}</span>
+            <span className="max-sm:hidden">{t('practice.backTo', { course: courseName })}</span>
           </button>
           <div className="flex items-center gap-3">
             <div className="flex gap-1 max-sm:hidden">
@@ -207,7 +211,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
               ))}
             </div>
             <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-sm text-neutral-500">
-              {stats.correct} / {stats.attempted} correct
+              {t('practice.scoreLine', { correct: stats.correct, total: stats.attempted })}
             </div>
           </div>
         </div>
@@ -243,11 +247,11 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
                 variant="primary"
                 disabled={!checker.isComplete(slide, value)}
               >
-                Check
+                {t('lesson.check')}
               </Button>
             ) : (
               <Button onClick={handleNext} variant="primary" disabled={!goalsSatisfied}>
-                {stats.attempted >= SESSION_LENGTH ? 'See how you did' : 'Next'}
+                {stats.attempted >= SESSION_LENGTH ? t('practice.seeHow') : t('practice.next')}
               </Button>
             )}
           </div>

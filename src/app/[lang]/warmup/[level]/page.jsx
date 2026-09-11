@@ -2,6 +2,8 @@ import { notFound, redirect } from 'next/navigation';
 import { requireUser } from '@/lib/session';
 import { isValidLevel, levelById } from '@/lib/warmup/questions';
 import WarmupRunner from '@/components/warmup/WarmupRunner';
+import { getT } from '@/lib/i18n/server';
+import { levelName, levelBlurb } from '@/lib/warmup/level-copy';
 
 function resolveLevel(raw) {
   const level = Number(raw);
@@ -22,5 +24,12 @@ export default async function WarmupLevelPage({ params }) {
   const found = resolveLevel(level);
   if (!found) notFound();
 
-  return <WarmupRunner level={found.id} levelName={found.name} levelBlurb={found.blurb} />;
+  const t = await getT();
+  return (
+    <WarmupRunner
+      level={found.id}
+      levelName={levelName(t, found.id, found.name)}
+      levelBlurb={levelBlurb(t, found.id, found.blurb)}
+    />
+  );
 }

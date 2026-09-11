@@ -71,15 +71,3 @@ export function reminderFor(u: ReminderCandidate): Reminder | null {
 export function pickReminders(users: ReminderCandidate[]): Reminder[] {
   return users.map(reminderFor).filter((r): r is Reminder => r !== null);
 }
-
-export function reminderBody(r: Reminder, firstName: string, appUrl: string): string {
-  const settings = `${appUrl}/settings`;
-  const lead =
-    r.reason === 'streak-at-risk'
-      ? `Hey ${firstName}, you didn't practise today and your streak is about to reset. One lesson keeps it alive.`
-      : `Hey ${firstName}, it's been a few days. Your progress is exactly where you left it.`;
-
-  return `<p>${lead}</p>
-<p><a href="${appUrl}/dashboard">Open Mathly</a></p>
-<p style="color:#888;font-size:12px">Don't want these? <a href="${settings}">Turn reminders off</a>.</p>`;
-}

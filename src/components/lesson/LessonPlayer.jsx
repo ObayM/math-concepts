@@ -405,7 +405,7 @@ export default function LessonPlayer({
     <>
       {streak !== null && (
         <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 card-soft">
-          🔥 {streak} Day Streak
+          🔥 {t('lesson.dayStreak', { count: streak })}
         </div>
       )}
       {restartButton}
@@ -565,7 +565,7 @@ export default function LessonPlayer({
                 <div className="mb-3 flex items-center justify-between">
                   <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-500">
                     <Sparkles className="h-4 w-4" />
-                    AI Tutor
+                    {t('lesson.aiTutor')}
                   </p>
                   {tutorTurns.length > 0 && !tutorStreaming && (
                     <button
@@ -627,7 +627,7 @@ export default function LessonPlayer({
                     onKeyDown={(e) => e.key === 'Enter' && handleTutorAsk()}
                     disabled={tutorStreaming}
                     placeholder={tutorTurns.length ? t('lesson.followUp') : t('lesson.stuck')}
-                    aria-label="Ask the tutor"
+                    aria-label={t('lesson.askTutor')}
                     className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
                   />
                   <Button

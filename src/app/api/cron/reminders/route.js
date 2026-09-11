@@ -3,7 +3,9 @@ import { timingSafeEqual, createHash } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { getStreak } from '@/lib/db/activityService';
-import { pickReminders, reminderBody, REMINDER_HOUR } from '@/lib/reminders';
+import { pickReminders, REMINDER_HOUR } from '@/lib/reminders';
+import { localeOf, reminderEmail } from '@/lib/email-templates';
+import { originForLocale } from '@/lib/origin';
 import { firstName } from '@/lib/user-name';
 
 import { dayKeyOf, daysBetween, localDayKey, localHour } from '@/lib/timezone';
@@ -35,6 +37,7 @@ export async function POST(request) {
       reminderEmails: true,
       lastRemindedAt: true,
       timezone: true,
+      locale: true,
     },
   });
 
@@ -65,19 +68,21 @@ export async function POST(request) {
   }
 
   const reminders = pickReminders(candidates);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
   const byId = new Map(users.map((u) => [u.id, u]));
 
   let sent = 0;
   const failed = [];
   for (const r of reminders) {
-    const greetingName = firstName(byId.get(r.userId));
+    const row = byId.get(r.userId);
+    const locale = localeOf(row?.locale);
+    const { subject, html } = reminderEmail(
+      locale,
+      r.reason,
+      firstName(row),
+      originForLocale(locale)
+    );
     try {
-      await sendEmail({
-        to: r.email,
-        subject: r.subject,
-        html: reminderBody(r, greetingName, appUrl),
-      });
+      await sendEmail({ to: r.email, subject, html });
       await prisma.user.update({ where: { id: r.userId }, data: { lastRemindedAt: now } });
       sent++;
     } catch {
