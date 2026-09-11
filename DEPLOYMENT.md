@@ -122,6 +122,22 @@ one without `I_MEAN_IT=1`.
 `scripts/export-content.mjs` is a second, independent net: it dumps every lesson's Prism
 source, and in this codebase the source is the record.
 
+## Error tracking
+
+`@sentry/nextjs` is wired into `src/instrumentation.ts` (server, plus `onRequestError`),
+`src/instrumentation-client.ts` (browser) and both error boundaries. With
+`NEXT_PUBLIC_SENTRY_DSN` unset it is completely inert, so the app runs fine without an
+account. Set the DSN and both sides start reporting; `SENTRY_TRACES_SAMPLE_RATE` and its
+`NEXT_PUBLIC_` twin default to 0, so you pay for errors and not for traces.
+
+Point an uptime monitor at `/api/health`. It does a real `SELECT 1`, so it fails when the
+database does, not just when the process dies.
+
+**Analytics is deliberately not installed.** Picking a provider changes what the privacy
+policy has to say, so it is a decision rather than a default. Whatever you choose, the CSP
+in `src/proxy.js` is `script-src 'self' 'nonce-...' 'strict-dynamic'`, so a third-party
+snippet has to be loaded from a nonced script rather than pasted into the head.
+
 ## Scheduled work
 
 `POST /api/cron/reminders` must be called **hourly** with `Authorization: Bearer
