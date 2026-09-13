@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer';
+
 export async function sendEmail({ to, subject, html }) {
   if (!process.env.SMTP_HOST) {
     if (process.env.NODE_ENV === 'production') {
@@ -10,8 +12,7 @@ export async function sendEmail({ to, subject, html }) {
     return;
   }
 
-  const nodemailer = await import('nodemailer');
-  const transporter = nodemailer.default.createTransport({
+  const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT ?? '587'),
     secure: process.env.SMTP_SECURE === 'true',
@@ -19,6 +20,11 @@ export async function sendEmail({ to, subject, html }) {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD,
     },
+    // nodemailer waits 2 minutes to connect by default, and better-auth swallows
+    // the eventual failure, so a black-holed host hangs signup for that long
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
   });
 
   await transporter.sendMail({

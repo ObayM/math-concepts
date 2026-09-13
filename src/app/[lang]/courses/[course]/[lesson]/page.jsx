@@ -6,6 +6,8 @@ import LessonPlayer from '@/components/lesson/LessonPlayer';
 import { getLessonByKey, getNextLessonKey } from '@/lib/db/lessonService';
 import { courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
+import * as Sentry from '@sentry/nextjs';
+import { getT } from '@/lib/i18n/server';
 
 export async function generateMetadata({ params }) {
   const { course, lesson: lessonSlug, lang } = await params;
@@ -34,6 +36,7 @@ export async function generateMetadata({ params }) {
 export default async function LessonPage({ params, searchParams }) {
   const { course, lesson: lessonSlug, lang } = await params;
   const { preview } = await searchParams;
+  const t = await getT();
 
   const lessonRow = await getLessonByKey(lessonSlug, lang);
   if (!lessonRow) notFound();
@@ -55,13 +58,15 @@ export default async function LessonPage({ params, searchParams }) {
   const ir = wantsDraft ? lessonRow.data : lessonRow.publishedData;
   const parsed = lessonSchema.safeParse(ir);
   if (!parsed.success) {
-    console.error('Invalid lesson data for', lessonSlug, parsed.error.flatten());
-    return <BrokenLesson course={course} />;
+    Sentry.captureException(new Error(`invalid lesson data: ${lessonSlug}`), {
+      extra: { issues: parsed.error.flatten() },
+    });
+    return <BrokenLesson course={course} t={t} />;
   }
 
   if (!parsed.data.slides.some((slide) => !slide.hidden)) {
-    console.error('Lesson has no visible slides:', lessonSlug);
-    return <BrokenLesson course={course} />;
+    Sentry.captureException(new Error(`lesson has no visible slides: ${lessonSlug}`));
+    return <BrokenLesson course={course} t={t} />;
   }
 
   const nextLessonId = await getNextLessonKey(lessonRow.courseId, lessonRow.sortOrder);
@@ -78,20 +83,17 @@ export default async function LessonPage({ params, searchParams }) {
 
 // a lesson that fails to compile is not a missing page. saying "this doesn't
 // exist" sends the student looking for a typo in the url instead of telling us.
-function BrokenLesson({ course }) {
+function BrokenLesson({ course, t }) {
   return (
-    <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center px-4 pt-[var(--nav-h)]">
+    <div className="-mt-[var(--nav-h)] flex min-h-dvh items-center justify-center px-4 pt-[var(--nav-h)]">
       <div className="max-w-md text-center">
         <p className="font-mono text-4xl text-neutral-300">f(x) = ?</p>
         <h1 className="font-display mt-6 text-3xl font-bold tracking-tight text-neutral-900">
-          This lesson is having a moment
+          {t('lesson.brokenTitle')}
         </h1>
-        <p className="mt-3 text-neutral-500">
-          Something in it is broken on our side, not yours. We have been told. Try another lesson in
-          the meantime.
-        </p>
+        <p className="mt-3 text-neutral-500">{t('lesson.brokenBody')}</p>
         <Link href={`/courses/${course}`} className="mt-8 inline-block">
-          <Button variant="primary">Back to the course</Button>
+          <Button variant="primary">{t('lesson.back')}</Button>
         </Link>
       </div>
     </div>
