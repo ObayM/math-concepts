@@ -33,7 +33,7 @@ function Section({ title, hint, icon: Icon, children }) {
 
 function FilterChips({ levels, active, t }) {
   const chip = (isActive) =>
-    `tap-target-h inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold transition-colors ${
+    `tap-target-halo tap-target-h inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold transition-colors ${
       isActive
         ? 'bg-neutral-900 text-white'
         : 'bg-white text-neutral-500 border border-neutral-200 hover:text-neutral-800'
@@ -60,11 +60,11 @@ function FilterChips({ levels, active, t }) {
 export default async function HistoryView({ level, levels, totals, trend, weakSpots, sessions }) {
   const t = await getT();
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="animate-fade-in-up">
           <p className={eyebrow}>{t('warmup.title')}</p>
-          <h1 className="font-display mt-2 text-4xl font-bold tracking-tight text-neutral-900">
+          <h1 className="font-display mt-2 text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
             {t('warmup.historyTitle')}
           </h1>
           <p className="mt-3 text-neutral-500">{t('warmup.historyBlurb')}</p>
@@ -80,7 +80,7 @@ export default async function HistoryView({ level, levels, totals, trend, weakSp
             <p className="mt-2 text-neutral-500">{t('warmup.historyEmpty')}</p>
             <Link
               href="/warmup"
-              className="mt-6 inline-block font-bold text-primary-600 hover:text-primary-700"
+              className="tap-target-h mt-6 inline-flex items-center font-bold text-primary-600 hover:text-primary-700"
             >
               {t('warmup.pickALevel')}
             </Link>

@@ -26,16 +26,16 @@ import KeyboardCrosshair from './KeyboardCrosshair';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 
-const DEFAULT_W = 640; // used until the container is measured (also SSR)
-const ASPECT = 0.6; // height / width — comfortable landscape default
+const DEFAULT_W = 640;
+const ASPECT = 0.6;
 const MAX_H = 460;
 const MIN_H = 220;
-// a landscape phone is shorter than MIN_H allows for, and the fold guard has to
-// win there or the scene buries its own controls
+
 const ABS_MIN_H = 150;
-// a scene that eats the whole viewport pushes its own sliders below the fold,
-// which is fatal when the prose says "drag the slider"
 const VIEWPORT_SHARE = 0.42;
+
+const DEFAULT_TAP_LABEL =
+  'Tap the diagram to answer, or use the arrow keys to move the crosshair and Enter to drop it. Hold shift to move faster.';
 
 export default function SvgRenderer({
   ir,
@@ -43,19 +43,19 @@ export default function SvgRenderer({
   marker,
   revealed,
   inputLayer,
+  tapLabel = DEFAULT_TAP_LABEL,
 }: {
   ir: SceneIR;
   onTap?: (x: number, y: number) => void;
   marker?: { x: number; y: number; correct?: boolean };
   revealed?: boolean;
   inputLayer?: InputLayerConfig;
+  tapLabel?: string;
 }) {
   const { scope, set } = useScene();
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // measure the container so W/H are real pixels — text and touch targets stay
-  // physically sized on any screen instead of scaling with a fixed viewBox
   const [measuredW, setMeasuredW] = useState<number | null>(null);
   const [roomH, setRoomH] = useState<number | null>(null);
   const [keyCursor, setKeyCursor] = useState<Cursor | null>(null);
@@ -281,7 +281,7 @@ export default function SvgRenderer({
             style={{ cursor: 'crosshair' }}
             tabIndex={0}
             role="application"
-            aria-label="Tap the diagram to answer, or use the arrow keys to move the crosshair and Enter to drop it. Hold shift to move faster."
+            aria-label={tapLabel}
             onPointerDown={handleTap}
             onKeyDown={handleTapKey}
           />

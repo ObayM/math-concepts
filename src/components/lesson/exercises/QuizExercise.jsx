@@ -1,9 +1,10 @@
 'use client';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
+import { useT } from '@/components/i18n/LocaleProvider';
 
-// v2 quiz — reads slide.exercise (prompt, options[{text, why?}], correct, explanation)
 export default function QuizExercise({ slide, value, checked, onChange }) {
+  const t = useT();
   const ex = slide.exercise;
   const selected = value;
 
@@ -13,7 +14,7 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
         {ex.prompt}
       </RichText>
 
-      <div className="grid gap-3" role="radiogroup" aria-label="Answer choices">
+      <div className="grid gap-3" role="radiogroup" aria-label={t('exercise.answerChoices')}>
         {ex.options.map((option, idx) => {
           const isSelected = selected === idx;
           const isCorrect = idx === ex.correct;

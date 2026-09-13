@@ -1,4 +1,6 @@
+'use client';
 import clsx from 'clsx';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const sizes = {
   sm: 'w-5 h-5 border-2',
@@ -7,10 +9,11 @@ const sizes = {
 };
 
 export default function Spinner({ size = 'md', className = '' }) {
+  const t = useT();
   return (
     <div
       role="status"
-      aria-label="Loading"
+      aria-label={t('common.loading')}
       className={clsx(
         'animate-spin rounded-full border-primary-100 border-t-primary-500',
         sizes[size],

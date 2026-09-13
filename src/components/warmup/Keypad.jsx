@@ -11,15 +11,13 @@ const keyClass =
 export default function Keypad({ onPress, submitLabel, className = '' }) {
   const t = useT();
   return (
-    // grid flips its inline axis under rtl, which would deal the keys out
-    // 9-8-7. a numeric keypad reads left to right in every language.
     <div dir="ltr" className={clsx('select-none', className)}>
       <div className="grid grid-cols-3 gap-2">
         {KEYS.map((key) => (
           <button
             key={key}
             type="button"
-            aria-label={key === '-' ? 'minus' : key}
+            aria-label={key === '-' ? t('warmup.minus') : key}
             onPointerDown={(e) => {
               e.preventDefault();
               onPress(key);
@@ -31,7 +29,7 @@ export default function Keypad({ onPress, submitLabel, className = '' }) {
         ))}
         <button
           type="button"
-          aria-label="backspace"
+          aria-label={t('warmup.backspace')}
           onPointerDown={(e) => {
             e.preventDefault();
             onPress('back');

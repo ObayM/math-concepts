@@ -67,8 +67,8 @@ export default async function LevelPicker({ overview, totals }) {
     : null;
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="animate-fade-in-up">
           <p className={eyebrow}>{t('warmup.title')}</p>
           <h1 className="font-display mt-2 text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
@@ -104,7 +104,7 @@ export default async function LevelPicker({ overview, totals }) {
 
         <Link
           href="/warmup/history"
-          className="animate-fade-in-up mt-8 inline-flex items-center gap-2 text-sm font-bold text-neutral-500 opacity-0 [animation-delay:220ms] hover:text-neutral-800"
+          className="tap-target-h animate-fade-in-up mt-8 inline-flex items-center gap-2 text-sm font-bold text-neutral-500 opacity-0 [animation-delay:220ms] hover:text-neutral-800"
         >
           <History className="h-4 w-4" aria-hidden />
           {t('warmup.historyLink')}

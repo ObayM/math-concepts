@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 
 import DrawPad from './DrawPad';
 import NotesPad from './NotesPad';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const TAB_KEY = 'mathly-scratchpad-tab';
 
@@ -15,6 +16,7 @@ export default function Scratchpad({
   onStrokesChange,
   onClose,
 }) {
+  const t = useT();
   const [tab, setTab] = useState(() => {
     try {
       return localStorage.getItem(TAB_KEY) === 'notes' ? 'notes' : 'draw';
@@ -46,7 +48,7 @@ export default function Scratchpad({
 
   return (
     <aside
-      aria-label="Scratchpad"
+      aria-label={t('lesson.scratchpad')}
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose();
       }}
@@ -59,8 +61,8 @@ export default function Scratchpad({
         </div>
         <button
           onClick={onClose}
-          aria-label="Close scratchpad"
-          title="Close scratchpad"
+          aria-label={t('lesson.closeScratchpad')}
+          title={t('lesson.closeScratchpad')}
           className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-neutral-200/60 hover:text-neutral-600"
         >
           <X className="h-4 w-4" />

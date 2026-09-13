@@ -269,7 +269,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
 
   if (status === 'error') {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center pt-[var(--nav-h)]">
+      <div className="-mt-[var(--nav-h)] flex min-h-dvh items-center justify-center pt-[var(--nav-h)]">
         <Card className="card-soft p-8 text-center">
           <h1 className="font-display text-2xl font-bold text-neutral-900">
             {t('warmup.couldNotStart')}
@@ -287,7 +287,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
 
   if (status === 'stopped') {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center px-4 pb-[calc(1rem+var(--safe-b))] pt-[calc(var(--nav-h)+1rem)] md:px-6">
+      <div className="-mt-[var(--nav-h)] flex min-h-dvh items-center justify-center px-4 pb-[calc(1rem+var(--safe-b))] pt-[calc(var(--nav-h)+1rem)] md:px-6">
         <StopScreen
           stats={{ ...stats, sittingMs: elapsed }}
           xpEarned={xpEarned}
@@ -301,7 +301,7 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
 
   if (!question) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] flex min-h-dvh items-center justify-center pt-[var(--nav-h)]">
+      <div className="-mt-[var(--nav-h)] flex min-h-dvh items-center justify-center pt-[var(--nav-h)]">
         <p className="animate-pulse font-bold text-neutral-400">{t('warmup.warmingUp')}</p>
       </div>
     );
@@ -314,17 +314,17 @@ export default function WarmupRunner({ level, levelName, levelBlurb }) {
       : 'border-danger-500 bg-danger-50 text-danger-600';
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] flex h-dvh justify-center overflow-hidden pt-[var(--nav-h)] md:items-center md:px-6 md:pb-6 md:pt-[calc(var(--nav-h)+1.5rem)]">
+    <div className="-mt-[var(--nav-h)] flex h-dvh justify-center overflow-hidden pt-[var(--nav-h)] md:items-center md:px-6 md:pb-6 md:pt-[calc(var(--nav-h)+1.5rem)]">
       <Card className="card-hero flex w-full max-w-lg flex-1 flex-col rounded-3xl px-4 pb-[calc(0.5rem+var(--safe-b))] max-md:rounded-none max-md:border-0 max-md:bg-transparent max-md:shadow-none md:max-h-full md:flex-none md:min-h-[27rem] md:px-8 md:pb-7 md:pt-4">
         <div className="flex shrink-0 items-center justify-between py-2.5">
           <Link
             href="/warmup"
-            className="tap-target-h flex items-center gap-1.5 text-sm font-bold text-neutral-500 transition-colors hover:text-neutral-700"
+            className="tap-target flex items-center gap-1.5 text-sm font-bold text-neutral-500 transition-colors hover:text-neutral-700 max-sm:justify-start"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             <span className="max-sm:hidden">{t('warmup.levels')}</span>
           </Link>
-          <p className="text-sm font-bold text-neutral-400">{levelName}</p>
+          <h1 className="text-sm font-bold text-neutral-400">{levelName}</h1>
           <button
             type="button"
             onClick={stop}

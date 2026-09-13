@@ -28,8 +28,8 @@ export default async function ProfilePage({ params }) {
   const skills = profile.skillMastery.slice(0, MAX_SKILLS);
 
   return (
-    <div className="bg-grid-snow min-h-[calc(100dvh-var(--nav-h))]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+    <div className="min-h-[calc(100dvh-var(--nav-h))]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
         <ProfileHeaderCard profile={profile} isOwn={isOwn} />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

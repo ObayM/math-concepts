@@ -2,10 +2,11 @@
 import { RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 import { useTokenDrag, DragGhost } from './dnd';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function BuildExercise({ slide, value = [], checked, correct, onChange }) {
+  const t = useT();
   const ex = slide.exercise;
-  // value can briefly be a non-array (null / prior slide's answer) during slide swaps
   const placed = Array.isArray(value) ? value : [];
   const labelOf = (id) => ex.bank.find((t) => t.id === id)?.label ?? id;
   const usedCount = (id) => placed.filter((p) => p === id).length;
@@ -128,7 +129,7 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
         {...targetProps('bank')}
         className="flex flex-wrap justify-center gap-2"
         role="group"
-        aria-label="Token bank"
+        aria-label={t('exercise.tokenBank')}
       >
         {ex.bank.map((tok) => {
           const isOp = tok.kind === 'operator';

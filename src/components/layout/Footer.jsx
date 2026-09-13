@@ -24,19 +24,17 @@ export default async function Footer() {
             <Link
               key={link.href}
               href={link.href}
-              className="tap-target-h flex items-center text-sm text-neutral-400 transition-colors hover:text-primary-600"
+              className="tap-target-halo tap-target-h flex items-center text-sm text-neutral-400 transition-colors hover:text-primary-600"
             >
               {link.label}
             </Link>
           ))}
-          {/* settings owns the real preference, but a logged out visitor on the
-              wrong subdomain has no settings page to reach it from */}
           {hasLocaleOrigins && other && (
             <a
               href={originForLocale(other)}
               lang={other}
               aria-label={t('lang.switchLabel')}
-              className="tap-target-h flex items-center text-sm font-semibold text-neutral-500 transition-colors hover:text-primary-600"
+              className="tap-target-halo tap-target-h flex items-center text-sm font-semibold text-neutral-500 transition-colors hover:text-primary-600"
             >
               {t('lang.switch')}
             </a>

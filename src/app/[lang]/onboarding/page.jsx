@@ -4,7 +4,7 @@ import { getT } from '@/lib/i18n/server';
 export default async function OnboardingPage() {
   const t = await getT();
   return (
-    <div className="min-h-[calc(100dvh-var(--nav-h))] flex items-center justify-center p-4">
+    <div className="min-h-[calc(100dvh-var(--nav-h))] flex items-center justify-center p-4 ">
       <main className="container max-w-xl mx-auto text-center">
         <h1 className="text-4xl font-extrabold text-primary-600 sm:text-5xl">
           {t('onboarding.title')}

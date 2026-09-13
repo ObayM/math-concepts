@@ -75,11 +75,11 @@ export default async function CoursePage({ params }) {
   }
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
-      <main className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <Link
           href="/courses"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-400 transition-colors hover:text-neutral-700"
+          className="tap-target-h inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-400 transition-colors hover:text-neutral-700"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('course.allCourses')}

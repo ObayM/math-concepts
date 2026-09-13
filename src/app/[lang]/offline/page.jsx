@@ -1,16 +1,19 @@
-export const metadata = { title: 'Offline' };
+import { getT } from '@/lib/i18n/server';
 
-export default function OfflinePage() {
+export async function generateMetadata() {
+  const t = await getT();
+  return { title: t('offline.title') };
+}
+
+export default async function OfflinePage() {
+  const t = await getT();
   return (
-    <main className="flex min-h-[calc(100dvh-var(--nav-h))] items-center justify-center bg-surface px-6">
+    <main className="flex min-h-[calc(100dvh-var(--nav-h))] items-center justify-center px-6">
       <div className="max-w-md text-center">
         <h1 className="font-display text-3xl font-bold tracking-tight text-neutral-900">
-          You are offline.
+          {t('offline.title')}
         </h1>
-        <p className="mt-3 text-neutral-500">
-          Mathly needs a connection to load lessons and save what you have learned. Reconnect and
-          this page will pick right back up.
-        </p>
+        <p className="mt-3 text-neutral-500">{t('offline.body')}</p>
       </div>
     </main>
   );

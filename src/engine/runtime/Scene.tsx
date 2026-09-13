@@ -15,6 +15,7 @@ export function Scene({
   marker,
   revealed,
   inputLayer,
+  tapLabel,
 }: {
   ir: SceneIR;
   onScopeChange?: (scope: Scope) => void;
@@ -22,6 +23,7 @@ export function Scene({
   marker?: { x: number; y: number; correct?: boolean };
   revealed?: boolean;
   inputLayer?: InputLayerConfig;
+  tapLabel?: string;
 }) {
   const Renderer =
     ir.space.type === 'numberline'
@@ -38,6 +40,7 @@ export function Scene({
           marker={marker}
           revealed={revealed}
           inputLayer={inputLayer}
+          tapLabel={tapLabel}
         />
         {ir.timeline && ir.timeline.length > 0 && <Timeline ir={ir} />}
         {ir.controls && ir.controls.length > 0 && (

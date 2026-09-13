@@ -1,8 +1,10 @@
 'use client';
 import { CheckCircle2, XCircle, Crosshair } from 'lucide-react';
 import RichText from '../RichText';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function HotspotExercise({ slide, value, checked, correct }) {
+  const t = useT();
   const ex = slide.exercise;
   const tapped = Array.isArray(value);
 
@@ -15,21 +17,19 @@ export default function HotspotExercise({ slide, value, checked, correct }) {
       {!checked && (
         <div className="flex items-center gap-2 text-neutral-400 font-medium text-sm">
           <Crosshair className="w-4 h-4 shrink-0" />
-          {tapped
-            ? "Marked. Hit Check when you're ready."
-            : 'Tap the scene above, or tab to it and aim with the arrow keys.'}
+          {t(tapped ? 'exercise.hotspotMarked' : 'exercise.hotspotPrompt')}
         </div>
       )}
 
       {checked &&
         (correct ? (
           <div className="flex items-center gap-2 text-success-600 font-bold text-sm">
-            <CheckCircle2 className="w-5 h-5 shrink-0" /> Right on target.
+            <CheckCircle2 className="w-5 h-5 shrink-0" /> {t('exercise.onTarget')}
           </div>
         ) : (
           <div className="flex items-center gap-2 text-danger-600 font-bold text-sm">
             <XCircle className="w-5 h-5 shrink-0" />
-            {ex.miss || 'Not quite — take another look.'}
+            {ex.miss || t('exercise.notQuite')}
           </div>
         ))}
 

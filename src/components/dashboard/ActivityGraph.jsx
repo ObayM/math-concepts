@@ -86,11 +86,12 @@ const ActivityGraph = ({
       <div className="flex justify-end mt-2">
         <button
           onClick={() => setView(view === 'week' ? 'month' : 'week')}
-          className="tap-target flex items-center justify-center p-1 rounded-lg text-neutral-300/60 hover:text-neutral-400 transition-colors cursor-pointer"
+          aria-pressed={view === 'month'}
+          className="tap-target flex items-center justify-center p-1 rounded-lg text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
           title={view === 'week' ? t('activity.monthly') : t('activity.weekly')}
           aria-label={t('activity.toggle')}
         >
-          <Calendar className="w-3 h-3" />
+          <Calendar className="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -106,12 +107,7 @@ const StreakView = ({ weekDays, activityMap, streak, hasActivityToday, showCapti
           {streak === 0 ? (
             <>{t('activity.startStreak')}</>
           ) : hasActivityToday ? (
-            <>
-              <span className="font-bold text-neutral-800">
-                {streak} day{streak !== 1 ? 's' : ''}
-              </span>{' '}
-              strong. Keep it going.
-            </>
+            <>{t('dashboard.streakDays', { count: streak })}</>
           ) : (
             <>{t('activity.keepAlive')}</>
           )}

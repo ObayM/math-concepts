@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Eraser, Pen, Trash2, Undo2 } from 'lucide-react';
 
 import { drawStrokes, eraseAt, fromGrid, toGrid } from './strokes';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const SAMPLE_PX = 3;
 const PEN_WIDTH = 2.5;
@@ -11,6 +12,7 @@ const MAX_UNDO = 30;
 const INK = '#1e293b';
 
 export default function DrawPad({ strokes, onChange }) {
+  const t = useT();
   const [tool, setTool] = useState('pen');
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
@@ -185,13 +187,13 @@ export default function DrawPad({ strokes, onChange }) {
 
       <div
         ref={wrapRef}
-        className="bg-grid-snow relative min-h-0 flex-1 overflow-hidden rounded-xl border border-neutral-200"
+        className="bg-grid-pad relative min-h-0 flex-1 overflow-hidden rounded-xl border border-neutral-200"
       >
         <canvas
           ref={canvasRef}
           onPointerDown={handleDown}
           role="application"
-          aria-label="Drawing area. Use the notes tab if you would rather type."
+          aria-label={t('lesson.drawingArea')}
           className={`absolute inset-0 ${tool === 'eraser' ? 'cursor-cell' : 'cursor-crosshair'}`}
           style={{ touchAction: 'none' }}
         />

@@ -123,7 +123,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
             aria-label={t('settings.remindersLabel')}
             disabled={savingReminders}
             onClick={toggleReminders}
-            className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-60 ${
+            className={`tap-target-halo relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-60 ${
               reminders ? 'bg-primary-500' : 'bg-neutral-300'
             }`}
           >
@@ -216,6 +216,7 @@ export default function SettingsForm({ reminderEmails, emailVerified }) {
             type="button"
             variant="outline"
             className="mt-4 border-danger-300 text-danger-600 hover:bg-danger-50"
+            aria-expanded={deleteOpen}
             onClick={() => setDeleteOpen(true)}
           >
             {t('settings.deleteCta')}

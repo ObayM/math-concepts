@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <main className="flex items-center justify-center min-h-[calc(100dvh-var(--nav-h))] px-4 bg-surface">
+      <main className="flex items-center justify-center min-h-[calc(100dvh-var(--nav-h))] px-4 ">
         <Card className="animate-fade-in-up w-full max-w-md space-y-4 p-6 text-center sm:p-8">
           <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
             {t('reset.invalidTitle')}
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
 
   if (done) {
     return (
-      <main className="flex items-center justify-center min-h-[calc(100dvh-var(--nav-h))] px-4 bg-surface">
+      <main className="flex items-center justify-center min-h-[calc(100dvh-var(--nav-h))] px-4 ">
         <Card className="animate-fade-in-up w-full max-w-md space-y-4 p-6 text-center sm:p-8">
           <div className="flex justify-center">
             <div className="rounded-full bg-success-50 p-4">
@@ -88,10 +88,10 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-[calc(100dvh-var(--nav-h))] px-4 bg-surface">
+    <main className="flex items-center justify-center min-h-[calc(100dvh-var(--nav-h))] px-4 ">
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 sm:p-8">
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
             {t('reset.title')}
           </h1>
           <p className="mt-2 text-sm text-neutral-500">{t('reset.blurb')}</p>

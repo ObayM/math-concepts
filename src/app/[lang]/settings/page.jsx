@@ -20,10 +20,10 @@ export default async function SettingsPage() {
   const originFor = Object.fromEntries(LOCALES.map((l) => [l, originForLocale(l)]));
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)]">
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <header className="animate-fade-in-up">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-neutral-900">
+          <h1 className="font-display text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
             {t('settings.title')}
           </h1>
           <p className="mt-2 text-neutral-500">{settings.email}</p>

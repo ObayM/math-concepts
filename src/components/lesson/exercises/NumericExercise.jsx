@@ -1,11 +1,11 @@
 'use client';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
+import { useT } from '@/components/i18n/LocaleProvider';
 
-// v2 numeric — reads slide.exercise (prompt, answers[], tolerance, unit?, explanation)
 export default function NumericExercise({ slide, value, checked, correct, onChange }) {
+  const t = useT();
   const ex = slide.exercise;
-  // value can briefly be null/non-string while the player swaps slides — keep the input controlled
   const text = typeof value === 'string' ? value : '';
 
   let cls = 'border-neutral-200 focus:border-primary-400';
@@ -23,13 +23,12 @@ export default function NumericExercise({ slide, value, checked, correct, onChan
           <input
             type="text"
             inputMode="decimal"
-            // a number is ltr in every language; typing "-7" into an rtl field
-            // puts the minus on the wrong side
             dir="ltr"
             value={text}
             disabled={checked}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="your answer"
+            placeholder={t('exercise.yourAnswer')}
+            aria-label={t('exercise.yourAnswer')}
             className={`w-full p-4 rounded-2xl border-2 text-lg font-bold text-neutral-800 outline-none transition-all ${cls}`}
           />
           {ex.unit && (

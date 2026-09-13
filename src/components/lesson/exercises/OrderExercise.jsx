@@ -2,8 +2,10 @@
 import { RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 import { useTokenDrag, DragGhost } from './dnd';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function OrderExercise({ slide, value = [], checked, onChange }) {
+  const t = useT();
   const ex = slide.exercise;
   const placed = Array.isArray(value) ? value : [];
   const bank = [...ex.items, ...(ex.decoys ?? [])];
@@ -84,7 +86,7 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
         {...targetProps('bank')}
         className="flex flex-wrap justify-center gap-2"
         role="group"
-        aria-label="Available items"
+        aria-label={t('exercise.availableItems')}
       >
         {bank.map((label, idx) => {
           const disabled = checked || placed.length >= ex.items.length || placed.includes(idx);

@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const base =
-  'group inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  'tap-target-h group inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
 const sizes = {
   sm: 'px-4 py-2 text-sm',

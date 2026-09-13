@@ -55,7 +55,7 @@ function ConfirmCard() {
   }
 
   return (
-    <main className="flex min-h-[calc(100dvh-var(--nav-h))] items-center justify-center px-4">
+    <main className="flex min-h-[calc(100dvh-var(--nav-h))] items-center justify-center px-4 ">
       <Card className="animate-fade-in-up w-full max-w-md space-y-6 p-6 text-center sm:p-8">
         <div className="flex justify-center">
           <div className="rounded-full bg-primary-50 p-4">
@@ -64,7 +64,7 @@ function ConfirmCard() {
         </div>
 
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-neutral-900">
             {t('confirm.title')}
           </h1>
           <p className="mt-3 text-sm text-neutral-500">
@@ -111,7 +111,7 @@ function ConfirmCard() {
 
 export default function AuthConfirmPage() {
   return (
-    <Suspense fallback={<main className="min-h-[calc(100dvh-var(--nav-h))]" />}>
+    <Suspense fallback={<main className="min-h-[calc(100dvh-var(--nav-h))] " />}>
       <ConfirmCard />
     </Suspense>
   );

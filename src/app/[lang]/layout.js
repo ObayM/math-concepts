@@ -102,7 +102,7 @@ export default async function RootLayout({ children, params }) {
             {chromeless ? (
               children
             ) : (
-              <div className="flex min-h-dvh flex-col">
+              <div className="bg-app flex min-h-dvh flex-col">
                 <Navbar />
                 <div className="flex-1">{children}</div>
                 {!pathname.startsWith('/admin') && <Footer />}

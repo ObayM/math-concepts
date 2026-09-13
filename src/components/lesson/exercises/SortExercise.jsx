@@ -5,8 +5,10 @@ import RichText from '../RichText';
 import { hashStr, seededShuffle } from './shuffle';
 import { sortItems } from './index';
 import { useTokenDrag, DragGhost } from './dnd';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function SortExercise({ slide, value, checked, onChange }) {
+  const t = useT();
   const ex = slide.exercise;
   const items = useMemo(() => sortItems(ex), [ex]);
   const placed =
@@ -73,7 +75,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
         {...targetProps('tray')}
         className="flex flex-wrap justify-center gap-2 min-h-14"
         role="group"
-        aria-label="Items left to sort"
+        aria-label={t('exercise.itemsLeft')}
       >
         {tray.map((i) => (
           <button

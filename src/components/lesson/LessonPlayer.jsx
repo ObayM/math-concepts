@@ -345,10 +345,12 @@ export default function LessonPlayer({
 
   if (!path.length) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
-        <Card className="animate-fade-in-up w-full max-w-4xl min-h-[500px] max-md:min-h-0 flex flex-col items-center justify-center p-8 text-center">
-          <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">Loading lesson...</h2>
-          <p className="text-neutral-500 mt-2">Hang tight while we get things ready.</p>
+      <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
+        <Card className="animate-fade-in-up w-full max-w-5xl min-h-[500px] max-md:min-h-0 flex flex-col items-center justify-center p-8 text-center">
+          <h2 className="text-2xl font-bold text-neutral-800 animate-pulse">
+            {t('lesson.loading')}
+          </h2>
+          <p className="text-neutral-500 mt-2">{t('lesson.loadingBlurb')}</p>
           <Button onClick={handleBackToCourse} variant="ghost" className="mt-6">
             {t('lesson.back')}
           </Button>
@@ -359,8 +361,8 @@ export default function LessonPlayer({
 
   if (isComplete) {
     return (
-      <div className="bg-app -mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
-        <Card className="card-hero animate-fade-in-up w-full max-w-4xl min-h-[500px] max-md:min-h-0 rounded-3xl flex items-center justify-center">
+      <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
+        <Card className="card-hero animate-fade-in-up w-full max-w-5xl min-h-[500px] max-md:min-h-0 rounded-3xl flex items-center justify-center">
           <LessonCompletion
             onContinue={handleContinue}
             onBack={handleBackToCourse}
@@ -394,8 +396,8 @@ export default function LessonPlayer({
     <button
       onClick={handleReset}
       className="tap-target bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors flex items-center justify-center"
-      title="Restart lesson"
-      aria-label="Restart lesson"
+      title={t('lesson.restartAction')}
+      aria-label={t('lesson.restartAction')}
     >
       <RotateCcw className="w-4 h-4" />
     </button>
@@ -416,8 +418,8 @@ export default function LessonPlayer({
     <button
       onClick={togglePad}
       aria-pressed={showPad}
-      title="Scratchpad"
-      aria-label="Scratchpad"
+      title={t('lesson.scratchpad')}
+      aria-label={t('lesson.scratchpad')}
       className={`relative hidden lg:block rounded-xl p-2 transition-colors hover:bg-primary-50 ${showPad ? 'bg-primary-50 text-primary-600' : 'text-neutral-400 hover:text-primary-600'}`}
     >
       <PencilLine className="h-5 w-5" />
@@ -439,7 +441,7 @@ export default function LessonPlayer({
   );
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden max-md:px-0 max-md:pb-0 max-md:items-stretch max-md:overflow-visible">
+    <div className="-mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 text-neutral-900 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden max-md:px-0 max-md:pb-0 max-md:items-stretch max-md:overflow-visible">
       {saveError && (
         <div className="absolute start-4 top-[calc(var(--nav-h)+0.75rem)] flex items-center gap-2 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-semibold px-4 py-2 rounded-full z-10 max-md:start-0 max-md:end-0 max-md:top-[var(--nav-h)] max-md:justify-center max-md:rounded-none">
           {t('lesson.saveFailed')}
@@ -455,14 +457,14 @@ export default function LessonPlayer({
       )}
 
       <div
-        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-4xl'} transition-[max-width] duration-300 bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex relative md:max-h-[calc(100dvh-var(--nav-h)-1.5rem)] max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
+        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-5xl'} transition-[max-width] duration-300 bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex relative md:max-h-[calc(100dvh-var(--nav-h)-1.5rem)] max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
       >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
             <div
               className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
               role="progressbar"
-              aria-label="Lesson progress"
+              aria-label={t('lesson.progressAria')}
               aria-valuemin={1}
               aria-valuemax={path.length}
               aria-valuenow={pathIndex + 1}
@@ -534,9 +536,10 @@ export default function LessonPlayer({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setTutorOpen((o) => !o)}
-                className="text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50"
+                className="tap-target text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50 flex items-center justify-center"
                 title={t('lesson.askTutor')}
                 aria-label={t('lesson.askTutor')}
+                aria-expanded={tutorOpen}
               >
                 <Sparkles className="w-5 h-5" />
               </button>
@@ -602,7 +605,7 @@ export default function LessonPlayer({
                           {turn.content ? (
                             <RichText>{turn.content}</RichText>
                           ) : (
-                            <span className="flex gap-1" aria-label="Thinking">
+                            <span className="flex gap-1" aria-label={t('lesson.thinking')}>
                               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
                               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:150ms]" />
                               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:300ms]" />
@@ -634,6 +637,7 @@ export default function LessonPlayer({
                     onClick={handleTutorAsk}
                     variant="primary"
                     size="sm"
+                    aria-label={t('lesson.send')}
                     disabled={tutorStreaming || !tutorQuery.trim()}
                   >
                     <Send className="h-4 w-4" />

@@ -111,6 +111,8 @@ export default function Navbar() {
             <button
               type="button"
               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-neutral-700"
+              aria-expanded={isMobileMenuOpen}
+              aria-haspopup="dialog"
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <span className="sr-only">{t('nav.open')}</span>
@@ -143,6 +145,9 @@ export default function Navbar() {
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  aria-label={t('nav.account')}
+                  aria-expanded={isProfileOpen}
+                  aria-haspopup="menu"
                   className="flex items-center justify-center w-9 h-9 rounded-full transition-opacity hover:opacity-80"
                 >
                   <Avatar

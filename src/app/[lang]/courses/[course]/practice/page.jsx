@@ -5,11 +5,13 @@ import { getMyMastery } from '@/lib/db/progressService';
 import { requireUser } from '@/lib/session';
 import PracticeRunner from '@/components/lesson/PracticeRunner';
 import Button from '@/components/ui/Button';
+import { getT } from '@/lib/i18n/server';
 
 export default async function PracticePage({ params }) {
   const { course: courseSlug, lang } = await params;
   const user = await requireUser();
   if (!user) redirect('/login');
+  const t = await getT();
 
   const course = await resolveCourseBySlug(courseSlug, lang);
   if (!course) notFound();
@@ -23,13 +25,12 @@ export default async function PracticePage({ params }) {
     return (
       <div className="min-h-[calc(100dvh-var(--nav-h))] bg-surface flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-extrabold text-neutral-900 mb-2">No practice yet</h1>
+          <h1 className="text-2xl font-extrabold text-neutral-900 mb-2">{t('practice.nothing')}</h1>
           <p className="text-neutral-500 mb-6">
-            {course.name} doesn&apos;t have any exercises to practice yet — check back after a
-            lesson or two.
+            {t('practice.emptyBody', { course: course.name })}
           </p>
           <Button as="a" href={`/courses/${courseSlug}`} variant="outline">
-            Back to {course.name}
+            {t('practice.backTo', { course: course.name })}
           </Button>
         </div>
       </div>

@@ -11,6 +11,7 @@ import MatchExercise from './exercises/MatchExercise';
 import OrderExercise from './exercises/OrderExercise';
 import SortExercise from './exercises/SortExercise';
 import TableExercise from './exercises/TableExercise';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 const exerciseRegistry = {
   quiz: QuizExercise,
@@ -33,6 +34,7 @@ export default function SlideView({
   goalsMet,
   onScopeChange,
 }) {
+  const t = useT();
   const Exercise = slide.exercise ? exerciseRegistry[slide.exercise.kind] : null;
 
   const isHotspot = slide.exercise?.kind === 'hotspot';
@@ -68,6 +70,7 @@ export default function SlideView({
             marker={marker}
             revealed={checked}
             inputLayer={inputLayer}
+            tapLabel={t('exercise.sceneAria')}
           />
         </div>
       )}
