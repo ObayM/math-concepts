@@ -16,6 +16,7 @@ const ar: Dictionary = {
   'nav.primary': 'التنقل',
   'nav.global': 'التنقل',
   'nav.you': 'أنت',
+  'nav.account': 'قائمة الحساب',
   'nav.learn': 'تعلّم',
 
   'footer.tagline': 'ماثلي. خلي الرياضيات تبان.',
@@ -48,6 +49,47 @@ const ar: Dictionary = {
 
   'exercise.notQuite': 'ليست صحيحة. ألق نظرة أخرى.',
   'exercise.yourAnswer': 'إجابتك',
+
+  'exercise.answerChoices': 'خيارات الإجابة',
+  'exercise.tokenBank': 'العناصر المتاحة',
+  'exercise.availableItems': 'العناصر المتاحة',
+  'exercise.itemsLeft': 'العناصر المتبقية للترتيب',
+  'exercise.clear': 'مسح',
+  'exercise.goodMatch': 'ممتاز، مطابقة صحيحة.',
+  'exercise.onTarget': 'في الهدف تمامًا.',
+  'exercise.hotspotPrompt': 'اضغط على الرسم بالأعلى، أو انتقل إليه بمفتاح Tab وصوّب بالأسهم.',
+  'exercise.hotspotMarked': 'تم التحديد. اضغط "تحقق" لما تكون جاهزًا.',
+  'exercise.sketchCurve': 'ارسم على الرسم بالأعلى، أو انتقل إليه بمفتاح Tab واستخدم الأسهم.',
+  'exercise.sketchPoints':
+    'اضغط على الرسم بالأعلى لتضع النقاط، أو انتقل إليه بمفتاح Tab واستخدم الأسهم.',
+  'exercise.sketchLine':
+    'اسحب على الرسم بالأعلى لترسم خطًا، أو انتقل إليه بمفتاح Tab واستخدم الأسهم.',
+  'exercise.sceneAria':
+    'اضغط على الرسم للإجابة، أو استخدم الأسهم لتحريك المؤشر وEnter لتثبيته. اضغط Shift للحركة الأسرع.',
+
+  'lesson.loading': 'جارٍ تحميل الدرس...',
+  'lesson.loadingBlurb': 'لحظة.',
+  'lesson.restartAction': 'أعد الدرس من البداية',
+  'lesson.scratchpad': 'المسودة',
+  'lesson.closeScratchpad': 'إغلاق المسودة',
+  'lesson.progressAria': 'تقدّمك في الدرس',
+  'lesson.thinking': 'يفكر',
+  'lesson.send': 'إرسال',
+  'lesson.drawingArea': 'مساحة الرسم. استخدم تبويب الملاحظات إذا كنت تفضّل الكتابة.',
+  'lesson.brokenTitle': 'هذا الدرس فيه مشكلة مؤقتة',
+  'lesson.brokenBody':
+    'فيه شيء معطّل عندنا، مش عندك. وصلنا الخبر بالفعل. جرّب درسًا آخر في الوقت الحالي.',
+
+  'warmup.backspace': 'مسح حرف',
+  'warmup.minus': 'ناقص',
+
+  'offline.title': 'أنت غير متصل بالإنترنت.',
+  'offline.body':
+    'مائلي يحتاج اتصالًا ليحمّل الدروس ويحفظ ما تعلمته. اتصل من جديد وستكمل هذه الصفحة من حيث توقفت.',
+
+  'practice.emptyBody': 'لا توجد تمارين في {course} حتى الآن. ارجع بعد درس أو درسين.',
+
+  'common.loading': 'جارٍ التحميل',
 
   'auth.welcomeBack': 'أهلًا بعودتك!',
   'auth.signIn': 'دخول',
@@ -335,9 +377,10 @@ const ar: Dictionary = {
   'practice.next': 'التالي',
   'lesson.dayStreak': 'سلسلة {count} يوم',
   'lesson.aiTutor': 'المدرّس الذكي',
-  'home.heroLead': 'اتعلم الرياضيات بـ',
-  'home.heroAccent': 'حدس بصري',
-  'home.heroBlurb': 'بطّل حفظ قوانين. ابدأ تشوف الأنماط. دروس تقدر تسحبها وتبنيها وتجرب فيها.',
+  'home.heroLead': 'اتعلم الرياضيات وانت',
+  'home.heroAccent': 'بتلعب فيها',
+  'home.heroBlurb':
+    'اسحب منحنى، ابني إجابة، شوف إيه اللي بيحصل. دروس تخليك تعمل الرياضيات مش بس تقراها.',
   'home.startFree': 'ابدأ مجانًا',
   'home.continue': 'أكمل التعلم',
   'home.logIn': 'تسجيل الدخول',
@@ -347,21 +390,19 @@ const ar: Dictionary = {
   'home.demoLoad': 'افتح الشريحة التفاعلية',
   'home.demoLoading': 'جارٍ التحميل...',
   'home.featuresEyebrow': 'إيه اللي مختلف',
-  'home.f1Title': 'رسومات بترد عليك',
+  'home.f1Title': 'رسومات تقدر تلمسها',
   'home.f1Body':
-    'اسحب نقطة، حرّك شريط، ارسم منحنى. الرياضيات بتتغير قدامك، فالفكرة توصل قبل القانون.',
+    'اسحب نقطة، حرّك شريط، ارسم منحنى. الرياضيات بتتحدث لحظيًا فتفهم الفكرة قبل القانون.',
   'home.f2Title': 'بياخد باله لما تتلخبط',
   'home.f2Body': 'تغلط إجابة، فالدرس يلف على شرح أصغر معمول للغلطة دي بالذات، وبعدين يرجعك مكانك.',
   'home.f3Title': 'مدرّس شايف شاشتك',
   'home.f3Body': 'اسأل سؤال وهو عارف انت في أنهي شريحة وإجابتك كانت إيه وغلطت فين.',
   'home.coursesEyebrow': 'تقدر تتعلم إيه',
   'home.coursesAll': 'شوف كل الدورات',
-  'home.pricingTitle': 'مجاني طول ما هو في مرحلة التجربة.',
-  'home.pricingBlurb': 'من غير كارت ولا عداد. لو ده اتغير هنقولك بوضوح وبدري.',
-  'home.ctaTitle': 'جاهز تشوفها بتتوضح؟',
+  'home.ctaTitle': 'عايز تجرب؟',
   'home.ctaBlurb': 'اعمل حساب وابدأ أول درس في أقل من دقيقة.',
   'courses.title': 'دوراتنا',
-  'courses.subtitle': 'مسارات مرئية وتفاعلية تخلي الرياضيات تبان فعلًا.',
+  'courses.subtitle': 'دورات تفاعلية تمشيك في الرياضيات خطوة بخطوة.',
   'courses.lessonCount': {
     zero: 'لا دروس',
     one: 'درس واحد',

@@ -63,7 +63,7 @@ export default async function Home({ params }) {
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
-    <div className="bg-app -mt-[var(--nav-h)] pt-[var(--nav-h)]">
+    <div className="-mt-[var(--nav-h)] pt-[var(--nav-h)]">
       <Hero />
 
       <main className="container mx-auto px-6 pb-24">
@@ -127,7 +127,7 @@ export default async function Home({ params }) {
             </div>
             <Link
               href="/courses"
-              className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-neutral-500 hover:text-neutral-800"
+              className="tap-target-h mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-neutral-500 hover:text-neutral-800"
             >
               {t('home.coursesAll')}
               <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
@@ -135,14 +135,7 @@ export default async function Home({ params }) {
           </section>
         )}
 
-        <section className="mx-auto mt-24 max-w-3xl text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight text-neutral-900">
-            {t('home.pricingTitle')}
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-lg text-neutral-500">{t('home.pricingBlurb')}</p>
-        </section>
-
-        <section className="mx-auto mt-20 max-w-3xl">
+        <section className="mx-auto mt-24 max-w-3xl">
           <Card className="card-soft p-10 text-center sm:p-14">
             <h2 className="font-display text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
               {t('home.ctaTitle')}

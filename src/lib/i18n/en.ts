@@ -14,6 +14,7 @@ const en = {
   'nav.primary': 'Primary',
   'nav.global': 'Global',
   'nav.you': 'You',
+  'nav.account': 'Account menu',
   'nav.learn': 'Learn',
 
   'footer.tagline': 'Mathly. Make math click.',
@@ -46,6 +47,48 @@ const en = {
 
   'exercise.notQuite': 'Not quite. Take another look.',
   'exercise.yourAnswer': 'your answer',
+
+  'exercise.answerChoices': 'Answer choices',
+  'exercise.tokenBank': 'Token bank',
+  'exercise.availableItems': 'Available items',
+  'exercise.itemsLeft': 'Items left to sort',
+  'exercise.clear': 'Clear',
+  'exercise.goodMatch': 'Nice, good match.',
+  'exercise.onTarget': 'Right on target.',
+  'exercise.hotspotPrompt': 'Tap the scene above, or tab to it and aim with the arrow keys.',
+  'exercise.hotspotMarked': "Marked. Hit Check when you're ready.",
+  'exercise.sketchCurve': 'Draw on the scene above, or tab to it and use the arrow keys.',
+  'exercise.sketchPoints':
+    'Tap the scene above to place points, or tab to it and use the arrow keys.',
+  'exercise.sketchLine':
+    'Drag on the scene above to draw a line, or tab to it and use the arrow keys.',
+  'exercise.sceneAria':
+    'Tap the diagram to answer, or use the arrow keys to move the crosshair and Enter to drop it. Hold shift to move faster.',
+
+  'lesson.loading': 'Loading lesson...',
+  'lesson.loadingBlurb': 'One sec.',
+  'lesson.restartAction': 'Restart lesson',
+  'lesson.scratchpad': 'Scratchpad',
+  'lesson.closeScratchpad': 'Close scratchpad',
+  'lesson.progressAria': 'Lesson progress',
+  'lesson.thinking': 'Thinking',
+  'lesson.send': 'Send',
+  'lesson.drawingArea': 'Drawing area. Use the notes tab if you would rather type.',
+  'lesson.brokenTitle': "This lesson didn't load",
+  'lesson.brokenBody':
+    'Something in it is broken on our side, not yours. We have been told. Try another lesson in the meantime.',
+
+  'warmup.backspace': 'backspace',
+  'warmup.minus': 'minus',
+
+  'offline.title': 'You are offline.',
+  'offline.body':
+    'Mathly needs a connection to load lessons and save what you have learned. Reconnect and this page will pick right back up.',
+
+  'practice.emptyBody':
+    '{course} does not have any exercises to practice yet. Check back after a lesson or two.',
+
+  'common.loading': 'Loading',
 
   'auth.welcomeBack': 'Welcome Back!',
   'auth.signIn': 'Sign In',
@@ -322,10 +365,10 @@ const en = {
   'practice.next': 'Next',
   'lesson.dayStreak': '{count} day streak',
   'lesson.aiTutor': 'AI tutor',
-  'home.heroLead': 'Master math with',
-  'home.heroAccent': 'visual intuition',
+  'home.heroLead': 'Learn math by',
+  'home.heroAccent': 'playing with it',
   'home.heroBlurb':
-    'Stop memorising formulas. Start seeing the patterns. Lessons you can drag, build and poke at.',
+    'Drag a curve, build an answer, see what happens. Lessons that make you do the math, not just read it.',
   'home.startFree': 'Start learning free',
   'home.continue': 'Continue learning',
   'home.logIn': 'Log in',
@@ -336,9 +379,9 @@ const en = {
   'home.demoLoad': 'Load the interactive slide',
   'home.demoLoading': 'Loading...',
   'home.featuresEyebrow': 'What makes it different',
-  'home.f1Title': 'Diagrams that answer back',
+  'home.f1Title': 'Diagrams you can touch',
   'home.f1Body':
-    'Drag a point, move a slider, sketch a curve. The maths updates while you watch, so the idea lands before the formula does.',
+    'Drag a point, move a slider, sketch a curve. The math updates live so you get the idea before the formula.',
   'home.f2Title': 'It notices when you are stuck',
   'home.f2Body':
     'Get one wrong and the lesson detours into a smaller explanation built for that exact mistake, then puts you back where you were.',
@@ -347,13 +390,10 @@ const en = {
     'Ask a question and the tutor already knows which slide you are on, what you answered and where you went wrong.',
   'home.coursesEyebrow': 'What you can learn',
   'home.coursesAll': 'See all courses',
-  'home.pricingTitle': 'Free while it is in beta.',
-  'home.pricingBlurb':
-    'No card, no trial timer. We will say so clearly and well in advance if that ever changes.',
-  'home.ctaTitle': 'Ready to see it click?',
+  'home.ctaTitle': 'Want to try it?',
   'home.ctaBlurb': 'Make an account and start the first lesson in under a minute.',
   'courses.title': 'Our courses',
-  'courses.subtitle': 'Visual, interactive tracks that make the math actually click.',
+  'courses.subtitle': 'Interactive courses that walk you through the math step by step.',
   'courses.lessonCount': { one: '1 lesson', other: '{count} lessons' },
   'courses.unitCount': { one: '1 unit', other: '{count} units' },
   'courses.empty': 'No courses published yet. Check back soon.',
