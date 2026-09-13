@@ -10,7 +10,7 @@ env:
   BETTER_AUTH_SECRET: ci-only-secret-not-for-real-use
   BETTER_AUTH_URL: http://localhost:3000
   NEXT_PUBLIC_APP_URL: http://localhost:3000
-  GEMINI_API_KEY: ci-placeholder-key
+  HACKCLUB_AI_KEY: ci-placeholder-key
   CRON_SECRET: ci-cron-secret
   DISABLE_HIBP: '1'
   ALLOW_INCOMPLETE_ENV: '1'

@@ -32,3 +32,9 @@ export function isRegister(value: unknown): value is Register {
 }
 
 export const AUTHORING_LOCALES = LOCALES;
+
+export function stripFence(text: string): string {
+  const trimmed = text.trim();
+  const fenced = /^```[^\n]*\n([\s\S]*?)\n?```$/.exec(trimmed);
+  return (fenced ? fenced[1] : trimmed).trim();
+}

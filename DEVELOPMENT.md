@@ -2,7 +2,7 @@
 
 Developers, we're ready for launch!
 
-You'll need Node.js, Docker (for the local Postgres database), and optionally a Gemini API key
+You'll need Node.js, Docker (for the local Postgres database), and optionally a Hack Club AI key
 
 ## First-time setup
 
@@ -21,7 +21,7 @@ cp .env.example .env
 Open up `.env` and put in your secrets:
 
 - `BETTER_AUTH_SECRET`: Run `openssl rand -base64 32` to generate a fresh secret!
-- `GEMINI_API_KEY`: Grab one from [Google AI Studio](https://aistudio.google.com/app/apikey) if you want the cool AI features to work (they're optional but highly recommended!).
+- `HACKCLUB_AI_KEY`: Grab one from the [Hack Club AI dashboard](https://ai.hackclub.com/dashboard) if you want the cool AI features to work (they're optional but highly recommended!).
 
 Everything else can stay as the defaults for local development.
 

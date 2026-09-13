@@ -35,7 +35,7 @@ See `DEVELOPMENT.md` for the full setup.
 
 ## Tech
 
-Next.js 16, React 19, Better Auth, Prisma 6 + Postgres, Tailwind v4, KaTeX, Monaco, Vitest + Playwright, Vercel AI SDK + Gemini.
+Next.js 16, React 19, Better Auth, Prisma 6 + Postgres, Tailwind v4, KaTeX, Monaco, Vitest + Playwright, Vercel AI SDK + Hack Club AI.
 
 ## Credits
 

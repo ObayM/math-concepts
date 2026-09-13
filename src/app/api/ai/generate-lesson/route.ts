@@ -9,7 +9,7 @@ import { LESSON_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 import { verifyLesson } from '@/engine/verify';
 import { toAIContext } from '@/engine/lang/docs';
-import { authoringDirective, REGISTERS } from '@/lib/ai-authoring';
+import { authoringDirective, REGISTERS, stripFence } from '@/lib/ai-authoring';
 import { LOCALES } from '@/lib/locale';
 
 const INSTRUCTIONS = toAIContext();
@@ -57,7 +57,7 @@ Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markd
       maxOutputTokens: 4096,
       abortSignal: AbortSignal.timeout(60_000),
     });
-    prism = result.text;
+    prism = stripFence(result.text);
   } catch (err: unknown) {
     const reference = randomUUID();
     console.error(`[ai/generate-lesson] %s`, reference, err);

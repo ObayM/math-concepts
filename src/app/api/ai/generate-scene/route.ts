@@ -8,7 +8,7 @@ import { spendQuota, quotaExceeded } from '@/lib/ai-quota';
 import { SCENE_GEN_MODEL, aiNotConfigured, isAiConfigured } from '@/lib/ai';
 import { compile, CompileError, formatCompileError } from '@/engine';
 import { toAIContext } from '@/engine/lang/docs';
-import { authoringDirective, REGISTERS } from '@/lib/ai-authoring';
+import { authoringDirective, REGISTERS, stripFence } from '@/lib/ai-authoring';
 import { LOCALES } from '@/lib/locale';
 
 const INSTRUCTIONS = toAIContext();
@@ -52,7 +52,7 @@ Return ONLY the Prism source. No markdown, no explanation.${authoringDirective(l
       maxOutputTokens: 2048,
       abortSignal: AbortSignal.timeout(45_000),
     });
-    prism = result.text;
+    prism = stripFence(result.text);
   } catch (err: unknown) {
     const reference = randomUUID();
     console.error(`[ai/generate-scene] %s`, reference, err);

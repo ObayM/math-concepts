@@ -26,8 +26,8 @@ export default function PrivacyPage() {
 
       <Section title="The AI tutor">
         When you ask the tutor a question, we send that question, the slide you are on, and your
-        answer to Google&apos;s Gemini API so it can reply. We do not send your email, name, or
-        anything from other lessons.
+        answer to Hack Club AI so it can reply. We do not send your email, name, or anything from
+        other lessons.
       </Section>
 
       <Section title="Email">

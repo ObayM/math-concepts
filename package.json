@@ -29,9 +29,9 @@
     "export:content": "node --env-file=.env scripts/export-content.mjs"
   },
   "dependencies": {
-    "@ai-sdk/google": "^4.0.3",
     "@google/genai": "^1.30.0",
     "@monaco-editor/react": "^4.7.0",
+    "@openrouter/ai-sdk-provider": "^3.0.0",
     "@prisma/client": "^6.0.0",
     "@sentry/nextjs": "^10.74.0",
     "ai": "^7.0.8",

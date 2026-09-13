@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { authoringDirective, isRegister, REGISTERS } from '@/lib/ai-authoring';
+import { authoringDirective, isRegister, REGISTERS, stripFence } from '@/lib/ai-authoring';
 
 describe('the arabic authoring directive', () => {
   it('says nothing for english, so the english prompt is untouched', () => {
@@ -35,5 +35,27 @@ describe('the arabic authoring directive', () => {
   it('validates register names', () => {
     expect(isRegister('egyptian')).toBe(true);
     expect(isRegister('pirate')).toBe(false);
+  });
+});
+
+describe('stripping the markdown fence a model wraps its source in', () => {
+  it('unwraps a tagged fence', () => {
+    expect(stripFence('```prism\nlesson "A" {}\n```')).toBe('lesson "A" {}');
+  });
+
+  it('unwraps a bare fence', () => {
+    expect(stripFence('```\nscene {}\n```')).toBe('scene {}');
+  });
+
+  it('survives the chatter models put around the fence', () => {
+    expect(stripFence('  \n```prism\nscene {}\n```  \n')).toBe('scene {}');
+  });
+
+  it('leaves unfenced source alone', () => {
+    expect(stripFence('lesson "A" {\n  slide "B" {}\n}')).toBe('lesson "A" {\n  slide "B" {}\n}');
+  });
+
+  it('keeps backticks that are part of the source', () => {
+    expect(stripFence('scene {\n  label "a ``b`` c"\n}')).toBe('scene {\n  label "a ``b`` c"\n}');
   });
 });
