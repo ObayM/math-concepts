@@ -6,9 +6,9 @@ const hackclub = createOpenRouter({
   baseURL: 'https://ai.hackclub.com/proxy/v1',
 });
 
-export const TUTOR_MODEL = hackclub.chat('~openai/gpt-luna-latest');
-export const SCENE_GEN_MODEL = hackclub.chat('~openai/gpt-luna-latest');
-export const LESSON_GEN_MODEL = hackclub.chat('~openai/gpt-luna-latest');
+export const TUTOR_MODEL = hackclub.chat('google/gemini-3.8-flash');
+export const SCENE_GEN_MODEL = hackclub.chat('google/gemini-3.8-flash');
+export const LESSON_GEN_MODEL = hackclub.chat('google/gemini-3.8-flash');
 
 export function isAiConfigured(): boolean {
   return Boolean(process.env.HACKCLUB_AI_KEY?.trim());

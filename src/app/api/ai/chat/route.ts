@@ -77,7 +77,7 @@ export async function POST(req: Request) {
       model: TUTOR_MODEL,
       instructions,
       messages,
-      maxOutputTokens: 400,
+      maxOutputTokens: 1200,
       abortSignal: AbortSignal.timeout(30_000),
       onError: ({ error }) => console.error('tutor stream failed', error),
       onFinish: ({ usage }) =>
