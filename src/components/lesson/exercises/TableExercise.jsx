@@ -5,7 +5,7 @@ import RichText from '../RichText';
 // (prompt, header?, rows[][{value}|{blank,answer}], tolerance, explanation).
 // value is a flat array of typed strings, one per blank cell in row-major
 // order — matches `flatBlanks` in the checkable registry.
-export default function TableExercise({ slide, value, checked, onChange }) {
+export default function TableExercise({ slide, value, checked, onChange, revealAnswer = true }) {
   const ex = slide.exercise;
   const totalBlanks = ex.rows.reduce((n, row) => n + row.filter((c) => c.blank).length, 0);
   const v = Array.isArray(value) ? value : new Array(totalBlanks).fill('');
@@ -97,7 +97,7 @@ export default function TableExercise({ slide, value, checked, onChange }) {
         </p>
       )}
 
-      {checked && ex.explanation && (
+      {checked && revealAnswer && ex.explanation && (
         <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {ex.explanation}
         </RichText>

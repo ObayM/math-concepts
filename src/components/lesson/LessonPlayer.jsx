@@ -518,6 +518,7 @@ export default function LessonPlayer({
                   onChange={handleAnswerChange}
                   goalsMet={goalsMet}
                   onScopeChange={handleScopeChange}
+                  revealAnswer={!flow.pending?.retry}
                 />
                 <div aria-live="polite" className="sr-only">
                   {checked &&

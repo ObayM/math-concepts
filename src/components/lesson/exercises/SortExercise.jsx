@@ -7,7 +7,7 @@ import { sortItems } from './index';
 import { useTokenDrag, DragGhost } from './dnd';
 import { useT } from '@/components/i18n/LocaleProvider';
 
-export default function SortExercise({ slide, value, checked, onChange }) {
+export default function SortExercise({ slide, value, checked, onChange, revealAnswer = true }) {
   const t = useT();
   const ex = slide.exercise;
   const items = useMemo(() => sortItems(ex), [ex]);
@@ -166,7 +166,7 @@ export default function SortExercise({ slide, value, checked, onChange }) {
         </DragGhost>
       )}
 
-      {checked && ex.explanation && (
+      {checked && revealAnswer && ex.explanation && (
         <RichText className="block text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed max-w-md mx-auto text-center">
           {ex.explanation}
         </RichText>

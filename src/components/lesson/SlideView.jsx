@@ -33,6 +33,7 @@ export default function SlideView({
   onChange,
   goalsMet,
   onScopeChange,
+  revealAnswer = true,
 }) {
   const t = useT();
   const Exercise = slide.exercise ? exerciseRegistry[slide.exercise.kind] : null;
@@ -68,7 +69,7 @@ export default function SlideView({
             onScopeChange={onScopeChange}
             onTap={onTap}
             marker={marker}
-            revealed={checked}
+            revealed={checked && revealAnswer}
             inputLayer={inputLayer}
             tapLabel={t('exercise.sceneAria')}
           />
@@ -85,6 +86,7 @@ export default function SlideView({
             checked={checked}
             correct={correct}
             onChange={onChange}
+            revealAnswer={revealAnswer}
           />
         </div>
       )}

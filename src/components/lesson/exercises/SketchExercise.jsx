@@ -9,7 +9,14 @@ const PROMPT_KEY_BY_MODE = {
   line: 'exercise.sketchLine',
 };
 
-export default function SketchExercise({ slide, value, checked, correct, onChange }) {
+export default function SketchExercise({
+  slide,
+  value,
+  checked,
+  correct,
+  onChange,
+  revealAnswer = true,
+}) {
   const t = useT();
   const ex = slide.exercise;
   const hasDrawn = Array.isArray(value) && value.length > 0;
@@ -48,7 +55,7 @@ export default function SketchExercise({ slide, value, checked, correct, onChang
           </div>
         ))}
 
-      {checked && ex.explanation && (
+      {checked && revealAnswer && ex.explanation && (
         <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {ex.explanation}
         </RichText>

@@ -3,7 +3,7 @@ import { CheckCircle2, XCircle, Crosshair } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
 
-export default function HotspotExercise({ slide, value, checked, correct }) {
+export default function HotspotExercise({ slide, value, checked, correct, revealAnswer = true }) {
   const t = useT();
   const ex = slide.exercise;
   const tapped = Array.isArray(value);
@@ -33,7 +33,7 @@ export default function HotspotExercise({ slide, value, checked, correct }) {
           </div>
         ))}
 
-      {checked && ex.explanation && (
+      {checked && revealAnswer && ex.explanation && (
         <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {ex.explanation}
         </RichText>

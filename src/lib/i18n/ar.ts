@@ -49,6 +49,7 @@ const ar: Dictionary = {
 
   'exercise.notQuite': 'ليست صحيحة. ألق نظرة أخرى.',
   'exercise.yourAnswer': 'إجابتك',
+  'exercise.answerIs': 'ليست صحيحة. الإجابة هي',
 
   'exercise.answerChoices': 'خيارات الإجابة',
   'exercise.tokenBank': 'العناصر المتاحة',

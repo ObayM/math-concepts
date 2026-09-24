@@ -3,7 +3,14 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
 
-export default function NumericExercise({ slide, value, checked, correct, onChange }) {
+export default function NumericExercise({
+  slide,
+  value,
+  checked,
+  correct,
+  onChange,
+  revealAnswer = true,
+}) {
   const t = useT();
   const ex = slide.exercise;
   const text = typeof value === 'string' ? value : '';
@@ -47,12 +54,22 @@ export default function NumericExercise({ slide, value, checked, correct, onChan
 
       {checked && !correct && (
         <p className="mt-2 text-sm text-danger-600 font-medium">
-          Not quite — the answer is {ex.answers[0]}
-          {ex.unit ? ` ${ex.unit}` : ''}.
+          {revealAnswer ? (
+            <>
+              {t('exercise.answerIs')}{' '}
+              <span dir="ltr">
+                {ex.answers[0]}
+                {ex.unit ? ` ${ex.unit}` : ''}
+              </span>
+              .
+            </>
+          ) : (
+            t('exercise.notQuite')
+          )}
         </p>
       )}
 
-      {checked && ex.explanation && (
+      {checked && (correct || revealAnswer) && ex.explanation && (
         <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {ex.explanation}
         </RichText>

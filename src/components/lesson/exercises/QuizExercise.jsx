@@ -5,7 +5,7 @@ import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
 import { hashStr, shuffledOrder } from './shuffle';
 
-export default function QuizExercise({ slide, value, checked, onChange }) {
+export default function QuizExercise({ slide, value, checked, onChange, revealAnswer = true }) {
   const t = useT();
   const ex = slide.exercise;
   const selected = value;
@@ -28,7 +28,7 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
         {order.map((idx) => {
           const option = ex.options[idx];
           const isSelected = selected === idx;
-          const isCorrect = idx === ex.correct;
+          const isCorrect = revealAnswer && idx === ex.correct;
 
           let cls =
             'border-2 border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50';
@@ -77,7 +77,7 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
         })}
       </div>
 
-      {checked && ex.explanation && (
+      {checked && revealAnswer && ex.explanation && (
         <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {ex.explanation}
         </RichText>

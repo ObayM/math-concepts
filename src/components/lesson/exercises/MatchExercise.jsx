@@ -41,7 +41,7 @@ const PAIR = [
 
 const hueOf = (i) => PAIR[i % PAIR.length];
 
-export default function MatchExercise({ slide, value, checked, onChange }) {
+export default function MatchExercise({ slide, value, checked, onChange, revealAnswer = true }) {
   const ex = slide.exercise;
   const matches = Array.isArray(value) ? value : new Array(ex.pairs.length).fill(null);
   const [armed, setArmed] = useState(null);
@@ -183,7 +183,7 @@ export default function MatchExercise({ slide, value, checked, onChange }) {
         </DragGhost>
       )}
 
-      {checked && ex.explanation && (
+      {checked && revealAnswer && ex.explanation && (
         <RichText className="mt-6 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
           {ex.explanation}
         </RichText>
