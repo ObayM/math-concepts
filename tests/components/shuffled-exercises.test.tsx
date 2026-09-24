@@ -80,7 +80,9 @@ describe('build', () => {
     }`);
 
   it('does not deal the bank in answer order', () => {
-    render(<BuildExercise slide={slide} value={[]} checked={false} onChange={() => {}} />);
+    render(
+      <BuildExercise slide={slide} value={[]} checked={false} correct={null} onChange={() => {}} />
+    );
     const shown = [...document.querySelectorAll('[data-token]')].map((b) =>
       b.getAttribute('data-token')
     );

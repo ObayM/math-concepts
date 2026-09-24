@@ -32,8 +32,9 @@ export function applyDrag(
   return out;
 }
 
-function snapRound(v: number, step: number): number {
-  return Math.round(v / step) * step;
+export function snapRound(v: number, step: number): number {
+  const decimals = Math.min(12, Math.max(0, -Math.floor(Math.log10(step)) + 3));
+  return Number((Math.round(v / step) * step).toFixed(decimals));
 }
 
 function snapSteps(snap: Draggable['snap']): [number | null, number | null] {

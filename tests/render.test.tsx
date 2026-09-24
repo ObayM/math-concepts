@@ -270,4 +270,20 @@ describe('space3 render (SSR smoke)', () => {
     expect(out).toContain('<svg');
     expect(out).not.toContain('NaN');
   });
+
+  it('holds a reveal block back until the answer is checked', () => {
+    const withReveal = compile(`scene space3 {
+  x: [-1, 1]
+  y: [-1, 1]
+  z: [-1, 1]
+  point3 A = (1, 1, 1) { label: "shown" }
+  reveal {
+    label3 at (0, 0, 1) = "hidden until checked"
+  }
+}`);
+    expect(renderToStaticMarkup(<Scene ir={withReveal} />)).not.toContain('hidden until checked');
+    expect(renderToStaticMarkup(<Scene ir={withReveal} revealed />)).toContain(
+      'hidden until checked'
+    );
+  });
 });

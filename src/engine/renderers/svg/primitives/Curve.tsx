@@ -2,12 +2,13 @@ import { evalNumber, evalBool } from '@/engine/runtime/eval';
 import { resolveColor, dash, STROKE } from '@/engine/colors';
 import { PLOT_PAD } from '@/engine/renderers/svg/coords';
 import type { PrimProps } from '@/engine/renderers/svg/types';
+import { MAX_CURVE_STEPS } from '@/engine/ir/schema';
 
 const SAMPLES = 240;
 
 export default function Curve({ obj, scope, cx }: PrimProps) {
   const parametric = obj.xExpr !== undefined;
-  const n = obj.tSteps ?? SAMPLES;
+  const n = Math.min(MAX_CURVE_STEPS, Math.max(2, obj.tSteps ?? SAMPLES));
   const [aMin, aMax] = parametric ? obj.tDomain : cx.xDomain;
   const step = (aMax - aMin) / n;
 

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { exprIRSchema, textSchema } from '@/engine/expr';
 
+export const MAX_CURVE_STEPS = 2000;
+
 // expr = a number, an expression AST, or (v1, being phased out) a string.
 // the string form dies with the runtime cutover — new compiles emit trees.
 const expr = z.union([z.string(), z.number(), exprIRSchema]);

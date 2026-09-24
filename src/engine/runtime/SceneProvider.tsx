@@ -52,7 +52,7 @@ function clampVal(
     let v = value;
     if (def.min != null) v = Math.max(def.min, v);
     if (def.max != null) v = Math.min(def.max, v);
-    return v;
+    return Number.isFinite(v) ? Number(v.toPrecision(12)) : v;
   }
   return value;
 }

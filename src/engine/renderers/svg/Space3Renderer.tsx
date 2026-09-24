@@ -45,7 +45,7 @@ function depthOf(obj: Record<string, any>, scope: any, cx: Coord3): number {
   }
 }
 
-export default function Space3Renderer({ ir }: { ir: SceneIR }) {
+export default function Space3Renderer({ ir, revealed }: { ir: SceneIR; revealed?: boolean }) {
   const { scope } = useScene();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [measuredW, setMeasuredW] = useState<number | null>(null);
@@ -91,7 +91,8 @@ export default function Space3Renderer({ ir }: { ir: SceneIR }) {
   );
 
   const visible = expandObjects(ir.objects as never, scope).filter(
-    (o: Record<string, any>) => !o.visibleIf || evalBool(o.visibleIf, scope)
+    (o: Record<string, any>) =>
+      (o.phase !== 'reveal' || revealed) && (!o.visibleIf || evalBool(o.visibleIf, scope))
   );
   const painted = visible
     .map((o: Record<string, any>, i: number) => ({ o, i, d: depthOf(o, scope, cx) }))

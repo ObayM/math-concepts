@@ -2,7 +2,7 @@ import type { Expr, PropMap, Stmt, SlideStmt } from './ast';
 import type { SceneIR } from '@/engine/ir/types';
 import type { LessonIR } from '@/engine/ir/lesson';
 import type { ExprIR, NumExpr, UnOp, BinOp, Value } from '@/engine/expr';
-import { sceneSchema } from '@/engine/ir/schema';
+import { sceneSchema, MAX_CURVE_STEPS } from '@/engine/ir/schema';
 import { lessonSchema } from '@/engine/ir/lesson';
 import { evalExpr, ExprError, BUILTINS, BUILTIN_NAMES, CONSTS } from '@/engine/expr';
 import { lex } from './lexer';
@@ -670,7 +670,14 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
             throw new CompileError('a parametric curve needs t: [start, end]', s.ln);
           obj.tDomain = [cNum(t.items[0], cScope, s.ln), cNum(t.items[1], cScope, s.ln)];
           const steps = propNum(s.props, 'steps', s.ln, cScope);
-          if (steps != null) obj.tSteps = steps;
+          if (steps != null) {
+            if (!Number.isInteger(steps) || steps < 2 || steps > MAX_CURVE_STEPS)
+              throw new CompileError(
+                `steps: must be a whole number from 2 to ${MAX_CURVE_STEPS}, got ${steps}`,
+                s.ln
+              );
+            obj.tSteps = steps;
+          }
         } else {
           obj.expr = lowerR(s.expr, cScope, s.ln, ['x']);
         }
