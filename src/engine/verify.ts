@@ -314,6 +314,7 @@ function checkDetourReachable(lesson: LessonIR, out: Finding[]) {
   const targeted = new Set<string>();
   for (const s of lesson.slides) {
     for (const b of exerciseBranches(s.exercise)) targeted.add(b.slide);
+    if (s.then) targeted.add(s.then);
   }
   for (const s of lesson.slides) {
     if (s.hidden && !targeted.has(s.id)) {

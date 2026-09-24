@@ -1210,6 +1210,8 @@ function pStrList(props: PropMap, key: string): string[] | undefined {
   return undefined;
 }
 
+export const MAX_DETOUR_SLIDES = 3;
+
 const branchIR = (b: Branch) => ({ slide: b.slide, ...(b.retry && { retry: true }) });
 
 function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
@@ -1783,10 +1785,13 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   const skill = pStr(s.props, 'skill');
   const hidden = pBool(s.props, 'hidden');
   const beat = pBeat(s.props, s.ln);
+  const then = pStr(s.props, 'then');
+  if (then && !hidden) throw new CompileError('then: only works on a hidden slide', s.ln);
   return {
     id,
     title: s.title,
     ...(beat && { beat }),
+    ...(then && { then }),
     ...(category && { category }),
     ...(skill && { skill }),
     ...(hidden && { hidden }),
@@ -1841,6 +1846,31 @@ function validateSlideFlow(slides: ReturnType<typeof emitSlide>[], stmts: SlideS
           `onwrong: "${branch.slide}" is itself a detour; detours can't chain`,
           ln
         );
+    }
+  });
+
+  slides.forEach((s, i) => {
+    const seen = [s.id];
+    let at = s;
+    while (at.then) {
+      const ln = stmts[i].ln;
+      const nextSlide = byId.get(at.then);
+      if (!nextSlide)
+        throw new CompileError(
+          `then: "${at.then}" is not a slide in this lesson${suggest(at.then, byId.keys())}`,
+          ln
+        );
+      if (!nextSlide.hidden)
+        throw new CompileError(`then: "${at.then}" needs hidden: true, it is part of a detour`, ln);
+      if (seen.includes(nextSlide.id))
+        throw new CompileError(`then: "${at.then}" loops back on itself`, ln);
+      seen.push(nextSlide.id);
+      if (seen.length > MAX_DETOUR_SLIDES)
+        throw new CompileError(
+          `a detour can be at most ${MAX_DETOUR_SLIDES} slides long; this one runs ${seen.join(' -> ')}`,
+          ln
+        );
+      at = nextSlide;
     }
   });
 

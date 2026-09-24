@@ -127,3 +127,67 @@ ${body}
     ).toThrow(/"nope" is not a slide/);
   });
 });
+
+describe('bridges longer than one slide', () => {
+  const src = (chain: string) => `lesson "L" {
+  slide "Check" {
+    id: "check"
+    numeric {
+      ask "Slope?"
+      answer: 2
+      onwrong: "b1" retry
+    }
+  }
+  slide "Next" {
+    id: "next"
+    > On we go.
+    quiz {
+      ask "q"
+      * "a"
+      - "b"
+    }
+  }
+${chain}
+}`;
+  const bridge = (id: string, then?: string) =>
+    `  slide "${id}" {\n    id: "${id}"\n    hidden: true\n${then ? `    then: "${then}"\n` : ''}    > step ${id}\n  }`;
+
+  it('walks every bridge slide, then goes back to the question', () => {
+    const lesson = lessonSchema.parse(
+      compileLesson(src([bridge('b1', 'b2'), bridge('b2', 'b3'), bridge('b3')].join('\n')))
+    );
+    const slides = lesson.slides;
+    let f = stageBranch(slides, initialFlow(0), false, '5');
+    const seen: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      f = next(slides, f).state;
+      seen.push(f.detour!.slideId);
+    }
+    expect(seen).toEqual(['b1', 'b2', 'b3']);
+    f = next(slides, f).state;
+    expect(f.detour).toBeNull();
+    expect(f.pathIndex).toBe(0);
+  });
+
+  it('caps a bridge at three slides', () => {
+    expect(() =>
+      compileLesson(
+        src([bridge('b1', 'b2'), bridge('b2', 'b3'), bridge('b3', 'b4'), bridge('b4')].join('\n'))
+      )
+    ).toThrow(/at most 3 slides long/);
+  });
+
+  it('refuses a loop', () => {
+    expect(() => compileLesson(src([bridge('b1', 'b2'), bridge('b2', 'b1')].join('\n')))).toThrow(
+      /loops back/
+    );
+  });
+
+  it('refuses then: on a main-path slide', () => {
+    expect(() =>
+      compileLesson(
+        src(bridge('b1')).replace('    id: "next"\n', '    id: "next"\n    then: "b1"\n')
+      )
+    ).toThrow(/then: only works on a hidden slide/);
+  });
+});

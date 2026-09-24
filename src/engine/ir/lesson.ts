@@ -150,6 +150,7 @@ const slide = z.object({
   category: z.string().optional(),
   skill: z.string().optional(),
   hidden: z.boolean().optional(),
+  then: z.string().optional(),
   prose: z.string().optional(),
   scene: sceneSchema.optional(),
   exercise: exercise.optional(),

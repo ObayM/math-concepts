@@ -52,6 +52,11 @@ export const lessonSection: DocSection = {
           description: 'keep off the main path; only reachable as an onwrong: detour',
         },
         {
+          name: 'then',
+          type: 'string',
+          description: 'on a hidden slide: the next hidden slide of the same detour (up to 3 long)',
+        },
+        {
           name: 'beat',
           type: 'check | bridge | hook | explore | reveal | trap | name | breaker | example | transfer | detour',
           description: 'the beat this slide plays in the lesson, for the linter',
@@ -109,7 +114,7 @@ export const lessonSection: DocSection = {
       syntax:
         'onwrong: "slide-id" [retry]\n- "wrong option" { why: "...", onwrong: "slide-id", retry }\nwrong <value> ["why"] [-> "slide-id" [retry]]',
       description:
-        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide (which must be a `hidden: true` slide in the same lesson) and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead.\n\nDifferent mistakes usually mean different misconceptions, so each can get its own detour: put `onwrong:` on a quiz option, or add a `wrong <value> -> "slide-id"` line to a numeric (with an optional `\"why\"` for the mistake). The exercise-level `onwrong:` catches every wrong answer nobody named. Each detour fires at most once per question, so a student who comes back and makes a different mistake still gets the fix for that one, and detours cannot chain.',
+        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide (which must be a `hidden: true` slide in the same lesson) and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead.\n\nDifferent mistakes usually mean different misconceptions, so each can get its own detour: put `onwrong:` on a quiz option, or add a `wrong <value> -> "slide-id"` line to a numeric (with an optional `\"why\"` for the mistake). The exercise-level `onwrong:` catches every wrong answer nobody named. Each detour fires at most once per question, so a student who comes back and makes a different mistake still gets the fix for that one, and detours cannot chain. A detour that needs more than one slide (a short bridge for a missing prerequisite) links its hidden slides with `then: "next-id"`, up to three in a row, before sending the learner back.',
       props: [
         {
           name: 'onwrong',

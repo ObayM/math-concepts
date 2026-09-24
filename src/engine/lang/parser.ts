@@ -429,7 +429,7 @@ function makeParser(tokens: Token[]) {
 
   const LESSON_PROPS = new Set(['course', 'skills', 'unit', 'difficulty', 'icon', 'summary']);
 
-  const SLIDE_PROPS = new Set(['cat', 'id', 'skill', 'hidden', 'beat']);
+  const SLIDE_PROPS = new Set(['cat', 'id', 'skill', 'hidden', 'beat', 'then']);
 
   function parseSlide(ln: number): SlideStmt {
     eat('IDENT', 'slide');

@@ -231,7 +231,7 @@ export default function LessonPlayer({
 
   const handleNext = () => {
     const { state, complete } = nextFlow(slides, flow);
-    runTransition(flow.detour?.retry ? 'left' : 'right', () => {
+    runTransition(flow.detour?.retry && !slide?.then ? 'left' : 'right', () => {
       setFlow(state);
       if (complete) setIsComplete(true);
     });
@@ -385,9 +385,11 @@ export default function LessonPlayer({
   const nextLabel = flow.pending
     ? t('lesson.backUp')
     : inDetour
-      ? flow.detour.retry
-        ? t('lesson.tryAgain')
-        : t('lesson.gotIt')
+      ? slide?.then
+        ? t('lesson.continue')
+        : flow.detour.retry
+          ? t('lesson.tryAgain')
+          : t('lesson.gotIt')
       : isLast
         ? t('lesson.complete')
         : t('lesson.continue');

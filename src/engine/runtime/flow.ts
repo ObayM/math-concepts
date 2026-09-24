@@ -93,6 +93,16 @@ export function next(slides: SlideIR[], state: FlowState): FlowStep {
     };
   }
 
+  if (state.detour) {
+    const here = activeSlide(slides, state);
+    const onward = here?.then && slides.find((s) => s.id === here.then && s.hidden);
+    if (onward)
+      return {
+        state: { ...state, detour: { ...state.detour, slideId: onward.id } },
+        complete: false,
+      };
+  }
+
   const cleared = { ...state, detour: null, pending: null };
   if (state.detour && state.detour.retry) return { state: cleared, complete: false };
   if (state.pathIndex >= lastIndex) return { state: cleared, complete: true };
