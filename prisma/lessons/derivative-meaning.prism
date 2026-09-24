@@ -301,7 +301,7 @@ lesson "What a derivative is" {
       label w2 at (0.5, 3.4) = "average speed = ${fixed(((1 + h)^2 - 1)/h, 3)}" { color: speed, size: 20 }
       label s2 at (0.5, 3.4) = "\dfrac{\textcolor{distance}{f(1 + h) - f(1)}}{\textcolor{gap}{h}} = ${fixed(((1 + h)^2 - 1)/h, 3)}" { tex, size: 20 }
       label w3 at (0.5, 1.4) = "settles on 2" { color: speed, size: 20 }
-      label s3 at (0.5, 1.4) = "\lim_{\textcolor{gap}{h} \to 0} \dfrac{\textcolor{distance}{f(1 + h) - f(1)}}{\textcolor{gap}{h}} = f'(1) = 2" { tex, size: 20 }
+      label s3 at (0.5, 1.4) = "\lim\limits_{\textcolor{gap}{h} \to 0} \dfrac{\textcolor{distance}{f(1 + h) - f(1)}}{\textcolor{gap}{h}} = f'(1) = 2" { tex, size: 20 }
       morph w1 -> s1 { by: m }
       morph w2 -> s2 { by: m }
       morph w3 -> s3 { by: m }
@@ -314,8 +314,8 @@ lesson "What a derivative is" {
       ask "Put the definition together."
       skill: "derivative-from-definition"
       template: "$f'(1) =$ ___ ___"
-      bank: ["$\lim_{h \to 0}$", "$\lim_{h \to 1}$", "$\dfrac{f(1 + h) - f(1)}{h}$", "$\dfrac{f(h) - f(1)}{h}$", "$\big(f(1 + h) - f(1)\big) \cdot h$"]
-      answer: ["$\lim_{h \to 0}$", "$\dfrac{f(1 + h) - f(1)}{h}$"]
+      bank: ["$\lim\limits_{h \to 0}$", "$\lim\limits_{h \to 1}$", "$\dfrac{f(1 + h) - f(1)}{h}$", "$\dfrac{f(h) - f(1)}{h}$", "$\big(f(1 + h) - f(1)\big) \cdot h$"]
+      answer: ["$\lim\limits_{h \to 0}$", "$\dfrac{f(1 + h) - f(1)}{h}$"]
       hint "lim means where it's heading, the same idea as in the limits lessons."
       hint "The gap is heading for 0, and the average is the change in distance divided by the gap."
       after: 2
@@ -495,7 +495,7 @@ lesson "What a derivative is" {
       expect: 2 * (0 - 1)
       wrong 2 "Right size. Check the direction: is the curve going up or down at $x = -1$?" -> "d-detour-sign" retry
       wrong 1 "1 is $f(-1)$, the height. The derivative is how steep." -> "d-detour-value" retry
-      hint "$(-1 + h)^2 - 1$ multiplies out to $-2h + h^2$."
+      hint "Multiply out $(-1 + h)^2$ carefully. Watch the sign of the middle term."
     }
   }
 
