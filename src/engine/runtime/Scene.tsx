@@ -42,6 +42,7 @@ export function Scene({
   inputLayer,
   tapLabel,
   command,
+  onStepChange,
 }: {
   ir: SceneIR;
   onScopeChange?: (scope: Scope) => void;
@@ -51,6 +52,7 @@ export function Scene({
   inputLayer?: InputLayerConfig;
   tapLabel?: string;
   command?: SceneCommand;
+  onStepChange?: (idx: number) => void;
 }) {
   const Renderer =
     ir.space.type === 'numberline'
@@ -70,7 +72,7 @@ export function Scene({
           inputLayer={inputLayer}
           tapLabel={tapLabel}
         />
-        {ir.timeline && ir.timeline.length > 0 && <Timeline ir={ir} />}
+        {ir.timeline && ir.timeline.length > 0 && <Timeline ir={ir} onStepChange={onStepChange} />}
         {ir.controls && ir.controls.length > 0 && (
           <div className="flex flex-wrap items-center gap-3">
             {ir.controls.map((control, i) => {

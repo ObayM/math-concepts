@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw, ChevronLeft, Lightbulb } from 'lucide-react';
 import { useScene } from './SceneProvider';
+import { evalBool } from './eval';
 import type { SceneIR } from '@/engine/ir/types';
 
 function baseState(ir: SceneIR): Record<string, number | boolean> {
@@ -23,6 +24,14 @@ function foldTo(ir: SceneIR, i: number): Record<string, number | boolean> {
   return s;
 }
 
+function safeBool(e: unknown, scope: Record<string, unknown>): boolean {
+  try {
+    return evalBool(e as never, scope as never);
+  } catch {
+    return false;
+  }
+}
+
 function StepHint({ hint }: { hint: string }) {
   const [shown, setShown] = useState(false);
   if (shown) return <p className="text-neutral-400 text-xs leading-relaxed">{hint}</p>;
@@ -38,11 +47,19 @@ function StepHint({ hint }: { hint: string }) {
   );
 }
 
-export default function Timeline({ ir }: { ir: SceneIR }) {
-  const { setMany, animate } = useScene();
+export default function Timeline({
+  ir,
+  onStepChange,
+}: {
+  ir: SceneIR;
+  onStepChange?: (idx: number) => void;
+}) {
+  const { scope, setMany, animate } = useScene();
   const steps = ir.timeline ?? [];
   const [idx, setIdx] = useState(0);
   const mounted = useRef(false);
+  const holding = steps[idx]?.wait;
+  const waiting = idx < steps.length - 1 && Boolean(holding) && !safeBool(holding, scope);
 
   useEffect(() => {
     if (mounted.current) return;
@@ -72,7 +89,10 @@ export default function Timeline({ ir }: { ir: SceneIR }) {
       setMany(targetState);
     }
     setIdx(next);
+    onStepChange?.(next);
   };
+
+  const released = Boolean(holding) && !waiting && idx < steps.length - 1;
 
   if (!steps.length) return null;
 
@@ -106,7 +126,8 @@ export default function Timeline({ ir }: { ir: SceneIR }) {
         <button
           type="button"
           onClick={() => goto(atLast ? 0 : idx + 1)}
-          className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors active:scale-95"
+          disabled={waiting}
+          className={`flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors active:scale-95 disabled:opacity-40 disabled:hover:bg-primary-500 disabled:active:scale-100 ${released ? 'animate-pop-in' : ''}`}
         >
           {atLast ? <RotateCcw className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
           {atLast ? 'Replay' : 'Play'}

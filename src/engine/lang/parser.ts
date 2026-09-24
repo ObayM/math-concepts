@@ -542,6 +542,23 @@ function makeParser(tokens: Token[]) {
       endStmt();
       return true;
     }
+    if (at('after')) {
+      const ln = peek().line;
+      pos++;
+      eat('COLON');
+      if (at('goals')) {
+        pos++;
+        common.after = { on: 'goals', ln };
+      } else if (check('NUM')) {
+        common.after = { on: Number(peek().raw), ln };
+        pos++;
+      } else {
+        const t = peek();
+        throw new CompileError('after: takes goals or a timeline step number', t.line, t.col);
+      }
+      endStmt();
+      return true;
+    }
     if (at('onwrong')) {
       pos++;
       eat('COLON');

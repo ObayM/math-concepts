@@ -16,6 +16,7 @@ import {
   slideKey,
   canGoBack,
   stageBranch,
+  exerciseVisible,
   next as nextFlow,
   back as backFlow,
 } from '@/engine/runtime/flow';
@@ -45,6 +46,7 @@ export default function LessonPlayer({
   const [answer, setAnswer] = useState(null);
   const [checked, setChecked] = useState(false);
   const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
+  const [stepState, setStepState] = useState({ key: null, idx: 0 });
   const [quizHistory, setQuizHistory] = useState([]);
   const [isComplete, setIsComplete] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -381,6 +383,11 @@ export default function LessonPlayer({
     goalsState.slideId === slide?.id ? goalsState.met : (slide?.goals ?? []).map(() => false);
   const goalsSatisfied = !slide?.goals?.length || goalsMet.every(Boolean);
   const canAdvance = (!checker || checked) && goalsSatisfied;
+  const questionShown = exerciseVisible(
+    slide,
+    goalsMet,
+    stepState.key === currentKey ? stepState.idx : 0
+  );
   const correct = checked && checker ? checker.check(slide, answer) : null;
   const nextLabel = flow.pending
     ? t('lesson.backUp')
@@ -521,6 +528,7 @@ export default function LessonPlayer({
                   goalsMet={goalsMet}
                   onScopeChange={handleScopeChange}
                   revealAnswer={!flow.pending?.retry}
+                  onStepChange={(idx) => setStepState({ key: currentKey, idx })}
                 />
                 <div aria-live="polite" className="sr-only">
                   {checked &&
@@ -547,7 +555,7 @@ export default function LessonPlayer({
                 <Sparkles className="w-5 h-5" />
               </button>
 
-              {checker && !checked ? (
+              {checker && !checked && questionShown ? (
                 <Button
                   onClick={handleCheck}
                   variant="primary"

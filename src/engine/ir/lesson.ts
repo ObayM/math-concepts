@@ -20,6 +20,7 @@ const exerciseBase = {
   explanation: z.string().optional(),
   skill: z.string().optional(),
   onwrong: branch.optional(),
+  after: z.union([z.literal('goals'), z.number().int().positive()]).optional(),
 };
 
 const quizExercise = z.object({

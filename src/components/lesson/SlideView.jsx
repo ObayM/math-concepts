@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Scene } from '@/engine';
+import { exerciseVisible } from '@/engine/runtime/flow';
 import RichText, { proseClass } from './RichText';
 import GoalBanner from './GoalBanner';
 import HintLadder from './HintLadder';
@@ -36,14 +37,22 @@ export default function SlideView({
   goalsMet,
   onScopeChange,
   revealAnswer = true,
+  onStepChange = () => {},
 }) {
   const t = useT();
   const [command, setCommand] = useState(null);
+  const [step, setStep] = useState({ slideId: slide.id, idx: 0 });
+  const stepIdx = step.slideId === slide.id ? step.idx : 0;
+  const handleStep = (idx) => {
+    setStep({ slideId: slide.id, idx });
+    onStepChange(idx);
+  };
+  const shown = exerciseVisible(slide, goalsMet, stepIdx);
   const showMe = (i) => {
     const goal = slide.goals?.[i];
     if (goal?.showme) setCommand({ id: Date.now(), slideId: slide.id, ...goal.showme });
   };
-  const Exercise = slide.exercise ? exerciseRegistry[slide.exercise.kind] : null;
+  const Exercise = slide.exercise && shown ? exerciseRegistry[slide.exercise.kind] : null;
 
   const isHotspot = slide.exercise?.kind === 'hotspot';
   const onTap = isHotspot && !checked ? (x, y) => onChange([x, y]) : undefined;
@@ -80,6 +89,7 @@ export default function SlideView({
             inputLayer={inputLayer}
             tapLabel={t('exercise.sceneAria')}
             command={command?.slideId === slide.id ? command : undefined}
+            onStepChange={handleStep}
           />
         </div>
       )}
@@ -89,7 +99,10 @@ export default function SlideView({
       )}
 
       {Exercise && (
-        <div data-feedback={checked ? (correct ? 'correct' : 'wrong') : undefined}>
+        <div
+          className={slide.exercise?.after !== undefined ? 'animate-fade-in-up' : undefined}
+          data-feedback={checked ? (correct ? 'correct' : 'wrong') : undefined}
+        >
           <Exercise
             slide={slide}
             value={value}

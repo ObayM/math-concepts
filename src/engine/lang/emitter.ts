@@ -1121,6 +1121,8 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         const dur = propNum(s.props, 'dur', s.ln, cScope);
         const ease = propStr(s.props, 'ease', cScope);
         const hint = propStr(s.props, 'hint', cScope);
+        const wait = s.props.get('wait');
+        if (wait && wait !== true) obj.wait = asIR(lowerR(wait, cScope, s.ln));
         if (set) obj.set = set;
         if (animate) obj.animate = animate;
         if (dur != null) obj.duration = dur;
@@ -1771,6 +1773,25 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   const allowedIds = scene ? Object.keys(scene.state ?? {}) : [];
   const goals = goalItems.map((g) => emitGoal(g, allowedIds));
 
+  const exerciseItem = s.items.find((it) => 'common' in it) as
+    | { common: { after?: { on: 'goals' | number; ln: number } } }
+    | undefined;
+  const after = exerciseItem?.common.after;
+  if (after && exercise) {
+    if (after.on === 'goals' && !goals.length)
+      throw new CompileError('after: goals needs a goal on the slide', after.ln);
+    if (typeof after.on === 'number') {
+      const steps = scene?.timeline?.length ?? 0;
+      if (!Number.isInteger(after.on) || after.on < 1 || after.on > steps)
+        throw new CompileError(
+          steps
+            ? `after: ${after.on} is not a step; the timeline has steps 1 to ${steps}`
+            : 'after: <step> needs a scene with a timeline',
+          after.ln
+        );
+    }
+  }
+
   if (
     scene?.space?.type === 'numberline' &&
     (exercise?.kind === 'hotspot' || exercise?.kind === 'sketch')
@@ -1797,7 +1818,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
     ...(hidden && { hidden }),
     ...(prose.length && { prose: prose.join('\n\n') }),
     ...(scene && { scene }),
-    ...(exercise && { exercise }),
+    ...(exercise && { exercise: after ? { ...exercise, after: after.on } : exercise }),
     ...(goals.length && { goals }),
   };
 }

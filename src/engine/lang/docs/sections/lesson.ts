@@ -77,7 +77,7 @@ export const lessonSection: DocSection = {
       syntax:
         'goal "Instruction" { when: <condition>, [hints: ["...", "..."]], [showme: {k: v}], [dur: <ms>] }',
       description:
-        'Gates the slide\'s Continue until the learner satisfies `when` (a boolean expression over the scene\'s state, which latches once true). Use it for guided tasks like "drag the vertex below the axis". Hints stay hidden until the learner has been stuck for a while, then arrive one at a time, broadest first. Once the last hint is out, `showme` offers a Show me button that animates the scene to the given values, so the goal gets met in front of them and is marked as helped. `dsl verify` checks that the goal starts unmet and that `showme` really meets it.',
+        "Gates the slide's Continue until the learner satisfies `when` (a boolean expression over the scene's state, which latches once true). Use it for guided tasks like \"drag the vertex below the axis\". Hints stay hidden until the learner has been stuck for a while, then arrive one at a time, broadest first. Once the last hint is out, `showme` offers a Show me button that animates the scene to the given values, so the goal gets met in front of them and is marked as helped. `dsl verify` checks that the goal starts unmet and that `showme` really meets it. Put `after: goals` inside the slide's exercise to keep the question hidden until every goal is met, so the student explores first and gets asked second.",
       props: [
         {
           name: 'when',

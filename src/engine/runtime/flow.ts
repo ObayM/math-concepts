@@ -114,3 +114,14 @@ export function back(slides: SlideIR[], state: FlowState): FlowState {
   if (state.pathIndex > 0) return { ...state, pathIndex: state.pathIndex - 1, pending: null };
   return state;
 }
+
+export function exerciseVisible(
+  slide: SlideIR | null | undefined,
+  goalsMet: boolean[] = [],
+  step = 0
+): boolean {
+  const after = slide?.exercise?.after;
+  if (after === undefined) return true;
+  if (after === 'goals') return (slide?.goals ?? []).every((_, i) => goalsMet[i]);
+  return step >= after - 1;
+}

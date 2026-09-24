@@ -154,5 +154,6 @@ export type ExerciseCommon = {
   explanation?: string;
   skill?: string;
   onwrong?: Branch;
+  after?: { on: 'goals' | number; ln: number };
   expect?: { expr: Expr; ln: number };
 };
