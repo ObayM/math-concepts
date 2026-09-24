@@ -13,7 +13,7 @@ import type {
 } from './ast';
 import { CompileError } from './errors';
 
-const SPACE_PROPS = new Set(['x', 'y', 'z', 'camera', 'grid', 'axes', 'aspect']);
+const SPACE_PROPS = new Set(['x', 'y', 'z', 'camera', 'grid', 'axes', 'aspect', 'alt']);
 
 // the whole parser lives in one closure over (tokens, pos); makeParser exposes
 // the two entry points — a full file, or a bare expression (f-string fragments etc.)

@@ -42,6 +42,7 @@ const space = z
     grid: z.boolean().optional(),
     axes: z.boolean().optional(),
     aspect: z.literal('equal').optional(),
+    alt: z.string().optional(),
   })
   .refine((s) => s.type === 'numberline' || s.yDomain !== undefined, {
     message: 'yDomain is required unless type is "numberline"',

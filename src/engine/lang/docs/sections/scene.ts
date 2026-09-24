@@ -9,7 +9,7 @@ export const sceneSection: DocSection = {
     {
       keyword: 'scene',
       syntax:
-        'scene <type> {\n  x: [min,max]\n  [y: [min,max]]\n  [grid]\n  [axes]\n  [aspect: equal]\n  ...\n}',
+        'scene <type> {\n  x: [min,max]\n  [y: [min,max]]\n  [grid]\n  [axes]\n  [aspect: equal]\n  [alt: "what the picture shows"]\n  ...\n}',
       description:
         "`type` is `plane` (2D cartesian) or `numberline` (1D axis). For `plane`, both `x:` and `y:` are required. For `numberline`, only `x:` is needed. The space config lines can appear anywhere in the block, in any order, alongside state/object/control declarations.\n\nBy default the x and y domains are stretched independently to fill the box, so a circle only looks round if the domains happen to match the box. Add `aspect: equal` when shape matters — unit circles, Argand diagrams, geometry, force diagrams — and one shared scale is used for both axes, letterboxed inside the same space.\n\nOn a plane the domains can use the scene's params, which is how you zoom: `x: [1 - z, 1 + z]` with a slider on `z` closes in on x = 1, and a goal like `when: z < 0.05` asks the student to zoom until the curve looks straight. The grid and tick labels follow the zoom.",
       props: [
@@ -30,6 +30,12 @@ export const sceneSection: DocSection = {
           name: 'aspect',
           type: 'equal',
           description: 'one scale for both axes, so circles stay round (plane only)',
+        },
+        {
+          name: 'alt',
+          type: 'string',
+          description:
+            'what a screen reader hears: what the picture shows and what the student can change. `dsl verify --standard` asks for one on every main-path scene',
         },
       ],
       example:

@@ -106,6 +106,7 @@ export default function Space3Renderer({ ir, revealed }: { ir: SceneIR; revealed
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
+        aria-label={ir.space.alt}
         className="w-full select-none"
         style={{ touchAction: 'none' }}
       >

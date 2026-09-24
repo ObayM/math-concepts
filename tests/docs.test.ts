@@ -95,6 +95,6 @@ describe('toAIContext', () => {
 
   it('is a reasonable size (not empty, not runaway)', () => {
     expect(ctx.length).toBeGreaterThan(1000);
-    expect(ctx.length).toBeLessThan(60000);
+    expect(ctx.length).toBeLessThan(80000);
   });
 });

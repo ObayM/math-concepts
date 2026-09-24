@@ -16,6 +16,7 @@ lesson "What a derivative is" {
     > Quick one before we start.
 
     scene plane {
+      alt: "A straight line on a grid, passing through the points (1, 1) and (3, 5)."
       x: [-0.3, 4.3]
       y: [-1.2, 7.4]
       grid
@@ -44,6 +45,7 @@ lesson "What a derivative is" {
     > Slope is how far a line goes [up]{distance} for every one step [across]{gap}. Drag the right-hand point and watch the steps.
 
     scene plane {
+      alt: "A line from (0, 1) to a draggable point at x = 4, with a staircase of four one-across steps under it. A readout shows how far it goes up per step across."
       x: [-0.3, 4.4]
       y: [-0.6, 14]
       grid
@@ -73,6 +75,7 @@ lesson "What a derivative is" {
     > Now one you haven't seen.
 
     scene plane {
+      alt: "A straight line on a grid through the points (0, 1) and (2, 7)."
       x: [-0.3, 3.3]
       y: [-0.5, 8.5]
       grid
@@ -114,6 +117,7 @@ lesson "What a derivative is" {
     > Here's a car. After $t$ seconds it has gone $t^2$ metres. Between $t = 1$ and $t = 2$, what was its [average speed]{speed}?
 
     scene plane {
+      alt: "The curve y = t squared. Points at (1, 1) and (2, 4), with the one-second gap between them along the bottom and the distance covered marked up the side."
       x: [-0.2, 2.6]
       y: [-0.5, 6]
       grid
@@ -145,6 +149,7 @@ lesson "What a derivative is" {
     > 3 m/s is the average over a whole second. But the car was speeding up the whole time. Shrink the [gap]{gap} and watch the [average]{speed}.
 
     scene plane {
+      alt: "The curve y = t squared with a fixed point at (1, 1) and a second point a gap further along. A slider sets the gap, and readouts show the gap and the average speed over it."
       x: [-0.2, 2.4]
       y: [-0.5, 5.6]
       grid
@@ -185,6 +190,7 @@ lesson "What a derivative is" {
     > You bet on "${answer("d-hook", "a guess")}". Here's what happened: the average didn't drop to 0 and didn't blow up. It settled on ${answer("d-shrink", "2")}. That's what a speedometer shows: the speed the average heads for as the gap shrinks.
 
     scene plane {
+      alt: "The same curve with the gap shrinking on its own, while the average speed readout stops changing."
       x: [-0.2, 2.4]
       y: [-0.5, 5.6]
       grid
@@ -217,6 +223,7 @@ lesson "What a derivative is" {
     > So why not skip the shrinking and set the [gap]{gap} to 0? Go on, drag it all the way.
 
     scene plane {
+      alt: "The same curve and gap slider, now allowed to reach 0. A readout shows the distance, the time and the average speed."
       x: [-0.2, 2.4]
       y: [-0.5, 5.6]
       grid
@@ -256,6 +263,7 @@ lesson "What a derivative is" {
     > Here's the same idea on the graph. The line through the two points has a slope, and that slope is the [average speed]{speed}.
 
     scene plane {
+      alt: "The curve y = t squared with a straight line through (1, 1) and a second point. A slider shrinks the gap between the points, and a readout shows the slope of the line."
       x: [-0.2, 2.4]
       y: [-0.5, 5.6]
       grid
@@ -291,6 +299,7 @@ lesson "What a derivative is" {
     > Everything you just did has a name. Call the car's distance $f$. The [gap]{gap} is $h$. The [average]{speed} is a fraction. Heading for is $\lim$. And the number it settles on is the **derivative**.
 
     scene plane {
+      alt: "Three readouts written in words, gap, average speed and settles on 2, which turn into their symbols h, the difference quotient, and the limit f prime of 1 equals 2."
       x: [0, 10]
       y: [0, 6]
       axes: false
@@ -329,6 +338,7 @@ lesson "What a derivative is" {
     > Does every curve have a slope at every point? Try this one at 0.
 
     scene plane {
+      alt: "The graph of y = |x|, a V shape with its corner at 0. Two sliders set a gap on each side of the corner, and readouts show the slope on the right and on the left."
       x: [-2, 2]
       y: [-0.4, 2]
       aspect: equal
@@ -371,6 +381,7 @@ lesson "What a derivative is" {
     > One more. What happens at a jump?
 
     scene plane {
+      alt: "A step graph at height 1 up to x = 2, jumping to height 3 after it. A line joins (2, 1) to a point a gap to the right, and a readout shows the average over the gap."
       x: [0, 4]
       y: [-0.5, 4.5]
       grid
@@ -409,6 +420,7 @@ lesson "What a derivative is" {
     > Here's how you get $f'(1)$ without a slider, just algebra. Step through it.
 
     scene plane {
+      alt: "Four lines of algebra that appear one per step: the change in distance, multiplied out, divided by h, and h heading for 0."
       x: [0, 10]
       y: [0, 6]
       axes: false
@@ -541,6 +553,7 @@ lesson "What a derivative is" {
     > That's an average over a big gap, and the car kept speeding up the whole time. The shorter the [gap]{gap}, the closer you get to what it's doing right now.
 
     scene plane {
+      alt: "The curve y = t squared with a gap slider. Readouts show the gap and the average speed over it."
       x: [-0.2, 2.4]
       y: [-0.5, 5.6]
       grid
@@ -584,6 +597,7 @@ lesson "What a derivative is" {
     > That's the [height]{distance}, where it is. The derivative is [how steep]{speed}, how fast it's changing. Slide the point and compare them.
 
     scene plane {
+      alt: "The curve y = x squared with a draggable point on it, its height drawn as a vertical line and its steepness as a dashed tangent. Readouts show both numbers."
       x: [-3, 3]
       y: [-1, 9]
       grid
@@ -620,6 +634,7 @@ lesson "What a derivative is" {
     > Right size, wrong direction. Where the curve goes down, the slope is negative.
 
     scene plane {
+      alt: "The curve y = x squared with a draggable point and its dashed tangent line. A readout shows the slope."
       x: [-3, 3]
       y: [-1, 9]
       grid

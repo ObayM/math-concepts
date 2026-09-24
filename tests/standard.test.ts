@@ -221,3 +221,25 @@ describe('show me', () => {
     );
   });
 });
+
+describe('scene alt', () => {
+  const body = (alt: string) => `  slide "s" {
+    scene plane {
+      x: [0, 1]
+      y: [0, 1]
+${alt}      param h = 1 { range: [0, 1], step: 0.1 }
+      slider h
+    }
+    goal "Make h small" { when: h < 0.5 }
+  }`;
+
+  it('asks for alt text on a main-path scene', () => {
+    expect(codes(body(''))).toContain('V_SCENE_NO_ALT');
+    expect(codes(body('      alt: "A slider for h."\n'))).not.toContain('V_SCENE_NO_ALT');
+  });
+
+  it('puts the alt text on the rendered scene', () => {
+    const l = lesson(body('      alt: "A slider for h."\n'));
+    expect(l.slides[0].scene!.space.alt).toBe('A slider for h.');
+  });
+});

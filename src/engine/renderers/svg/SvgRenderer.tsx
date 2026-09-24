@@ -262,6 +262,8 @@ export default function SvgRenderer({
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
+        role={ir.space.alt ? 'group' : undefined}
+        aria-label={ir.space.alt}
         className="w-full select-none [&_[role=application]:focus-visible]:outline-2 [&_[role=application]:focus-visible]:outline-offset-[-3px] [&_[role=application]:focus-visible]:outline-primary-500"
         style={{ touchAction: 'none' }}
       >

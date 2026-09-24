@@ -289,9 +289,21 @@ function checkBeats(lesson: LessonIR, out: Finding[]) {
   }
 }
 
+function checkAlt(slide: SlideIR, out: Finding[]) {
+  if (!slide.scene || slide.hidden || slide.scene.space.alt) return;
+  out.push(
+    warn(
+      slide.id,
+      'V_SCENE_NO_ALT',
+      'the scene has no alt: description, so a screen reader gets nothing. Say what the picture shows and what the student can change'
+    )
+  );
+}
+
 export function checkStandard(lesson: LessonIR): Finding[] {
   const out: Finding[] = [];
   for (const slide of lesson.slides) {
+    checkAlt(slide, out);
     checkGoals(slide, out);
     checkTask(slide, out);
     checkWordBudget(slide, out);

@@ -664,6 +664,12 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
           ...(s.props.has('axes') && { axes: axesV !== false }),
           ...(aspectV !== undefined && { aspect: 'equal' }),
         };
+        const altV = s.props.get('alt');
+        if (altV !== undefined) {
+          if (altV === true || altV.k !== 'str' || !altV.v.trim())
+            throw new CompileError('alt: needs a string describing the scene', s.ln);
+          ir.space.alt = altV.v;
+        }
         run(s.children, cScope);
         const viewOf = (list: Extract<Expr, { k: 'list' }>, axis: string) => {
           if (list.items.length !== 2) throw new CompileError(`${axis}: needs [min, max]`, s.ln);

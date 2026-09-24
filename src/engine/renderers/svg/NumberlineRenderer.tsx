@@ -113,6 +113,8 @@ export default function NumberlineRenderer({
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
+        role={ir.space.alt ? 'group' : undefined}
+        aria-label={ir.space.alt}
         className="w-full select-none"
         style={{ touchAction: 'none' }}
       >
