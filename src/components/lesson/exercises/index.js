@@ -10,7 +10,7 @@ import {
   distToPolyline,
   slope as slopeOf,
 } from '@/engine/checks/geometry';
-import { sameAnswer } from './answers';
+import { sameAnswer, parseNumber, isNumberAnswer } from './answers';
 
 const sameSequence = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 
@@ -28,9 +28,9 @@ export const exercises = {
   },
   numeric: {
     initial: () => '',
-    isComplete: (_slide, v) => v !== '' && v != null && !Number.isNaN(Number(v)),
+    isComplete: (_slide, v) => isNumberAnswer(v),
     check: (slide, v) => {
-      const n = Number(v);
+      const n = parseNumber(v);
       if (Number.isNaN(n)) return false;
       return slide.exercise.answers.some((a) => Math.abs(n - a) <= slide.exercise.tolerance);
     },
@@ -104,11 +104,7 @@ export const exercises = {
     initial: (slide) => new Array(flatBlanks(slide.exercise).length).fill(''),
     isComplete: (slide, v) => {
       const blanks = flatBlanks(slide.exercise);
-      return (
-        Array.isArray(v) &&
-        v.length === blanks.length &&
-        v.every((s) => s !== '' && s != null && !Number.isNaN(Number(s)))
-      );
+      return Array.isArray(v) && v.length === blanks.length && v.every(isNumberAnswer);
     },
     // full correctness (all blanks right); the component surfaces per-blank
     // partial credit for display, but Continue is gated by `checked` alone,
@@ -116,7 +112,9 @@ export const exercises = {
     check: (slide, v) => {
       const blanks = flatBlanks(slide.exercise);
       if (!Array.isArray(v) || v.length !== blanks.length) return false;
-      return blanks.every((b, i) => Math.abs(Number(v[i]) - b.answer) <= slide.exercise.tolerance);
+      return blanks.every(
+        (b, i) => Math.abs(parseNumber(v[i]) - b.answer) <= slide.exercise.tolerance
+      );
     },
   },
 };

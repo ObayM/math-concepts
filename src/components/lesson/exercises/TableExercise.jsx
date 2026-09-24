@@ -1,5 +1,6 @@
 'use client';
 import RichText from '../RichText';
+import { parseNumber } from './answers';
 
 // v2 table — a fill-in-the-blank function table. reads slide.exercise
 // (prompt, header?, rows[][{value}|{blank,answer}], tolerance, explanation).
@@ -11,7 +12,7 @@ export default function TableExercise({ slide, value, checked, onChange, revealA
   const v = Array.isArray(value) ? value : new Array(totalBlanks).fill('');
   const correctCount = v.filter((s, i) => {
     const b = ex.rows.flat().filter((c) => c.blank)[i];
-    return b && s !== '' && Math.abs(Number(s) - b.answer) <= ex.tolerance;
+    return b && s !== '' && Math.abs(parseNumber(s) - b.answer) <= ex.tolerance;
   }).length;
 
   const setBlank = (idx, text) => {
@@ -66,7 +67,7 @@ export default function TableExercise({ slide, value, checked, onChange, revealA
                     const isCorrect =
                       checked &&
                       filled !== '' &&
-                      Math.abs(Number(filled) - cell.answer) <= ex.tolerance;
+                      Math.abs(parseNumber(filled) - cell.answer) <= ex.tolerance;
                     const isWrong = checked && filled !== '' && !isCorrect;
                     let cls = 'border-neutral-300 focus:border-primary-400';
                     if (isCorrect) cls = 'border-success-500 bg-success-50 text-success-700';
@@ -76,6 +77,7 @@ export default function TableExercise({ slide, value, checked, onChange, revealA
                         <input
                           type="text"
                           inputMode="decimal"
+                          dir="ltr"
                           value={filled}
                           disabled={checked}
                           onChange={(e) => setBlank(idx, e.target.value)}
