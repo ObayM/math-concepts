@@ -76,7 +76,7 @@ export default function SlideView({
         </div>
       )}
 
-      {slide.goals && <GoalBanner goals={slide.goals} goalsMet={goalsMet} />}
+      {slide.goals && <GoalBanner key={slide.id} goals={slide.goals} goalsMet={goalsMet} />}
 
       {Exercise && (
         <div data-feedback={checked ? (correct ? 'correct' : 'wrong') : undefined}>

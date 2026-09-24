@@ -1,8 +1,18 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { CheckCircle2, Circle } from 'lucide-react';
 import RichText from './RichText';
 
-export default function GoalBanner({ goals, goalsMet }) {
+export const GOAL_STUCK_MS = 20_000;
+
+export default function GoalBanner({ goals, goalsMet, stuckAfterMs = GOAL_STUCK_MS }) {
+  const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const id = setTimeout(() => setStuck(true), stuckAfterMs);
+    return () => clearTimeout(id);
+  }, [stuckAfterMs]);
+
   if (!goals || goals.length === 0) return null;
 
   return (
@@ -27,8 +37,10 @@ export default function GoalBanner({ goals, goalsMet }) {
               >
                 {goal.prompt}
               </RichText>
-              {!met && goal.hint && (
-                <RichText className="block text-sm text-neutral-500 mt-1.5">{goal.hint}</RichText>
+              {!met && stuck && goal.hint && (
+                <RichText className="animate-fade-in-up block text-sm text-neutral-500 mt-1.5">
+                  {goal.hint}
+                </RichText>
               )}
             </div>
           </div>

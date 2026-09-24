@@ -47,12 +47,12 @@ describe('evalGoals (latch semantics)', () => {
 describe('GoalBanner render', () => {
   const goals = goalSlide!.goals!;
 
-  it('renders unmet goal with its hint', () => {
+  it('renders an unmet goal without its hint until the student is stuck', () => {
     const html = renderToStaticMarkup(
       React.createElement(GoalBanner, { goals, goalsMet: [false] })
     );
     expect(html).toContain('secant');
-    expect(html).toContain('Drag the slider');
+    expect(html).not.toContain('Drag the slider');
   });
 
   it('renders met goal without leaking the hint', () => {
