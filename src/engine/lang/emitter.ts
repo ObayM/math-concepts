@@ -1851,6 +1851,40 @@ function emitSort(s: Extract<Stmt, { k: 'sort' }>) {
   };
 }
 
+function emitMoves(s: Extract<Stmt, { k: 'moves' }>) {
+  if (!s.common.ask) throw new CompileError('moves needs an ask "..."', s.ln);
+  if (!s.start) throw new CompileError('moves needs a from "..." to start from', s.ln);
+  if (!s.steps.length) throw new CompileError('moves needs at least one move', s.ln);
+  const steps = s.steps.map((st) => {
+    const correct = st.options.filter((o) => o.correct);
+    if (correct.length !== 1)
+      throw new CompileError(
+        `each move needs exactly one * right choice, this one has ${correct.length}`,
+        st.ln
+      );
+    if (st.options.length < 2)
+      throw new CompileError('each move needs at least one wrong choice to pick against', st.ln);
+    const texts = new Set(st.options.map((o) => o.text));
+    if (texts.size !== st.options.length)
+      throw new CompileError('a move lists the same choice twice', st.ln);
+    return {
+      result: st.result,
+      options: st.options.map((o) => ({ text: o.text, ...(o.why && { why: o.why }) })),
+      correct: st.options.findIndex((o) => o.correct),
+    };
+  });
+  return {
+    kind: 'moves' as const,
+    prompt: s.common.ask,
+    start: s.start,
+    steps,
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && { onwrong: branchIR(s.common.onwrong) }),
+  };
+}
+
 function emitTable(s: Extract<Stmt, { k: 'table' }>) {
   if (!s.common.ask) throw new CompileError('table needs an ask "..."', s.ln);
   if (!s.rows.length) throw new CompileError('table needs at least one row: ...', s.ln);
@@ -1986,6 +2020,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles 
     | ReturnType<typeof emitOrder>
     | ReturnType<typeof emitSort>
     | ReturnType<typeof emitTable>
+    | ReturnType<typeof emitMoves>
     | undefined;
   const goalItems: Extract<Stmt, { k: 'goal' }>[] = [];
 
@@ -2035,6 +2070,9 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles 
     } else if (item.k === 'table') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitTable(item);
+    } else if (item.k === 'moves') {
+      if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
+      exercise = emitMoves(item);
     } else if (item.k === 'goal') {
       goalItems.push(item);
     }

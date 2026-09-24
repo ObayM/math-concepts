@@ -142,6 +142,24 @@ export const exercisesSection: DocSection = {
         'sketch curve {\n  ask "Draw $y = (x-1)^2 - 3$, vertex and both crossings roughly right."\n  follows: (x-1)^2 - 3\n  near (1, -3)\n  near (1-sqrt(3), 0)\n  near (1+sqrt(3), 0)\n  tol: 0.6\n  hint "Vertex form puts the vertex at (h, k)."\n}',
     },
     {
+      keyword: 'moves',
+      syntax:
+        'moves {\n  ask "..."\n  from "starting expression"\n  move "what it becomes" {\n    * "the right next move"\n    - "a tempting wrong move" { why: "..." }\n  }\n  [move ...]\n}',
+      description:
+        'Pick the next move. The student sees an expression and chooses what to do to it; the right choice turns it into the next line, a wrong one shows its `why` and they choose again. It reads like a worked solution the student drives, which is where procedural fluency gets built. Every move needs one `*` right choice and at least one real wrong one, shuffled on screen. The exercise counts as correct only when every move was right first time.',
+      props: [
+        { name: 'from', type: 'string', description: 'the starting expression', required: true },
+        {
+          name: 'move',
+          type: '"result" { * "right" - "wrong" }',
+          description: 'one step: what the expression becomes, and the choices (repeatable)',
+          required: true,
+        },
+      ],
+      example:
+        'moves {\n  ask "Solve for $x$."\n  from "$2x + 3 = 11$"\n  move "$2x = 8$" {\n    * "Subtract 3 from both sides"\n    - "Divide both sides by 2" { why: "You can, but then the 3 has to be halved too. Get rid of the + 3 first." }\n    - "Add 3 to both sides" { why: "That makes it $2x + 6$ on the left. Undo the + 3 instead." }\n  }\n  move "$x = 4$" {\n    * "Divide both sides by 2"\n    - "Subtract 2 from both sides" { why: "$2x$ means 2 times $x$, so undo the times." }\n  }\n}',
+    },
+    {
       keyword: 'match',
       syntax:
         'match {\n  ask "..."\n  pair "left" -> "right"\n  [pair "left2" -> "right2" ...]\n  [decoy "extra wrong right"]\n  [hint "..."]\n  [! "explanation"]\n}',

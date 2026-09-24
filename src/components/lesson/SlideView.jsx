@@ -15,6 +15,7 @@ import MatchExercise from './exercises/MatchExercise';
 import OrderExercise from './exercises/OrderExercise';
 import SortExercise from './exercises/SortExercise';
 import TableExercise from './exercises/TableExercise';
+import MovesExercise from './exercises/MovesExercise';
 import { useT } from '@/components/i18n/LocaleProvider';
 
 const exerciseRegistry = {
@@ -27,6 +28,7 @@ const exerciseRegistry = {
   order: OrderExercise,
   sort: SortExercise,
   table: TableExercise,
+  moves: MovesExercise,
 };
 
 const NO_MEMORY = emptyMemory();

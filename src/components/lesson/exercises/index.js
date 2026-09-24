@@ -119,4 +119,17 @@ export const exercises = {
       );
     },
   },
+  moves: {
+    initial: (slide) => slide.exercise.steps.map(() => []),
+    isComplete: (slide, v) =>
+      Array.isArray(v) &&
+      v.length === slide.exercise.steps.length &&
+      slide.exercise.steps.every((st, i) => Array.isArray(v[i]) && v[i].at(-1) === st.correct),
+    check: (slide, v) =>
+      Array.isArray(v) &&
+      v.length === slide.exercise.steps.length &&
+      slide.exercise.steps.every(
+        (st, i) => Array.isArray(v[i]) && v[i].length === 1 && v[i][0] === st.correct
+      ),
+  },
 };

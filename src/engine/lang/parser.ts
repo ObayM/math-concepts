@@ -475,6 +475,8 @@ function makeParser(tokens: Token[]) {
         items.push(parseOrder(peek().line));
       } else if (at('sort')) {
         items.push(parseSort(peek().line));
+      } else if (at('moves')) {
+        items.push(parseMoves(peek().line));
       } else if (at('table')) {
         items.push(parseTable(peek().line));
       } else if (check('IDENT') && SLIDE_PROPS.has(peek().raw)) {
@@ -630,6 +632,67 @@ function makeParser(tokens: Token[]) {
     }
     eat('RC');
     return { k: 'quiz', options, common, ln };
+  }
+
+  function parseMoveOptions(): QuizOption[] {
+    eat('LC');
+    skipNL();
+    const options: QuizOption[] = [];
+    while (!check('RC') && !check('EOF')) {
+      if (!check('MINUS') && !check('STAR')) {
+        const t = peek();
+        throw new CompileError(
+          'a move lists its choices as * "right" and - "wrong"',
+          t.line,
+          t.col
+        );
+      }
+      const correct = check('STAR');
+      pos++;
+      const text = eatStr();
+      let why: string | undefined;
+      if (check('LC')) {
+        const w = parsePropsBlock().get('why');
+        if (w && w !== true && w.k === 'str') why = w.v;
+      }
+      options.push({ text, correct, why });
+      endStmt();
+    }
+    eat('RC');
+    return options;
+  }
+
+  function parseMoves(ln: number): Stmt {
+    eat('IDENT', 'moves');
+    eat('LC');
+    skipNL();
+    let start: string | null = null;
+    const steps: { result: string; options: QuizOption[]; ln: number }[] = [];
+    const common: ExerciseCommon = { ask: '', hints: [] };
+    while (!check('RC') && !check('EOF')) {
+      if (parseCommonLine(common)) continue;
+      if (at('from')) {
+        pos++;
+        start = eatStr();
+        endStmt();
+      } else if (at('move')) {
+        const mln = peek().line;
+        pos++;
+        const result = eatStr();
+        steps.push({ result, options: parseMoveOptions(), ln: mln });
+        skipNL();
+      } else {
+        const t = peek();
+        const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
+        throw new CompileError(
+          `unexpected ${what} in moves - use ask/from/move/hint/!`,
+          t.line,
+          t.col
+        );
+      }
+    }
+    eat('RC');
+    return { k: 'moves', start, steps, common, ln };
   }
 
   function parseNumeric(ln: number): Stmt {

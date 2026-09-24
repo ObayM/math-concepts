@@ -18,6 +18,7 @@ const GRAMMAR_KEYWORDS = [
   'order',
   'sort',
   'table',
+  'moves',
   // scene + state
   'scene',
   'param',

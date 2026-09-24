@@ -17,6 +17,7 @@ const SLIDE_ITEM_KEYWORDS = new Set([
   'order',
   'sort',
   'table',
+  'moves',
   'scene',
 ]);
 

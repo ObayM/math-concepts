@@ -114,6 +114,9 @@ export const KEYWORDS = new Set([
   'ghost',
   'alt',
   'vary',
+  'moves',
+  'move',
+  'from',
   'alpha',
   'by',
 ]);

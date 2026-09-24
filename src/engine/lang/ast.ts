@@ -130,6 +130,13 @@ export type Stmt =
       tolerance: Expr | null;
       common: ExerciseCommon;
       ln: number;
+    }
+  | {
+      k: 'moves';
+      start: string | null;
+      steps: { result: string; options: QuizOption[]; ln: number }[];
+      common: ExerciseCommon;
+      ln: number;
     };
 
 export type HotspotTarget =
