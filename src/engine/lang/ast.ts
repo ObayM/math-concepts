@@ -49,6 +49,7 @@ export type Stmt =
   | { k: 'picker'; bind: string; props: PropMap; ln: number }
   | { k: 'button'; label: string; props: PropMap; ln: number }
   | { k: 'step'; narrate: string | null; props: PropMap; ln: number }
+  | { k: 'morph'; from: string; to: string; props: PropMap; ln: number }
   // lesson-level nodes
   | {
       k: 'lesson';

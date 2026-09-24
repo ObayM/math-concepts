@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
-import { evalNumber, evalBool } from '@/engine/runtime/eval';
+import { evalNumber, evalBool, alphaOf } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { svgPrimitives } from './registry';
@@ -291,7 +291,9 @@ export default function SvgRenderer({
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
           const Prim = svgPrimitives[obj.type];
           if (!Prim) return null;
-          return (
+          const alpha = alphaOf(obj, scope);
+          if (alpha !== null && alpha < 0.01) return null;
+          const el = (
             <Prim
               key={obj.id || i}
               obj={obj}
@@ -300,6 +302,13 @@ export default function SvgRenderer({
               points={points}
               startDrag={startDrag}
             />
+          );
+          return alpha === null || alpha > 0.99 ? (
+            el
+          ) : (
+            <g key={obj.id || i} opacity={alpha}>
+              {el}
+            </g>
           );
         })}
         {marker && (

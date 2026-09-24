@@ -358,6 +358,8 @@ function makeParser(tokens: Token[]) {
         return parseButton(ln);
       case 'step':
         return parseStep(ln);
+      case 'morph':
+        return parseMorph(ln);
       default:
         return parseCallStmt(ln);
     }
@@ -1340,6 +1342,16 @@ function makeParser(tokens: Token[]) {
     const props = parsePropsBlock();
     endStmt();
     return { k: 'step', narrate, props, ln };
+  }
+
+  function parseMorph(ln: number): Stmt {
+    eat('IDENT', 'morph');
+    const from = eatIdent();
+    eat('ARROW');
+    const to = eatIdent();
+    const props = parsePropsBlock();
+    endStmt();
+    return { k: 'morph', from, to, props, ln };
   }
 
   function parseCallStmt(ln: number): Stmt {

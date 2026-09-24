@@ -55,6 +55,7 @@ const GRAMMAR_KEYWORDS = [
   'repeat',
   'if',
   'reveal',
+  'morph',
   'let',
   'def',
 ];

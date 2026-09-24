@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
-import { evalNumber, evalBool } from '@/engine/runtime/eval';
+import { evalNumber, evalBool, alphaOf } from '@/engine/runtime/eval';
 import { expandObjects } from '@/engine/runtime/expand';
 import { space3Primitives } from './registry3';
 import { AXIS_LINE, AXIS_LABEL, LABEL_HALO, AXIS_LABEL_SIZE } from '@/engine/colors';
@@ -113,7 +113,16 @@ export default function Space3Renderer({ ir, revealed }: { ir: SceneIR; revealed
         {painted.map(({ o, i }) => {
           const Prim = space3Primitives[o.type];
           if (!Prim) return null;
-          return <Prim key={o.id ?? i} obj={o} scope={scope} cx={cx} />;
+          const alpha = alphaOf(o, scope);
+          if (alpha !== null && alpha < 0.01) return null;
+          const el = <Prim key={o.id ?? i} obj={o} scope={scope} cx={cx} />;
+          return alpha === null || alpha > 0.99 ? (
+            el
+          ) : (
+            <g key={o.id ?? i} opacity={alpha}>
+              {el}
+            </g>
+          );
         })}
       </svg>
     </div>

@@ -52,3 +52,10 @@ export function interpolate(text: string | Text, scope: Scope): string {
     return String(Math.round(v * 100) / 100);
   });
 }
+
+export function alphaOf(obj: { alpha?: unknown }, scope: Scope): number | null {
+  if (obj.alpha === undefined) return null;
+  const a = evalNumber(obj.alpha as never, scope);
+  if (!Number.isFinite(a)) return 0;
+  return Math.max(0, Math.min(1, a));
+}

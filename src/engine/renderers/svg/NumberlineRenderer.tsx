@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
-import { evalNumber, evalBool, interpolate } from '@/engine/runtime/eval';
+import { evalNumber, evalBool, interpolate, alphaOf } from '@/engine/runtime/eval';
 import { expandObjects } from '@/engine/runtime/expand';
 import { resolveColor, AXIS_LINE, AXIS_LABEL } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
@@ -122,6 +122,8 @@ export default function NumberlineRenderer({
         {expandObjects(ir.objects, scope).map((obj, i) => {
           if (obj.phase === 'reveal' && !revealed) return null;
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
+          const alpha = alphaOf(obj, scope);
+          if (alpha !== null && alpha < 0.5) return null;
           if (obj.type === 'point') {
             const x = evalNumber(obj.x, scope);
             if (!Number.isFinite(x)) return null;

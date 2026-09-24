@@ -328,6 +328,7 @@ function niceNum(v: number): string {
 export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): SceneIR {
   const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
   const macros: Macros = seedMacros ? new Map(seedMacros) : new Map();
+  const morphs: { from: string; to: string; by: ExprIR; ln: number }[] = [];
   let autoLabelId = 0;
   // vars bound by an enclosing `repeat` — valid runtime ids inside its body,
   // resolved by the renderer at expand time, not here
@@ -459,6 +460,8 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
     const width = props.get('width');
     if (color) obj.color = roleColor(color, roles);
     if (color && roles[color]) obj.role = color;
+    const alpha = props.get('alpha');
+    if (alpha && alpha !== true) obj.alpha = lowerR(alpha, cScope, ln);
     if (style) obj.style = style;
     if (show && show !== true) obj.visibleIf = asIR(lowerR(show, cScope, ln));
     if (width && width !== true) {
@@ -1121,6 +1124,13 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
         break;
       }
 
+      case 'morph': {
+        const by = s.props.get('by');
+        if (!by || by === true) throw new CompileError('morph needs by: <param from 0 to 1>', s.ln);
+        morphs.push({ from: s.from, to: s.to, by: asIR(lowerR(by, cScope, s.ln)), ln: s.ln });
+        break;
+      }
+
       case 'step': {
         const obj: any = {};
         if (s.narrate) obj.narrate = s.narrate;
@@ -1146,6 +1156,31 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
   }
 
   run(stmts, {});
+
+  for (const m of morphs) {
+    const a = ir.objects.find((o: any) => o.id === m.from);
+    const b = ir.objects.find((o: any) => o.id === m.to);
+    const ids = ir.objects.map((o: any) => o.id);
+    if (!a) throw new CompileError(`morph: no object "${m.from}"${suggest(m.from, ids)}`, m.ln);
+    if (!b) throw new CompileError(`morph: no object "${m.to}"${suggest(m.to, ids)}`, m.ln);
+    if (a === b) throw new CompileError('morph needs two different objects', m.ln);
+    const out = { k: 'bin', op: '-', l: { k: 'num', v: 1 }, r: m.by } as ExprIR;
+    a.alpha = a.alpha == null ? out : { k: 'bin', op: '*', l: asIR(a.alpha), r: out };
+    b.alpha = b.alpha == null ? m.by : { k: 'bin', op: '*', l: asIR(b.alpha), r: m.by };
+    if (a.x !== undefined && b.x !== undefined && a.y !== undefined && b.y !== undefined) {
+      const [ax, ay, bx, by] = [a.x, a.y, b.x, b.y].map(asIR);
+      const lerp = (p: ExprIR, q: ExprIR): ExprIR => ({
+        k: 'bin',
+        op: '+',
+        l: p,
+        r: { k: 'bin', op: '*', l: { k: 'bin', op: '-', l: q, r: p }, r: m.by },
+      });
+      a.x = lerp(ax, bx);
+      a.y = lerp(ay, by);
+      b.x = lerp(ax, bx);
+      b.y = lerp(ay, by);
+    }
+  }
 
   if (Object.keys(roles).length) {
     for (const o of ir.objects) {

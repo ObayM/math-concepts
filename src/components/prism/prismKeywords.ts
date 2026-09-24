@@ -105,6 +105,9 @@ export const KEYWORDS = new Set([
   'showme',
   'keep',
   'role',
+  'morph',
+  'alpha',
+  'by',
 ]);
 
 export const MATH_FNS = new Set([
