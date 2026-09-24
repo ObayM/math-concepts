@@ -106,6 +106,9 @@ export const KEYWORDS = new Set([
   'keep',
   'role',
   'morph',
+  'indicate',
+  'focus',
+  'surround',
   'alpha',
   'by',
 ]);

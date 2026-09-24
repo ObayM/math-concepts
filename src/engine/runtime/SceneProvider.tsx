@@ -8,7 +8,13 @@ type SceneCtx = {
   setMany: (values: Record<string, number | boolean | string>) => void;
   animate: (targets: Record<string, number>, duration?: number, ease?: string) => void;
   ir: SceneIR;
+  attention: Attention;
+  setAttention: (a: Attention) => void;
 };
+
+export type Attention = { indicate?: string[]; focus?: string[]; surround?: string[] };
+
+const NO_ATTENTION: Attention = {};
 
 const Ctx = createContext<SceneCtx | null>(null);
 
@@ -72,6 +78,7 @@ export function SceneProvider({
   initial?: Record<string, number>;
 }) {
   const [scope, setScope] = useState<Scope>(() => initScope(ir, initial));
+  const [attention, setAttention] = useState<Attention>(NO_ATTENTION);
   const scopeRef = useRef(scope);
   const tweensRef = useRef<Map<string, Tween>>(new Map());
   const rafRef = useRef<number | null>(null);
@@ -177,7 +184,11 @@ export function SceneProvider({
     [ir, commit, setMany]
   );
 
-  return <Ctx.Provider value={{ scope, set, setMany, animate, ir }}>{children}</Ctx.Provider>;
+  return (
+    <Ctx.Provider value={{ scope, set, setMany, animate, ir, attention, setAttention }}>
+      {children}
+    </Ctx.Provider>
+  );
 }
 
 export function useScene(): SceneCtx {

@@ -54,7 +54,7 @@ export default function Timeline({
   ir: SceneIR;
   onStepChange?: (idx: number) => void;
 }) {
-  const { scope, setMany, animate } = useScene();
+  const { scope, setMany, animate, setAttention } = useScene();
   const steps = ir.timeline ?? [];
   const [idx, setIdx] = useState(0);
   const mounted = useRef(false);
@@ -65,7 +65,10 @@ export default function Timeline({
     if (mounted.current) return;
     mounted.current = true;
     setMany(foldTo(ir, 0));
-  }, [ir, setMany]);
+    const first = ir.timeline?.[0];
+    if (first?.indicate || first?.focus || first?.surround)
+      setAttention({ indicate: first.indicate, focus: first.focus, surround: first.surround });
+  }, [ir, setMany, setAttention]);
 
   const goto = (target: number) => {
     const next = Math.max(0, Math.min(steps.length - 1, target));
@@ -90,6 +93,8 @@ export default function Timeline({
     }
     setIdx(next);
     onStepChange?.(next);
+    const at = steps[next];
+    setAttention({ indicate: at?.indicate, focus: at?.focus, surround: at?.surround });
   };
 
   const released = Boolean(holding) && !waiting && idx < steps.length - 1;

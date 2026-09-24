@@ -347,6 +347,7 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
   const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
   const macros: Macros = seedMacros ? new Map(seedMacros) : new Map();
   const morphs: { from: string; to: string; by: ExprIR; ln: number }[] = [];
+  const attention: { ids: string[]; key: string; ln: number }[] = [];
   let autoLabelId = 0;
   // vars bound by an enclosing `repeat` — valid runtime ids inside its body,
   // resolved by the renderer at expand time, not here
@@ -1194,6 +1195,19 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
         const hint = propStr(s.props, 'hint', cScope);
         const wait = s.props.get('wait');
         if (wait && wait !== true) obj.wait = asIR(lowerR(wait, cScope, s.ln));
+        for (const key of ['indicate', 'focus', 'surround'] as const) {
+          const v = s.props.get(key);
+          if (v === undefined) continue;
+          const ids = v !== true && v.k === 'list' ? v.items : v !== true ? [v] : [];
+          const names = ids.map((e) => {
+            if (e.k === 'id') return e.name;
+            if (e.k === 'str') return e.v;
+            throw new CompileError(`${key}: takes object ids`, s.ln);
+          });
+          if (!names.length) throw new CompileError(`${key}: takes object ids`, s.ln);
+          obj[key] = names;
+          attention.push({ ids: names, key, ln: s.ln });
+        }
         if (set) obj.set = set;
         if (animate) obj.animate = animate;
         if (dur != null) obj.duration = dur;
@@ -1206,6 +1220,14 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
   }
 
   run(stmts, {});
+
+  const objectIds = ir.objects.map((o: any) => o.id);
+  for (const a of attention) {
+    for (const id of a.ids) {
+      if (!objectIds.includes(id))
+        throw new CompileError(`${a.key}: no object "${id}"${suggest(id, objectIds)}`, a.ln);
+    }
+  }
 
   for (const m of morphs) {
     const a = ir.objects.find((o: any) => o.id === m.from);

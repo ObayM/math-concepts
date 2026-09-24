@@ -231,6 +231,30 @@
   view-transition-name: slide;
 }
 
+@keyframes objectPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+.scene-obj {
+  transition: opacity var(--duration-base) ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.scene-obj[data-attention='indicate'] {
+  animation: objectPulse 900ms var(--ease-entrance) 2;
+}
+
+.scene-obj[data-attention='dim'] {
+  opacity: 0.18;
+}
+
 /* where the browser can animate the outgoing slide, the enter-only class is
    redundant and would double up with the transition */
 @supports (view-transition-name: none) {

@@ -347,6 +347,9 @@ const timelineStep = z.object({
   narrate: z.string().optional(),
   hint: z.string().optional(),
   wait: exprIRSchema.optional(),
+  indicate: z.array(z.string()).optional(),
+  focus: z.array(z.string()).optional(),
+  surround: z.array(z.string()).optional(),
 });
 
 export const sceneSchema = z.object({

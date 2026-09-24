@@ -1,9 +1,10 @@
 'use client';
-import React, { useRef, useState, useEffect } from 'react';
-import { useScene } from '@/engine/runtime/SceneProvider';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
+import { useScene, type Attention } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool, alphaOf } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
+import { ROLE_EVENT } from '@/engine/runtime/roleEvent';
 import { svgPrimitives } from './registry';
 import {
   resolveColor,
@@ -52,7 +53,13 @@ export default function SvgRenderer({
   inputLayer?: InputLayerConfig;
   tapLabel?: string;
 }) {
-  const { scope, set } = useScene();
+  const { scope, set, attention } = useScene();
+  const [hoveredRole, setHoveredRole] = useState<string | null>(null);
+  useEffect(() => {
+    const onRole = (e: Event) => setHoveredRole((e as CustomEvent<string | null>).detail);
+    document.addEventListener(ROLE_EVENT, onRole);
+    return () => document.removeEventListener(ROLE_EVENT, onRole);
+  }, []);
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -296,24 +303,21 @@ export default function SvgRenderer({
           if (!Prim) return null;
           const alpha = alphaOf(obj, scope);
           if (alpha !== null && alpha < 0.01) return null;
-          const el = (
-            <Prim
+          return (
+            <g
               key={obj.id || i}
-              obj={obj}
-              scope={scope}
-              cx={cx}
-              points={points}
-              startDrag={startDrag}
-            />
-          );
-          return alpha === null || alpha > 0.99 ? (
-            el
-          ) : (
-            <g key={obj.id || i} opacity={alpha}>
-              {el}
+              className="scene-obj"
+              data-obj={obj.id}
+              data-attention={attentionOf(obj, attention, hoveredRole)}
+              opacity={alpha === null || alpha > 0.99 ? undefined : alpha}
+            >
+              <Prim obj={obj} scope={scope} cx={cx} points={points} startDrag={startDrag} />
             </g>
           );
         })}
+        {attention.surround?.map((id) => (
+          <Surround key={`surround-${id}`} id={id} svgRef={svgRef} scope={scope} />
+        ))}
         {marker && (
           <g pointerEvents="none">
             <circle
@@ -353,4 +357,55 @@ function liveDomain(
   const lo = evalNumber(view[0] as never, scope);
   const hi = evalNumber(view[1] as never, scope);
   return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : fallback;
+}
+
+const baseId = (id: string | undefined) => (id ?? '').split('#')[0];
+
+function attentionOf(
+  obj: { id?: string; role?: string },
+  attention: Attention,
+  hoveredRole: string | null
+): 'indicate' | 'dim' | undefined {
+  const id = baseId(obj.id);
+  if (hoveredRole && obj.role === hoveredRole) return 'indicate';
+  if (attention.indicate?.includes(id)) return 'indicate';
+  if (attention.focus?.length && !attention.focus.includes(id)) return 'dim';
+  return undefined;
+}
+
+function Surround({
+  id,
+  svgRef,
+  scope,
+}: {
+  id: string;
+  svgRef: React.RefObject<SVGSVGElement | null>;
+  scope: Scope;
+}) {
+  const ref = useRef<SVGRectElement>(null);
+  useLayoutEffect(() => {
+    const rect = ref.current;
+    const target = svgRef.current?.querySelector<SVGGraphicsElement>(
+      `[data-obj="${CSS.escape(id)}"]`
+    );
+    if (!rect || !target || typeof target.getBBox !== 'function') return;
+    const b = target.getBBox();
+    const pad = 8;
+    rect.setAttribute('x', String(b.x - pad));
+    rect.setAttribute('y', String(b.y - pad));
+    rect.setAttribute('width', String(b.width + 2 * pad));
+    rect.setAttribute('height', String(b.height + 2 * pad));
+  }, [id, svgRef, scope]);
+  return (
+    <rect
+      ref={ref}
+      rx={10}
+      fill="none"
+      stroke={resolveColor('warning')}
+      strokeWidth={2.5}
+      strokeDasharray="6 5"
+      pointerEvents="none"
+      className="animate-pop-in"
+    />
+  );
 }

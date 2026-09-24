@@ -1,11 +1,15 @@
 'use client';
 import katex from 'katex';
 import { texColors } from '@/engine/colors';
+import { ROLE_EVENT } from '@/engine/runtime/roleEvent';
 
 export const proseClass = 'block max-w-[42rem] text-xl leading-[1.75] font-normal text-neutral-700';
 
 const tex = (src, displayMode) =>
   katex.renderToString(texColors(src), { throwOnError: false, displayMode });
+
+const announceRole = (role) =>
+  document.dispatchEvent(new CustomEvent(ROLE_EVENT, { detail: role }));
 
 const DISPLAY_ONLY = /^\$\$([^$]+)\$\$$/;
 
@@ -40,12 +44,15 @@ function renderInline(text) {
         </em>
       );
     } else if (m[5] != null) {
+      const role = m[7];
       parts.push(
         <span
           key={key++}
-          data-role={m[7]}
+          data-role={role}
           className="font-semibold"
           style={{ color: `var(--color-${m[6]}-600)` }}
+          onPointerEnter={role ? () => announceRole(role) : undefined}
+          onPointerLeave={role ? () => announceRole(null) : undefined}
         >
           {renderInline(m[5])}
         </span>
