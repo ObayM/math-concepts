@@ -127,6 +127,31 @@ export default function SvgRenderer({
     window.addEventListener('pointercancel', up);
   };
 
+  const keyDrag = (obj: SceneObjectLike) => (e: React.KeyboardEvent) => {
+    const d = obj.draggable;
+    const dir = ARROWS[e.key];
+    if (!d || !dir) return;
+    e.preventDefault();
+    const fast = e.shiftKey ? 5 : 1;
+    if (d.along) {
+      const ref = ir.objects.find((o) => o.id === d.along!.ref);
+      const cur = Number(scope[d.bind] ?? 0);
+      const sign = dir[0] || dir[1];
+      if (ref?.type === 'circle') {
+        const a = cur + (Math.PI / 36) * fast * sign;
+        set(d.bind, ((((a + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI);
+      } else {
+        set(d.bind, Math.max(0, Math.min(1, cur + 0.05 * fast * sign)));
+      }
+      return;
+    }
+    const [sx, sy] = keySteps(d.snap, [xMin, xMax], [yMin, yMax]);
+    const px = evalNumber(obj.x as never, scope);
+    const py = evalNumber(obj.y as never, scope);
+    const patch = applyDrag(d, px + dir[0] * sx * fast, py + dir[1] * sy * fast, ir, scope);
+    for (const key in patch) set(key, patch[key]);
+  };
+
   const handleTap = (e: React.PointerEvent<SVGRectElement>) => {
     const svg = svgRef.current;
     if (!svg || !onTap) return;
@@ -349,7 +374,14 @@ export default function SvgRenderer({
               data-attention={attentionOf(obj, attention, hoveredRole)}
               opacity={alpha === null || alpha > 0.99 ? undefined : alpha}
             >
-              <Prim obj={obj} scope={scope} cx={cx} points={points} startDrag={startDrag} />
+              <Prim
+                obj={obj}
+                scope={scope}
+                cx={cx}
+                points={points}
+                startDrag={startDrag}
+                keyDrag={keyDrag}
+              />
             </g>
           );
         })}
@@ -446,4 +478,24 @@ function Surround({
       className="animate-pop-in"
     />
   );
+}
+
+type SceneObjectLike = { x?: unknown; y?: unknown; draggable?: Draggable };
+
+const ARROWS: Record<string, [number, number]> = {
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+  ArrowUp: [0, 1],
+  ArrowDown: [0, -1],
+};
+
+function keySteps(
+  snap: Draggable['snap'],
+  xDomain: [number, number],
+  yDomain: [number, number]
+): [number, number] {
+  if (snap === 'grid') return [1, 1];
+  if (Array.isArray(snap)) return [snap[0], snap[1]];
+  if (typeof snap === 'number') return [snap, snap];
+  return [(xDomain[1] - xDomain[0]) / 40, (yDomain[1] - yDomain[0]) / 40];
 }

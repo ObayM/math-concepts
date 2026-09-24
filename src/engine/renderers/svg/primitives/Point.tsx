@@ -1,8 +1,9 @@
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
 import { resolveColor, LABEL_HALO } from '@/engine/colors';
+import { shortNum } from '@/engine/format';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
-export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
+export default function Point({ obj, scope, cx, startDrag, keyDrag }: PrimProps) {
   const px = cx.toX(evalNumber(obj.x, scope));
   const py = cx.toY(evalNumber(obj.y, scope));
   if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
@@ -10,9 +11,30 @@ export default function Point({ obj, scope, cx, startDrag }: PrimProps) {
   const r = obj.r ?? 7;
   const draggable = !!obj.draggable;
   const onPointerDown = draggable ? startDrag(obj) : undefined;
+  const x = evalNumber(obj.x, scope);
+  const y = evalNumber(obj.y, scope);
+  const where = `(${shortNum(x)}, ${shortNum(y)})`;
+  const keys =
+    draggable && keyDrag
+      ? {
+          tabIndex: 0,
+          role: 'slider',
+          'aria-label': obj.label ? interpolate(obj.label, scope) : obj.id,
+          'aria-valuetext': where,
+          'aria-valuenow': obj.draggable.axis === 'y' ? y : x,
+          onKeyDown: keyDrag(obj),
+        }
+      : {};
 
   return (
-    <g className={draggable ? 'cursor-grab active:cursor-grabbing' : undefined}>
+    <g
+      className={
+        draggable
+          ? 'cursor-grab active:cursor-grabbing outline-none [&:focus-visible>circle:first-child]:opacity-40'
+          : undefined
+      }
+      {...keys}
+    >
       {draggable && (
         <>
           <circle cx={px} cy={py} r={r + 8} fill={color} opacity={0.12} />

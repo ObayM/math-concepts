@@ -1,4 +1,4 @@
-import type { PointerEvent } from 'react';
+import type { PointerEvent, KeyboardEvent } from 'react';
 import type { Scope } from '@/engine/ir/types';
 
 export interface CoordSystem {
@@ -32,4 +32,5 @@ export interface PrimProps {
   cx: CoordSystem;
   points: Record<string, { x: number; y: number }>;
   startDrag: (obj: any) => (e: PointerEvent) => void;
+  keyDrag?: (obj: any) => (e: KeyboardEvent) => void;
 }
