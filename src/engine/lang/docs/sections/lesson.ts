@@ -110,6 +110,14 @@ export const lessonSection: DocSection = {
         'scene plane {\n  x: [-6, 6]\n  y: [-6, 6]\n  grid\n  axes\n  param r1 = -3 { range: [-6, 6] }\n  param r2 = 2 { range: [-6, 6] }\n  point p1 = (r1, 0) { drag: x -> r1, color: danger }\n  point p2 = (r2, 0) { drag: x -> r2, color: danger }\n}\ngoal "Make both roots negative" {\n  when: r1 < 0 and r2 < 0\n  hints: ["Where does a negative root sit on the axis?", "Drag both red points left of zero."]\n  showme: { r1: -4, r2: -1 }\n}',
     },
     {
+      keyword: 'answer',
+      syntax: '${answer("slide-id")}\n${answer("slide-id", "fallback")}\n${recall("param")}',
+      description:
+        'Lesson memory. Inside prose, a question or a goal, `${answer("slide-id")}` shows what the student answered on an earlier quiz or numeric slide (the option they picked, or the number they typed), and `${recall("name")}` shows the last value of a `keep` param. This is how a reveal can say "you guessed rounding" and how the naming slide can use the number the student found themselves. The slide has to come earlier in the lesson, which the compiler checks. Before there is an answer the fallback shows, or `?` if you gave none.',
+      example:
+        'lesson "Speed" {\n  slide "Bet" {\n    id: "bet"\n    quiz {\n      ask "What does a speedometer show at one instant?"\n      * "something real, we need a new idea for it"\n      - "nothing real, it is rounding"\n    }\n  }\n\n  slide "Shrink the gap" {\n    id: "shrink"\n    scene plane {\n      x: [0, 2]\n      y: [0, 4]\n      param h = 1 { range: [0.001, 1], step: 0.001, keep }\n      curve f = x^2\n      slider h { label: "gap" }\n    }\n    goal "Get the gap below 0.01" { when: h < 0.01 }\n  }\n\n  slide "What you found" {\n    > You bet on ${answer("bet", "a guess")}, and you shrank the gap to ${recall("h")}.\n    quiz {\n      ask "Was the bet right?"\n      * "it shows something real"\n      - "it shows nothing"\n    }\n  }\n}',
+    },
+    {
       keyword: 'onwrong',
       syntax:
         'onwrong: "slide-id" [retry]\n- "wrong option" { why: "...", onwrong: "slide-id", retry }\nwrong <value> ["why"] [-> "slide-id" [retry]]',

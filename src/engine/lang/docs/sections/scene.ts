@@ -32,12 +32,17 @@ export const sceneSection: DocSection = {
     },
     {
       keyword: 'param',
-      syntax: 'param <name> = <number> { [range: [min,max]], [step: <number>] }',
+      syntax: 'param <name> = <number> { [range: [min,max]], [step: <number>], [keep] }',
       description:
-        'Declares a numeric state variable. Controls (sliders, steppers) and draggable objects write to it; object expressions read from it. The `{ ... }` block is optional — omit it if there is nothing to configure.',
+        'Declares a numeric state variable. Controls (sliders, steppers) and draggable objects write to it; object expressions read from it. The `{ ... }` block is optional, so omit it if there is nothing to configure. `keep` makes the value part of the lesson\'s memory: a later slide with a `keep` param of the same name starts where the student left it, and prose can show it with `${recall("name")}`.',
       props: [
         { name: 'range', type: '[number, number]', description: 'min/max bounds for controls' },
         { name: 'step', type: 'number', description: 'discrete step size' },
+        {
+          name: 'keep',
+          type: 'flag',
+          description: 'carry the value to later slides that keep a param of the same name',
+        },
       ],
       example: 'param t = 0 { range: [-3, 3] }',
     },

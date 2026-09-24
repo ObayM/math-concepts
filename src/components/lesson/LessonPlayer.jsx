@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card';
 import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor, TutorError } from '@/utils/aiService';
 import { evalGoals } from '@/engine/runtime/goals';
+import { emptyMemory, keepFromScope, memoryFromHistory, remember } from '@/engine/runtime/memory';
 import {
   visiblePath,
   initialFlow,
@@ -48,6 +49,7 @@ export default function LessonPlayer({
   const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
   const [stepState, setStepState] = useState({ key: null, idx: 0 });
   const [quizHistory, setQuizHistory] = useState([]);
+  const [memory, setMemory] = useState(emptyMemory);
   const [isComplete, setIsComplete] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [streak, setStreak] = useState(null);
@@ -107,6 +109,7 @@ export default function LessonPlayer({
       .then((r) => r.json())
       .then((d) => {
         if (d.currentStep > 0 && d.currentStep < path.length) setFlow(initialFlow(d.currentStep));
+        if (Array.isArray(d.quizHistory)) setMemory(memoryFromHistory(slides, d.quizHistory));
         if (d.completed) {
           setIsComplete(true);
           if (Array.isArray(d.quizHistory)) setQuizHistory(d.quizHistory);
@@ -114,7 +117,7 @@ export default function LessonPlayer({
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
-  }, [lessonId, path.length]);
+  }, [lessonId, path.length, slides]);
 
   const skipNextSaveRef = useRef(true);
   useEffect(() => {
@@ -249,6 +252,7 @@ export default function LessonPlayer({
     setChecked(true);
     const correct = checker.check(slide, answer);
     setFlow((f) => stageBranch(slides, f, correct, answer));
+    setMemory((m) => remember(m, slide, answer));
     const question = slide.exercise?.prompt ?? slide.title ?? '';
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;
@@ -273,6 +277,7 @@ export default function LessonPlayer({
 
   const handleScopeChange = (scope) => {
     scopeRef.current = scope;
+    setMemory((m) => keepFromScope(m, slide, scope));
     const goals = slide?.goals;
     if (!goals?.length) return;
     setGoalsState((prev) => {
@@ -339,6 +344,7 @@ export default function LessonPlayer({
     setFlow(initialFlow(0));
     setResetForKey(null);
     setQuizHistory([]);
+    setMemory(emptyMemory());
     setIsComplete(false);
     setChecked(false);
     setAnswer(null);
@@ -529,6 +535,7 @@ export default function LessonPlayer({
                   onScopeChange={handleScopeChange}
                   revealAnswer={!flow.pending?.retry}
                   onStepChange={(idx) => setStepState({ key: currentKey, idx })}
+                  memory={memory}
                 />
                 <div aria-live="polite" className="sr-only">
                   {checked &&

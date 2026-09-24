@@ -9,6 +9,7 @@ import { lex } from './lexer';
 import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
 import { splitTemplate, countSlots, type TemplateSeg } from './template';
+import { memoryRefs } from '@/engine/runtime/memory';
 import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from './icons';
 
 type CompileScope = Record<string, number | boolean>;
@@ -629,6 +630,7 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
         }
         const step = propNum(s.props, 'step', s.ln, cScope);
         if (step != null) varDef.step = step;
+        if (s.props.get('keep') === true) varDef.keep = true;
         ir.state[s.name] = varDef;
         break;
       }
@@ -1823,6 +1825,47 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   };
 }
 
+function validateMemory(slides: ReturnType<typeof emitSlide>[], stmts: SlideStmt[]) {
+  slides.forEach((s, i) => {
+    const texts = [
+      s.prose ?? '',
+      s.exercise?.prompt ?? '',
+      s.exercise?.explanation ?? '',
+      ...(s.goals ?? []).map((g) => g.prompt),
+    ];
+    for (const ref of texts.flatMap(memoryRefs)) {
+      const earlier = slides.slice(0, i);
+      if (ref.fn === 'answer') {
+        const from = earlier.find((e) => e.id === ref.name);
+        if (!from)
+          throw new CompileError(
+            `answer("${ref.name}") needs a slide before this one with that id${suggest(
+              ref.name,
+              earlier.map((e) => e.id)
+            )}`,
+            stmts[i].ln
+          );
+        if (from.exercise?.kind !== 'quiz' && from.exercise?.kind !== 'numeric')
+          throw new CompileError(
+            `answer("${ref.name}") can only show a quiz or numeric answer`,
+            stmts[i].ln
+          );
+      } else {
+        const kept = slides.slice(0, i + 1).flatMap((e) =>
+          Object.entries(e.scene?.state ?? {})
+            .filter(([, d]) => d.type === 'number' && (d as { keep?: boolean }).keep)
+            .map(([n]) => n)
+        );
+        if (!kept.includes(ref.name))
+          throw new CompileError(
+            `recall("${ref.name}") needs a param ${ref.name} { keep } on this slide or an earlier one${suggest(ref.name, kept)}`,
+            stmts[i].ln
+          );
+      }
+    }
+  });
+}
+
 export function exerciseBranches(
   exercise: ReturnType<typeof emitSlide>['exercise'] | LessonIR['slides'][number]['exercise']
 ): { slide: string; retry?: boolean }[] {
@@ -1914,6 +1957,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
   const icon = pEnum(root.props, 'icon', LESSON_ICONS, root.ln);
   const slides = root.slides.map((s, i) => emitSlide(s, i, lessonMacros));
   validateSlideFlow(slides, root.slides);
+  validateMemory(slides, root.slides);
   const ir = {
     version: 2 as const,
     title: root.title,

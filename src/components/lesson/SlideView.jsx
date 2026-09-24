@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Scene } from '@/engine';
 import { exerciseVisible } from '@/engine/runtime/flow';
+import { emptyMemory, keptInitial, withMemory } from '@/engine/runtime/memory';
 import RichText, { proseClass } from './RichText';
 import GoalBanner from './GoalBanner';
 import HintLadder from './HintLadder';
@@ -28,8 +29,10 @@ const exerciseRegistry = {
   table: TableExercise,
 };
 
+const NO_MEMORY = emptyMemory();
+
 export default function SlideView({
-  slide,
+  slide: source,
   value,
   checked,
   correct,
@@ -38,8 +41,10 @@ export default function SlideView({
   onScopeChange,
   revealAnswer = true,
   onStepChange = () => {},
+  memory = NO_MEMORY,
 }) {
   const t = useT();
+  const slide = withMemory(source, memory);
   const [command, setCommand] = useState(null);
   const [step, setStep] = useState({ slideId: slide.id, idx: 0 });
   const stepIdx = step.slideId === slide.id ? step.idx : 0;
@@ -90,6 +95,7 @@ export default function SlideView({
             tapLabel={t('exercise.sceneAria')}
             command={command?.slideId === slide.id ? command : undefined}
             onStepChange={handleStep}
+            initial={keptInitial(slide, memory)}
           />
         </div>
       )}

@@ -43,6 +43,7 @@ export function Scene({
   tapLabel,
   command,
   onStepChange,
+  initial,
 }: {
   ir: SceneIR;
   onScopeChange?: (scope: Scope) => void;
@@ -53,6 +54,7 @@ export function Scene({
   tapLabel?: string;
   command?: SceneCommand;
   onStepChange?: (idx: number) => void;
+  initial?: Record<string, number>;
 }) {
   const Renderer =
     ir.space.type === 'numberline'
@@ -61,7 +63,7 @@ export function Scene({
         ? Space3Renderer
         : SvgRenderer;
   return (
-    <SceneProvider ir={ir} onScopeChange={onScopeChange}>
+    <SceneProvider ir={ir} onScopeChange={onScopeChange} initial={initial}>
       <RunCommand command={command} />
       <div className="flex flex-col gap-4">
         <Renderer

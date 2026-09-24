@@ -17,6 +17,7 @@ const numberVar = z.object({
   min: z.number().optional(),
   max: z.number().optional(),
   step: z.number().optional(),
+  keep: z.boolean().optional(),
 });
 const booleanVar = z.object({ type: z.literal('boolean'), init: z.boolean() });
 const enumVar = z.object({

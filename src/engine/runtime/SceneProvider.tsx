@@ -33,10 +33,13 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }
 
-function initScope(ir: SceneIR): Scope {
+function initScope(ir: SceneIR, initial?: Record<string, number>): Scope {
   const scope: Scope = {};
   for (const [key, def] of Object.entries(ir.state)) {
     scope[key] = def.init;
+  }
+  for (const [key, v] of Object.entries(initial ?? {})) {
+    if (ir.state[key]?.type === 'number') scope[key] = clampVal(ir, key, v);
   }
   return scope;
 }
@@ -61,12 +64,14 @@ export function SceneProvider({
   ir,
   children,
   onScopeChange,
+  initial,
 }: {
   ir: SceneIR;
   children: React.ReactNode;
   onScopeChange?: (scope: Scope) => void;
+  initial?: Record<string, number>;
 }) {
-  const [scope, setScope] = useState<Scope>(() => initScope(ir));
+  const [scope, setScope] = useState<Scope>(() => initScope(ir, initial));
   const scopeRef = useRef(scope);
   const tweensRef = useRef<Map<string, Tween>>(new Map());
   const rafRef = useRef<number | null>(null);

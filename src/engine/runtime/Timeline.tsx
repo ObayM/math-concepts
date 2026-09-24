@@ -8,7 +8,7 @@ import type { SceneIR } from '@/engine/ir/types';
 function baseState(ir: SceneIR): Record<string, number | boolean> {
   const s: Record<string, number | boolean> = {};
   for (const [k, def] of Object.entries(ir.state)) {
-    if (def.type === 'number' || def.type === 'boolean') s[k] = def.init;
+    if (def.type === 'boolean' || (def.type === 'number' && !def.keep)) s[k] = def.init;
   }
   return s;
 }
