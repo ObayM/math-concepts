@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { lessonSchema } from '@/engine/ir/lesson';
 import { exercises } from '@/components/lesson/exercises';
+import { instantiate, varies } from '@/engine/runtime/variant';
+import { readVariant } from '@/lib/variant-token';
 import {
   xpForAttempts,
   lessonXpCap,
@@ -29,17 +31,25 @@ export function countExercises(publishedData) {
 // never trust the client's `correct` — re-derive it from the published
 // exercise and the answer the client claims it submitted. this is the
 // server-side trust boundary for mastery/attempts.
-export function verifyAttempts(slideMap, attempts) {
+export function gradeAnswer(slide, answer, variant, { userId, lessonKey } = {}) {
+  const checker = slide?.exercise ? exercises[slide.exercise.kind] : null;
+  if (!checker) return false;
+  if (!varies(slide)) return Boolean(checker.check(slide, answer));
+  const seed = readVariant(variant, userId, lessonKey, slide.id);
+  if (seed === null) return false;
+  return Boolean(checker.check(instantiate(slide, seed), answer));
+}
+
+export function verifyAttempts(slideMap, attempts, who = {}) {
   return attempts.map((a) => {
     const slide = a.slideId ? slideMap.get(a.slideId) : null;
-    const checker = slide?.exercise ? exercises[slide.exercise.kind] : null;
     return {
       title: a.title,
       question: a.question,
       slideId: a.slideId ?? null,
       kind: a.kind ?? null,
       skill: slide?.exercise?.skill ?? slide?.skill ?? null,
-      correct: checker ? Boolean(checker.check(slide, a.answer)) : false,
+      correct: gradeAnswer(slide, a.answer, a.variant, who),
     };
   });
 }
@@ -128,7 +138,7 @@ export async function getMyMastery(userId) {
   return Object.fromEntries(rows.map((r) => [r.skill, r.score]));
 }
 
-export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) {
+export async function recordPracticeAttempt(userId, lessonKey, slideId, answer, variant) {
   const [lesson, timezone] = await Promise.all([
     prisma.lesson.findUnique({
       where: { lessonKey },
@@ -141,8 +151,7 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer) 
   const slide = buildSlideMap(lesson.publishedData).get(slideId);
   if (!slide?.exercise) return null;
 
-  const checker = exercises[slide.exercise.kind];
-  const correct = checker ? Boolean(checker.check(slide, answer)) : false;
+  const correct = gradeAnswer(slide, answer, variant, { userId, lessonKey });
   const skill = slide.exercise.skill ?? slide.skill ?? null;
 
   await prisma.$transaction(async (tx) => {
@@ -215,7 +224,7 @@ export async function upsertLessonProgress(
 
       if (newAttempts.length) {
         const slideMap = buildSlideMap(lesson.publishedData);
-        const verified = verifyAttempts(slideMap, newAttempts);
+        const verified = verifyAttempts(slideMap, newAttempts, { userId, lessonKey });
 
         await tx.lessonAttempt.createMany({
           data: verified.map((v) => ({

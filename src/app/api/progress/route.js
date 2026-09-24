@@ -21,6 +21,7 @@ const bodySchema = z.object({
         slideId: z.string().max(200).optional(),
         kind: z.string().max(50).optional(),
         answer: z.unknown().optional(),
+        variant: z.string().max(100).optional(),
       })
     )
     .max(500)

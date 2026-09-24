@@ -38,8 +38,17 @@ const numericExercise = z.object({
   tolerance: z.number().nonnegative(),
   unit: z.string().optional(),
   wrong: z
-    .array(z.object({ value: z.number(), why: z.string().optional(), onwrong: branch.optional() }))
+    .array(
+      z.object({
+        value: z.number(),
+        valueExpr: exprIRSchema.optional(),
+        why: z.string().optional(),
+        onwrong: branch.optional(),
+      })
+    )
     .optional(),
+  vary: z.array(z.object({ name: z.string(), values: z.array(z.number()).min(1) })).optional(),
+  answerExprs: z.array(exprIRSchema).optional(),
   ...exerciseBase,
 });
 

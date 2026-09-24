@@ -10,6 +10,7 @@ import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
 import { splitTemplate, countSlots, type TemplateSeg } from './template';
 import { memoryRefs } from '@/engine/runtime/memory';
+import { variantScope } from '@/engine/runtime/variant';
 import {
   applyRoles,
   roleColor,
@@ -1414,9 +1415,119 @@ function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
   };
 }
 
+export const MAX_VARIANTS = 2000;
+
+function varyValues(v: { name: string; values: Expr; ln: number }): number[] {
+  const e = v.values;
+  if (e.k === 'list') return e.items.map((it) => cNum(it, {}, v.ln));
+  if (e.k === 'call' && e.fn === 'range' && (e.args.length === 2 || e.args.length === 3)) {
+    const [lo, hi, step] = e.args.map((a) => cNum(a, {}, v.ln));
+    const by = step ?? 1;
+    if (!(by > 0)) throw new CompileError(`vary ${v.name}: the step must be positive`, v.ln);
+    const out: number[] = [];
+    for (let x = lo; x < hi - 1e-9 && out.length <= MAX_VARIANTS; x += by)
+      out.push(Number(x.toFixed(9)));
+    return out;
+  }
+  throw new CompileError(`vary ${v.name} in range(start, end) or in [a, b, c]`, v.ln);
+}
+
+function emitVaryingNumeric(s: Extract<Stmt, { k: 'numeric' }>) {
+  const names = new Set<string>();
+  const vary = s.vary.map((v) => {
+    if (names.has(v.name)) throw new CompileError(`vary ${v.name} is declared twice`, v.ln);
+    if (v.name in CONSTS || v.name in BUILTINS)
+      throw new CompileError(`vary ${v.name}: that name is taken`, v.ln);
+    names.add(v.name);
+    const values = varyValues(v);
+    if (!values.length) throw new CompileError(`vary ${v.name} has no values`, v.ln);
+    return { name: v.name, values };
+  });
+  const total = vary.reduce((n, v) => n * v.values.length, 1);
+  if (total > MAX_VARIANTS)
+    throw new CompileError(
+      `${total} combinations of vary is too many (at most ${MAX_VARIANTS})`,
+      s.ln
+    );
+
+  const tolerance = s.tolerance ? cNum(s.tolerance, {}, s.ln) : 1e-6;
+  if (tolerance < 0) throw new CompileError('tolerance must not be negative', s.ln);
+  const near = (a: number, b: number) => Math.abs(a - b) <= Math.max(tolerance, 1e-9);
+  const answerExprs = s.answers.map((a) => asIR(foldIR(lowerTree(a, {}))));
+  const wrongExprs = s.wrong.map((w) => asIR(foldIR(lowerTree(w.value, {}))));
+  const expectExpr = s.common.expect && asIR(foldIR(lowerTree(s.common.expect.expr, {})));
+
+  const at = (e: ExprIR, scope: Record<string, number>, ln: number, what: string) => {
+    let v: Value;
+    try {
+      v = evalExpr(e, scope);
+    } catch (err) {
+      if (err instanceof ExprError) throw new CompileError(`${what}: ${err.message}`, ln);
+      throw err;
+    }
+    if (typeof v !== 'number' || !Number.isFinite(v)) {
+      const where = Object.entries(scope)
+        .map(([k, n]) => `${k} = ${n}`)
+        .join(', ');
+      throw new CompileError(`${what} is not a number when ${where}`, ln);
+    }
+    return v;
+  };
+
+  let first: number[] = [];
+  for (let i = 0; i < total; i++) {
+    const scope = variantScope(vary, i);
+    const where = Object.entries(scope)
+      .map(([k, n]) => `${k} = ${n}`)
+      .join(', ');
+    const answers = answerExprs.map((e) => at(e, scope, s.ln, 'answer'));
+    if (i === 0) first = answers;
+    if (expectExpr) {
+      const expected = at(expectExpr, scope, s.common.expect!.ln, 'expect:');
+      if (!answers.some((a) => near(a, expected)))
+        throw new CompileError(
+          `expect: works out to ${expected} when ${where}, but the answer is ${answers.join(' or ')}`,
+          s.common.expect!.ln
+        );
+    }
+    const seen: number[] = [];
+    s.wrong.forEach((w, j) => {
+      const value = at(wrongExprs[j], scope, w.ln, 'wrong');
+      if (answers.some((a) => near(a, value)))
+        throw new CompileError(`wrong ${value} is also a right answer when ${where}`, w.ln);
+      if (seen.some((v) => near(v, value)))
+        throw new CompileError(`two wrong lines both mean ${value} when ${where}`, w.ln);
+      seen.push(value);
+    });
+  }
+
+  return {
+    kind: 'numeric' as const,
+    prompt: s.common.ask,
+    answers: first,
+    answerExprs,
+    vary,
+    tolerance,
+    ...(s.wrong.length && {
+      wrong: s.wrong.map((w, j) => ({
+        value: at(wrongExprs[j], variantScope(vary, 0), w.ln, 'wrong'),
+        valueExpr: wrongExprs[j],
+        ...(w.why && { why: w.why }),
+        ...(w.onwrong && { onwrong: branchIR(w.onwrong) }),
+      })),
+    }),
+    ...(s.unit && { unit: s.unit }),
+    hints: s.common.hints,
+    ...(s.common.explanation && { explanation: s.common.explanation }),
+    ...(s.common.skill && { skill: s.common.skill }),
+    ...(s.common.onwrong && { onwrong: branchIR(s.common.onwrong) }),
+  };
+}
+
 function emitNumeric(s: Extract<Stmt, { k: 'numeric' }>) {
   if (!s.common.ask) throw new CompileError('numeric needs an ask "..."', s.ln);
   if (!s.answers.length) throw new CompileError('numeric needs an answer: <number>', s.ln);
+  if (s.vary.length) return emitVaryingNumeric(s);
   // answers/tolerance fold to constants at compile time (e.g. 64/3, sqrt(2))
   const answers = s.answers.map((a) => cNum(a, {}, s.ln));
   const tolerance = s.tolerance ? cNum(s.tolerance, {}, s.ln) : 1e-6;

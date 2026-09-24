@@ -69,6 +69,7 @@ export type Stmt =
       tolerance: Expr | null;
       unit: string | null;
       wrong: WrongAnswer[];
+      vary: { name: string; values: Expr; ln: number }[];
       common: ExerciseCommon;
       ln: number;
     }

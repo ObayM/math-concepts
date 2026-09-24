@@ -63,10 +63,11 @@ export function stageBranch(
   slides: SlideIR[],
   state: FlowState,
   correct: boolean,
-  answer?: unknown
+  answer?: unknown,
+  shown?: SlideIR | null
 ): FlowState {
   if (correct || state.detour) return state;
-  const slide = activeSlide(slides, state);
+  const slide = shown ?? activeSlide(slides, state);
   if (!slide) return state;
   const branch = wrongBranch(slide, answer);
   if (!branch) return state;

@@ -470,12 +470,13 @@ lesson "What a derivative is" {
     > Your turn, three of them. The letter changes to $x$. Nothing else does.
 
     numeric {
-      ask "$f(x) = x^2$. What's $f'(5)$?"
+      vary a in range(3, 10)
+      ask "$f(x) = x^2$. What's $f'(${a})$?"
       skill: "derivative-from-definition"
-      answer: 10
-      expect: 2 * 5
-      wrong 25 "25 is $f(5)$, the height. The derivative is how steep." -> "d-detour-value" retry
-      hint "Work out $\dfrac{f(5 + h) - f(5)}{h}$, tidy it up, then let $h$ head for 0."
+      answer: 2 * a
+      expect: 2 * a
+      wrong a^2 "${a}² is $f(${a})$, the height. The derivative is how steep." -> "d-detour-value" retry
+      hint "Work out $\dfrac{f(${a} + h) - f(${a})}{h}$, tidy it up, then let $h$ head for 0."
     }
   }
 
@@ -501,13 +502,14 @@ lesson "What a derivative is" {
     > Last one.
 
     numeric {
-      ask "$f(x) = x^2$. What's $f'(-1)$?"
+      vary a in [1, 3, 4, 5]
+      ask "$f(x) = x^2$. What's $f'(-${a})$?"
       skill: "derivative-from-definition"
-      answer: -2
-      expect: 2 * (0 - 1)
-      wrong 2 "Right size. Check the direction: is the curve going up or down at $x = -1$?" -> "d-detour-sign" retry
-      wrong 1 "1 is $f(-1)$, the height. The derivative is how steep." -> "d-detour-value" retry
-      hint "Multiply out $(-1 + h)^2$ carefully. Watch the sign of the middle term."
+      answer: 0 - 2 * a
+      expect: 2 * (0 - a)
+      wrong 2 * a "Right size. Check the direction: is the curve going up or down at $x = -${a}$?" -> "d-detour-sign" retry
+      wrong a^2 "${a}² is $f(-${a})$, the height. The derivative is how steep." -> "d-detour-value" retry
+      hint "Multiply out $(-${a} + h)^2$ carefully. Watch the sign of the middle term."
     }
   }
 

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import SlideView from '@/components/lesson/SlideView';
 import { exercises } from '@/components/lesson/exercises';
+import { instantiate, randomSeed } from '@/engine/runtime/variant';
 import { evalGoals } from '@/engine/runtime/goals';
 import type { Scope } from '@/engine/ir/types';
 import type { LessonIR } from '@/engine/ir/lesson';
@@ -11,7 +12,8 @@ import type { LessonIR } from '@/engine/ir/lesson';
 // slide can have, no progress bar/tutor/backend calls.
 export default function MiniPlayer({ lesson }: { lesson: LessonIR }) {
   const [idx, setIdx] = useState(0);
-  const slide = lesson.slides[Math.min(idx, lesson.slides.length - 1)];
+  const [seed, setSeed] = useState(randomSeed);
+  const slide = instantiate(lesson.slides[Math.min(idx, lesson.slides.length - 1)], seed);
   const checker = slide.exercise ? exercises[slide.exercise.kind] : null;
 
   const [value, setValue] = useState<unknown>(() => (checker ? checker.initial(slide) : null));
@@ -80,7 +82,13 @@ export default function MiniPlayer({ lesson }: { lesson: LessonIR }) {
               Check
             </button>
           ) : (
-            <button className="mini-player-check" onClick={() => setChecked(false)}>
+            <button
+              className="mini-player-check"
+              onClick={() => {
+                setChecked(false);
+                setSeed(randomSeed());
+              }}
+            >
               Try again
             </button>
           )}

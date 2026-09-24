@@ -10,6 +10,7 @@ import LessonCompletion from '@/components/lesson/LessonCompletion';
 import { askTutor, TutorError } from '@/utils/aiService';
 import { evalGoals } from '@/engine/runtime/goals';
 import { emptyMemory, keepFromScope, memoryFromHistory, remember } from '@/engine/runtime/memory';
+import { instantiate, randomSeed, seedOf, varies } from '@/engine/runtime/variant';
 import {
   visiblePath,
   initialFlow,
@@ -50,6 +51,7 @@ export default function LessonPlayer({
   const [stepState, setStepState] = useState({ key: null, idx: 0 });
   const [quizHistory, setQuizHistory] = useState([]);
   const [memory, setMemory] = useState(emptyMemory);
+  const [variant, setVariant] = useState({ key: null, token: null });
   const [isComplete, setIsComplete] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [streak, setStreak] = useState(null);
@@ -82,6 +84,29 @@ export default function LessonPlayer({
   const currentKey = slideKey(flow);
   const isLast = !inDetour && pathIndex === path.length - 1;
   const checker = getChecker(slide);
+  const needsVariant = varies(slide);
+  const variantToken = variant.key === currentKey ? variant.token : null;
+  const played = useMemo(() => {
+    if (!needsVariant) return slide;
+    return variantToken ? instantiate(slide, seedOf(variantToken)) : null;
+  }, [slide, needsVariant, variantToken]);
+
+  useEffect(() => {
+    if (!needsVariant) return;
+    let live = true;
+    const land = (token) => live && setVariant({ key: currentKey, token });
+    fetch('/api/variant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonKey: lessonId, slideId: slide.id }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => land(d?.variant ?? `${randomSeed()}.local`))
+      .catch(() => land(`${randomSeed()}.local`));
+    return () => {
+      live = false;
+    };
+  }, [currentKey, needsVariant, lessonId, slide?.id]);
 
   useEffect(() => {
     if (shownKeyRef.current !== null && shownKeyRef.current !== currentKey) {
@@ -257,12 +282,12 @@ export default function LessonPlayer({
   };
 
   const handleCheck = () => {
-    if (!checker) return;
+    if (!checker || !played) return;
     setChecked(true);
-    const correct = checker.check(slide, answer);
-    setFlow((f) => stageBranch(slides, f, correct, answer));
-    setMemory((m) => remember(m, slide, answer));
-    const question = slide.exercise?.prompt ?? slide.title ?? '';
+    const correct = checker.check(played, answer);
+    setFlow((f) => stageBranch(slides, f, correct, answer, played));
+    setMemory((m) => remember(m, played, answer));
+    const question = played.exercise?.prompt ?? slide.title ?? '';
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;
       return [
@@ -274,6 +299,7 @@ export default function LessonPlayer({
           slideId: slide.id,
           kind: slide.exercise?.kind,
           answer,
+          ...(variantToken && { variant: variantToken }),
         },
       ];
     });
@@ -403,7 +429,7 @@ export default function LessonPlayer({
     goalsMet,
     stepState.key === currentKey ? stepState.idx : 0
   );
-  const correct = checked && checker ? checker.check(slide, answer) : null;
+  const correct = checked && checker && played ? checker.check(played, answer) : null;
   const nextLabel = flow.pending
     ? t('lesson.backUp')
     : inDetour
@@ -538,7 +564,7 @@ export default function LessonPlayer({
 
               <div className="flex-1 w-full">
                 <SlideView
-                  slide={slide}
+                  slide={played ?? { ...slide, prose: undefined, exercise: undefined }}
                   value={answer}
                   checked={checked}
                   correct={correct}

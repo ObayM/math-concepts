@@ -8,6 +8,7 @@ const bodySchema = z.object({
   lessonKey: z.string().min(1).max(200),
   slideId: z.string().min(1).max(200),
   answer: z.unknown().optional(),
+  variant: z.string().max(100).optional(),
 });
 
 export async function POST(request) {
@@ -21,9 +22,9 @@ export async function POST(request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const { lessonKey, slideId, answer } = parsed.data;
+  const { lessonKey, slideId, answer, variant } = parsed.data;
 
-  const result = await recordPracticeAttempt(user.id, lessonKey, slideId, answer);
+  const result = await recordPracticeAttempt(user.id, lessonKey, slideId, answer, variant);
   if (result === null) return NextResponse.json({ error: 'Exercise not found' }, { status: 404 });
 
   return NextResponse.json({ success: true, correct: result.correct, xp: result.xp });

@@ -10,6 +10,7 @@ import SlideView from '@/components/lesson/SlideView';
 import { exercises } from '@/components/lesson/exercises';
 import { evalGoals } from '@/engine/runtime/goals';
 import { weightedPick, slideSkill } from '@/lib/practice';
+import { instantiate, randomSeed, seedOf, varies } from '@/engine/runtime/variant';
 import { useT } from '@/components/i18n/LocaleProvider';
 
 const SESSION_LENGTH = 10;
@@ -34,6 +35,7 @@ export default function PracticeRunner({
   const [done, setDone] = useState(false);
   const [empty, setEmpty] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [variant, setVariant] = useState({ slide: null, token: null });
   const liveMastery = useRef({ ...mastery });
   const liveSeen = useRef({ ...lastSeen });
   const pick = (exclude) =>
@@ -52,6 +54,23 @@ export default function PracticeRunner({
     setValue(exercises[first.exercise.kind].initial(first));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!varies(slide)) return;
+    let live = true;
+    const land = (token) => live && setVariant({ slide, token });
+    fetch('/api/variant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonKey: slide.lessonKey, slideId: slide.id }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => land(d?.variant ?? `${randomSeed()}.local`))
+      .catch(() => land(`${randomSeed()}.local`));
+    return () => {
+      live = false;
+    };
+  }, [slide]);
 
   if (empty) {
     return (
@@ -82,7 +101,9 @@ export default function PracticeRunner({
   }
 
   const checker = exercises[slide.exercise.kind];
-  const correct = checked ? checker.check(slide, value) : null;
+  const token = variant.slide === slide ? variant.token : null;
+  const played = varies(slide) ? (token ? instantiate(slide, seedOf(token)) : null) : slide;
+  const correct = checked && played ? checker.check(played, value) : null;
   const goalsMet =
     goalsState.slideId === slide.id ? goalsState.met : (slide.goals ?? []).map(() => false);
   const goalsSatisfied = !slide.goals?.length || goalsMet.every(Boolean);
@@ -101,7 +122,8 @@ export default function PracticeRunner({
   };
 
   const handleCheck = () => {
-    const isCorrect = checker.check(slide, value);
+    if (!played) return;
+    const isCorrect = checker.check(played, value);
     setChecked(true);
     setStats((s) => ({ attempted: s.attempted + 1, correct: s.correct + (isCorrect ? 1 : 0) }));
 
@@ -124,7 +146,12 @@ export default function PracticeRunner({
       fetch('/api/practice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lessonKey: slide.lessonKey, slideId: slide.id, answer: value }),
+        body: JSON.stringify({
+          lessonKey: slide.lessonKey,
+          slideId: slide.id,
+          answer: value,
+          ...(token && { variant: token }),
+        }),
       })
         .then((r) => r.json())
         .then((d) => {
@@ -239,7 +266,7 @@ export default function PracticeRunner({
             </div>
 
             <SlideView
-              slide={slide}
+              slide={played ?? { ...slide, prose: undefined, exercise: undefined }}
               value={value}
               checked={checked}
               correct={correct}
@@ -254,7 +281,7 @@ export default function PracticeRunner({
               <Button
                 onClick={handleCheck}
                 variant="primary"
-                disabled={!checker.isComplete(slide, value)}
+                disabled={!played || !checker.isComplete(played, value)}
               >
                 {t('lesson.check')}
               </Button>

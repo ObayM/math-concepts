@@ -34,9 +34,9 @@ export const exercisesSection: DocSection = {
     {
       keyword: 'numeric',
       syntax:
-        'numeric {\n  ask "..."\n  answer: <number>\n  [answer: <another accepted value>]\n  [wrong <value> ["why"] [-> "detour-id" [retry]]]\n  [tolerance: <n>]\n  [unit: "..."]\n}',
+        'numeric {\n  ask "..."\n  answer: <number>\n  [answer: <another accepted value>]\n  [wrong <value> ["why"] [-> "detour-id" [retry]]]\n  [vary <name> in range(a, b) | [v1, v2, ...]]\n  [tolerance: <n>]\n  [unit: "..."]\n}',
       description:
-        'A free-entry numeric answer. The learner types a number and it counts as correct if it lands within `tolerance` of any listed `answer`. Answers fold from expressions, so `64/3` or `sqrt(2)` are fine. `tolerance` defaults to a tiny epsilon (so type an exact expected value, or widen it for estimates). `unit` is shown as a suffix in the input. A `wrong` line names a specific mistake: its `"why"` shows when a student types that value, and `-> "detour-id"` sends them to a scaffold made for that misconception (see `onwrong`).',
+        'A free-entry numeric answer. The learner types a number and it counts as correct if it lands within `tolerance` of any listed `answer`. Answers fold from expressions, so `64/3` or `sqrt(2)` are fine. `tolerance` defaults to a tiny epsilon (so type an exact expected value, or widen it for estimates). `unit` is shown as a suffix in the input. A `wrong` line names a specific mistake: its `"why"` shows when a student types that value, and `-> "detour-id"` sends them to a scaffold made for that misconception (see `onwrong`).\n\n`vary` gives fresh numbers on every attempt. Declare `vary a in range(2, 10)` (or a list of values), write `${a}` in the question, and write `answer:`, `expect:` and `wrong` as expressions in `a`. The compiler works every combination out and refuses to build if `expect:` disagrees with the answer, or a `wrong` value is right, for any of them. Each time a student meets the question the server hands out a new signed seed, and grading uses that seed, so it stays on the server.',
       props: [
         { name: 'answer', type: 'number', description: 'an accepted value (repeatable)' },
         {
@@ -49,6 +49,12 @@ export const exercisesSection: DocSection = {
           name: 'wrong',
           type: '<value> ["why"] [-> "slide-id" [retry]]',
           description: 'a known wrong answer, its feedback, and its own detour (repeatable)',
+        },
+        {
+          name: 'vary',
+          type: '<name> in range(a, b) | [values]',
+          description:
+            'a number that changes on every attempt, usable as ${name} in the text (repeatable)',
         },
       ],
       example:

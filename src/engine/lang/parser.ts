@@ -640,10 +640,18 @@ function makeParser(tokens: Token[]) {
     let tolerance: Expr | null = null;
     let unit: string | null = null;
     const wrong: WrongAnswer[] = [];
+    const vary: { name: string; values: Expr; ln: number }[] = [];
     const common: ExerciseCommon = { ask: '', hints: [] };
     while (!check('RC') && !check('EOF')) {
       if (parseCommonLine(common)) continue;
-      if (at('wrong')) {
+      if (at('vary')) {
+        const vln = peek().line;
+        pos++;
+        const name = eatIdent();
+        eat('IDENT', 'in');
+        vary.push({ name, values: parseExpr(), ln: vln });
+        endStmt();
+      } else if (at('wrong')) {
         const wln = peek().line;
         pos++;
         const value = parseOr();
@@ -682,14 +690,14 @@ function makeParser(tokens: Token[]) {
         const t = peek();
         const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
         throw new CompileError(
-          `unexpected ${what} in numeric - use ask/answer/wrong/tolerance/unit/hint/!`,
+          `unexpected ${what} in numeric - use ask/answer/vary/wrong/tolerance/unit/hint/!`,
           t.line,
           t.col
         );
       }
     }
     eat('RC');
-    return { k: 'numeric', answers, tolerance, unit, wrong, common, ln };
+    return { k: 'numeric', answers, tolerance, unit, wrong, vary, common, ln };
   }
 
   function parseBuild(ln: number): Stmt {

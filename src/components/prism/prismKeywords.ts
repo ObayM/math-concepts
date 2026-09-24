@@ -113,6 +113,7 @@ export const KEYWORDS = new Set([
   'trace',
   'ghost',
   'alt',
+  'vary',
   'alpha',
   'by',
 ]);
