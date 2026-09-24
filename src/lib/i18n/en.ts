@@ -50,6 +50,8 @@ const en = {
   'exercise.answerIs': 'Not quite. The answer is',
   'exercise.hint': 'Need a hint?',
   'exercise.anotherHint': 'Another hint',
+  'goal.showMe': 'Show me',
+  'goal.helped': 'We showed you this one. Watch what changed.',
 
   'exercise.answerChoices': 'Answer choices',
   'exercise.tokenBank': 'Token bank',

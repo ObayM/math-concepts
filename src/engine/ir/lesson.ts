@@ -127,6 +127,13 @@ export const goal = z.object({
   prompt: z.string(),
   when: exprIRSchema,
   hint: z.string().optional(),
+  hints: z.array(z.string()).optional(),
+  showme: z
+    .object({
+      set: z.record(z.string(), z.union([z.number(), z.boolean()])),
+      duration: z.number().nonnegative().optional(),
+    })
+    .optional(),
 });
 
 const slide = z.object({

@@ -52,6 +52,8 @@ const ar: Dictionary = {
   'exercise.answerIs': 'ليست صحيحة. الإجابة هي',
   'exercise.hint': 'تحتاج تلميحًا؟',
   'exercise.anotherHint': 'تلميح آخر',
+  'goal.showMe': 'ورّيني',
+  'goal.helped': 'وريناك هذا الهدف. لاحظ ما الذي تغيّر.',
 
   'exercise.answerChoices': 'خيارات الإجابة',
   'exercise.tokenBank': 'العناصر المتاحة',

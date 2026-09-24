@@ -1651,7 +1651,28 @@ function emitGoal(s: Extract<Stmt, { k: 'goal' }>, allowedIds: string[]) {
   validateGoalIds(whenExpr, allowedIds, s.ln);
   const when = asIR(lower(whenExpr, {}));
   const hint = pStr(s.props, 'hint');
-  return { prompt: s.prompt, when, ...(hint && { hint }) };
+  const ladder = pStrList(s.props, 'hints');
+  if (hint && ladder) throw new CompileError('a goal takes hint: or hints: [...], not both', s.ln);
+  if (ladder && (!ladder.length || ladder.some((h) => !h)))
+    throw new CompileError('hints: needs a list of strings', s.ln);
+  const showme = propDict(s.props, 'showme', s.ln);
+  if (showme) {
+    for (const k of Object.keys(showme)) {
+      if (!allowedIds.includes(k))
+        throw new CompileError(`showme: "${k}" is not defined here${suggest(k, allowedIds)}`, s.ln);
+    }
+  }
+  const dur = s.props.get('dur');
+  const duration = dur && dur !== true ? cNum(dur, {}, s.ln) : undefined;
+  if (duration != null && !showme)
+    throw new CompileError('dur: only means something with showme:', s.ln);
+  return {
+    prompt: s.prompt,
+    when,
+    ...(hint && { hint }),
+    ...(ladder && { hints: ladder }),
+    ...(showme && { showme: { set: showme, ...(duration != null && { duration }) } }),
+  };
 }
 
 function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {

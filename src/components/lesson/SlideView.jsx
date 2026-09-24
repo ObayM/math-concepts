@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { Scene } from '@/engine';
 import RichText, { proseClass } from './RichText';
 import GoalBanner from './GoalBanner';
@@ -37,6 +38,11 @@ export default function SlideView({
   revealAnswer = true,
 }) {
   const t = useT();
+  const [command, setCommand] = useState(null);
+  const showMe = (i) => {
+    const goal = slide.goals?.[i];
+    if (goal?.showme) setCommand({ id: Date.now(), slideId: slide.id, ...goal.showme });
+  };
   const Exercise = slide.exercise ? exerciseRegistry[slide.exercise.kind] : null;
 
   const isHotspot = slide.exercise?.kind === 'hotspot';
@@ -73,11 +79,14 @@ export default function SlideView({
             revealed={checked && revealAnswer}
             inputLayer={inputLayer}
             tapLabel={t('exercise.sceneAria')}
+            command={command?.slideId === slide.id ? command : undefined}
           />
         </div>
       )}
 
-      {slide.goals && <GoalBanner key={slide.id} goals={slide.goals} goalsMet={goalsMet} />}
+      {slide.goals && (
+        <GoalBanner key={slide.id} goals={slide.goals} goalsMet={goalsMet} onShowMe={showMe} />
+      )}
 
       {Exercise && (
         <div data-feedback={checked ? (correct ? 'correct' : 'wrong') : undefined}>

@@ -69,9 +69,10 @@ export const lessonSection: DocSection = {
     },
     {
       keyword: 'goal',
-      syntax: 'goal "Instruction" { when: <condition>, [hint: "..."] }',
+      syntax:
+        'goal "Instruction" { when: <condition>, [hints: ["...", "..."]], [showme: {k: v}], [dur: <ms>] }',
       description:
-        'Gates the slide\'s Continue until the learner satisfies `when` (a boolean expression over the scene\'s state — it latches once true). Use it for guided tasks like "drag the vertex below the axis".',
+        'Gates the slide\'s Continue until the learner satisfies `when` (a boolean expression over the scene\'s state, which latches once true). Use it for guided tasks like "drag the vertex below the axis". Hints stay hidden until the learner has been stuck for a while, then arrive one at a time, broadest first. Once the last hint is out, `showme` offers a Show me button that animates the scene to the given values, so the goal gets met in front of them and is marked as helped. `dsl verify` checks that the goal starts unmet and that `showme` really meets it.',
       props: [
         {
           name: 'when',
@@ -79,10 +80,29 @@ export const lessonSection: DocSection = {
           description: 'boolean condition over scene state',
           required: true,
         },
-        { name: 'hint', type: 'string', description: 'nudge shown if the learner is stuck' },
+        {
+          name: 'hint',
+          type: 'string',
+          description: 'a single nudge shown if the learner is stuck',
+        },
+        {
+          name: 'hints',
+          type: '[string]',
+          description: 'a ladder of nudges, broadest first, one more per tap',
+        },
+        {
+          name: 'showme',
+          type: '{ key: value }',
+          description: 'state the Show me button animates to, which must meet the goal',
+        },
+        {
+          name: 'dur',
+          type: 'ms',
+          description: 'how long the Show me animation takes (default 2000)',
+        },
       ],
       example:
-        'scene plane {\n  x: [-6, 6]\n  y: [-6, 6]\n  grid\n  axes\n  param r1 = -3 { range: [-6, 6] }\n  param r2 = 2 { range: [-6, 6] }\n  point p1 = (r1, 0) { drag: x -> r1, color: danger }\n  point p2 = (r2, 0) { drag: x -> r2, color: danger }\n}\ngoal "Make both roots negative" { when: r1 < 0 and r2 < 0, hint: "Drag both points left." }',
+        'scene plane {\n  x: [-6, 6]\n  y: [-6, 6]\n  grid\n  axes\n  param r1 = -3 { range: [-6, 6] }\n  param r2 = 2 { range: [-6, 6] }\n  point p1 = (r1, 0) { drag: x -> r1, color: danger }\n  point p2 = (r2, 0) { drag: x -> r2, color: danger }\n}\ngoal "Make both roots negative" {\n  when: r1 < 0 and r2 < 0\n  hints: ["Where does a negative root sit on the axis?", "Drag both red points left of zero."]\n  showme: { r1: -4, r2: -1 }\n}',
     },
     {
       keyword: 'onwrong',

@@ -66,7 +66,7 @@ function labelTexts(scene: SceneIR | undefined): string[] {
 function studentText(slide: SlideIR): string[] {
   const ex = slide.exercise;
   const out = [slide.title ?? '', slide.prose ?? ''];
-  for (const g of slide.goals ?? []) out.push(g.prompt, g.hint ?? '');
+  for (const g of slide.goals ?? []) out.push(g.prompt, g.hint ?? '', ...(g.hints ?? []));
   if (ex) {
     out.push(ex.prompt, ex.explanation ?? '', ...ex.hints);
     if (ex.kind === 'quiz') for (const o of ex.options) out.push(o.text, o.why ?? '');
@@ -109,6 +109,23 @@ function checkGoals(slide: SlideIR, out: Finding[]) {
         severity: 'error',
         message: `goal ${i + 1} ("${g.prompt}") is already true with the scene's starting values, so Continue opens before the student touches anything`,
       });
+    }
+
+    if (g.showme) {
+      let lands = false;
+      try {
+        lands = Boolean(evalExpr(g.when as ExprIR, { ...scope, ...g.showme.set } as never));
+      } catch {
+        lands = false;
+      }
+      if (!lands) {
+        out.push({
+          slideId: slide.id,
+          code: 'V_SHOWME_MISSES',
+          severity: 'error',
+          message: `goal ${i + 1}'s showme: leaves the goal unmet, so Show me would play and still leave Continue locked`,
+        });
+      }
     }
 
     for (const name of floatEquals(g.when as ExprIR)) {

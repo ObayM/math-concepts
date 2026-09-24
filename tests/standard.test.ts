@@ -192,3 +192,32 @@ describe('verifyLesson', () => {
     expect(found.every((f) => !isBlocking(f))).toBe(true);
   });
 });
+
+describe('show me', () => {
+  const body = (to: number) => `  slide "g" {
+    scene plane {
+      x: [0, 1]
+      y: [0, 1]
+      param h = 1 { range: [0, 1], step: 0.001 }
+      slider h
+    }
+    goal "Get h below 0.01" { when: h < 0.01, hints: ["left"], showme: { h: ${to} } }
+  }`;
+
+  it('flags a show me that does not meet its goal', () => {
+    expect(codes(body(0.5))).toContain('V_SHOWME_MISSES');
+    expect(codes(body(0.001))).not.toContain('V_SHOWME_MISSES');
+  });
+
+  it('refuses a show me on state that does not exist', () => {
+    expect(() => lesson(body(0.5).replace('showme: { h:', 'showme: { hh:'))).toThrow(
+      /showme: "hh" is not defined here/
+    );
+  });
+
+  it('refuses hint and hints together', () => {
+    expect(() => lesson(body(0.5).replace('hints: ["left"]', 'hint: "a", hints: ["b"]'))).toThrow(
+      /not both/
+    );
+  });
+});
