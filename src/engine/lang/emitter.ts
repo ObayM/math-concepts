@@ -9,7 +9,7 @@ import { lex } from './lexer';
 import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
 import { splitTemplate, countSlots, type TemplateSeg } from './template';
-import { LESSON_DIFFICULTIES, LESSON_ICONS } from './icons';
+import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from './icons';
 
 type CompileScope = Record<string, number | boolean>;
 type Macros = Map<string, { params: string[]; body: Stmt[] }>;
@@ -1189,6 +1189,19 @@ function pEnum<T extends string>(
   return v as T;
 }
 
+function pBeat(props: PropMap, ln: number): (typeof SLIDE_BEATS)[number] | undefined {
+  const v = props.get('beat');
+  if (v === undefined) return undefined;
+  const name = v !== true && v.k === 'id' ? v.name : v !== true && v.k === 'str' ? v.v : null;
+  if (name == null || !SLIDE_BEATS.includes(name as never)) {
+    throw new CompileError(
+      `beat: must be one of ${SLIDE_BEATS.join(', ')}${name ? `, got "${name}"${suggest(name, SLIDE_BEATS)}` : ''}`,
+      ln
+    );
+  }
+  return name as (typeof SLIDE_BEATS)[number];
+}
+
 function pStrList(props: PropMap, key: string): string[] | undefined {
   const v = props.get(key);
   if (v && v !== true && v.k === 'list') {
@@ -1727,9 +1740,11 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   const category = pStr(s.props, 'cat');
   const skill = pStr(s.props, 'skill');
   const hidden = pBool(s.props, 'hidden');
+  const beat = pBeat(s.props, s.ln);
   return {
     id,
     title: s.title,
+    ...(beat && { beat }),
     ...(category && { category }),
     ...(skill && { skill }),
     ...(hidden && { hidden }),

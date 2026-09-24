@@ -25,3 +25,19 @@ export type LessonIcon = (typeof LESSON_ICONS)[number];
 export const LESSON_DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const;
 
 export type LessonDifficulty = (typeof LESSON_DIFFICULTIES)[number];
+
+export const SLIDE_BEATS = [
+  'check',
+  'bridge',
+  'hook',
+  'explore',
+  'reveal',
+  'trap',
+  'name',
+  'breaker',
+  'example',
+  'transfer',
+  'detour',
+] as const;
+
+export type SlideBeat = (typeof SLIDE_BEATS)[number];

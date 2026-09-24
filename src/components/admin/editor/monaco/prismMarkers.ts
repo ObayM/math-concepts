@@ -40,6 +40,13 @@ export function computeMarkers(source: string, monaco: Monaco): editor.IMarkerDa
 
   const lines = slideLines(source);
   return findings.map((f) =>
-    at(monaco, monaco.MarkerSeverity.Warning, f.message, lines.get(f.slideId) ?? 1, 1, f.code)
+    at(
+      monaco,
+      f.severity === 'warning' ? monaco.MarkerSeverity.Info : monaco.MarkerSeverity.Warning,
+      f.message,
+      lines.get(f.slideId) ?? 1,
+      1,
+      f.code
+    )
   );
 }

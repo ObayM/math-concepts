@@ -3,7 +3,10 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { compileLesson, slideLines } from '@/engine/lang';
 import { lessonSchema } from '@/engine/ir/lesson';
-import { verifyLesson } from '@/engine/verify';
+import { verifyLesson as verifyAll, isBlocking } from '@/engine/verify';
+import type { LessonIR } from '@/engine/ir/lesson';
+
+const verifyLesson = (lesson: LessonIR) => verifyAll(lesson).filter(isBlocking);
 
 const codes = (src: string) =>
   verifyLesson(lessonSchema.parse(compileLesson(src))).map((f) => f.code);

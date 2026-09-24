@@ -1,11 +1,13 @@
 import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
 import type { SceneIR } from '@/engine/ir/types';
 import { evalNum } from '@/engine/expr';
+import { checkStandard } from './standard';
 
 export interface Finding {
   slideId: string;
   code: string;
   message: string;
+  severity?: 'error' | 'warning';
 }
 
 const SAMPLES = 60;
@@ -338,5 +340,7 @@ export function verifyLesson(lesson: LessonIR): Finding[] {
     checkFreeDragAnchor(slide, out);
   }
   checkDetourReachable(lesson, out);
-  return out;
+  return [...out.map((f) => ({ ...f, severity: 'error' as const })), ...checkStandard(lesson)];
 }
+
+export const isBlocking = (f: Finding) => f.severity !== 'warning';

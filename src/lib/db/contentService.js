@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
-import { verifyLesson } from '@/engine/verify';
+import { verifyLesson, isBlocking } from '@/engine/verify';
 
 function slugify(name) {
   return name
@@ -129,7 +129,8 @@ export async function publishLesson(id, { force = false } = {}) {
   if (!lesson) throw new Error('lesson not found');
   const compiled = compileAndValidate(lesson.source);
   if (compiled.error) throw new Error(compiled.error);
-  if (compiled.findings.length && !force) throw new VerifyError(compiled.findings);
+  const blocking = compiled.findings.filter(isBlocking);
+  if (blocking.length && !force) throw new VerifyError(blocking);
   return prisma.lesson.update({
     where: { id },
     data: {

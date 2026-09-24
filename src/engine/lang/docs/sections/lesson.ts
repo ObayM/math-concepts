@@ -35,9 +35,9 @@ export const lessonSection: DocSection = {
     {
       keyword: 'slide',
       syntax:
-        'slide "Title" {\n  [cat: "..."]\n  [skill: "..."]\n  > prose...\n  scene ... { ... }\n  <exercise>\n  goal "..." { ... }\n}',
+        'slide "Title" {\n  [beat: explore]\n  [cat: "..."]\n  [skill: "..."]\n  > prose...\n  scene ... { ... }\n  <exercise>\n  goal "..." { ... }\n}',
       description:
-        'One screen of a lesson. Compose it from prose, an optional scene, an optional exercise (quiz/build), and optional goals. `cat` groups slides into sections; `skill` tags the specific skill this slide drills.',
+        'One screen of a lesson. Compose it from prose, an optional scene, an optional exercise (quiz/build), and optional goals. `cat` groups slides into sections; `skill` tags the specific skill this slide drills. `beat` says which part of the lesson standard the slide is (hook, explore, trap, name, transfer...), so `dsl verify --standard` can warn about a lesson with no trap, no transfer, or symbols named before anything was explored.',
       props: [
         { name: 'cat', type: 'string', description: 'section/category label' },
         {
@@ -51,9 +51,14 @@ export const lessonSection: DocSection = {
           type: 'boolean',
           description: 'keep off the main path; only reachable as an onwrong: detour',
         },
+        {
+          name: 'beat',
+          type: 'check | bridge | hook | explore | reveal | trap | name | breaker | example | transfer | detour',
+          description: 'the beat this slide plays in the lesson, for the linter',
+        },
       ],
       example:
-        'slide "Vertex form" {\n  cat: "Forms"\n  > Drag the vertex — the curve follows.\n  scene plane {\n    x: [-6, 6]\n    y: [-6, 6]\n    param h = 1 { range: [-4, 4] }\n    param k = -2 { range: [-4, 4] }\n    curve f = (x-h)^2 + k { color: primary }\n    point v = (h, k) { drag: xy -> (h, k), color: accent }\n  }\n}',
+        'slide "Vertex form" {\n  beat: explore\n  cat: "Forms"\n  > Drag the vertex and the curve follows.\n  scene plane {\n    x: [-6, 6]\n    y: [-6, 6]\n    param h = 1 { range: [-4, 4] }\n    param k = -2 { range: [-4, 4] }\n    curve f = (x-h)^2 + k { color: primary }\n    point v = (h, k) { drag: xy -> (h, k), color: accent }\n  }\n}',
     },
     {
       keyword: '>',

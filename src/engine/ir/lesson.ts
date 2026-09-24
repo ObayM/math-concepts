@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sceneSchema } from './schema';
 import { exprIRSchema } from '@/engine/expr';
-import { LESSON_DIFFICULTIES, LESSON_ICONS } from '@/engine/lang/icons';
+import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from '@/engine/lang/icons';
 
 // the stored IR is a cache of the compiled source, never the record. anything
 // older than this gets recompiled on read rather than migrated. see issue #7.
@@ -132,6 +132,7 @@ export const goal = z.object({
 const slide = z.object({
   id: z.string(),
   title: z.string().optional(),
+  beat: z.enum(SLIDE_BEATS).optional(),
   category: z.string().optional(),
   skill: z.string().optional(),
   hidden: z.boolean().optional(),

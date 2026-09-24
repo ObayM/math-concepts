@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { compile, compileLesson, CompileError, formatCompileError } from '@/engine/lang';
-import { verifyLesson } from '@/engine/verify';
+import { verifyLesson, isBlocking } from '@/engine/verify';
 import { PRISM_DOCS } from '@/engine/lang/docs';
 import { PRISM_COOKBOOK } from '@/engine/lang/docs/cookbook';
 import { PRISM_ERRORS } from '@/engine/lang/docs/errors';
@@ -115,7 +115,8 @@ if (cmd === 'docs-check') {
   }
   process.exit(anyFail ? 1 : 0);
 } else if (cmd === 'verify') {
-  const dir = argv[1] ?? 'prisma/lessons';
+  const standard = argv.includes('--standard');
+  const dir = argv.slice(1).find((a) => !a.startsWith('--')) ?? 'prisma/lessons';
   const target = fs.statSync(dir).isDirectory()
     ? fs
         .readdirSync(dir)
@@ -123,6 +124,7 @@ if (cmd === 'docs-check') {
         .map((f) => path.join(dir, f))
     : [dir];
   let total = 0;
+  let warnings = 0;
   for (const file of target) {
     const src = fs.readFileSync(file, 'utf8');
     if (!isLesson(src)) continue;
@@ -135,13 +137,17 @@ if (cmd === 'docs-check') {
       total++;
       continue;
     }
-    if (!findings.length) {
+    const errors = findings.filter(isBlocking);
+    const style = findings.filter((f) => !isBlocking(f));
+    warnings += style.length;
+    const shown = standard ? findings : errors;
+    if (!shown.length) {
       console.log(`${G}✓${X} ${path.basename(file)}`);
       continue;
     }
-    total += findings.length;
-    console.log(`${Y}!${X} ${path.basename(file)} ${D}(${findings.length})${X}`);
-    for (const f of findings) {
+    total += errors.length;
+    console.log(`${Y}!${X} ${path.basename(file)} ${D}(${shown.length})${X}`);
+    for (const f of shown) {
       console.log(`  ${Y}${f.code}${X} ${D}${f.slideId}${X}`);
       console.log(`    ${f.message}`);
     }
@@ -151,6 +157,8 @@ if (cmd === 'docs-check') {
       ? `\n${Y}${total} thing${total === 1 ? '' : 's'} worth a look${X}`
       : `\n${G}nothing to flag${X}`
   );
+  if (warnings && !standard)
+    console.log(`${D}${warnings} lesson-standard warnings, see them with --standard${X}`);
   process.exit(total ? 1 : 0);
 } else if (cmd === 'compile') {
   const file = argv[1];
@@ -174,6 +182,7 @@ ${B}commands:${X}
   check <file>       validate a .prism lesson or scene file
   check-all [dir]    validate every .prism file (default: prisma/lessons)
   verify [dir|file]  look for math and reachability problems the compiler can't catch
+                     (--standard also lists the lesson-standard warnings)
   compile <file>     compile and print the IR as JSON
   docs-check         compile every /prism doc example, gallery entry, and cookbook source
 
