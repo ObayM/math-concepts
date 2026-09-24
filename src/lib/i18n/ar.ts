@@ -269,6 +269,9 @@ const ar: Dictionary = {
   'settings.deleting': 'جارٍ الحذف...',
   'settings.deleteKeep': 'خليني محتفظ بحسابي',
   'settings.deleteFailed': 'ما ظبطش. راجع كلمة المرور.',
+  'practice.takeALesson':
+    'التدريب يعيد لك فقط ما تعلمته. خذ درسًا في {course} أولًا وستبدأ أسئلته بالظهور هنا.',
+  'practice.sessionDone': 'انتهت الجلسة',
   'practice.nothing': 'مفيش حاجة للتدريب',
   'practice.loading': 'جارٍ تحميل التدريب...',
   'practice.sharp': 'شغل ممتاز. الحاجات دي ثبتت.',

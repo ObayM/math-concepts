@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { slideSkill, slideWeight, weightedPick, weakestSkills } from '@/lib/practice';
+import {
+  slideSkill,
+  slideWeight,
+  weightedPick,
+  weakestSkills,
+  reviewInterval,
+  timeFactor,
+} from '@/lib/practice';
 
 const slide = (id: string, skill?: string) => ({
   id,
@@ -109,5 +116,41 @@ describe('weakestSkills', () => {
 
   it('handles an empty map', () => {
     expect(weakestSkills({})).toEqual([]);
+  });
+});
+
+describe('spaced resurfacing', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = 100 * DAY;
+
+  it('stretches the review interval as mastery grows', () => {
+    expect([0.2, 0.6, 0.8, 0.95].map(reviewInterval)).toEqual([1, 3, 7, 21]);
+  });
+
+  it('holds back a skill seen minutes ago and boosts one that is due', () => {
+    expect(timeFactor(0.9, now - 60_000, now)).toBeLessThan(0.5);
+    expect(timeFactor(0.9, now - 25 * DAY, now)).toBe(3);
+    expect(timeFactor(0.9, now - 10 * DAY, now)).toBeGreaterThan(0.5);
+    expect(timeFactor(0.9, now - 10 * DAY, now)).toBeLessThan(1);
+    expect(timeFactor(undefined, undefined, now)).toBe(1);
+  });
+
+  it('brings a mastered skill back once it is due', () => {
+    const pool = [slide('a', 'old'), slide('b', 'fresh')];
+    const mastery = { old: 1, fresh: 1 };
+    const lastSeen = { old: now - 30 * DAY, fresh: now - 60_000 };
+    let old = 0;
+    const rng = seeded(Array.from({ length: 200 }, (_, i) => (i + 0.5) / 200));
+    for (let i = 0; i < 200; i++) {
+      if (weightedPick(pool, mastery, rng, undefined, { lastSeen, now })?.id === 'a') old++;
+    }
+    expect(old / 200).toBeGreaterThan(0.85);
+  });
+
+  it('does not ask the same skill twice in a row when there is another', () => {
+    const pool = [slide('a1', 'x'), slide('a2', 'x'), slide('b', 'y')];
+    for (let i = 0; i < 20; i++) {
+      expect(weightedPick(pool, {}, Math.random, pool[0])?.id).toBe('b');
+    }
   });
 });

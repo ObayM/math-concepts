@@ -100,6 +100,26 @@ async function rebuildSkillMastery(tx, userId, skill) {
   });
 }
 
+export async function getMySkillTimes(userId) {
+  const rows = await prisma.userSkillMastery.findMany({
+    where: { userId },
+    select: { skill: true, updatedAt: true },
+  });
+  return Object.fromEntries(rows.map((r) => [r.skill, r.updatedAt.getTime()]));
+}
+
+export async function getTakenLessonIds(userId) {
+  const [progress, attempts] = await Promise.all([
+    prisma.userLessonProgress.findMany({ where: { userId }, select: { lessonId: true } }),
+    prisma.lessonAttempt.findMany({
+      where: { userId },
+      select: { lessonId: true },
+      distinct: ['lessonId'],
+    }),
+  ]);
+  return [...new Set([...progress, ...attempts].map((r) => r.lessonId))];
+}
+
 export async function getMyMastery(userId) {
   const rows = await prisma.userSkillMastery.findMany({
     where: { userId },

@@ -63,9 +63,9 @@ export async function getNextLessonKey(courseId, sortOrder) {
 // pool — the source for infinite practice mode. exercises live inside each
 // lesson's compiled `data` JSON, not a separate table, so this has to pull
 // every lesson row and scan its slides.
-export async function getExercisePoolByCourse(courseId) {
+export async function getExercisePoolByCourse(courseId, { lessonIds } = {}) {
   const lessons = await prisma.lesson.findMany({
-    where: { courseId, status: 'published' },
+    where: { courseId, status: 'published', ...(lessonIds && { id: { in: lessonIds } }) },
     select: { lessonKey: true, title: true, publishedData: true },
   });
 

@@ -261,6 +261,9 @@ const en = {
   'settings.deleting': 'Deleting...',
   'settings.deleteKeep': 'Keep my account',
   'settings.deleteFailed': "That didn't work. Check your password.",
+  'practice.takeALesson':
+    'Practice only brings back what you have learned. Take a lesson in {course} first and its questions will start turning up here.',
+  'practice.sessionDone': 'Session done',
   'practice.nothing': 'Nothing to practice',
   'practice.loading': 'Loading practice...',
   'practice.sharp': 'Sharp work. That stuff is sticking.',

@@ -16,7 +16,13 @@ const SESSION_LENGTH = 10;
 
 const playable = (slide) => (slide && exercises[slide.exercise?.kind] ? slide : null);
 
-export default function PracticeRunner({ pool, mastery = {}, coursePath, courseName }) {
+export default function PracticeRunner({
+  pool,
+  mastery = {},
+  lastSeen = {},
+  coursePath,
+  courseName,
+}) {
   const t = useT();
   const router = useRouter();
 
@@ -29,10 +35,15 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   const [empty, setEmpty] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const liveMastery = useRef({ ...mastery });
+  const liveSeen = useRef({ ...lastSeen });
+  const pick = (exclude) =>
+    playable(
+      weightedPick(pool, liveMastery.current, Math.random, exclude, { lastSeen: liveSeen.current })
+    );
   const activityTouched = useRef(false);
 
   useEffect(() => {
-    const first = playable(weightedPick(pool, liveMastery.current));
+    const first = pick();
     if (!first) {
       setEmpty(true);
       return;
@@ -50,7 +61,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
             {t('practice.nothing')}
           </h1>
           <p className="mt-2 text-neutral-500">
-            {courseName} has no questions ready yet. Try a lesson first.
+            {t('practice.takeALesson', { course: courseName })}
           </p>
           <Link href={`/courses/${coursePath}`} className="mt-6 inline-block">
             <Button variant="secondary">{t('practice.backTo', { course: courseName })}</Button>
@@ -98,6 +109,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
     if (skill) {
       const prev = liveMastery.current[skill] ?? 0;
       liveMastery.current[skill] = prev * 0.7 + (isCorrect ? 1 : 0) * 0.3;
+      liveSeen.current[skill] = Date.now();
     }
 
     if (!activityTouched.current) {
@@ -126,10 +138,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
   };
 
   const handleNext = () => {
-    const next =
-      stats.attempted >= SESSION_LENGTH
-        ? null
-        : playable(weightedPick(pool, liveMastery.current, Math.random, slide));
+    const next = stats.attempted >= SESSION_LENGTH ? null : pick(slide);
     if (!next) {
       setDone(true);
       return;
@@ -144,7 +153,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
     setXpEarned(0);
     setDone(false);
     setChecked(false);
-    const next = playable(weightedPick(pool, liveMastery.current, Math.random, slide));
+    const next = pick(slide);
     if (!next) {
       setDone(true);
       return;
@@ -159,7 +168,7 @@ export default function PracticeRunner({ pool, mastery = {}, coursePath, courseN
       <div className="-mt-[var(--nav-h)] min-h-dvh px-4 pb-4 pt-[var(--nav-h)] md:px-6 md:pb-6 flex items-center justify-center">
         <Card className="card-hero animate-fade-in-up rounded-3xl p-10 max-md:p-6 w-full max-w-lg text-center">
           <p className="text-primary-500 font-bold text-sm tracking-wider uppercase mb-3">
-            Session done
+            {t('practice.sessionDone')}
           </p>
           <h1 className="font-display text-4xl font-bold text-neutral-900 tracking-tight mb-2">
             {t('practice.outOf', { correct: stats.correct, total: stats.attempted })}

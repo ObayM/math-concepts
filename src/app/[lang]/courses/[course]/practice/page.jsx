@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { getExercisePoolByCourse } from '@/lib/db/lessonService';
 import { resolveCourseBySlug } from '@/lib/db/courseService';
-import { getMyMastery } from '@/lib/db/progressService';
+import { getMyMastery, getMySkillTimes, getTakenLessonIds } from '@/lib/db/progressService';
 import { requireUser } from '@/lib/session';
 import PracticeRunner from '@/components/lesson/PracticeRunner';
 import Button from '@/components/ui/Button';
@@ -16,9 +16,12 @@ export default async function PracticePage({ params }) {
   const course = await resolveCourseBySlug(courseSlug, lang);
   if (!course) notFound();
 
-  const [pool, mastery] = await Promise.all([
-    getExercisePoolByCourse(course.id),
+  const taken = await getTakenLessonIds(user.id);
+  const [pool, mastery, lastSeen, anyInCourse] = await Promise.all([
+    getExercisePoolByCourse(course.id, { lessonIds: taken }),
     getMyMastery(user.id),
+    getMySkillTimes(user.id),
+    getExercisePoolByCourse(course.id).then((all) => all.length > 0),
   ]);
 
   if (!pool.length) {
@@ -27,7 +30,9 @@ export default async function PracticePage({ params }) {
         <div className="text-center max-w-md">
           <h1 className="text-2xl font-extrabold text-neutral-900 mb-2">{t('practice.nothing')}</h1>
           <p className="text-neutral-500 mb-6">
-            {t('practice.emptyBody', { course: course.name })}
+            {anyInCourse
+              ? t('practice.takeALesson', { course: course.name })
+              : t('practice.emptyBody', { course: course.name })}
           </p>
           <Button as="a" href={`/courses/${courseSlug}`} variant="outline">
             {t('practice.backTo', { course: course.name })}
@@ -41,6 +46,7 @@ export default async function PracticePage({ params }) {
     <PracticeRunner
       pool={pool}
       mastery={mastery}
+      lastSeen={lastSeen}
       coursePath={courseSlug}
       courseName={course.name}
     />
