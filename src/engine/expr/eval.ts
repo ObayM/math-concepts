@@ -1,5 +1,6 @@
 import type { ExprIR, Scope, Value } from './types';
 import { BUILTINS, CONSTS } from './builtins';
+import { shortNum } from '@/engine/format';
 
 // tree-walking evaluator. replaces the old string + new Function path:
 // no eval, no CSP unsafe-eval, and unknown identifiers throw instead of
@@ -109,8 +110,8 @@ export function evalText(t: { parts: (string | ExprIR)[] }, scope: Scope): strin
       const v = evalExpr(p, scope);
       if (typeof v === 'string') return v;
       if (typeof v === 'boolean') return String(v);
-      if (!isFinite(v)) return '—';
-      return String(Math.round(v * 100) / 100);
+      if (!isFinite(v)) return '?';
+      return shortNum(v);
     })
     .join('');
 }

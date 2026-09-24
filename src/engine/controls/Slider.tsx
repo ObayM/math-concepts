@@ -1,5 +1,6 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
+import { shortNum } from '@/engine/format';
 
 type SliderControl = {
   as: 'slider';
@@ -22,7 +23,7 @@ export default function Slider({ control }: { control: SliderControl }) {
   const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
 
   const name = control.label || control.bind;
-  const shown = Math.round(val * 100) / 100;
+  const shown = shortNum(val);
 
   return (
     <div className="w-full bg-neutral-100 rounded-2xl px-4 py-3">
@@ -55,8 +56,8 @@ export default function Slider({ control }: { control: SliderControl }) {
         />
       </div>
       <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-neutral-400">
-        <span>{Math.round(min * 100) / 100}</span>
-        <span>{Math.round(max * 100) / 100}</span>
+        <span>{shortNum(min)}</span>
+        <span>{shortNum(max)}</span>
       </div>
     </div>
   );

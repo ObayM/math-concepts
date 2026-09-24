@@ -11,10 +11,15 @@ export const sceneSection: DocSection = {
       syntax:
         'scene <type> {\n  x: [min,max]\n  [y: [min,max]]\n  [grid]\n  [axes]\n  [aspect: equal]\n  ...\n}',
       description:
-        '`type` is `plane` (2D cartesian) or `numberline` (1D axis). For `plane`, both `x:` and `y:` are required. For `numberline`, only `x:` is needed. The space config lines can appear anywhere in the block, in any order, alongside state/object/control declarations.\n\nBy default the x and y domains are stretched independently to fill the box, so a circle only looks round if the domains happen to match the box. Add `aspect: equal` when shape matters — unit circles, Argand diagrams, geometry, force diagrams — and one shared scale is used for both axes, letterboxed inside the same space.',
+        "`type` is `plane` (2D cartesian) or `numberline` (1D axis). For `plane`, both `x:` and `y:` are required. For `numberline`, only `x:` is needed. The space config lines can appear anywhere in the block, in any order, alongside state/object/control declarations.\n\nBy default the x and y domains are stretched independently to fill the box, so a circle only looks round if the domains happen to match the box. Add `aspect: equal` when shape matters — unit circles, Argand diagrams, geometry, force diagrams — and one shared scale is used for both axes, letterboxed inside the same space.\n\nOn a plane the domains can use the scene's params, which is how you zoom: `x: [1 - z, 1 + z]` with a slider on `z` closes in on x = 1, and a goal like `when: z < 0.05` asks the student to zoom until the curve looks straight. The grid and tick labels follow the zoom.",
       props: [
-        { name: 'x', type: '[number, number]', description: 'x-axis domain', required: true },
-        { name: 'y', type: '[number, number]', description: 'y-axis domain (plane only)' },
+        {
+          name: 'x',
+          type: '[expr, expr]',
+          description: 'x-axis domain; may use params on a plane, to zoom',
+          required: true,
+        },
+        { name: 'y', type: '[expr, expr]', description: 'y-axis domain (plane only)' },
         { name: 'grid', type: 'flag', description: 'draw a background grid (plane only)' },
         {
           name: 'axes',

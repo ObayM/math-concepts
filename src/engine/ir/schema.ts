@@ -37,6 +37,8 @@ const space = z
     zDomain: z.tuple([z.number(), z.number()]).optional(),
     // azimuth and elevation in degrees. exprs, so a slider can spin the scene.
     camera: z.tuple([expr, expr]).optional(),
+    xView: z.tuple([expr, expr]).optional(),
+    yView: z.tuple([expr, expr]).optional(),
     grid: z.boolean().optional(),
     axes: z.boolean().optional(),
     aspect: z.literal('equal').optional(),

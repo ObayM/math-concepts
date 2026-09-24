@@ -1,5 +1,6 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
+import { shortNum } from '@/engine/format';
 
 type StepperControl = { as: 'stepper'; bind: string; label?: string; step?: number };
 
@@ -14,7 +15,7 @@ export default function Stepper({ control }: { control: StepperControl }) {
     'tap-target w-9 h-9 rounded-xl bg-white border border-neutral-200 font-bold text-lg text-neutral-600 hover:border-primary-400 active:scale-90 transition flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300';
 
   const name = control.label || control.bind;
-  const shown = Math.round(val * 100) / 100;
+  const shown = shortNum(val);
 
   return (
     <div className="flex w-full items-center justify-between rounded-2xl bg-neutral-100 p-4">

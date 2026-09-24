@@ -92,6 +92,24 @@ function suggest(name: string, cands: Iterable<string>): string {
   return best && bestD <= 2 && bestD < name.length ? ` — did you mean "${best}"?` : '';
 }
 
+function freeIds(e: Expr): string[] {
+  switch (e.k) {
+    case 'id':
+      return [e.name];
+    case 'un':
+      return freeIds(e.e);
+    case 'bin':
+      return [...freeIds(e.l), ...freeIds(e.r)];
+    case 'call':
+      return e.args.flatMap(freeIds);
+    case 'tuple':
+    case 'list':
+      return e.items.flatMap(freeIds);
+    default:
+      return [];
+  }
+}
+
 function treeAt(expr: Expr, ln: number): ExprIR {
   try {
     return toExprIR(expr);
@@ -582,10 +600,19 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
         const isNumberline = s.spaceType === 'numberline';
         if (!isNumberline && (!yV || yV === true || yV.k !== 'list'))
           throw new CompileError('scene needs y: [min, max]', s.ln);
-        const xD = xV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number];
+        const live = (e: Expr) => freeIds(e).some((n) => !(n in cScope) && !(n in CONSTS));
+        const xLive = xV.items.some(live);
+        const yLive = yV && yV !== true && yV.k === 'list' && yV.items.some(live);
+        if ((xLive || yLive) && isNumberline)
+          throw new CompileError('a numberline cannot zoom; its x: must be constant', s.ln);
+        const xD = xLive
+          ? ([0, 1] as [number, number])
+          : (xV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number]);
         const yD =
           yV && yV !== true && yV.k === 'list'
-            ? (yV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number])
+            ? yLive
+              ? ([0, 1] as [number, number])
+              : (yV.items.map((e) => cNum(e, cScope, s.ln)) as [number, number])
             : undefined;
         const is3 = s.spaceType === 'space3';
         const zV = s.props.get('z');
@@ -621,6 +648,29 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
           ...(aspectV !== undefined && { aspect: 'equal' }),
         };
         run(s.children, cScope);
+        const viewOf = (list: Extract<Expr, { k: 'list' }>, axis: string) => {
+          if (list.items.length !== 2) throw new CompileError(`${axis}: needs [min, max]`, s.ln);
+          const view = list.items.map((e) => asIR(lowerR(e, cScope, s.ln))) as [ExprIR, ExprIR];
+          const init: Record<string, Value> = {};
+          for (const [k, d] of Object.entries(ir.state)) init[k] = (d as { init: Value }).init;
+          const at = view.map((e) => evalExpr(e, init as never)) as [number, number];
+          if (!(typeof at[0] === 'number' && typeof at[1] === 'number' && at[1] > at[0]))
+            throw new CompileError(
+              `${axis}: starts out empty; max has to be bigger than min`,
+              s.ln
+            );
+          return { view, at };
+        };
+        if (xLive) {
+          const { view, at } = viewOf(xV, 'x');
+          ir.space.xView = view;
+          ir.space.xDomain = at;
+        }
+        if (yLive && yV && typeof yV !== 'boolean' && yV.k === 'list') {
+          const { view, at } = viewOf(yV, 'y');
+          ir.space.yView = view;
+          ir.space.yDomain = at;
+        }
         // the camera usually spins on a param declared inside the scene, so it
         // can only be lowered once the children have registered their state
         if (camRaw && camRaw !== true && camRaw.k === 'list') {

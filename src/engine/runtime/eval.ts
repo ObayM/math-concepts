@@ -43,12 +43,12 @@ export function interpolate(text: string | Text, scope: Scope): string {
     try {
       return evalTextTree(text, scope);
     } catch {
-      return '—';
+      return '?';
     }
   }
   return text.replace(/\$\{([^}]+)\}/g, (_, e: string) => {
     const v = evalNumber(e.trim(), scope);
-    if (!isFinite(v)) return '—';
+    if (!isFinite(v)) return '?';
     return String(Math.round(v * 100) / 100);
   });
 }

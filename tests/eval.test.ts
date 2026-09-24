@@ -48,9 +48,9 @@ describe('interpolate (v2 Text {parts})', () => {
     expect(interpolate(text, { t: 1.2345 })).toBe('slope = 2.47');
   });
 
-  it('renders non-finite values as an em dash', () => {
+  it('renders non-finite values as a question mark', () => {
     const text = { parts: ['v = ', bin('/', n(1), id('t'))] };
-    expect(interpolate(text, { t: 0 })).toBe('v = —');
+    expect(interpolate(text, { t: 0 })).toBe('v = ?');
   });
 
   it('a plain string with no parts passes through', () => {

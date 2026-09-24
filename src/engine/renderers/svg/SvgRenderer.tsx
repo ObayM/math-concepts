@@ -23,7 +23,7 @@ import {
 } from '@/engine/runtime/keyboardCursor';
 import InputLayer, { type InputLayerConfig } from './InputLayer';
 import KeyboardCrosshair from './KeyboardCrosshair';
-import type { SceneIR } from '@/engine/ir/types';
+import type { SceneIR, Scope } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 
 const DEFAULT_W = 640;
@@ -84,10 +84,12 @@ export default function SvgRenderer({
   );
 
   if (!ir.space.yDomain) return null; // plane scenes must have yDomain
-  const [xMin, xMax] = ir.space.xDomain;
-  const [yMin, yMax] = ir.space.yDomain;
+  const xDomain = liveDomain(ir.space.xView, ir.space.xDomain, scope);
+  const yDomain = liveDomain(ir.space.yView, ir.space.yDomain, scope);
+  const [xMin, xMax] = xDomain;
+  const [yMin, yMax] = yDomain;
 
-  const cx: CoordSystem = planeCoords(ir.space.xDomain, ir.space.yDomain, W, H, ir.space.aspect);
+  const cx: CoordSystem = planeCoords(xDomain, yDomain, W, H, ir.space.aspect);
 
   const objects = expandObjects(ir.objects, scope);
 
@@ -149,7 +151,8 @@ export default function SvgRenderer({
     return (n >= 5 ? 5 : n >= 2 ? 2 : 1) * pow;
   };
   const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-  const fmt = (v: number) => String(Math.round(v * 1000) / 1000);
+  const fmt = (v: number, step: number) =>
+    String(Number(v.toFixed(Math.min(12, Math.max(0, -Math.floor(Math.log10(step)) + 1)))));
 
   const grid: React.ReactNode[] = [];
   const ticks: React.ReactNode[] = [];
@@ -168,7 +171,7 @@ export default function SvgRenderer({
       grid.push(
         <line key={`gx${k}`} x1={X} y1={PLOT_PAD} x2={X} y2={H - PLOT_PAD} stroke={GRID_LINE} />
       );
-      if (Math.abs(t) > 1e-9)
+      if (Math.abs(t) > sx * 1e-6)
         ticks.push(
           <text
             key={`tx${k}`}
@@ -183,7 +186,7 @@ export default function SvgRenderer({
             paintOrder="stroke"
             style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-nunito)' }}
           >
-            {fmt(t)}
+            {fmt(t, sx)}
           </text>
         );
     }
@@ -192,7 +195,7 @@ export default function SvgRenderer({
       grid.push(
         <line key={`gy${k}`} x1={PLOT_PAD} y1={Y} x2={W - PLOT_PAD} y2={Y} stroke={GRID_LINE} />
       );
-      if (Math.abs(t) > 1e-9)
+      if (Math.abs(t) > sy * 1e-6)
         ticks.push(
           <text
             key={`ty${k}`}
@@ -208,7 +211,7 @@ export default function SvgRenderer({
             paintOrder="stroke"
             style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-nunito)' }}
           >
-            {fmt(t)}
+            {fmt(t, sy)}
           </text>
         );
     }
@@ -339,4 +342,15 @@ export default function SvgRenderer({
       </svg>
     </div>
   );
+}
+
+function liveDomain(
+  view: [unknown, unknown] | undefined,
+  fallback: [number, number],
+  scope: Scope
+): [number, number] {
+  if (!view) return fallback;
+  const lo = evalNumber(view[0] as never, scope);
+  const hi = evalNumber(view[1] as never, scope);
+  return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : fallback;
 }

@@ -110,11 +110,11 @@ describe('coercing wrappers', () => {
     expect(evalBool(3, {})).toBe(true);
   });
 
-  it('evalText: 2dp rounding, em dash for non-finite', () => {
+  it('evalText: 2dp rounding, a question mark for non-finite', () => {
     expect(evalText({ parts: ['slope = ', bin('*', n(2), id('t'))] }, { t: 1.2345 })).toBe(
       'slope = 2.47'
     );
-    expect(evalText({ parts: ['v = ', bin('/', n(1), id('t'))] }, { t: 0 })).toBe('v = —');
+    expect(evalText({ parts: ['v = ', bin('/', n(1), id('t'))] }, { t: 0 })).toBe('v = ?');
   });
 });
 

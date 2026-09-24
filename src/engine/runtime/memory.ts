@@ -1,5 +1,6 @@
 import type { SlideIR } from '@/engine/ir/lesson';
 import { parseNumber } from '@/engine/checks/number';
+import { shortNum } from '@/engine/format';
 
 export type LessonMemory = {
   answers: Record<string, string>;
@@ -19,8 +20,7 @@ export function memoryRefs(text: string): { fn: 'answer' | 'recall'; name: strin
   return out;
 }
 
-const shown = (n: number) =>
-  String(Math.abs(n) >= 1 || n === 0 ? Math.round(n * 100) / 100 : Number(n.toPrecision(2)));
+const shown = shortNum;
 
 export function fillMemory(text: string, memory: LessonMemory): string {
   return text.replace(MEMORY_REF, (_, fn: string, name: string, fallback?: string) => {
