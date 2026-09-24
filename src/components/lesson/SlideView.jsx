@@ -2,6 +2,7 @@
 import { Scene } from '@/engine';
 import RichText, { proseClass } from './RichText';
 import GoalBanner from './GoalBanner';
+import HintLadder from './HintLadder';
 import QuizExercise from './exercises/QuizExercise';
 import NumericExercise from './exercises/NumericExercise';
 import BuildExercise from './exercises/BuildExercise';
@@ -88,6 +89,9 @@ export default function SlideView({
             onChange={onChange}
             revealAnswer={revealAnswer}
           />
+          <div className="mt-4">
+            <HintLadder key={slide.id} hints={slide.exercise.hints} disabled={checked} />
+          </div>
         </div>
       )}
     </div>

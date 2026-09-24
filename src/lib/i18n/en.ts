@@ -48,6 +48,8 @@ const en = {
   'exercise.notQuite': 'Not quite. Take another look.',
   'exercise.yourAnswer': 'your answer',
   'exercise.answerIs': 'Not quite. The answer is',
+  'exercise.hint': 'Need a hint?',
+  'exercise.anotherHint': 'Another hint',
 
   'exercise.answerChoices': 'Answer choices',
   'exercise.tokenBank': 'Token bank',
