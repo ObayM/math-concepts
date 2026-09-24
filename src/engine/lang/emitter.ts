@@ -481,6 +481,8 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
     if (color && roles[color]) obj.role = color;
     const alpha = props.get('alpha');
     if (alpha && alpha !== true) obj.alpha = lowerR(alpha, cScope, ln);
+    const draw = props.get('draw');
+    if (draw && draw !== true) obj.draw = lowerR(draw, cScope, ln);
     if (style) obj.style = style;
     if (show && show !== true) obj.visibleIf = asIR(lowerR(show, cScope, ln));
     if (width && width !== true) {

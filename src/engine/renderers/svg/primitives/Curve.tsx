@@ -1,4 +1,4 @@
-import { evalNumber, evalBool } from '@/engine/runtime/eval';
+import { evalNumber, evalBool, drawOf } from '@/engine/runtime/eval';
 import { resolveColor, dash, STROKE } from '@/engine/colors';
 import { PLOT_PAD } from '@/engine/renderers/svg/coords';
 import type { PrimProps } from '@/engine/renderers/svg/types';
@@ -12,10 +12,11 @@ export default function Curve({ obj, scope, cx }: PrimProps) {
   const [aMin, aMax] = parametric ? obj.tDomain : cx.xDomain;
   const step = (aMax - aMin) / n;
 
+  const last = Math.round(n * drawOf(obj, scope));
   let d = '';
   let penDown = false;
   let prevY: number | undefined;
-  for (let i = 0; i <= n; i++) {
+  for (let i = 0; i <= last; i++) {
     const a = aMin + i * step;
     let x: number, y: number;
     if (parametric) {

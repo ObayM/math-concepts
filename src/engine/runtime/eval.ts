@@ -59,3 +59,10 @@ export function alphaOf(obj: { alpha?: unknown }, scope: Scope): number | null {
   if (!Number.isFinite(a)) return 0;
   return Math.max(0, Math.min(1, a));
 }
+
+export function drawOf(obj: { draw?: unknown }, scope: Scope): number {
+  if (obj.draw === undefined) return 1;
+  const d = evalNumber(obj.draw as never, scope);
+  if (!Number.isFinite(d)) return 0;
+  return Math.max(0, Math.min(1, d));
+}

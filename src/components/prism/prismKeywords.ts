@@ -109,6 +109,7 @@ export const KEYWORDS = new Set([
   'indicate',
   'focus',
   'surround',
+  'draw',
   'alpha',
   'by',
 ]);

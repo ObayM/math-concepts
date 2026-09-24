@@ -1,4 +1,4 @@
-import { evalNumber } from '@/engine/runtime/eval';
+import { evalNumber, drawOf } from '@/engine/runtime/eval';
 import { resolveColor, dash, STROKE } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
@@ -21,10 +21,11 @@ export default function Line({ obj, scope, cx, points }: PrimProps) {
     y2 = evalNumber(obj.y2 ?? 0, scope);
   }
 
+  const k = drawOf(obj, scope);
   const X1 = cx.toX(x1);
   const Y1 = cx.toY(y1);
-  const X2 = cx.toX(x2);
-  const Y2 = cx.toY(y2);
+  const X2 = cx.toX(x1 + (x2 - x1) * k);
+  const Y2 = cx.toY(y1 + (y2 - y1) * k);
   if (![X1, Y1, X2, Y2].every(Number.isFinite)) return null;
 
   return (

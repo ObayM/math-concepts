@@ -1,4 +1,4 @@
-import { evalNumber } from '@/engine/runtime/eval';
+import { evalNumber, drawOf } from '@/engine/runtime/eval';
 import { resolveColor, dash, SHAPE_FILL_OPACITY, SHAPE_STROKE_WIDTH } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 import { rotateAbout } from './rotate';
@@ -18,6 +18,20 @@ export default function Polygon({ obj, scope, cx }: PrimProps) {
   if (pts.some(([a, b]: number[]) => !Number.isFinite(a) || !Number.isFinite(b))) return null;
 
   const color = resolveColor(obj.color);
+  const k = drawOf(obj, scope);
+  if (k < 1) {
+    return (
+      <polyline
+        points={partialPerimeter(pts, k)}
+        fill="none"
+        stroke={color}
+        strokeWidth={obj.strokeWidth ?? SHAPE_STROKE_WIDTH}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        strokeDasharray={dash(obj.style)}
+      />
+    );
+  }
   return (
     <polygon
       points={pts.map((p: number[]) => p.join(',')).join(' ')}
@@ -29,4 +43,19 @@ export default function Polygon({ obj, scope, cx }: PrimProps) {
       strokeDasharray={dash(obj.style)}
     />
   );
+}
+
+function partialPerimeter(pts: number[][], k: number): string {
+  const ring = [...pts, pts[0]];
+  const lens = ring.slice(1).map((p, i) => Math.hypot(p[0] - ring[i][0], p[1] - ring[i][1]));
+  let left = lens.reduce((a, b) => a + b, 0) * k;
+  const out = [ring[0]];
+  for (let i = 0; i < lens.length && left > 0; i++) {
+    const t = Math.min(1, left / (lens[i] || 1));
+    const [ax, ay] = ring[i];
+    const [bx, by] = ring[i + 1];
+    out.push([ax + (bx - ax) * t, ay + (by - ay) * t]);
+    left -= lens[i];
+  }
+  return out.map((p) => p.join(',')).join(' ');
 }

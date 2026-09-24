@@ -1,4 +1,4 @@
-import { evalNumber } from '@/engine/runtime/eval';
+import { evalNumber, drawOf } from '@/engine/runtime/eval';
 import { resolveColor, SHAPE_FILL_OPACITY } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
@@ -12,7 +12,7 @@ export default function Area({ obj, scope, cx }: PrimProps) {
   const from = obj.from !== undefined ? evalNumber(obj.from, scope) : xMin;
   const to = obj.to !== undefined ? evalNumber(obj.to, scope) : xMax;
   const lo = Math.max(xMin, Math.min(from, to));
-  const hi = Math.min(xMax, Math.max(from, to));
+  const hi = lo + (Math.min(xMax, Math.max(from, to)) - lo) * drawOf(obj, scope);
   if (!(hi > lo)) return null;
 
   const step = (hi - lo) / SAMPLES;

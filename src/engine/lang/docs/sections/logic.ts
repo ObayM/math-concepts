@@ -38,8 +38,8 @@ export const logicSection: DocSection = {
       keyword: 'morph',
       syntax: 'morph <from-id> -> <to-id> { by: <expr from 0 to 1> }',
       description:
-        "Turns one object into another without losing track of it. As `by` goes from 0 to 1 the first object fades out and the second fades in, and when both have a position they travel together from the first one's spot to the second's. Drive `by` with a param that a timeline step animates, and a word can visibly become its symbol right where it was. Any object can also take `alpha: <expr>` to fade as a whole, where `opacity:` is only a shape's fill.",
-      example: `param m = 0 { range: [0, 1] }\nlabel word at (-4, 3) = "the gap"\nlabel sym at (2, 3) = "h"\nmorph word -> sym { by: m }\nstep "In words, it's the gap." { set: { m: 0 } }\nstep "Mathematicians call it h." { animate: { m: 1 }, dur: 900 }`,
+        "Turns one object into another without losing track of it. As `by` goes from 0 to 1 the first object fades out and the second fades in, and when both have a position they travel together from the first one's spot to the second's. Drive `by` with a param that a timeline step animates, and a word can visibly become its symbol right where it was. Any object can also take `alpha: <expr>` to fade as a whole, where `opacity:` is only a shape's fill, and a curve, line, vector, area or polygon can take `draw: <expr from 0 to 1>` to be drawn in progressively, left to right or along its edge. Tie `draw` to a param a timeline step animates and the student builds the picture one press at a time, and can step back through it.",
+      example: `param m = 0 { range: [0, 1] }\nlabel word at (-4, 3) = "the gap"\nlabel sym at (2, 3) = "h"\nmorph word -> sym { by: m }\nstep "In words, it's the gap." { set: { m: 0 } }\nstep "Mathematicians call it h." { animate: { m: 1 }, dur: 900 }\nparam k = 0 { range: [0, 1] }\ncurve f = x^2 / 4 { draw: k }\nstep "Now draw the curve." { animate: { k: 1 }, dur: 1500 }`,
     },
     {
       keyword: 'let',

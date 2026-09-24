@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { useScene, type Attention } from '@/engine/runtime/SceneProvider';
-import { evalNumber, evalBool, alphaOf } from '@/engine/runtime/eval';
+import { evalNumber, evalBool, alphaOf, drawOf } from '@/engine/runtime/eval';
 import { applyDrag, type Draggable } from '@/engine/runtime/drag';
 import { expandObjects } from '@/engine/runtime/expand';
 import { ROLE_EVENT } from '@/engine/runtime/roleEvent';
@@ -303,6 +303,7 @@ export default function SvgRenderer({
           if (!Prim) return null;
           const alpha = alphaOf(obj, scope);
           if (alpha !== null && alpha < 0.01) return null;
+          if (obj.draw !== undefined && drawOf(obj, scope) <= 0) return null;
           return (
             <g
               key={obj.id || i}
