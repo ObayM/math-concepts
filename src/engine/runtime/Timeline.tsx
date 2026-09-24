@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw, ChevronLeft, Lightbulb } from 'lucide-react';
 import { useScene } from './SceneProvider';
 import { evalBool } from './eval';
+import { useT } from '@/components/i18n/LocaleProvider';
 import type { SceneIR } from '@/engine/ir/types';
 
 function baseState(ir: SceneIR): Record<string, number | boolean> {
@@ -33,6 +34,7 @@ function safeBool(e: unknown, scope: Record<string, unknown>): boolean {
 }
 
 function StepHint({ hint }: { hint: string }) {
+  const t = useT();
   const [shown, setShown] = useState(false);
   if (shown) return <p className="text-neutral-400 text-xs leading-relaxed">{hint}</p>;
   return (
@@ -42,7 +44,7 @@ function StepHint({ hint }: { hint: string }) {
       className="flex items-center gap-1 self-start text-xs font-semibold text-primary-500 hover:text-primary-600 transition-colors"
     >
       <Lightbulb className="w-3.5 h-3.5" />
-      Hint
+      {t('scene.hint')}
     </button>
   );
 }
@@ -55,6 +57,7 @@ export default function Timeline({
   onStepChange?: (idx: number) => void;
 }) {
   const { scope, setMany, animate, setAttention } = useScene();
+  const t = useT();
   const steps = ir.timeline ?? [];
   const [idx, setIdx] = useState(0);
   const mounted = useRef(false);
@@ -123,7 +126,8 @@ export default function Timeline({
           onClick={() => goto(idx - 1)}
           disabled={idx === 0}
           className="tap-target p-2 rounded-xl text-neutral-500 hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-          title="Previous step"
+          title={t('scene.prevStep')}
+          aria-label={t('scene.prevStep')}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -135,7 +139,7 @@ export default function Timeline({
           className={`flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors active:scale-95 disabled:opacity-40 disabled:hover:bg-primary-500 disabled:active:scale-100 ${released ? 'animate-pop-in' : ''}`}
         >
           {atLast ? <RotateCcw className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
-          {atLast ? 'Replay' : 'Play'}
+          {atLast ? t('scene.replay') : t('scene.play')}
         </button>
 
         <div className="flex gap-1.5 ml-1">

@@ -1,6 +1,7 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { shortNum } from '@/engine/format';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 type SliderControl = {
   as: 'slider';
@@ -13,6 +14,7 @@ type SliderControl = {
 
 export default function Slider({ control }: { control: SliderControl }) {
   const { scope, set, ir } = useScene();
+  const t = useT();
   const def = ir.state[control.bind];
   const dnum = def?.type === 'number' ? def : undefined;
 
@@ -41,7 +43,7 @@ export default function Slider({ control }: { control: SliderControl }) {
           step={step}
           value={val}
           aria-label={name}
-          aria-valuetext={`${name} is ${shown}`}
+          aria-valuetext={t('scene.valueIs', { name, value: shown })}
           onChange={(e) => set(control.bind, Number(e.target.value))}
           className="peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
         />

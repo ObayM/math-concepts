@@ -83,9 +83,9 @@ export default function OrderExercise({
               {...(filled && !checked ? sourceProps(`pos:${i}`) : {})}
               onClick={() => filled && removeAt(i)}
               disabled={checked || !filled}
-              aria-label={
-                filled ? `position ${i + 1}, filled, tap to remove` : `position ${i + 1}, empty`
-              }
+              aria-label={t(filled ? 'exercise.positionFilled' : 'exercise.positionEmpty', {
+                n: i + 1,
+              })}
               className={`w-full min-h-12 px-4 py-2 rounded-xl border-2 flex items-center gap-3 text-start font-bold text-neutral-700 transition-all disabled:cursor-default ${cls}`}
             >
               <span className="text-neutral-400 text-sm shrink-0">{i + 1}.</span>
@@ -122,7 +122,7 @@ export default function OrderExercise({
         disabled={checked || placed.length === 0}
         className="tap-target-h flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
       >
-        <RotateCcw className="w-4 h-4" /> Start over
+        <RotateCcw className="w-4 h-4" /> {t('exercise.startOver')}
       </button>
 
       {drag && (

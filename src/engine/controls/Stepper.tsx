@@ -1,11 +1,13 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { shortNum } from '@/engine/format';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 type StepperControl = { as: 'stepper'; bind: string; label?: string; step?: number };
 
 export default function Stepper({ control }: { control: StepperControl }) {
   const { scope, set, ir } = useScene();
+  const t = useT();
   const def = ir.state[control.bind];
   const dnum = def?.type === 'number' ? def : undefined;
   const step = control.step ?? dnum?.step ?? 1;
@@ -23,7 +25,7 @@ export default function Stepper({ control }: { control: StepperControl }) {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          aria-label={`Decrease ${name}`}
+          aria-label={t('scene.decrease', { name })}
           onClick={() => set(control.bind, val - step)}
           className={btn}
         >
@@ -31,14 +33,14 @@ export default function Stepper({ control }: { control: StepperControl }) {
         </button>
         <span
           role="status"
-          aria-label={`${name} is ${shown}`}
+          aria-label={t('scene.valueIs', { name, value: shown })}
           className="w-12 text-center font-mono text-lg font-bold tabular-nums text-primary-600"
         >
           {shown}
         </span>
         <button
           type="button"
-          aria-label={`Increase ${name}`}
+          aria-label={t('scene.increase', { name })}
           onClick={() => set(control.bind, val + step)}
           className={btn}
         >

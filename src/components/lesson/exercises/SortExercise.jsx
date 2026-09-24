@@ -117,7 +117,7 @@ export default function SortExercise({ slide, value, checked, onChange, revealAn
                   put(b);
                 }}
                 disabled={checked}
-                aria-label={`${bin.label}, holds ${mine.length}. Pick an item first, then choose this bin.`}
+                aria-label={t('exercise.binAria', { bin: bin.label, n: mine.length })}
                 className="text-start text-sm font-bold text-neutral-500 uppercase tracking-wide disabled:cursor-default"
               >
                 {bin.label}
@@ -132,7 +132,7 @@ export default function SortExercise({ slide, value, checked, onChange, revealAn
                       pull(i);
                     }}
                     disabled={checked}
-                    aria-label={`${items[i].text} in ${bin.label}, tap to take it back`}
+                    aria-label={t('exercise.inBin', { item: items[i].text, bin: bin.label })}
                     className={`min-h-10 px-3 rounded-xl border-2 font-bold text-neutral-800 transition-all active:scale-95 disabled:cursor-default flex items-center gap-2 ${chipClass(i, true)}`}
                   >
                     <RichText>{items[i].text}</RichText>
@@ -155,7 +155,7 @@ export default function SortExercise({ slide, value, checked, onChange, revealAn
         disabled={checked || tray.length === items.length}
         className="tap-target-h flex items-center gap-2 mx-auto text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
       >
-        <RotateCcw className="w-4 h-4" /> Start over
+        <RotateCcw className="w-4 h-4" /> {t('exercise.startOver')}
       </button>
 
       {drag && (

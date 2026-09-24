@@ -71,6 +71,8 @@ export default function LessonPlayer({
   const [tutorStreaming, setTutorStreaming] = useState(false);
   const [tutorError, setTutorError] = useState(null);
   const scopeRef = useRef({});
+  const headingRef = useRef(null);
+  const shownKeyRef = useRef(null);
   const transcriptRef = useRef(null);
 
   const path = useMemo(() => visiblePath(slides), [slides]);
@@ -80,6 +82,13 @@ export default function LessonPlayer({
   const currentKey = slideKey(flow);
   const isLast = !inDetour && pathIndex === path.length - 1;
   const checker = getChecker(slide);
+
+  useEffect(() => {
+    if (shownKeyRef.current !== null && shownKeyRef.current !== currentKey) {
+      headingRef.current?.focus({ preventScroll: true });
+    }
+    shownKeyRef.current = currentKey;
+  }, [currentKey]);
 
   const pad = useScratchpad(lessonId, slide?.id, () => setSaveError(true));
 
@@ -483,11 +492,10 @@ export default function LessonPlayer({
               aria-valuemin={1}
               aria-valuemax={path.length}
               aria-valuenow={pathIndex + 1}
-              aria-valuetext={
-                inDetour
-                  ? `Detour off slide ${pathIndex + 1} of ${path.length}`
-                  : `Slide ${pathIndex + 1} of ${path.length}`
-              }
+              aria-valuetext={t(inDetour ? 'lesson.detourOf' : 'lesson.slideOf', {
+                n: pathIndex + 1,
+                total: path.length,
+              })}
             >
               {path.map((_, idx) => (
                 <div
@@ -519,7 +527,11 @@ export default function LessonPlayer({
                     {inDetour ? t('lesson.detour') : slide?.category || t('lesson.concept')}
                   </span>
                 </div>
-                <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight">
+                <h1
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="font-display text-3xl md:text-4xl font-bold leading-tight text-neutral-900 tracking-tight outline-none"
+                >
                   {slide?.title}
                 </h1>
               </div>
@@ -568,7 +580,7 @@ export default function LessonPlayer({
                   variant="primary"
                   disabled={!checker.isComplete(slide, answer)}
                 >
-                  Check
+                  {t('lesson.check')}
                 </Button>
               ) : (
                 <Button onClick={handleNext} variant="primary" disabled={!canAdvance}>
@@ -596,7 +608,7 @@ export default function LessonPlayer({
                       }}
                       className="flex items-center gap-1 text-xs font-bold text-neutral-400 hover:text-primary-600"
                     >
-                      <RotateCcw className="h-3 w-3" /> Start over
+                      <RotateCcw className="h-3 w-3" /> {t('exercise.startOver')}
                     </button>
                   )}
                 </div>

@@ -75,7 +75,7 @@ export default function BuildExercise({
   };
 
   const slotLabel = (i) =>
-    placed[i] != null ? `slot ${i + 1}, filled, tap to remove` : `slot ${i + 1}, empty`;
+    t(placed[i] != null ? 'exercise.slotFilled' : 'exercise.slotEmpty', { n: i + 1 });
 
   const renderTemplate = () => {
     let slotIndex = -1;
@@ -175,7 +175,7 @@ export default function BuildExercise({
         disabled={checked || placed.length === 0}
         className="tap-target-h flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors disabled:opacity-40"
       >
-        <RotateCcw className="w-4 h-4" /> Start over
+        <RotateCcw className="w-4 h-4" /> {t('exercise.startOver')}
       </button>
 
       {drag && (
