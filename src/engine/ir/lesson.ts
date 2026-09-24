@@ -12,17 +12,21 @@ export function irNeedsRecompile(ir: unknown): boolean {
   return (ir as { version?: unknown }).version !== LESSON_IR_VERSION;
 }
 
+const branch = z.object({ slide: z.string(), retry: z.boolean().optional() });
+
 const exerciseBase = {
   prompt: z.string(),
   hints: z.array(z.string()).default([]),
   explanation: z.string().optional(),
   skill: z.string().optional(),
-  onwrong: z.object({ slide: z.string(), retry: z.boolean().optional() }).optional(),
+  onwrong: branch.optional(),
 };
 
 const quizExercise = z.object({
   kind: z.literal('quiz'),
-  options: z.array(z.object({ text: z.string(), why: z.string().optional() })).min(2),
+  options: z
+    .array(z.object({ text: z.string(), why: z.string().optional(), onwrong: branch.optional() }))
+    .min(2),
   correct: z.number().int().nonnegative(),
   ...exerciseBase,
 });
@@ -32,6 +36,9 @@ const numericExercise = z.object({
   answers: z.array(z.number()).min(1), // any listed value within tolerance is correct
   tolerance: z.number().nonnegative(),
   unit: z.string().optional(),
+  wrong: z
+    .array(z.object({ value: z.number(), why: z.string().optional(), onwrong: branch.optional() }))
+    .optional(),
   ...exerciseBase,
 });
 

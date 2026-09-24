@@ -66,6 +66,7 @@ export type Stmt =
       answers: Expr[];
       tolerance: Expr | null;
       unit: string | null;
+      wrong: WrongAnswer[];
       common: ExerciseCommon;
       ln: number;
     }
@@ -140,7 +141,11 @@ export type SlideStmt = {
   ln: number;
 };
 
-export type QuizOption = { text: string; correct: boolean; why?: string };
+export type Branch = { slide: string; retry: boolean };
+
+export type QuizOption = { text: string; correct: boolean; why?: string; onwrong?: Branch };
+
+export type WrongAnswer = { value: Expr; why?: string; onwrong?: Branch; ln: number };
 
 // shared bits every exercise can declare: prompt (ask), hint ladder, explanation
 export type ExerciseCommon = {
@@ -148,6 +153,6 @@ export type ExerciseCommon = {
   hints: string[];
   explanation?: string;
   skill?: string;
-  onwrong?: { slide: string; retry: boolean };
+  onwrong?: Branch;
   expect?: { expr: Expr; ln: number };
 };

@@ -246,7 +246,7 @@ export default function LessonPlayer({
     if (!checker) return;
     setChecked(true);
     const correct = checker.check(slide, answer);
-    setFlow((f) => stageBranch(slides, f, correct));
+    setFlow((f) => stageBranch(slides, f, correct, answer));
     const question = slide.exercise?.prompt ?? slide.title ?? '';
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;

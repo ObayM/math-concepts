@@ -102,7 +102,7 @@ describe('stageBranch', () => {
   it('only branches once per slide', () => {
     const once = next(slides, stageBranch(slides, at(1), false)).state;
     const returned = next(slides, once).state;
-    expect(returned.branched).toEqual(['s2']);
+    expect(returned.branched).toEqual(['s2>help-retry']);
     expect(stageBranch(slides, returned, false).pending).toBeNull();
   });
 
@@ -127,7 +127,7 @@ describe('next', () => {
     const step = next(slides, stageBranch(slides, at(1), false));
     expect(step.state.detour).toEqual({ slideId: 'help-retry', retry: true });
     expect(step.state.pending).toBeNull();
-    expect(step.state.branched).toEqual(['s2']);
+    expect(step.state.branched).toEqual(['s2>help-retry']);
     expect(step.complete).toBe(false);
   });
 

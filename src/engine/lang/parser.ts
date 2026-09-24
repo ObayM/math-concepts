@@ -6,6 +6,8 @@ import type {
   IfCase,
   SlideStmt,
   QuizOption,
+  Branch,
+  WrongAnswer,
   ExerciseCommon,
   HotspotTarget,
 } from './ast';
@@ -575,12 +577,22 @@ function makeParser(tokens: Token[]) {
         pos++;
         const text = eatStr();
         let why: string | undefined;
+        let onwrong: Branch | undefined;
         if (check('LC')) {
+          const optLine = peek().line;
           const p = parsePropsBlock();
           const w = p.get('why');
           if (w && w !== true && w.k === 'str') why = w.v;
+          const o = p.get('onwrong');
+          if (o !== undefined) {
+            if (o === true || o.k !== 'str')
+              throw new CompileError('onwrong: on an option needs a slide id string', optLine);
+            onwrong = { slide: o.v, retry: p.get('retry') === true };
+          } else if (p.has('retry')) {
+            throw new CompileError('retry only means something next to onwrong:', optLine);
+          }
         }
-        options.push({ text, correct, why });
+        options.push({ text, correct, why, ...(onwrong && { onwrong }) });
         endStmt();
       } else {
         const t = peek();
@@ -599,10 +611,31 @@ function makeParser(tokens: Token[]) {
     const answers: Expr[] = [];
     let tolerance: Expr | null = null;
     let unit: string | null = null;
+    const wrong: WrongAnswer[] = [];
     const common: ExerciseCommon = { ask: '', hints: [] };
     while (!check('RC') && !check('EOF')) {
       if (parseCommonLine(common)) continue;
-      if (at('answer')) {
+      if (at('wrong')) {
+        const wln = peek().line;
+        pos++;
+        const value = parseOr();
+        const entry: WrongAnswer = { value, ln: wln };
+        if (check('STR')) entry.why = eatStr();
+        if (check('ARROW')) {
+          pos++;
+          const slide = eatStr();
+          let retry = false;
+          if (at('retry')) {
+            pos++;
+            retry = true;
+          }
+          entry.onwrong = { slide, retry };
+        }
+        if (!entry.why && !entry.onwrong)
+          throw new CompileError('wrong <value> needs a "why" or a -> "detour-id"', wln);
+        wrong.push(entry);
+        endStmt();
+      } else if (at('answer')) {
         pos++;
         eat('COLON');
         answers.push(parseExpr()); // any listed value is accepted
@@ -621,14 +654,14 @@ function makeParser(tokens: Token[]) {
         const t = peek();
         const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
         throw new CompileError(
-          `unexpected ${what} in numeric — use ask/answer/tolerance/unit/hint/!`,
+          `unexpected ${what} in numeric - use ask/answer/wrong/tolerance/unit/hint/!`,
           t.line,
           t.col
         );
       }
     }
     eat('RC');
-    return { k: 'numeric', answers, tolerance, unit, common, ln };
+    return { k: 'numeric', answers, tolerance, unit, wrong, common, ln };
   }
 
   function parseBuild(ln: number): Stmt {

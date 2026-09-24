@@ -2,6 +2,7 @@ import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
 import type { SceneIR } from '@/engine/ir/types';
 import { evalNum } from '@/engine/expr';
 import { checkStandard } from './standard';
+import { exerciseBranches } from './lang/emitter';
 
 export interface Finding {
   slideId: string;
@@ -312,8 +313,7 @@ function isBareRef(expr: unknown, name: string): boolean {
 function checkDetourReachable(lesson: LessonIR, out: Finding[]) {
   const targeted = new Set<string>();
   for (const s of lesson.slides) {
-    const t = s.exercise?.onwrong?.slide;
-    if (t) targeted.add(t);
+    for (const b of exerciseBranches(s.exercise)) targeted.add(b.slide);
   }
   for (const s of lesson.slides) {
     if (s.hidden && !targeted.has(s.id)) {

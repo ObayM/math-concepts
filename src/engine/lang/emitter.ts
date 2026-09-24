@@ -1,4 +1,4 @@
-import type { Expr, PropMap, Stmt, SlideStmt } from './ast';
+import type { Expr, PropMap, Stmt, SlideStmt, Branch } from './ast';
 import type { SceneIR } from '@/engine/ir/types';
 import type { LessonIR } from '@/engine/ir/lesson';
 import type { ExprIR, NumExpr, UnOp, BinOp, Value } from '@/engine/expr';
@@ -1210,6 +1210,8 @@ function pStrList(props: PropMap, key: string): string[] | undefined {
   return undefined;
 }
 
+const branchIR = (b: Branch) => ({ slide: b.slide, ...(b.retry && { retry: true }) });
+
 function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
   if (!s.common.ask) throw new CompileError('quiz needs an ask "..."', s.ln);
   const correct = s.options.findIndex((o) => o.correct);
@@ -1234,7 +1236,15 @@ function emitQuiz(s: Extract<Stmt, { k: 'quiz' }>) {
   return {
     kind: 'quiz' as const,
     prompt: s.common.ask,
-    options: s.options.map((o) => ({ text: o.text, ...(o.why && { why: o.why }) })),
+    options: s.options.map((o) => {
+      if (o.correct && o.onwrong)
+        throw new CompileError(`the correct option "${o.text}" can't have an onwrong:`, s.ln);
+      return {
+        text: o.text,
+        ...(o.why && { why: o.why }),
+        ...(o.onwrong && { onwrong: branchIR(o.onwrong) }),
+      };
+    }),
     correct,
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
@@ -1269,11 +1279,22 @@ function emitNumeric(s: Extract<Stmt, { k: 'numeric' }>) {
       );
     }
   }
+  const wrong = s.wrong.map((w) => {
+    const value = cNum(w.value, {}, w.ln);
+    if (answers.some((a) => Math.abs(a - value) <= Math.max(tolerance, 1e-9)))
+      throw new CompileError(`wrong ${value} is also a right answer`, w.ln);
+    return {
+      value,
+      ...(w.why && { why: w.why }),
+      ...(w.onwrong && { onwrong: branchIR(w.onwrong) }),
+    };
+  });
   return {
     kind: 'numeric' as const,
     prompt: s.common.ask,
     answers,
     tolerance,
+    ...(wrong.length && { wrong }),
     ...(s.unit && { unit: s.unit }),
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
@@ -1776,6 +1797,18 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   };
 }
 
+export function exerciseBranches(
+  exercise: ReturnType<typeof emitSlide>['exercise'] | LessonIR['slides'][number]['exercise']
+): { slide: string; retry?: boolean }[] {
+  if (!exercise) return [];
+  const out = exercise.onwrong ? [exercise.onwrong] : [];
+  if (exercise.kind === 'quiz')
+    for (const o of exercise.options) if (o.onwrong) out.push(o.onwrong);
+  if (exercise.kind === 'numeric')
+    for (const w of exercise.wrong ?? []) if (w.onwrong) out.push(w.onwrong);
+  return out;
+}
+
 function validateSlideFlow(slides: ReturnType<typeof emitSlide>[], stmts: SlideStmt[]) {
   const byId = new Map<string, ReturnType<typeof emitSlide>>();
   slides.forEach((s, i) => {
@@ -1788,27 +1821,27 @@ function validateSlideFlow(slides: ReturnType<typeof emitSlide>[], stmts: SlideS
   });
 
   slides.forEach((s, i) => {
-    const branch = s.exercise?.onwrong;
-    if (!branch) return;
-    const ln = stmts[i].ln;
-    const target = byId.get(branch.slide);
-    if (!target)
-      throw new CompileError(
-        `onwrong: "${branch.slide}" is not a slide in this lesson${suggest(branch.slide, byId.keys())}`,
-        ln
-      );
-    if (target.id === s.id)
-      throw new CompileError(`onwrong: "${branch.slide}" points at its own slide`, ln);
-    if (!target.hidden)
-      throw new CompileError(
-        `onwrong: "${branch.slide}" needs hidden: true, or it would also show on the main path`,
-        ln
-      );
-    if (target.exercise?.onwrong)
-      throw new CompileError(
-        `onwrong: "${branch.slide}" is itself a detour; detours can't chain`,
-        ln
-      );
+    for (const branch of exerciseBranches(s.exercise)) {
+      const ln = stmts[i].ln;
+      const target = byId.get(branch.slide);
+      if (!target)
+        throw new CompileError(
+          `onwrong: "${branch.slide}" is not a slide in this lesson${suggest(branch.slide, byId.keys())}`,
+          ln
+        );
+      if (target.id === s.id)
+        throw new CompileError(`onwrong: "${branch.slide}" points at its own slide`, ln);
+      if (!target.hidden)
+        throw new CompileError(
+          `onwrong: "${branch.slide}" needs hidden: true, or it would also show on the main path`,
+          ln
+        );
+      if (exerciseBranches(target.exercise).length)
+        throw new CompileError(
+          `onwrong: "${branch.slide}" is itself a detour; detours can't chain`,
+          ln
+        );
+    }
   });
 
   if (slides.every((s) => s.hidden))

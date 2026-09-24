@@ -34,9 +34,9 @@ export const exercisesSection: DocSection = {
     {
       keyword: 'numeric',
       syntax:
-        'numeric {\n  ask "..."\n  answer: <number>\n  [answer: <another accepted value>]\n  [tolerance: <n>]\n  [unit: "..."]\n}',
+        'numeric {\n  ask "..."\n  answer: <number>\n  [answer: <another accepted value>]\n  [wrong <value> ["why"] [-> "detour-id" [retry]]]\n  [tolerance: <n>]\n  [unit: "..."]\n}',
       description:
-        'A free-entry numeric answer. The learner types a number and it counts as correct if it lands within `tolerance` of any listed `answer`. Answers fold from expressions, so `64/3` or `sqrt(2)` are fine. `tolerance` defaults to a tiny epsilon (so type an exact expected value, or widen it for estimates). `unit` is shown as a suffix in the input.',
+        'A free-entry numeric answer. The learner types a number and it counts as correct if it lands within `tolerance` of any listed `answer`. Answers fold from expressions, so `64/3` or `sqrt(2)` are fine. `tolerance` defaults to a tiny epsilon (so type an exact expected value, or widen it for estimates). `unit` is shown as a suffix in the input. A `wrong` line names a specific mistake: its `"why"` shows when a student types that value, and `-> "detour-id"` sends them to a scaffold made for that misconception (see `onwrong`).',
       props: [
         { name: 'answer', type: 'number', description: 'an accepted value (repeatable)' },
         {
@@ -45,6 +45,11 @@ export const exercisesSection: DocSection = {
           description: 'how far off is still correct (default ~0)',
         },
         { name: 'unit', type: 'string', description: 'label shown next to the input' },
+        {
+          name: 'wrong',
+          type: '<value> ["why"] [-> "slide-id" [retry]]',
+          description: 'a known wrong answer, its feedback, and its own detour (repeatable)',
+        },
       ],
       example:
         'numeric {\n  ask "As $n \\to \\infty$, the area under x² on [0,4]?"\n  answer: 64/3\n  tolerance: 0.05\n  hint "The antiderivative of x² is x³/3."\n  ! "x³/3 evaluated from 0 to 4 is 64/3."\n}',

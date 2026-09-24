@@ -2,6 +2,7 @@
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { parseNumber } from './answers';
 
 export default function NumericExercise({
   slide,
@@ -14,6 +15,10 @@ export default function NumericExercise({
   const t = useT();
   const ex = slide.exercise;
   const text = typeof value === 'string' ? value : '';
+  const n = parseNumber(text);
+  const why = ex.wrong?.find(
+    (w) => w.why && Math.abs(w.value - n) <= Math.max(ex.tolerance, 1e-9)
+  )?.why;
 
   let cls = 'border-neutral-200 focus:border-primary-400';
   if (checked)
@@ -67,6 +72,10 @@ export default function NumericExercise({
             t('exercise.notQuite')
           )}
         </p>
+      )}
+
+      {checked && !correct && why && (
+        <RichText className="mt-2 block text-sm text-danger-600">{why}</RichText>
       )}
 
       {checked && (correct || revealAnswer) && ex.explanation && (

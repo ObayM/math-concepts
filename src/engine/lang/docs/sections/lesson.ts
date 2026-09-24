@@ -106,9 +106,10 @@ export const lessonSection: DocSection = {
     },
     {
       keyword: 'onwrong',
-      syntax: 'onwrong: "slide-id" [retry]',
+      syntax:
+        'onwrong: "slide-id" [retry]\n- "wrong option" { why: "...", onwrong: "slide-id", retry }\nwrong <value> ["why"] [-> "slide-id" [retry]]',
       description:
-        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide (which must be a `hidden: true` slide in the same lesson) and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead. Detours fire at most once per question and cannot chain.',
+        'Adaptive branching. Goes inside any exercise: if the learner gets it wrong, they take a detour to the named slide (which must be a `hidden: true` slide in the same lesson) and then come back. A scaffold is an ordinary slide, so it can carry its own prose, scene, and exercise. Add `retry` to return the learner to the original question for another attempt; leave it off to move them forward instead.\n\nDifferent mistakes usually mean different misconceptions, so each can get its own detour: put `onwrong:` on a quiz option, or add a `wrong <value> -> "slide-id"` line to a numeric (with an optional `\"why\"` for the mistake). The exercise-level `onwrong:` catches every wrong answer nobody named. Each detour fires at most once per question, so a student who comes back and makes a different mistake still gets the fix for that one, and detours cannot chain.',
       props: [
         {
           name: 'onwrong',
@@ -123,7 +124,7 @@ export const lessonSection: DocSection = {
         },
       ],
       example:
-        'lesson "Chain rule" {\n  slide "Differentiate it" {\n    quiz {\n      ask "What is the derivative of $(3x+1)^2$?"\n      * "$6(3x+1)$"\n      - "$2(3x+1)$" { why: "That drops the inner derivative." }\n      onwrong: "forgot-inner" retry\n      ! "Outer derivative times inner derivative."\n    }\n  }\n\n  slide "The inner bit" {\n    id: "forgot-inner"\n    hidden: true\n    > The outside is squaring, so its derivative is $2(3x+1)$. But the inside $3x+1$ changes **three times as fast** as $x$, so you multiply by $3$ too.\n    numeric {\n      ask "What is the derivative of the inside, $3x+1$?"\n      answer: 3\n    }\n  }\n}',
+        'lesson "Chain rule" {\n  slide "Differentiate it" {\n    quiz {\n      ask "What is the derivative of $(3x+1)^2$?"\n      * "$6(3x+1)$"\n      - "$2(3x+1)$" { why: "That drops the inner derivative.", onwrong: "forgot-inner", retry }\n      - "$3x+1$" { why: "The power went missing." }\n      onwrong: "chain-again" retry\n      ! "Outer derivative times inner derivative."\n    }\n  }\n\n  slide "The inner bit" {\n    id: "forgot-inner"\n    hidden: true\n    > The outside is squaring, so its derivative is $2(3x+1)$. But the inside $3x+1$ changes **three times as fast** as $x$, so you multiply by $3$ too.\n    numeric {\n      ask "What is the derivative of the inside, $3x+1$?"\n      answer: 3\n    }\n  }\n\n  slide "Outside, then inside" {\n    id: "chain-again"\n    hidden: true\n    > Differentiate the outside and leave the inside alone, then multiply by the derivative of the inside.\n    numeric {\n      ask "What is the derivative of $(2x)^2$ at $x = 1$?"\n      answer: 8\n      wrong 4 "That is the outside only."\n    }\n  }\n}',
     },
   ],
 };

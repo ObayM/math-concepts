@@ -55,3 +55,21 @@ describe('a wrong quiz answer before a retry', () => {
     expect(right.className).not.toMatch(/success/);
   });
 });
+
+describe('a named wrong numeric answer', () => {
+  const slide = slideOf(`    numeric {
+      ask "Slope?"
+      answer: 2
+      wrong 4 "That's the rise on its own."
+    }`);
+
+  it('shows the why for that mistake', () => {
+    render(<NumericExercise slide={slide} value="4" checked correct={false} onChange={() => {}} />);
+    expect(screen.getByText("That's the rise on its own.")).toBeTruthy();
+  });
+
+  it('stays quiet for a mistake nobody named', () => {
+    render(<NumericExercise slide={slide} value="5" checked correct={false} onChange={() => {}} />);
+    expect(screen.queryByText("That's the rise on its own.")).toBeNull();
+  });
+});
