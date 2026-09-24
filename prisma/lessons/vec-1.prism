@@ -73,8 +73,8 @@ lesson "What a Vector Is" {
       aspect: equal
       grid
       axes
-      param ax = 4 { range: [-5, 5], step: 1 }
-      param ay = 3 { range: [-4, 4], step: 1 }
+      param ax = 2 { range: [-5, 5], step: 1 }
+      param ay = 1 { range: [-4, 4], step: 1 }
       vector a = (0, 0) -> (ax, ay) { color: primary, width: 4 }
       line across = (0, 0) -> (ax, 0) { color: warning, width: 3, style: dashed }
       line up = (ax, 0) -> (ax, ay) { color: success, width: 3, style: dashed }

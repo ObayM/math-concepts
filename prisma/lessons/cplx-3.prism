@@ -60,8 +60,8 @@ lesson "Conjugate and Modulus" {
       aspect: equal
       grid
       axes
-      param a = 3 { range: [-5, 5], step: 1 }
-      param b = 4 { range: [-4, 4], step: 1 }
+      param a = 1 { range: [-5, 5], step: 1 }
+      param b = 1 { range: [-4, 4], step: 1 }
       vector z = (0, 0) -> (a, b) { color: primary, width: 4 }
       line across = (0, 0) -> (a, 0) { color: warning, width: 3, style: dashed }
       line up = (a, 0) -> (a, b) { color: success, width: 3, style: dashed }
