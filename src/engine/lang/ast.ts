@@ -94,6 +94,8 @@ export type Stmt =
       slope: Expr | null;
       tol: Expr | null;
       slopeTol: Expr | null;
+      follows: Expr | null;
+      over: Expr | null;
       common: ExerciseCommon;
       ln: number;
     }

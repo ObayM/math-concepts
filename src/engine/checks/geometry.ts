@@ -40,9 +40,26 @@ export function distToPolyline(p: Pt, line: Pt[]): number {
   return Math.sqrt(best);
 }
 
-// every target point must lie within tol of the drawn polyline
+// every target point must lie within tol of the drawn polyline, and every time
+// the drawing crosses a target's x it has to be near that target, so scribbling
+// up and down across the whole scene doesn't pass
 export function curveNearPoints(line: Pt[], targets: Pt[], tol: number): boolean {
-  return targets.every((t) => distToPolyline(t, line) <= tol);
+  return targets.every(
+    (t) =>
+      distToPolyline(t, line) <= tol &&
+      crossingsAt(line, t[0]).every((y) => Math.abs(y - t[1]) <= 2 * tol)
+  );
+}
+
+function crossingsAt(line: Pt[], x: number): number[] {
+  const ys: number[] = [];
+  for (let i = 0; i < line.length - 1; i++) {
+    const [x1, y1] = line[i];
+    const [x2, y2] = line[i + 1];
+    if (x1 === x2 || x < Math.min(x1, x2) || x > Math.max(x1, x2)) continue;
+    ys.push(y1 + ((x - x1) / (x2 - x1)) * (y2 - y1));
+  }
+  return ys;
 }
 
 export function pointsNearTargets(points: Pt[], targets: Pt[], tol: number): boolean {

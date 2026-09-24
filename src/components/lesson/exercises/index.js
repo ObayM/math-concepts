@@ -6,6 +6,7 @@
 import {
   pointInRegion,
   curveNearPoints,
+  curveMatchesExpr,
   pointsNearTargets,
   distToPolyline,
   slope as slopeOf,
@@ -65,7 +66,8 @@ export const exercises = {
         }
         return distToPolyline(ex.through, [a, b]) <= ex.tol;
       }
-      return curveNearPoints(v, ex.targets, ex.tol);
+      if (ex.follows && !curveMatchesExpr(v, ex.follows, ex.over, ex.tol)) return false;
+      return curveNearPoints(v, ex.targets ?? [], ex.tol);
     },
   },
   match: {

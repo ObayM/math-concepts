@@ -189,3 +189,63 @@ describe('exercises.sketch', () => {
     expect(exercises.sketch.check(slide, [[0, 0]])).toBeFalsy();
   });
 });
+
+describe('sketch curve checks the shape, not just a few points', () => {
+  const nearOnly = lessonSchema.parse(
+    compileLesson(
+      'lesson "L" {\n  slide "s" {\n    sketch curve {\n      ask "draw sin"\n      near (0, 0)\n      near (1.57, 1)\n      near (3.14, 0)\n      tol: 0.3\n    }\n  }\n}'
+    )
+  ).slides[0];
+
+  const zigzag: [number, number][] = [];
+  for (let x = -0.5; x <= 3.6; x += 0.05) zigzag.push([x, zigzag.length % 2 ? 3 : -3]);
+
+  const sine: [number, number][] = [];
+  for (let x = 0; x <= 3.2; x += 0.1) sine.push([x, Math.sin(x)]);
+
+  it('refuses a zigzag that happens to cross every target', () => {
+    expect(exercises.sketch.check(nearOnly, zigzag)).toBe(false);
+  });
+
+  it('still accepts an honest drawing', () => {
+    expect(exercises.sketch.check(nearOnly, sine)).toBe(true);
+  });
+
+  const follows = lessonSchema.parse(
+    compileLesson(
+      'lesson "L" {\n  slide "s" {\n    sketch curve {\n      ask "draw sin"\n      follows: sin(x)\n      over: [0, 3.1]\n      tol: 0.3\n    }\n  }\n}'
+    )
+  ).slides[0];
+
+  it('compiles follows: into the IR', () => {
+    const ex = follows.exercise!;
+    expect(ex.kind === 'sketch' && ex.over).toEqual([0, 3.1]);
+  });
+
+  it('grades against the function across the whole range', () => {
+    expect(exercises.sketch.check(follows, sine)).toBe(true);
+    const flat: [number, number][] = sine.map(([x]) => [x, 0]);
+    expect(exercises.sketch.check(follows, flat)).toBe(false);
+    expect(exercises.sketch.check(follows, zigzag)).toBe(false);
+  });
+
+  it('takes the range from the near points when over: is left out', () => {
+    const ex = firstExercise(
+      'lesson "L" {\n  slide "s" {\n    sketch curve {\n      ask "q"\n      near (0, 0)\n      near (2, 4)\n      follows: x^2\n    }\n  }\n}'
+    );
+    expect(ex.kind === 'sketch' && ex.over).toEqual([0, 2]);
+  });
+
+  it.each([
+    ['follows: y + 1\n      over: [0, 1]', /follows: .*y/],
+    ['follows: x\n', /needs an over/],
+    ['follows: x\n      over: [2, 1]', /end must be bigger/],
+    ['follows: sqrt(x)\n      over: [-5, -1]', /undefined over most/],
+  ])('refuses %j', (body, msg) => {
+    expect(() =>
+      compileLesson(
+        `lesson "L" {\n  slide "s" {\n    sketch curve {\n      ask "q"\n      ${body}\n    }\n  }\n}`
+      )
+    ).toThrow(msg);
+  });
+});

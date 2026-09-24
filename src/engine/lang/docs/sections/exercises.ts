@@ -94,11 +94,21 @@ export const exercisesSection: DocSection = {
     {
       keyword: 'sketch',
       syntax:
-        'sketch curve {\n  ask "..."\n  near (x, y)\n  [near (x, y) ...]\n  [tol: <n>]\n}\nsketch points {\n  ask "..."\n  near (x, y)\n  [near (x, y) ...]\n  [tol: <n>]\n}\nsketch line {\n  ask "..."\n  through (x, y)\n  slope: <n>\n  [tol: <n>]\n  [slopeTol: <n>]\n}',
+        'sketch curve {\n  ask "..."\n  [follows: <expr in x>]\n  [over: [start, end]]\n  [near (x, y) ...]\n  [tol: <n>]\n}\nsketch points {\n  ask "..."\n  near (x, y)\n  [near (x, y) ...]\n  [tol: <n>]\n}\nsketch line {\n  ask "..."\n  through (x, y)\n  slope: <n>\n  [tol: <n>]\n  [slopeTol: <n>]\n}',
       description:
-        "Draw directly on the slide's scene — a freehand curve, a handful of tapped points, or a dragged straight line. `curve` and `points` check against `near` landmark points (the drawn shape must pass within `tol` of each); `curve` is checked as a connected stroke, `points` as independent taps. `line` checks the drawn segment's slope against `slope` (within `slopeTol`) and that it passes within `tol` of `through`. Pairs naturally with a `reveal { ... }` block for predict-then-reveal.",
+        "Draw directly on the slide's scene — a freehand curve, a handful of tapped points, or a dragged straight line. `curve` and `points` check against `near` landmark points (the drawn shape must pass within `tol` of each); `curve` is checked as a connected stroke, `points` as independent taps. Give a `curve` a `follows:` function and the whole drawing is graded against it over `over:` (or the span of the `near` points), which is what you want whenever the shape matters and not just a few landmarks. `line` checks the drawn segment's slope against `slope` (within `slopeTol`) and that it passes within `tol` of `through`. Pairs naturally with a `reveal { ... }` block for predict-then-reveal.",
       props: [
         { name: 'near', type: '(number, number)', description: 'a landmark point (repeatable)' },
+        {
+          name: 'follows',
+          type: 'expression in x',
+          description: 'the function the drawn curve has to match (curve mode)',
+        },
+        {
+          name: 'over',
+          type: '[number, number]',
+          description: 'the x range follows: is checked on (default: the near points)',
+        },
         {
           name: 'through',
           type: '(number, number)',
@@ -118,7 +128,7 @@ export const exercisesSection: DocSection = {
         },
       ],
       example:
-        'sketch curve {\n  ask "Draw $y = (x-1)^2 - 3$ — vertex and both crossings roughly right."\n  near (1, -3)\n  near (1-sqrt(3), 0)\n  near (1+sqrt(3), 0)\n  tol: 0.6\n  hint "Vertex form puts the vertex at (h, k)."\n}',
+        'sketch curve {\n  ask "Draw $y = (x-1)^2 - 3$, vertex and both crossings roughly right."\n  follows: (x-1)^2 - 3\n  near (1, -3)\n  near (1-sqrt(3), 0)\n  near (1+sqrt(3), 0)\n  tol: 0.6\n  hint "Vertex form puts the vertex at (h, k)."\n}',
     },
     {
       keyword: 'match',

@@ -64,13 +64,14 @@ lesson "Trigonometric Derivatives" {
     sketch curve {
       ask "Draw the derivative of cos x."
       skill: "deriv-trig-sin-cos"
+      follows: -sin(x)
       near (0, 0)
       near (1.5708, -1)
       near (3.1416, 0)
       near (-1.5708, 1)
       tol: 0.4
       hint "The derivative of cos x is -sin x."
-      ! "The derivative of cos x is -sin x — zero at 0 and π, at its lowest at π/2."
+      ! "The derivative of cos x is -sin x: zero at 0 and π, at its lowest at π/2."
     }
   }
 

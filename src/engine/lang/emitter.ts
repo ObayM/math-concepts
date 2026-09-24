@@ -1374,6 +1374,43 @@ function tuplePair(e: Expr, ln: number, what: string): [number, number] {
   return [cNum(e.items[0], {}, ln), cNum(e.items[1], {}, ln)];
 }
 
+function emitFollows(
+  expr: Expr,
+  overExpr: Expr | null,
+  targets: [number, number][],
+  ln: number
+): { expr: ExprIR; over: [number, number] } {
+  let over: [number, number];
+  if (overExpr) {
+    if (overExpr.k !== 'list' || overExpr.items.length !== 2)
+      throw new CompileError('over: needs [start, end]', ln);
+    over = [cNum(overExpr.items[0], {}, ln), cNum(overExpr.items[1], {}, ln)];
+  } else if (targets.length >= 2) {
+    const xs = targets.map((t) => t[0]);
+    over = [Math.min(...xs), Math.max(...xs)];
+  } else {
+    throw new CompileError('follows: needs an over: [start, end] to check it on', ln);
+  }
+  if (!(over[1] > over[0])) throw new CompileError('over: end must be bigger than start', ln);
+
+  const tree = asIR(foldIR(lowerTree(expr, {})));
+  let finite = 0;
+  for (let i = 0; i <= 20; i++) {
+    const x = over[0] + ((over[1] - over[0]) * i) / 20;
+    let y: Value;
+    try {
+      y = evalExpr(tree, { x });
+    } catch (e) {
+      if (e instanceof ExprError) throw new CompileError(`follows: ${e.message}`, ln);
+      throw e;
+    }
+    if (typeof y !== 'number') throw new CompileError('follows: must be a number in x', ln);
+    if (Number.isFinite(y)) finite++;
+  }
+  if (finite < 18) throw new CompileError('follows: is undefined over most of over:', ln);
+  return { expr: tree, over };
+}
+
 function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
   if (!s.common.ask) throw new CompileError('sketch needs an ask "..."', s.ln);
 
@@ -1405,17 +1442,21 @@ function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
     };
   }
 
-  if (!s.near.length) {
+  if ((s.follows || s.over) && s.mode !== 'curve')
+    throw new CompileError('follows: and over: only work on sketch curve', s.ln);
+  if (!s.near.length && !s.follows) {
     throw new CompileError(`sketch ${s.mode} needs at least one near (x, y)`, s.ln);
   }
   const targets = s.near.map((t) => tuplePair(t, s.ln, 'near'));
   const tol = s.tol ? cNum(s.tol, {}, s.ln) : s.mode === 'curve' ? 0.5 : 0.4;
   if (tol < 0) throw new CompileError('tolerance must not be negative', s.ln);
+  const follows = s.follows ? emitFollows(s.follows, s.over, targets, s.ln) : null;
   return {
     kind: 'sketch' as const,
     mode: s.mode,
     prompt: s.common.ask,
     targets,
+    ...(follows && { follows: follows.expr, over: follows.over }),
     tol,
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
