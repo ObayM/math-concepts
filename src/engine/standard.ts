@@ -79,8 +79,7 @@ function studentText(slide: SlideIR): string[] {
 function standaloneNumbers(text: string): number[] {
   const stripped = text.replace(/[\^_]\{[^}]*\}|[\^_]-?\d+(\.\d+)?/g, ' ');
   const out: number[] = [];
-  for (const m of stripped.matchAll(/(?<![\w.])-?\d+(?:\.\d+)?(?![\w.]*\d)/g))
-    out.push(Number(m[0]));
+  for (const m of stripped.matchAll(/(?<![\w.])-?\d+(?:\.\d+)?(?![\w.])/g)) out.push(Number(m[0]));
   return out;
 }
 

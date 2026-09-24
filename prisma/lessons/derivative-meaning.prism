@@ -1,0 +1,648 @@
+lesson "What a derivative is" {
+  course: "calculus"
+  unit: "Derivatives & Rules"
+  difficulty: "Intermediate"
+  icon: "TrendingUp"
+  summary: "A speedometer shows a speed at one instant, when no time passes. Shrink the gap, watch the average settle, and find out what that number really is."
+  skills: ["derivative-meaning", "derivative-from-definition"]
+
+  role gap = primary
+  role distance = accent
+  role speed = success
+
+  slide "Warm up" {
+    id: "d-check"
+    beat: check
+    > Quick one before we start.
+
+    scene plane {
+      x: [-0.3, 4.3]
+      y: [-1.2, 7.4]
+      grid
+      axes
+      line l = (0, -1) -> (4, 7) { color: primary, width: 3 }
+      point a = (1, 1) { label: "(1, 1)" }
+      point b = (3, 5) { label: "(3, 5)" }
+    }
+
+    numeric {
+      ask "How steep is this line? Give its slope."
+      skill: "slope-of-line"
+      answer: 2
+      wrong 4 "That's how far it climbs in total, but it takes 2 steps across to do it." -> "d-bridge-slope" retry
+      wrong 0.5 "That's across over up. Slope is up over across." -> "d-bridge-slope" retry
+      hint "How far up does it go, for how far across?"
+      ! "Up 4 for 2 across is 2 up for every step across."
+    }
+  }
+
+  slide "Slope, one step at a time" {
+    id: "d-bridge-slope"
+    beat: bridge
+    hidden: true
+    then: "d-bridge-slope-2"
+    > Slope is how far a line goes [up]{distance} for every one step [across]{gap}. Drag the right-hand point and watch the steps.
+
+    scene plane {
+      x: [-0.3, 4.4]
+      y: [-0.6, 14]
+      grid
+      axes
+      param top = 5 { range: [1, 13], step: 1 }
+      line l = (0, 1) -> (4, top) { color: neutral, width: 2 }
+      for i in range(0, 4) {
+        line f"run{i}" = (i, 1 + i*(top - 1)/4) -> (i + 1, 1 + i*(top - 1)/4) { color: gap, width: 3 }
+        line f"up{i}" = (i + 1, 1 + i*(top - 1)/4) -> (i + 1, 1 + (i + 1)*(top - 1)/4) { color: distance, width: 3 }
+      }
+      point start = (0, 1)
+      point end = (4, top) { drag: y -> top, snap: 1, color: distance }
+      label at (0.15, 13) = "up per step across = ${(top - 1)/4}" { color: distance }
+    }
+
+    goal "Make a line that goes up 3 for every step across" {
+      when: top == 13
+      hints: ["There are 4 steps across. Each one has to climb 3.", "3 up on each of 4 steps is 12 up in total, starting from 1."]
+      showme: { top: 13 }
+    }
+  }
+
+  slide "Same idea, new line" {
+    id: "d-bridge-slope-2"
+    beat: bridge
+    hidden: true
+    > Now one you haven't seen.
+
+    scene plane {
+      x: [-0.3, 3.3]
+      y: [-0.5, 8.5]
+      grid
+      axes
+      line l = (0, 1) -> (2.4, 8.2) { color: primary, width: 3 }
+      point a = (0, 1) { label: "(0, 1)" }
+      point b = (2, 7) { label: "(2, 7)" }
+    }
+
+    numeric {
+      ask "What's the slope of this line?"
+      skill: "slope-of-line"
+      answer: 3
+      expect: (7 - 1) / (2 - 0)
+      wrong 6 "That's the whole climb. Share it out over the steps across."
+      hint "How far up from one point to the other, and how far across?"
+    }
+  }
+
+  slide "The speedometer" {
+    id: "d-hook"
+    beat: hook
+    > A speedometer says 60 km/h at exactly 3:00. But speed is distance over time, and in one instant no time passes. So what is it actually showing?
+
+    quiz {
+      ask "What is the speedometer showing?"
+      skill: "derivative-meaning"
+      * "Something real, but we need a new idea to say what"
+      - "Nothing real, it's rounding" { why: "Hold that thought. In a minute you'll watch a number settle that isn't rounding anything." }
+      - "The average over the last minute" { why: "Close, and keep that idea. A minute is a long time to a car that's speeding up, so we'll shrink it." }
+      - "60 divided by 0" { why: "Dividing by 0 doesn't give a number, and the dial shows one. So something else is going on." }
+      ! "There's no wrong bet here. Let's find out."
+    }
+  }
+
+  slide "Average speed over one second" {
+    id: "d-avg"
+    beat: explore
+    > Here's a car. After $t$ seconds it has gone $t^2$ metres. Between $t = 1$ and $t = 2$, what was its [average speed]{speed}?
+
+    scene plane {
+      x: [-0.2, 2.6]
+      y: [-0.5, 6]
+      grid
+      axes
+      curve f = x^2 { where: x >= 0, color: neutral, width: 3 }
+      line run = (1, 1) -> (2, 1) { color: gap, width: 4 }
+      line rise = (2, 1) -> (2, 4) { color: distance, width: 4 }
+      point a = (1, 1) { label: "(1, 1)" }
+      point b = (2, 4) { label: "(2, 4)" }
+      label at (1.15, 0.55) = "gap = 1 second" { color: gap }
+      label at (2.08, 2.5) = "distance covered = ?" { color: distance }
+    }
+
+    numeric {
+      ask "Average speed between $t = 1$ and $t = 2$?"
+      skill: "derivative-meaning"
+      unit: "m/s"
+      answer: 3
+      expect: (2^2 - 1^2) / (2 - 1)
+      wrong 4 "4 m is where the car is at $t = 2$, not how far it went in that second." -> "d-detour-distance" retry
+      wrong 1 "1 m is where the car is at $t = 1$, not how far it went." -> "d-detour-distance" retry
+      hint "Average speed is the [distance covered]{distance} divided by the [time it took]{gap}."
+    }
+  }
+
+  slide "Shrink the gap" {
+    id: "d-shrink"
+    beat: explore
+    > 3 m/s is the average over a whole second. But the car was speeding up the whole time. Shrink the [gap]{gap} and watch the [average]{speed}.
+
+    scene plane {
+      x: [-0.2, 2.4]
+      y: [-0.5, 5.6]
+      grid
+      axes
+      param h = 1 { range: [0.001, 1], step: 0.001, keep }
+      curve f = x^2 { where: x >= 0, color: neutral, width: 3 }
+      line run = (1, 1) -> (1 + h, 1) { color: gap, width: 4 }
+      line rise = (1 + h, 1) -> (1 + h, (1 + h)^2) { color: distance, width: 4 }
+      point a = (1, 1)
+      point b = (1 + h, (1 + h)^2) { color: distance }
+      label at (0.05, 5.2) = "gap = ${h} s" { color: gap }
+      label at (0.05, 4.7) = "average speed over the gap = ${fixed(((1 + h)^2 - 1)/h, 3)} m/s" { color: speed }
+      slider h { label: "gap" }
+    }
+
+    goal "Get the [gap]{gap} below 0.01 seconds" {
+      when: h < 0.01
+      hints: ["Keep your eye on the [average]{speed}, not the graph.", "Try gaps of 0.1, then 0.01, then 0.001. What stays the same?"]
+      showme: { h: 0.001 }
+      dur: 3500
+    }
+
+    numeric {
+      ask "What number is the [average speed]{speed} settling on?"
+      skill: "derivative-meaning"
+      unit: "m/s"
+      answer: 2
+      wrong 3 "3 is the average over a whole second. Shrink the gap and it changes." -> "d-detour-big-gap" retry
+      wrong 0 "The gap shrinks towards 0, but the average doesn't. Look at the readout." -> "d-detour-big-gap" retry
+      wrong 2.001 "That's the average over your last gap. Shrink it more and it changes again. Where is it heading?"
+      after: goals
+    }
+  }
+
+  slide "What the speedometer shows" {
+    id: "d-reveal"
+    beat: reveal
+    > You bet on "${answer("d-hook", "a guess")}". Here's what happened: the average didn't drop to 0 and didn't blow up. It settled on ${answer("d-shrink", "2")}. That's what a speedometer shows: the speed the average heads for as the gap shrinks.
+
+    scene plane {
+      x: [-0.2, 2.4]
+      y: [-0.5, 5.6]
+      grid
+      axes
+      param h = 0.1 { range: [0.0001, 1] }
+      curve f = x^2 { where: x >= 0, color: neutral, width: 3 }
+      line rise = (1 + h, 1) -> (1 + h, (1 + h)^2) { color: distance, width: 4 }
+      point a = (1, 1)
+      point b = (1 + h, (1 + h)^2) { color: distance }
+      label at (0.05, 5.2) = "gap = ${h} s" { color: gap }
+      label at (0.05, 4.7) = "average speed = ${fixed(((1 + h)^2 - 1)/h, 2)} m/s" { color: speed }
+      step "The gap keeps shrinking..." { set: { h: 0.1 } }
+      step "...and the average stops moving." { animate: { h: 0.0001 }, dur: 2500, ease: easeOut }
+    }
+
+    numeric {
+      ask "Another car's average speed over gaps of 0.1, 0.01 and 0.001 seconds comes out as 5.3, 5.03 and 5.003 m/s. What does its speedometer show?"
+      skill: "derivative-meaning"
+      unit: "m/s"
+      answer: 5
+      wrong 5.3 "That's the average over the biggest gap, the least like one instant." -> "d-detour-big-gap" retry
+      wrong 5.003 "That's still an average, over 0.001 s. Shrink the gap further and it moves again. Where is it heading?"
+      after: 2
+    }
+  }
+
+  slide "Why not a gap of 0?" {
+    id: "d-trap"
+    beat: trap
+    > So why not skip the shrinking and set the [gap]{gap} to 0? Go on, drag it all the way.
+
+    scene plane {
+      x: [-0.2, 2.4]
+      y: [-0.5, 5.6]
+      grid
+      axes
+      param h = 0.5 { range: [0, 1], step: 0.01 }
+      curve f = x^2 { where: x >= 0, color: neutral, width: 3 }
+      line rise = (1 + h, 1) -> (1 + h, (1 + h)^2) { color: distance, width: 4 }
+      point a = (1, 1)
+      point b = (1 + h, (1 + h)^2) { color: distance }
+      label at (0.05, 5.2) = "${fixed((1 + h)^2 - 1, 2)} metres in ${fixed(h, 2)} seconds" { color: distance }
+      label at (0.05, 4.7) = "average speed = ${fixed(((1 + h)^2 - 1)/h, 2)} m/s" { color: speed }
+      slider h { label: "gap" }
+    }
+
+    goal "Set the [gap]{gap} to 0" {
+      when: h == 0
+      hints: ["Drag the gap slider all the way to the left."]
+      showme: { h: 0 }
+      dur: 1500
+    }
+
+    quiz {
+      ask "Why does a gap of 0 fail?"
+      skill: "derivative-meaning"
+      * "0 metres in 0 seconds is 0 divided by 0, which isn't a number"
+      - "The car stops moving when the gap is 0" { why: "The car keeps going. It's our fraction that breaks, not the car." }
+      - "It works, and the speed is 0" { why: "The readout says ?, not 0. No distance over no time isn't 0 m/s, it's nothing at all." }
+      - "It works, and the speed is 2" { why: "2 is where the average heads, but at a gap of 0 the fraction is 0 over 0. You only get the 2 by watching it close in." }
+      after: goals
+      ! "Tempting, and it's exactly what people tried for centuries. We never let the gap reach 0. We watch where the average is heading."
+    }
+  }
+
+  slide "The same thing as a picture" {
+    id: "d-picture"
+    beat: explore
+    > Here's the same idea on the graph. The line through the two points has a slope, and that slope is the [average speed]{speed}.
+
+    scene plane {
+      x: [-0.2, 2.4]
+      y: [-0.5, 5.6]
+      grid
+      axes
+      param h = 1 { range: [0.001, 1], step: 0.001 }
+      curve f = x^2 { where: x >= 0, color: neutral, width: 3 }
+      point a = (1, 1)
+      point b = (1 + h, (1 + h)^2) { color: distance }
+      line sec { through: a, slope: ((1 + h)^2 - 1)/h, color: speed, width: 3 }
+      label at (0.05, 5.2) = "slope of the line = ${fixed(((1 + h)^2 - 1)/h, 2)}" { color: speed }
+      slider h { label: "gap" }
+    }
+
+    goal "Shrink the [gap]{gap} until the line just touches the curve" {
+      when: h < 0.05
+      hints: ["Watch what the line does as the second point slides in.", "Keep going until the two points look like one."]
+      showme: { h: 0.01 }
+    }
+
+    quiz {
+      ask "The slope of that touching line is the same as..."
+      skill: "derivative-meaning"
+      * "the car's speed at $t = 1$"
+      - "the distance at $t = 1$" { why: "The distance at $t = 1$ is 1 m, the height of the point. The slope is how steep the line is, not how high." }
+      - "the average over the first second" { why: "That was the line at a gap of 1, with slope 3. You shrank it until it stopped being an average over anything." }
+      after: goals
+    }
+  }
+
+  slide "What mathematicians write" {
+    id: "d-name"
+    beat: name
+    > Everything you just did has a name. Call the car's distance $f$. The [gap]{gap} is $h$. The [average]{speed} is a fraction. Heading for is $\lim$. And the number it settles on is the **derivative**.
+
+    scene plane {
+      x: [0, 10]
+      y: [0, 6]
+      axes: false
+      param h = 0.01 { range: [0.001, 1], step: 0.001, keep }
+      param m = 0 { range: [0, 1] }
+      label w1 at (0.5, 5) = "gap = ${h}" { color: gap, size: 20 }
+      label s1 at (0.5, 5) = "h = ${h}" { color: gap, size: 20 }
+      label w2 at (0.5, 3.4) = "average speed = ${fixed(((1 + h)^2 - 1)/h, 3)}" { color: speed, size: 20 }
+      label s2 at (0.5, 3.4) = "\dfrac{\textcolor{distance}{f(1 + h) - f(1)}}{\textcolor{gap}{h}} = ${fixed(((1 + h)^2 - 1)/h, 3)}" { tex, size: 20 }
+      label w3 at (0.5, 1.4) = "settles on 2" { color: speed, size: 20 }
+      label s3 at (0.5, 1.4) = "\lim_{\textcolor{gap}{h} \to 0} \dfrac{\textcolor{distance}{f(1 + h) - f(1)}}{\textcolor{gap}{h}} = f'(1) = 2" { tex, size: 20 }
+      morph w1 -> s1 { by: m }
+      morph w2 -> s2 { by: m }
+      morph w3 -> s3 { by: m }
+      step "In words, the way you've been saying it." { set: { m: 0 } }
+      step "In symbols, the way it gets written." { animate: { m: 1 }, dur: 1600 }
+      slider h { label: "gap" }
+    }
+
+    build {
+      ask "Put the definition together."
+      skill: "derivative-from-definition"
+      template: "$f'(1) =$ ___ ___"
+      bank: ["$\lim_{h \to 0}$", "$\lim_{h \to 1}$", "$\dfrac{f(1 + h) - f(1)}{h}$", "$\dfrac{f(h) - f(1)}{h}$", "$\big(f(1 + h) - f(1)\big) \cdot h$"]
+      answer: ["$\lim_{h \to 0}$", "$\dfrac{f(1 + h) - f(1)}{h}$"]
+      hint "lim means where it's heading, the same idea as in the limits lessons."
+      hint "The gap is heading for 0, and the average is the change in distance divided by the gap."
+      after: 2
+      ! "The gap is $h$, heading for 0. The change in distance over the gap is the average. Where it settles is $f'(1)$."
+    }
+  }
+
+  slide "A corner" {
+    id: "d-corner"
+    beat: breaker
+    > Does every curve have a slope at every point? Try this one at 0.
+
+    scene plane {
+      x: [-2, 2]
+      y: [-0.4, 2]
+      aspect: equal
+      grid
+      axes
+      param hr = 1 { range: [0.001, 1], step: 0.001 }
+      param hl = 1 { range: [0.001, 1], step: 0.001 }
+      curve f = abs(x) { color: neutral, width: 3 }
+      point o = (0, 0)
+      point r = (hr, hr) { color: gap }
+      point l = (0 - hl, hl) { color: distance }
+      line right = (0, 0) -> (hr, hr) { color: gap, width: 3 }
+      line left = (0 - hl, hl) -> (0, 0) { color: distance, width: 3 }
+      label at (0.15, 1.85) = "slope on the right = ${fixed(abs(hr)/hr, 2)}" { color: gap }
+      label at (-1.95, 1.85) = "slope on the left = ${fixed((0 - abs(0 - hl))/hl, 2)}" { color: distance }
+      slider hr { label: "gap on the right" }
+      slider hl { label: "gap on the left" }
+    }
+
+    goal "Shrink both gaps below 0.01" {
+      when: hr < 0.01 and hl < 0.01
+      hints: ["There are two sliders this time, one for each side.", "Watch the two readouts as the gaps shrink. Do they meet?"]
+      showme: { hr: 0.005, hl: 0.005 }
+    }
+
+    quiz {
+      ask "So does $y = |x|$ have a slope at 0?"
+      skill: "derivative-meaning"
+      * "No: the right settles on 1 and the left on $-1$"
+      - "Yes, it's 0, halfway between" { why: "Neither side ever gets near 0. Averaging two different answers doesn't make a single one." }
+      - "Yes, it's 1" { why: "That's only the right side. From the left the line slopes down at $-1$." }
+      after: goals
+      ! "No single number to settle on, so no derivative. A sharp corner breaks it."
+    }
+  }
+
+  slide "A jump" {
+    id: "d-jump"
+    beat: breaker
+    > One more. What happens at a jump?
+
+    scene plane {
+      x: [0, 4]
+      y: [-0.5, 4.5]
+      grid
+      axes
+      param h = 1 { range: [0.001, 1], step: 0.001 }
+      curve lower = 1 { where: x <= 2, color: neutral, width: 3 }
+      curve upper = 3 { where: x > 2, color: neutral, width: 3 }
+      point a = (2, 1)
+      point hole = (2, 3) { open }
+      point b = (2 + h, 3) { color: distance }
+      line sec = (2, 1) -> (2 + h, 3) { color: speed, width: 3 }
+      label at (0.1, 4.2) = "average over the gap = ${fixed(2/h, 1)}" { color: speed }
+      slider h { label: "gap" }
+    }
+
+    goal "Shrink the gap below 0.01" {
+      when: h < 0.01
+      hints: ["Drag the gap slider left and keep an eye on the readout."]
+      showme: { h: 0.005 }
+    }
+
+    quiz {
+      ask "As the gap shrinks at $x = 2$, the average..."
+      skill: "derivative-meaning"
+      * "keeps growing, it never settles"
+      - "settles on 2" { why: "The jump stays 2 tall however small the gap gets, so it's 2 divided by something shrinking. That grows without end." }
+      - "settles on 0" { why: "The gap goes to 0, but it's on the bottom of the fraction. A smaller bottom makes the answer bigger." }
+      after: goals
+      ! "Corners and jumps are where derivatives go missing."
+    }
+  }
+
+  slide "Without the slider" {
+    id: "d-worked"
+    beat: example
+    > Here's how you get $f'(1)$ without a slider, just algebra. Step through it.
+
+    scene plane {
+      x: [0, 10]
+      y: [0, 6]
+      axes: false
+      param s = 0 { range: [0, 4], step: 1 }
+      label at (0.4, 5) = "f(1 + h) - f(1) = (1 + h)^2 - 1" { tex, size: 20, show: s >= 1 }
+      label at (0.4, 3.8) = "= 2h + h^2" { tex, size: 20, show: s >= 2 }
+      label at (0.4, 2.6) = "\text{divide by } h\!: \quad 2 + h" { tex, size: 20, show: s >= 3 }
+      label at (0.4, 1.4) = "\text{as } h \to 0\!: \quad 2 + h \to 2" { tex, size: 20, show: s >= 4 }
+      step "Start with the change in distance." { set: { s: 1 } }
+      step "Multiply out the bracket." { set: { s: 2 } }
+      step "Divide by the gap." { set: { s: 3 } }
+      step "Let the gap head for 0." { set: { s: 4 } }
+    }
+
+    quiz {
+      ask "Why are we allowed to divide by $h$ here?"
+      skill: "derivative-from-definition"
+      * "Because $h$ isn't 0, it's only heading there"
+      - "Because $h$ is 0" { why: "If $h$ were 0 we'd be dividing by 0, the trap from before." }
+      - "Because dividing by 0 is fine in calculus" { why: "It never is. That's the whole reason for the limit." }
+      after: 3
+    }
+  }
+
+  slide "You finish it" {
+    id: "d-faded"
+    beat: example
+    > Same car, now at $t = 3$. We've done the algebra. You finish it.
+    >
+    > $$\frac{f(3 + h) - f(3)}{h} = \frac{(3 + h)^2 - 9}{h} = \frac{6h + h^2}{h}$$
+
+    numeric {
+      ask "What's $f'(3)$?"
+      skill: "derivative-from-definition"
+      unit: "m/s"
+      answer: 6
+      expect: 2 * 3
+      wrong 7 "That's the average with a gap of 1, a whole second." -> "d-detour-zero" retry
+      wrong 9 "9 m is where the car is at $t = 3$." -> "d-detour-value" retry
+      hint "Divide the top by $h$ first. Then let $h$ head for 0."
+    }
+  }
+
+  slide "Your turn" {
+    id: "d-own-1"
+    beat: example
+    > Your turn, three of them. The letter changes to $x$. Nothing else does.
+
+    numeric {
+      ask "$f(x) = x^2$. What's $f'(5)$?"
+      skill: "derivative-from-definition"
+      answer: 10
+      expect: 2 * 5
+      wrong 25 "25 is $f(5)$, the height. The derivative is how steep." -> "d-detour-value" retry
+      hint "Work out $\dfrac{f(5 + h) - f(5)}{h}$, tidy it up, then let $h$ head for 0."
+    }
+  }
+
+  slide "Two terms" {
+    id: "d-own-2"
+    beat: example
+    > A new function this time.
+
+    numeric {
+      ask "$f(x) = x^2 + 3x$. What's $f'(1)$?"
+      skill: "derivative-from-definition"
+      answer: 5
+      expect: 2 * 1 + 3
+      wrong 4 "4 is $f(1)$, the height. The derivative is how steep." -> "d-detour-value" retry
+      wrong 2 "That's only the $x^2$ part. The $3x$ changes too."
+      hint "$f(1 + h) - f(1)$ has an $x^2$ part and a $3x$ part. Do both, then divide by $h$."
+    }
+  }
+
+  slide "Going downhill" {
+    id: "d-own-3"
+    beat: example
+    > Last one.
+
+    numeric {
+      ask "$f(x) = x^2$. What's $f'(-1)$?"
+      skill: "derivative-from-definition"
+      answer: -2
+      expect: 2 * (0 - 1)
+      wrong 2 "Right size. Check the direction: is the curve going up or down at $x = -1$?" -> "d-detour-sign" retry
+      wrong 1 "1 is $f(-1)$, the height. The derivative is how steep." -> "d-detour-value" retry
+      hint "$(-1 + h)^2 - 1$ multiplies out to $-2h + h^2$."
+    }
+  }
+
+  slide "A falling ball" {
+    id: "d-transfer"
+    beat: transfer
+    > A ball is dropped. After $t$ seconds its height is $20 - 5t^2$ metres.
+
+    numeric {
+      ask "At $t = 1$, what's the rate of change of its height?"
+      skill: "derivative-from-definition"
+      unit: "m/s"
+      answer: -10
+      expect: 0 - 10 * 1
+      wrong 10 "Right size, but the ball is falling, so its height is going down." -> "d-detour-sign" retry
+      wrong 15 "15 m is its height at $t = 1$, where it is, not how fast that's changing." -> "d-detour-value" retry
+      wrong -5 "That's the average over the whole first second. Shrink the gap." -> "d-detour-big-gap" retry
+      ! "That's the derivative. It'll come back in practice over the next few days, mixed in with other things."
+    }
+  }
+
+  slide "Where it is, not how far it went" {
+    id: "d-detour-distance"
+    beat: detour
+    hidden: true
+    > Easy slip: that's where the car *is*, not how far it went. In that second it went from 1 m to 4 m.
+
+    numeric {
+      ask "Try another second. Average speed between $t = 2$ and $t = 3$?"
+      skill: "derivative-meaning"
+      unit: "m/s"
+      answer: 5
+      expect: (3^2 - 2^2) / (3 - 2)
+      wrong 9 "9 m is where it is at $t = 3$. How far did it go that second?"
+      hint "It's at 4 m when $t = 2$ and 9 m when $t = 3$."
+    }
+  }
+
+  slide "A gap that's too big" {
+    id: "d-detour-big-gap"
+    beat: detour
+    hidden: true
+    > That's an average over a big gap, and the car kept speeding up the whole time. The shorter the [gap]{gap}, the closer you get to what it's doing right now.
+
+    scene plane {
+      x: [-0.2, 2.4]
+      y: [-0.5, 5.6]
+      grid
+      axes
+      param h = 1 { range: [0.001, 1], step: 0.001 }
+      curve f = x^2 { where: x >= 0, color: neutral, width: 3 }
+      line rise = (1 + h, 1) -> (1 + h, (1 + h)^2) { color: distance, width: 4 }
+      point a = (1, 1)
+      point b = (1 + h, (1 + h)^2) { color: distance }
+      label at (0.05, 5.2) = "gap = ${h} s" { color: gap }
+      label at (0.05, 4.7) = "average speed = ${fixed(((1 + h)^2 - 1)/h, 3)} m/s" { color: speed }
+      slider h { label: "gap" }
+    }
+
+    goal "Shrink the [gap]{gap} below 0.005 and watch the last digits" {
+      when: h < 0.005
+      hints: ["Drag the gap slider right down to the left end."]
+      showme: { h: 0.001 }
+      dur: 3000
+    }
+  }
+
+  slide "Nearly there" {
+    id: "d-detour-zero"
+    beat: detour
+    hidden: true
+    > You're nearly there. After dividing you have something with $h$ still in it, and $h$ isn't 1. It's heading for 0.
+
+    numeric {
+      ask "As $h$ heads for 0, where does $\dfrac{8h + h^2}{h}$ head?"
+      skill: "derivative-from-definition"
+      answer: 8
+      wrong 9 "That's with $h = 1$. Divide by $h$ first, then make $h$ tiny: 0.1, 0.01, 0.001."
+    }
+  }
+
+  slide "Where it is versus how fast" {
+    id: "d-detour-value"
+    beat: detour
+    hidden: true
+    > That's the [height]{distance}, where it is. The derivative is [how steep]{speed}, how fast it's changing. Slide the point and compare them.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-1, 9]
+      grid
+      axes
+      param a = 1 { range: [-2.5, 2.5], step: 0.5 }
+      curve f = x^2 { color: neutral, width: 3 }
+      point p = (a, a^2) { drag: x -> a, snap: 0.5, color: distance }
+      line tan { through: p, slope: 2*a, color: speed, width: 3, style: dashed }
+      line up = (a, 0) -> (a, a^2) { color: distance, width: 3 }
+      label at (-2.9, 8.5) = "height = ${a^2}" { color: distance }
+      label at (-2.9, 7.7) = "steepness = ${2*a}" { color: speed }
+    }
+
+    goal "Find a spot where the height and the steepness are the same number" {
+      when: a^2 == 2*a
+      hints: ["They're different almost everywhere. Try whole numbers of $x$.", "Try $x = 2$: the height is 4. How steep is it there?"]
+      showme: { a: 2 }
+    }
+
+    numeric {
+      ask "$f(x) = x^2$. How steep is it at $x = 4$?"
+      skill: "derivative-from-definition"
+      answer: 8
+      expect: 2 * 4
+      wrong 16 "16 is the height at $x = 4$. How steep is it there?"
+      after: goals
+    }
+  }
+
+  slide "Going down" {
+    id: "d-detour-sign"
+    beat: detour
+    hidden: true
+    > Right size, wrong direction. Where the curve goes down, the slope is negative.
+
+    scene plane {
+      x: [-3, 3]
+      y: [-1, 9]
+      grid
+      axes
+      param a = -1.5 { range: [-2.5, 2.5], step: 0.5 }
+      curve f = x^2 { color: neutral, width: 3 }
+      point p = (a, a^2) { drag: x -> a, snap: 0.5, color: distance }
+      line tan { through: p, slope: 2*a, color: speed, width: 3, style: dashed }
+      label at (-2.9, 8.5) = "slope = ${2*a}" { color: speed }
+    }
+
+    goal "Find a spot where the slope is positive" {
+      when: a > 0
+      hints: ["Positive means the line climbs as you go right."]
+    }
+
+    numeric {
+      ask "$f(x) = x^2$. What's $f'(-3)$?"
+      skill: "derivative-from-definition"
+      answer: -6
+      expect: 2 * (0 - 3)
+      wrong 6 "Right size. Which way does the curve go at $x = -3$?"
+      after: goals
+    }
+  }
+}
