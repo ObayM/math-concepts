@@ -1,12 +1,22 @@
 'use client';
+import { useMemo } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { hashStr, shuffledOrder } from './shuffle';
 
 export default function QuizExercise({ slide, value, checked, onChange }) {
   const t = useT();
   const ex = slide.exercise;
   const selected = value;
+  const order = useMemo(
+    () =>
+      shuffledOrder(
+        ex.options.length,
+        hashStr(ex.prompt + ex.options.map((o) => o.text).join('|'))
+      ),
+    [ex]
+  );
 
   return (
     <div className="flex flex-col">
@@ -15,7 +25,8 @@ export default function QuizExercise({ slide, value, checked, onChange }) {
       </RichText>
 
       <div className="grid gap-3" role="radiogroup" aria-label={t('exercise.answerChoices')}>
-        {ex.options.map((option, idx) => {
+        {order.map((idx) => {
+          const option = ex.options[idx];
           const isSelected = selected === idx;
           const isCorrect = idx === ex.correct;
 

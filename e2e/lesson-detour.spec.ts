@@ -36,10 +36,11 @@ test('a wrong answer sends you on a detour and brings you back', async ({
   await expect(page.getByText(/pick the product rule/i)).toBeVisible({ timeout: 20_000 });
 
   // assemble a deliberately wrong answer: the u'v' trap, then uv
-  const token = (n: number) => page.locator('[aria-label="Token bank"] button').nth(n);
+  const token = (id: string) =>
+    page.locator(`[aria-label="Token bank"] button[data-token="${id}"]`);
   const assembleWrong = async () => {
-    await token(2).click();
-    await token(3).click();
+    await token("$u'v'$").click();
+    await token('$uv$').click();
   };
 
   await assembleWrong();

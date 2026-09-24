@@ -21,3 +21,12 @@ export function seededShuffle(items, seed) {
   }
   return out;
 }
+
+export function shuffledOrder(n, seed) {
+  const order = seededShuffle(
+    Array.from({ length: n }, (_, i) => i),
+    seed
+  );
+  if (n > 1 && order.every((v, i) => v === i)) order.push(order.shift());
+  return order;
+}

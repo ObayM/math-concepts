@@ -1,13 +1,22 @@
 'use client';
+import { useMemo } from 'react';
 import { RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 import { useTokenDrag, DragGhost } from './dnd';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { hashStr, shuffledOrder } from './shuffle';
 
 export default function BuildExercise({ slide, value = [], checked, correct, onChange }) {
   const t = useT();
   const ex = slide.exercise;
   const placed = Array.isArray(value) ? value : [];
+  const bank = useMemo(
+    () =>
+      shuffledOrder(ex.bank.length, hashStr(ex.bank.map((tok) => tok.id).join('|'))).map(
+        (i) => ex.bank[i]
+      ),
+    [ex]
+  );
   const labelOf = (id) => ex.bank.find((t) => t.id === id)?.label ?? id;
   const usedCount = (id) => placed.filter((p) => p === id).length;
 
@@ -131,13 +140,14 @@ export default function BuildExercise({ slide, value = [], checked, correct, onC
         role="group"
         aria-label={t('exercise.tokenBank')}
       >
-        {ex.bank.map((tok) => {
+        {bank.map((tok) => {
           const isOp = tok.kind === 'operator';
           const disabled =
             checked || placed.length >= ex.slots || (!ex.reusable && usedCount(tok.id) > 0);
           return (
             <button
               key={tok.id}
+              data-token={tok.id}
               {...(disabled ? {} : sourceProps(`bank:${tok.id}`))}
               onClick={() => place(tok.id)}
               disabled={disabled}

@@ -1,14 +1,20 @@
 'use client';
+import { useMemo } from 'react';
 import { RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 import { useTokenDrag, DragGhost } from './dnd';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { hashStr, shuffledOrder } from './shuffle';
 
 export default function OrderExercise({ slide, value = [], checked, onChange }) {
   const t = useT();
   const ex = slide.exercise;
   const placed = Array.isArray(value) ? value : [];
   const bank = [...ex.items, ...(ex.decoys ?? [])];
+  const tray = useMemo(
+    () => shuffledOrder(ex.items.length + (ex.decoys?.length ?? 0), hashStr(ex.items.join('|'))),
+    [ex]
+  );
 
   const place = (idx) => {
     if (placed.length >= ex.items.length || placed.includes(idx)) return;
@@ -88,7 +94,8 @@ export default function OrderExercise({ slide, value = [], checked, onChange }) 
         role="group"
         aria-label={t('exercise.availableItems')}
       >
-        {bank.map((label, idx) => {
+        {tray.map((idx) => {
+          const label = bank[idx];
           const disabled = checked || placed.length >= ex.items.length || placed.includes(idx);
           return (
             <button
