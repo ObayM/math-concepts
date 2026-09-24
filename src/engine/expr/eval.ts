@@ -2,10 +2,6 @@ import type { ExprIR, Scope, Value } from './types';
 import { BUILTINS, CONSTS } from './builtins';
 import { shortNum } from '@/engine/format';
 
-// tree-walking evaluator. replaces the old string + new Function path:
-// no eval, no CSP unsafe-eval, and unknown identifiers throw instead of
-// silently becoming 0.
-
 export class ExprError extends Error {
   constructor(msg: string) {
     super(msg);
@@ -101,8 +97,6 @@ export function evalBool(e: number | ExprIR, scope: Scope): boolean {
   return truthy(evalExpr(e, scope));
 }
 
-// live text: static parts join as-is, expressions render rounded to 2dp
-// (matches the old ${} interpolation, em dash for non-finite)
 export function evalText(t: { parts: (string | ExprIR)[] }, scope: Scope): string {
   return t.parts
     .map((p) => {
@@ -111,6 +105,8 @@ export function evalText(t: { parts: (string | ExprIR)[] }, scope: Scope): strin
       if (typeof v === 'string') return v;
       if (typeof v === 'boolean') return String(v);
       if (!isFinite(v)) return '?';
+      if (p.k === 'call' && p.fn === 'fixed' && p.args[1]?.k === 'num')
+        return v.toFixed(Math.max(0, Math.min(6, Math.round(p.args[1].v))));
       return shortNum(v);
     })
     .join('');

@@ -16,7 +16,7 @@ export const expressionsSection: DocSection = {
     {
       keyword: 'math functions',
       syntax:
-        'sin cos tan asin acos atan atan2 sinh cosh tanh sec csc cot\nsqrt cbrt abs log log2 log10 exp pow hypot\nfloor ceil round sign min max clamp lerp mod\ndeg rad fact nCr nPr',
+        'sin cos tan asin acos atan atan2 sinh cosh tanh sec csc cot\nsqrt cbrt abs log log2 log10 exp pow hypot\nfloor ceil round sign min max clamp lerp mod\ndeg rad fact nCr nPr fixed',
       description:
         'All standard math functions, called without a namespace prefix. Trig works in radians — `deg`/`rad` convert. `mod` is a true modulo (unlike the `%` operator, `mod(-1, 3)` is `2`). `fact`, `nCr` and `nPr` are the counting functions; they return nothing usable for negative, non-integer, or out-of-range input.',
       example:
@@ -32,8 +32,9 @@ export const expressionsSection: DocSection = {
       keyword: 'interpolation',
       syntax: '"text ${expr} more text"',
       description:
-        'In label text, `${expr}` is evaluated at runtime and shown rounded to 2 decimal places.',
-      example: 'param t = 1 { range: [-3, 3] }\nlabel at (t, t^2+0.5) = "f(${t}) = ${t^2}"',
+        'In label text, `${expr}` is evaluated at runtime and shown rounded to 2 decimal places (small numbers keep two significant figures, so a gap of 0.001 still reads 0.001). Wrap it in `fixed(expr, digits)` to show an exact number of decimals, which is what a readout that should visibly settle wants: 3.000, 2.100, 2.010, 2.001.',
+      example:
+        'param t = 1 { range: [-3, 3] }\nlabel at (t, t^2+0.5) = "f(${t}) = ${t^2}"\nlabel at (-2.5, 8) = "slope = ${fixed(2*t, 3)}"',
     },
     {
       keyword: 'f-strings',

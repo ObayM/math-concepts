@@ -147,6 +147,7 @@ export const MATH_FNS = new Set([
   'fact',
   'nCr',
   'nPr',
+  'fixed',
   'PI',
   'E',
 ]);

@@ -1,10 +1,3 @@
-// the only functions callable from prism expressions. call-position and
-// id-position are separate namespaces, so a state var named `min` never
-// collides with the function `min(...)`.
-
-// bad input must return NaN, never throw — the emitter folds these calls and
-// swallows a throw, leaving a live tree instead of failing loudly. 170! is the
-// last one that fits a double.
 const FACT_MAX = 170;
 
 function factorial(n: number): number {
@@ -66,9 +59,12 @@ export const BUILTINS: Record<string, (...args: number[]) => number> = {
   fact: factorial,
   nCr: choose,
   nPr: permute,
+  fixed: (x, d) => {
+    const p = 10 ** Math.max(0, Math.min(6, Math.round(d)));
+    return Math.round(x * p) / p;
+  },
 };
 
 export const BUILTIN_NAMES = Object.keys(BUILTINS) as [string, ...string[]];
 
-// id-position constants, checked after scope (scope always wins)
 export const CONSTS: Record<string, number> = { PI: Math.PI, E: Math.E };

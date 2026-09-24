@@ -10,7 +10,6 @@ import {
 } from '@/engine/expr';
 import type { BinOp, ExprIR, Scope } from '@/engine/expr';
 
-// helpers to build trees without the noise
 const n = (v: number): ExprIR => ({ k: 'num', v });
 const id = (name: string): ExprIR => ({ k: 'id', name });
 const bin = (op: BinOp, l: ExprIR, r: ExprIR): ExprIR => ({ k: 'bin', op, l, r });
@@ -287,5 +286,21 @@ describe('angle and modulo builtins', () => {
     expect(evalNum(call('mod', n(-1), n(3)), {})).toBe(2);
     expect(evalNum(call('mod', n(7), n(3)), {})).toBe(1);
     expect(evalNum(call('mod', n(-7), n(3)), {})).toBe(2);
+  });
+});
+
+describe('fixed()', () => {
+  it('shows an exact number of decimals in live text', async () => {
+    const { evalText } = await import('@/engine/expr');
+    const call = {
+      k: 'call',
+      fn: 'fixed',
+      args: [
+        { k: 'id', name: 'v' },
+        { k: 'num', v: 3 },
+      ],
+    } as const;
+    expect(evalText({ parts: ['avg = ', call as never] }, { v: 3 })).toBe('avg = 3.000');
+    expect(evalText({ parts: ['avg = ', call as never] }, { v: 2.0012 })).toBe('avg = 2.001');
   });
 });
