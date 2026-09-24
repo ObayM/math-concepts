@@ -110,6 +110,14 @@ export const lessonSection: DocSection = {
         'scene plane {\n  x: [-6, 6]\n  y: [-6, 6]\n  grid\n  axes\n  param r1 = -3 { range: [-6, 6] }\n  param r2 = 2 { range: [-6, 6] }\n  point p1 = (r1, 0) { drag: x -> r1, color: danger }\n  point p2 = (r2, 0) { drag: x -> r2, color: danger }\n}\ngoal "Make both roots negative" {\n  when: r1 < 0 and r2 < 0\n  hints: ["Where does a negative root sit on the axis?", "Drag both red points left of zero."]\n  showme: { r1: -4, r2: -1 }\n}',
     },
     {
+      keyword: 'role',
+      syntax: 'role <name> = <colour>\n[words]{name}\n$\\textcolor{name}{x}$\ncolor: name',
+      description:
+        'Colour roles tie a word in the text to the thing it names in the picture. Declare `role distance = accent` once at the top of the lesson, then use `distance` wherever a colour goes: `color: distance` on a scene object, `[the distance]{distance}` around words in prose, questions and goals, and `\\textcolor{distance}{d}` inside math. Everything playing that role comes out the same colour, so "distance" in the sentence and the distance leg on the graph are visibly the same thing. The colour is one of primary, accent, success, danger, warning or neutral, and about three roles per lesson is plenty.',
+      example:
+        'lesson "Speed" {\n  role distance = accent\n  role gap = primary\n\n  slide "Average speed" {\n    > Average speed is the [distance]{distance} covered, $\\textcolor{distance}{d}$, over the [time gap]{gap}, $\\textcolor{gap}{h}$.\n    scene plane {\n      x: [0, 2.2]\n      y: [0, 4.5]\n      grid\n      axes\n      param h = 1 { range: [0.1, 1], step: 0.1 }\n      curve f = x^2 { color: neutral }\n      line run = (1, 1) -> (1 + h, 1) { color: gap, width: 3 }\n      line rise = (1 + h, 1) -> (1 + h, (1 + h)^2) { color: distance, width: 3 }\n      slider h { label: "gap" }\n    }\n    goal "Make the [gap]{gap} smaller than 0.5" { when: h < 0.5 }\n  }\n}',
+    },
+    {
       keyword: 'answer',
       syntax: '${answer("slide-id")}\n${answer("slide-id", "fallback")}\n${recall("param")}',
       description:

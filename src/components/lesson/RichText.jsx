@@ -1,14 +1,17 @@
 'use client';
 import katex from 'katex';
+import { texColors } from '@/engine/colors';
 
 export const proseClass = 'block max-w-[42rem] text-xl leading-[1.75] font-normal text-neutral-700';
 
-const tex = (src, displayMode) => katex.renderToString(src, { throwOnError: false, displayMode });
+const tex = (src, displayMode) =>
+  katex.renderToString(texColors(src), { throwOnError: false, displayMode });
 
 const DISPLAY_ONLY = /^\$\$([^$]+)\$\$$/;
 
 function renderInline(text) {
-  const re = /\$\$([^$]+)\$\$|\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+  const re =
+    /\$\$([^$]+)\$\$|\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]\n]+)\]\{(primary|accent|success|danger|warning|neutral)(?::([\w-]+))?\}/g;
   const parts = [];
   let last = 0;
   let key = 0;
@@ -35,6 +38,17 @@ function renderInline(text) {
         <em key={key++} className="italic text-neutral-800">
           {renderInline(m[4])}
         </em>
+      );
+    } else if (m[5] != null) {
+      parts.push(
+        <span
+          key={key++}
+          data-role={m[7]}
+          className="font-semibold"
+          style={{ color: `var(--color-${m[6]}-600)` }}
+        >
+          {renderInline(m[5])}
+        </span>
       );
     }
     last = re.lastIndex;

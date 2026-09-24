@@ -400,10 +400,19 @@ function makeParser(tokens: Token[]) {
     const props: PropMap = new Map();
     const slides: SlideStmt[] = [];
     const defs: Extract<Stmt, { k: 'def' }>[] = [];
+    const roles: { name: string; color: string; ln: number }[] = [];
     while (!check('RC') && !check('EOF')) {
       skipNL();
       if (check('RC') || check('EOF')) break;
-      if (at('slide')) {
+      if (at('role')) {
+        const rln = peek().line;
+        pos++;
+        const name = eatIdent();
+        eat('ASSIGN');
+        const color = eatIdent();
+        roles.push({ name, color, ln: rln });
+        endStmt();
+      } else if (at('slide')) {
         slides.push(parseSlide(peek().line));
         skipNL();
       } else if (at('def')) {
@@ -424,7 +433,7 @@ function makeParser(tokens: Token[]) {
       }
     }
     eat('RC');
-    return { k: 'lesson', title, props, slides, defs, ln };
+    return { k: 'lesson', title, props, slides, defs, roles, ln };
   }
 
   const LESSON_PROPS = new Set(['course', 'skills', 'unit', 'difficulty', 'icon', 'summary']);

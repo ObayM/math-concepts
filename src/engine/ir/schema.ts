@@ -54,6 +54,7 @@ const space = z
 const objBase = {
   id: z.string(),
   color: z.string().optional(),
+  role: z.string().optional(),
   strokeWidth: z.number().optional(),
   style: z.enum(['solid', 'dashed', 'dotted']).optional(),
   visibleIf: z.union([z.string(), exprIRSchema]).optional(),

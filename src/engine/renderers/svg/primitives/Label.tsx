@@ -1,6 +1,6 @@
 import katex from 'katex';
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
-import { resolveColor, LABEL_HALO } from '@/engine/colors';
+import { resolveColor, LABEL_HALO, texColors } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 
 export default function Label({ obj, scope, cx }: PrimProps) {
@@ -11,7 +11,7 @@ export default function Label({ obj, scope, cx }: PrimProps) {
   if (obj.tex) {
     const fontSize = obj.fontSize ?? 18;
     const raw = interpolate(obj.text, scope);
-    const html = katex.renderToString(raw, { throwOnError: false });
+    const html = katex.renderToString(texColors(raw), { throwOnError: false });
 
     const narrow = cx.W < 420;
     const estW = raw.replace(/\\[a-zA-Z]+|[{}\s]/g, '').length * fontSize * 0.62 + 12;

@@ -91,6 +91,20 @@ export const KEYWORDS = new Set([
   'row',
   'header',
   'blank',
+  'onwrong',
+  'retry',
+  'hidden',
+  'wrong',
+  'follows',
+  'over',
+  'beat',
+  'then',
+  'after',
+  'wait',
+  'hints',
+  'showme',
+  'keep',
+  'role',
 ]);
 
 export const MATH_FNS = new Set([

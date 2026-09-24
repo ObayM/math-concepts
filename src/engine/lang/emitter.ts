@@ -10,6 +10,14 @@ import { parseExprTokens } from './parser';
 import { CompileError } from './errors';
 import { splitTemplate, countSlots, type TemplateSeg } from './template';
 import { memoryRefs } from '@/engine/runtime/memory';
+import {
+  applyRoles,
+  roleColor,
+  isColorToken,
+  COLOR_TOKENS,
+  type Roles,
+  type ColorToken,
+} from '@/engine/roles';
 import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from './icons';
 
 type CompileScope = Record<string, number | boolean>;
@@ -317,7 +325,7 @@ function niceNum(v: number): string {
   return String(Math.round(v * 1e9) / 1e9);
 }
 
-export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
+export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): SceneIR {
   const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
   const macros: Macros = seedMacros ? new Map(seedMacros) : new Map();
   let autoLabelId = 0;
@@ -449,7 +457,8 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
     const style = propStr(props, 'style', cScope);
     const show = props.get('show');
     const width = props.get('width');
-    if (color) obj.color = color;
+    if (color) obj.color = roleColor(color, roles);
+    if (color && roles[color]) obj.role = color;
     if (style) obj.style = style;
     if (show && show !== true) obj.visibleIf = asIR(lowerR(show, cScope, ln));
     if (width && width !== true) {
@@ -1138,6 +1147,17 @@ export function emit(stmts: Stmt[], seedMacros?: Macros): SceneIR {
 
   run(stmts, {});
 
+  if (Object.keys(roles).length) {
+    for (const o of ir.objects) {
+      if (o.type !== 'label') continue;
+      if (typeof o.text === 'string') o.text = applyRoles(o.text, roles, () => {});
+      else if (o.text?.parts)
+        o.text.parts = o.text.parts.map((p: unknown) =>
+          typeof p === 'string' ? applyRoles(p, roles, () => {}) : p
+        );
+    }
+  }
+
   if (!ir.space) throw new CompileError('missing scene declaration');
   if (!ir.controls.length) delete ir.controls;
   if (!ir.timeline.length) delete ir.timeline;
@@ -1702,7 +1722,7 @@ function emitGoal(s: Extract<Stmt, { k: 'goal' }>, allowedIds: string[]) {
   };
 }
 
-function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
+function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles = {}) {
   // slug() keeps [a-z0-9] only, so a non-latin title either collapses to
   // nothing (leaving a positional id that moves when slides are reordered) or
   // survives as its latin scraps, which collide. slide ids are a database key.
@@ -1736,10 +1756,17 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
       );
     }
     if (item.k === 'prose') {
-      prose.push(item.text);
+      prose.push(
+        applyRoles(item.text, roles, (name) => {
+          throw new CompileError(
+            `[...]{${name}}: "${name}" is not a colour role or a colour${suggest(name, [...Object.keys(roles), ...COLOR_TOKENS])}`,
+            item.ln
+          );
+        })
+      );
     } else if (item.k === 'scene') {
       if (scene) throw new CompileError('a slide can have at most one scene', item.ln);
-      scene = emit([item], lessonMacros);
+      scene = emit([item], lessonMacros, roles);
     } else if (item.k === 'quiz') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitQuiz(item);
@@ -1773,7 +1800,22 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros) {
   }
 
   const allowedIds = scene ? Object.keys(scene.state ?? {}) : [];
-  const goals = goalItems.map((g) => emitGoal(g, allowedIds));
+  const tint = (t: string) => applyRoles(t, roles, () => {});
+  const goals = goalItems.map((g) => {
+    const goal = emitGoal(g, allowedIds);
+    return { ...goal, prompt: tint(goal.prompt) };
+  });
+  if (exercise && Object.keys(roles).length) {
+    const ex: any = { ...exercise, prompt: tint(exercise.prompt) };
+    if (ex.explanation) ex.explanation = tint(ex.explanation);
+    if (ex.kind === 'quiz')
+      ex.options = ex.options.map((o: any) => ({
+        ...o,
+        text: tint(o.text),
+        ...(o.why && { why: tint(o.why) }),
+      }));
+    exercise = ex;
+  }
 
   const exerciseItem = s.items.find((it) => 'common' in it) as
     | { common: { after?: { on: 'goals' | number; ln: number } } }
@@ -1955,7 +1997,19 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
   const summary = pStr(root.props, 'summary');
   const difficulty = pEnum(root.props, 'difficulty', LESSON_DIFFICULTIES, root.ln);
   const icon = pEnum(root.props, 'icon', LESSON_ICONS, root.ln);
-  const slides = root.slides.map((s, i) => emitSlide(s, i, lessonMacros));
+  const roles: Roles = {};
+  for (const r of root.roles) {
+    if (!isColorToken(r.color))
+      throw new CompileError(
+        `role ${r.name} = ${r.color}: the colour must be one of ${COLOR_TOKENS.join(', ')}${suggest(r.color, COLOR_TOKENS)}`,
+        r.ln
+      );
+    if (isColorToken(r.name))
+      throw new CompileError(`role ${r.name}: that name is already a colour`, r.ln);
+    if (roles[r.name]) throw new CompileError(`role ${r.name} is declared twice`, r.ln);
+    roles[r.name] = r.color as ColorToken;
+  }
+  const slides = root.slides.map((s, i) => emitSlide(s, i, lessonMacros, roles));
   validateSlideFlow(slides, root.slides);
   validateMemory(slides, root.slides);
   const ir = {

@@ -56,6 +56,7 @@ export type Stmt =
       props: PropMap;
       slides: SlideStmt[];
       defs: Extract<Stmt, { k: 'def' }>[];
+      roles: { name: string; color: string; ln: number }[];
       ln: number;
     }
   | { k: 'prose'; text: string; ln: number }

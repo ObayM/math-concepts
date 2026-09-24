@@ -12,6 +12,12 @@ export function resolveColor(c?: string): string {
   return TOKENS[c] ?? c;
 }
 
+export function texColors(src: string): string {
+  return src.replace(/\\(textcolor|color)\{([a-z]+)\}/g, (whole, cmd: string, name: string) =>
+    TOKENS[name] ? `\\${cmd}{${TOKENS[name]}}` : whole
+  );
+}
+
 export const GRID_LINE = 'var(--color-neutral-100)';
 export const AXIS_LINE = 'var(--color-neutral-400)';
 export const AXIS_LABEL = 'var(--color-neutral-600)';
