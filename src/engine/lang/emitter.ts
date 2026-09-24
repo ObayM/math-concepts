@@ -483,6 +483,20 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
     if (alpha && alpha !== true) obj.alpha = lowerR(alpha, cScope, ln);
     const draw = props.get('draw');
     if (draw && draw !== true) obj.draw = lowerR(draw, cScope, ln);
+    const ghost = props.get('ghost');
+    if (ghost !== undefined) {
+      if (ghost === true || ghost.k !== 'dict' || ghost.entries.length !== 1)
+        throw new CompileError('ghost: takes one param and its values, like { a: [1, 2, 3] }', ln);
+      const [param, list] = ghost.entries[0];
+      if (!(param in ir.state))
+        throw new CompileError(
+          `ghost: "${param}" is not a param here${suggest(param, Object.keys(ir.state))}`,
+          ln
+        );
+      if (list.k !== 'list' || !list.items.length || list.items.length > 12)
+        throw new CompileError('ghost: needs a list of 1 to 12 values', ln);
+      obj.ghost = { param, values: list.items.map((e) => cNum(e, cScope, ln)) };
+    }
     if (style) obj.style = style;
     if (show && show !== true) obj.visibleIf = asIR(lowerR(show, cScope, ln));
     if (width && width !== true) {
@@ -785,6 +799,7 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
         const r = propNum(s.props, 'r', s.ln, cScope);
         if (r != null) obj.r = r;
         if (s.props.get('open')) obj.open = true;
+        if (s.props.get('trace') === true) obj.trace = true;
         const label = propStr(s.props, 'label', cScope);
         if (label) obj.label = liveText(label, cScope, s.ln);
         const drag = s.props.get('drag');

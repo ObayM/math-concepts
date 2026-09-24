@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useCallback, useEffect, useRef, useState } from 'react';
 import type { SceneIR, Scope } from '@/engine/ir/types';
+import { evalNumber } from './eval';
 
 type SceneCtx = {
   scope: Scope;
@@ -10,7 +11,10 @@ type SceneCtx = {
   ir: SceneIR;
   attention: Attention;
   setAttention: (a: Attention) => void;
+  traces: Record<string, [number, number][]>;
 };
+
+const MAX_TRACE = 600;
 
 export type Attention = { indicate?: string[]; focus?: string[]; surround?: string[] };
 
@@ -79,6 +83,7 @@ export function SceneProvider({
 }) {
   const [scope, setScope] = useState<Scope>(() => initScope(ir, initial));
   const [attention, setAttention] = useState<Attention>(NO_ATTENTION);
+  const [traces, setTraces] = useState<Record<string, [number, number][]>>({});
   const scopeRef = useRef(scope);
   const tweensRef = useRef<Map<string, Tween>>(new Map());
   const rafRef = useRef<number | null>(null);
@@ -104,10 +109,30 @@ export function SceneProvider({
 
   // scopeRef leads and the state mirrors it, so a set() followed synchronously
   // by an animate() reads the value the user just produced, not last render's
-  const commit = useCallback((next: Scope) => {
-    scopeRef.current = next;
-    setScope(next);
-  }, []);
+  const commit = useCallback(
+    (next: Scope) => {
+      scopeRef.current = next;
+      setScope(next);
+      const traced = ir.objects.filter(
+        (o) => o.type === 'point' && (o as { trace?: boolean }).trace
+      ) as unknown as { id: string; x: never; y: never }[];
+      if (!traced.length) return;
+      setTraces((prev) => {
+        const out = { ...prev };
+        for (const o of traced) {
+          const x = evalNumber(o.x, next);
+          const y = evalNumber(o.y, next);
+          if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+          const path = out[o.id] ?? [];
+          const last = path[path.length - 1];
+          if (last && last[0] === x && last[1] === y) continue;
+          out[o.id] = [...path, [x, y] as [number, number]].slice(-MAX_TRACE);
+        }
+        return out;
+      });
+    },
+    [ir]
+  );
 
   const stopTweens = useCallback((keys: Iterable<string>) => {
     for (const k of keys) tweensRef.current.delete(k);
@@ -185,7 +210,7 @@ export function SceneProvider({
   );
 
   return (
-    <Ctx.Provider value={{ scope, set, setMany, animate, ir, attention, setAttention }}>
+    <Ctx.Provider value={{ scope, set, setMany, animate, ir, attention, setAttention, traces }}>
       {children}
     </Ctx.Provider>
   );

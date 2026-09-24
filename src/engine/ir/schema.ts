@@ -59,6 +59,7 @@ const objBase = {
   role: z.string().optional(),
   alpha: expr.optional(),
   draw: expr.optional(),
+  ghost: z.object({ param: z.string(), values: z.array(z.number()) }).optional(),
   strokeWidth: z.number().optional(),
   style: z.enum(['solid', 'dashed', 'dotted']).optional(),
   visibleIf: z.union([z.string(), exprIRSchema]).optional(),
@@ -98,6 +99,7 @@ const pointObj = z.object({
   r: z.number().optional(),
   // hollow (unfilled) marker — open circles for limit holes / one-sided endpoints
   open: z.boolean().optional(),
+  trace: z.boolean().optional(),
   label: liveText.optional(),
   // bind = x-axis state key; bindY = y-axis state key (for axis 'xy' free drag)
   // along = constrain the drag to a circle/segment, writing an angle/t param to bind instead

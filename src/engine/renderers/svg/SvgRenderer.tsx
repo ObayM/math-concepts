@@ -53,7 +53,7 @@ export default function SvgRenderer({
   inputLayer?: InputLayerConfig;
   tapLabel?: string;
 }) {
-  const { scope, set, attention } = useScene();
+  const { scope, set, attention, traces } = useScene();
   const [hoveredRole, setHoveredRole] = useState<string | null>(null);
   useEffect(() => {
     const onRole = (e: Event) => setHoveredRole((e as CustomEvent<string | null>).detail);
@@ -296,6 +296,41 @@ export default function SvgRenderer({
             onKeyDown={handleTapKey}
           />
         )}
+        {Object.entries(traces).map(([id, path]) => {
+          const owner = objects.find((o) => o.id === id);
+          if (!owner || path.length < 2) return null;
+          return (
+            <polyline
+              key={`trace-${id}`}
+              points={path.map(([x, y]) => `${cx.toX(x)},${cx.toY(y)}`).join(' ')}
+              fill="none"
+              stroke={resolveColor(owner.color)}
+              strokeOpacity={0.45}
+              strokeWidth={2}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              pointerEvents="none"
+            />
+          );
+        })}
+        {objects.flatMap((obj) => {
+          const ghost = obj.ghost;
+          if (!ghost || (obj.phase === 'reveal' && !revealed)) return [];
+          const Prim = svgPrimitives[obj.type];
+          if (!Prim) return [];
+          const { draggable: _drag, ...still } = obj as typeof obj & { draggable?: unknown };
+          return ghost.values.map((v: number) => (
+            <g key={`ghost-${obj.id}-${v}`} opacity={0.28} pointerEvents="none">
+              <Prim
+                obj={still}
+                scope={{ ...scope, [ghost.param]: v }}
+                cx={cx}
+                points={points}
+                startDrag={startDrag}
+              />
+            </g>
+          ));
+        })}
         {objects.map((obj, i) => {
           if (obj.phase === 'reveal' && !revealed) return null;
           if (obj.visibleIf && !evalBool(obj.visibleIf, scope)) return null;
