@@ -1,0 +1,1069 @@
+lesson "المتجهات في الفراغ" {
+  course: "solid-geometry-g12-ar"
+  unit: "الهندسة والقياس في ثلاثة أبعاد"
+  difficulty: "Intermediate"
+  icon: "Move"
+  summary: "السهم في الفراغ ثلاثة أعداد: طوله معياره، واتجاهه ثلاث زوايا مع المحاور لا تختارها كل واحدة وحدها."
+  skills: ["sg-vec-components", "sg-vec-norm", "sg-vec-unit", "sg-vec-direction", "sg-vec-ops"]
+  requires: ["sg-3d-distance"]
+
+  role arrow = primary
+  role along = success
+  role tilt = accent
+
+  def cube(s) {
+    polygon3 floor = [(0, 0, 0), (s, 0, 0), (s, s, 0), (0, s, 0)] { color: neutral, opacity: 0.08 }
+    segment3 e1 = (s, 0, 0) -> (s, s, 0) { color: neutral, style: dashed }
+    segment3 e2 = (0, s, 0) -> (s, s, 0) { color: neutral, style: dashed }
+    segment3 e3 = (s, 0, 0) -> (s, 0, s) { color: neutral, style: dashed }
+    segment3 e4 = (0, s, 0) -> (0, s, s) { color: neutral, style: dashed }
+    segment3 e5 = (s, s, 0) -> (s, s, s) { color: neutral, style: dashed }
+    segment3 e6 = (0, 0, s) -> (s, 0, s) { color: neutral, style: dashed }
+    segment3 e7 = (0, 0, s) -> (0, s, s) { color: neutral, style: dashed }
+    segment3 e8 = (s, 0, s) -> (s, s, s) { color: neutral, style: dashed }
+    segment3 e9 = (0, s, s) -> (s, s, s) { color: neutral, style: dashed }
+  }
+
+  slide "تسخين" {
+    id: "sg2-check"
+    beat: check
+    cat: "السهم في الفراغ"
+    > تسخين سريع قبل أن نبدأ.
+
+    numeric {
+      ask "ما المسافة بين النقطتين $A(1, -2, 3)$ و $B(3, 1, 9)$؟"
+      skill: "sg-3d-distance"
+      answer: 7
+      expect: sqrt((3 - 1)^2 + (1 + 2)^2 + (9 - 3)^2)
+      tolerance: 0.01
+      wrong 49 "هذا مربع المسافة. بقي الجذر."
+      wrong 11 "جمعت الفروق $2 + 3 + 6$. المسافة وتر، لا مجموع." -> "sg2-bridge-dist" retry
+      wrong sqrt(41) "انتبه للإشارة: $1 - (-2) = 3$، لا $-1$." -> "sg2-bridge-dist" retry
+      hint "اطرح الإحداثيات المتناظرة، ربّع، اجمع، ثم خذ الجذر."
+      ! "الفروق $(2, 3, 6)$، و $\sqrt{4 + 9 + 36} = 7$. احتفظ بهذه الفكرة، ستعود بعد قليل باسم جديد."
+    }
+  }
+
+  slide "البعد بين نقطتين" {
+    id: "sg2-bridge-dist"
+    beat: bridge
+    hidden: true
+    cat: "السهم في الفراغ"
+    > المسافة في الفراغ وتر مثلث قائم مرتين: مرة على الأرض، ومرة للأعلى. لذلك نربّع الفروق الثلاثة ونجمعها ثم نأخذ الجذر:
+    > $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}$$
+
+    numeric {
+      ask "ما المسافة بين $(1, 4, -2)$ و $(-1, 5, 0)$؟"
+      skill: "sg-3d-distance"
+      answer: 3
+      expect: sqrt((-1 - 1)^2 + (5 - 4)^2 + (0 + 2)^2)
+      tolerance: 0.01
+      wrong 1 "جمعت الفروق $-2 + 1 + 2$. ربّع كل فرق أولًا."
+      wrong 9 "هذا مربع المسافة. بقي الجذر."
+      hint "الفروق هي $(-2, 1, 2)$."
+      ! "$\sqrt{4 + 1 + 4} = 3$. التربيع يمحو الإشارة، فالمسافة لا تكون سالبة. نرجع الآن إلى سؤال التسخين."
+    }
+  }
+
+  slide "سلك في غرفة" {
+    id: "sg2-hook"
+    beat: hook
+    cat: "السهم في الفراغ"
+    > غرفة على شكل مكعب. شددنا سلكًا من ركن في الأرض إلى الركن المقابل له في السقف. السلك يصنع **الزاوية نفسها** مع الأحرف الثلاثة الخارجة من ركنه.
+
+    scene space3 {
+      alt: "غرفة مكعبة مرسومة بخطوط متقطعة، وسلك أزرق من ركن الأرض عند نقطة الأصل إلى الركن المقابل في السقف. مؤشر يدوّر الغرفة."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3]
+      param az = 40 { range: [0, 90], step: 5 }
+      camera: [az, 20]
+      cube(2)
+      segment3 cable = (0, 0, 0) -> (2, 2, 2) { arrow, color: arrow, width: 3 }
+      slider az { label: "دوّر الغرفة" }
+    }
+
+    quiz {
+      ask "كم تتوقع قياس هذه الزاوية؟"
+      skill: "sg-vec-direction"
+      - "$45°$" { why: "إحساس قوي، ففي المربع يصنع القطر $45°$ مع الضلعين. احتفظ برهانك، الشريحة التالية تحسمه." }
+      - "$30°$" { why: "تقسيم $90°$ على ثلاثة فكرة معقولة. الشريحة التالية تحسمه." }
+      - "$60°$" { why: "كأن الزوايا الثلاث مجموعها $180°$ مثل المثلث. ستقيسها بعد قليل." }
+      * "حوالي $55°$"
+      ! "هذا رهان الآن. في الشريحة التالية تقيسها بيدك."
+    }
+  }
+
+  slide "قِس الزاوية" {
+    id: "sg2-explore"
+    beat: explore
+    cat: "السهم في الفراغ"
+    > هذا السلك نفسه، لكن طرفه العلوي يتحرك رأسيًا فوق الركن $(2, 2)$ من الأرض. ارفعه أو أنزله وراقب [زواياه]{tilt} مع المحاور الثلاثة.
+
+    scene space3 {
+      alt: "الغرفة المكعبة وسلك من نقطة الأصل إلى نقطة فوق الركن (2, 2) من الأرض. مؤشر يغيّر ارتفاع طرف السلك، وثلاث قراءات تعطي زاوية السلك مع كل محور."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3.8]
+      param az = 40 { range: [0, 90], step: 5 }
+      param h = 0.5 { range: [0, 3.5], step: 0.1 }
+      camera: [az, 20]
+      cube(2)
+      segment3 cable = (0, 0, 0) -> (2, 2, h) { arrow, color: arrow, width: 3 }
+      point3 T = (2, 2, h) { guides, color: arrow }
+      label3 rx at (0, 2.6, 3.6) = "θx = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 ry at (0, 2.6, 3.2) = "θy = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 rz at (0, 2.6, 2.8) = "θz = ${deg(acos(h/sqrt(8 + h^2)))}°" { color: tilt }
+      slider h { label: "ارتفاع طرف السلك" }
+      slider az { label: "دوّر الغرفة" }
+    }
+
+    goal "اجعل [الزوايا الثلاث]{tilt} متساوية" {
+      when: abs(deg(acos(2/sqrt(8 + h^2))) - deg(acos(h/sqrt(8 + h^2)))) < 0.5
+      hints: ["الزاويتان مع $x$ و $y$ متساويتان دائمًا هنا. راقب الزاوية مع $z$.", "ارفع الطرف حتى تنزل زاوية $z$ إلى زاوية $x$. أين ينتهي السلك في المكعب عندها؟"]
+      showme: { h: 2 }
+    }
+
+    numeric {
+      ask "كم قياس [الزاوية]{tilt} عندما صارت الثلاث متساوية؟"
+      skill: "sg-vec-direction"
+      answer: 54.74
+      expect: deg(acos(1/sqrt(3)))
+      tolerance: 0.6
+      unit: "°"
+      wrong 45 "هذه زاوية القطر في مربع على الأرض. اقرأ القراءات من جديد." -> "sg2-d-flat" retry
+      wrong 35.26 "هذه زاوية السلك مع أرض الغرفة. المطلوب زاويته مع كل محور."
+      hint "اقرأها من أي واحدة من القراءات الثلاث."
+      after: goals
+      ! "حوالي $54.7°$، والسلك ينتهي عند الركن $(2, 2, 2)$ تمامًا."
+    }
+  }
+
+  slide "الـ 45° تعيش على الأرض" {
+    id: "sg2-d-flat"
+    beat: detour
+    hidden: true
+    cat: "السهم في الفراغ"
+    > $45°$ هي زاوية القطر في **مربع** على الأرض. لكن هذا السلك يميل نحو $z$ أيضًا، فيبتعد عن $x$ و $y$. ارفعه من الأرض إلى ركن السقف وراقب زاويته مع $x$ وهي تكبر.
+
+    scene space3 {
+      alt: "الغرفة المكعبة والسلك مستلقٍ على الأرض في البداية. مؤشر يرفع طرفه، وثلاث قراءات لزواياه مع المحاور."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3.8]
+      param az = 40 { range: [0, 90], step: 5 }
+      param h = 0 { range: [0, 3.5], step: 0.1 }
+      camera: [az, 20]
+      cube(2)
+      segment3 cable = (0, 0, 0) -> (2, 2, h) { arrow, color: arrow, width: 3 }
+      point3 T = (2, 2, h) { guides, color: arrow }
+      label3 rx at (0, 2.6, 3.6) = "θx = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 ry at (0, 2.6, 3.2) = "θy = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 rz at (0, 2.6, 2.8) = "θz = ${deg(acos(h/sqrt(8 + h^2)))}°" { color: tilt }
+      slider h { label: "ارتفاع طرف السلك" }
+      slider az { label: "دوّر الغرفة" }
+    }
+
+    goal "ارفع طرف السلك إلى ركن السقف" {
+      when: abs(h - 2) < 0.05
+      hints: ["ركن السقف على ارتفاع $2$."]
+      showme: { h: 2 }
+    }
+
+    numeric {
+      ask "غرفة مكعبة أكبر، والسلك من ركن الأرض إلى الركن $(3, 3, 3)$. كم زاويته مع محور $z$؟"
+      skill: "sg-vec-direction"
+      answer: 54.74
+      expect: deg(acos(3/sqrt(27)))
+      tolerance: 0.6
+      unit: "°"
+      wrong 45 "ما زالت زاوية المربع. السلك يرتفع، فيبتعد عن كل محور أكثر."
+      after: goals
+      ! "المكعب أكبر لكن الشكل نفسه، فالزاوية نفسها: حوالي $54.7°$."
+    }
+  }
+
+  slide "أين تعيش الـ 45°؟" {
+    id: "sg2-reveal"
+    beat: reveal
+    cat: "السهم في الفراغ"
+    > راهنت على ${answer("sg2-hook", "تخمين")}. القياس الحقيقي حوالي $54.7°$. فأين ذهبت الـ $45°$؟ أنزل طرف السلك إلى أرض الغرفة وراقب.
+
+    scene space3 {
+      alt: "الغرفة المكعبة والسلك واصل إلى ركن السقف. مؤشر ينزل طرفه، وقراءتان لزاويتيه مع محوري x و y."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3.8]
+      param az = 40 { range: [0, 90], step: 5 }
+      param h = 2 { range: [0, 3.5], step: 0.1 }
+      camera: [az, 20]
+      cube(2)
+      segment3 cable = (0, 0, 0) -> (2, 2, h) { arrow, color: arrow, width: 3 }
+      point3 T = (2, 2, h) { guides, color: arrow }
+      label3 rx at (0, 2.6, 3.6) = "θx = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 ry at (0, 2.6, 3.2) = "θy = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      slider h { label: "ارتفاع طرف السلك" }
+      slider az { label: "دوّر الغرفة" }
+    }
+
+    goal "أنزل طرف السلك إلى الأرض" {
+      when: h < 0.05
+      hints: ["اسحب مؤشر الارتفاع إلى الصفر."]
+      showme: { h: 0 }
+    }
+
+    quiz {
+      ask "على الأرض صار السلك يصنع $45°$ مع $x$ ومع $y$. وكم زاويته مع محور $z$؟"
+      skill: "sg-vec-direction"
+      - "$0°$" { why: "$0°$ مع $z$ يعني أن السلك يشير لأعلى تمامًا. وهو الآن مستلقٍ على الأرض." }
+      - "$45°$" { why: "لو كانت $45°$ لكان السلك مرفوعًا عن الأرض، وأنت أنزلته إليها." }
+      * "$90°$"
+      - "$135°$" { why: "زاوية أكبر من $90°$ مع $z$ تعني أن السلك يشير إلى تحت الأرض." }
+      after: goals
+      ! "الأرض عمودية على $z$، فأي سهم عليها يصنع $90°$ مع $z$. الـ $45°$ تظهر فقط حين يترك السهم $z$ تمامًا."
+    }
+  }
+
+  slide "نثبّت 45° ونرفع؟" {
+    id: "sg2-trap"
+    beat: trap
+    cat: "السهم في الفراغ"
+    > فكرة مغرية: نُبقي $45°$ مع $x$ و $45°$ مع $y$، ثم نرفع السلك قليلًا عن الأرض. جرّب، وراقب الزوايا الثلاث وأنت ترفعه.
+
+    scene space3 {
+      alt: "الغرفة المكعبة والسلك مستلقٍ على الأرض على قطرها. مؤشر يرفع طرفه، وثلاث قراءات لزواياه مع المحاور."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3.8]
+      param az = 40 { range: [0, 90], step: 5 }
+      param h = 0 { range: [0, 3.5], step: 0.1 }
+      camera: [az, 20]
+      cube(2)
+      segment3 cable = (0, 0, 0) -> (2, 2, h) { arrow, color: arrow, width: 3 }
+      point3 T = (2, 2, h) { guides, color: arrow }
+      label3 rx at (0, 2.6, 3.6) = "θx = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 ry at (0, 2.6, 3.2) = "θy = ${deg(acos(2/sqrt(8 + h^2)))}°" { color: tilt }
+      label3 rz at (0, 2.6, 2.8) = "θz = ${deg(acos(h/sqrt(8 + h^2)))}°" { color: tilt }
+      slider h { label: "ارتفاع طرف السلك" }
+      slider az { label: "دوّر الغرفة" }
+    }
+
+    goal "ارفع السلك حتى تقل زاويته مع $z$ عن $60°$" {
+      when: deg(acos(h/sqrt(8 + h^2))) < 60
+      hints: ["ارفع الطرف ببطء، وعينك على الزاوية مع $x$."]
+      showme: { h: 2 }
+    }
+
+    quiz {
+      ask "متجه يصنع $45°$ مع محور $x$ و $45°$ مع محور $y$. كم زاويته مع محور $z$؟"
+      skill: "sg-vec-direction"
+      - "$45°$" { why: "هذا هو الفخ. رأيت للتو أن رفع السلك يكبّر الزاويتين مع $x$ و $y$ فوق $45°$ فورًا.", onwrong: "sg2-d-linked", retry }
+      * "$90°$"
+      - "$0°$" { why: "$0°$ مع $z$ يعني أنه عمودي لأعلى، وعندها زاويته مع $x$ تكون $90°$ لا $45°$." }
+      - "$60°$" { why: "ارفعه حتى $60°$ مع $z$ وانظر: الزاوية مع $x$ لم تعد $45°$." }
+      after: goals
+      ! "كان مغريًا لأن كل زاوية تبدو مستقلة. لكن $45°$ و $45°$ تحبسان السهم على الأرض، فلا يبقى له مع $z$ إلا $90°$. الزوايا الثلاث مربوطة ببعضها."
+    }
+  }
+
+  slide "الزوايا مربوطة" {
+    id: "sg2-d-linked"
+    beat: detour
+    hidden: true
+    cat: "السهم في الفراغ"
+    > لا تختار الزوايا الثلاث كل واحدة وحدها. هذا سهم مستلقٍ على الأرض، دوّره وراقب ماذا يحدث لزاويته مع $y$ كلما غيّرت زاويته مع $x$.
+
+    scene space3 {
+      alt: "سهم طوله 3 مستلقٍ على الأرض يخرج من نقطة الأصل. مؤشر يدوّره على الأرض، وقراءتان لزاويتيه مع محوري x و y."
+      x: [0, 3.5]
+      y: [0, 3.5]
+      z: [0, 2]
+      param p = 20 { range: [5, 85], step: 5 }
+      camera: [40, 25]
+      segment3 v = (0, 0, 0) -> (3*cos(rad(p)), 3*sin(rad(p)), 0) { arrow, color: arrow, width: 3 }
+      label3 rx at (0, 2.6, 1.8) = "θx = ${p}°" { color: tilt }
+      label3 ry at (0, 2.6, 1.4) = "θy = ${90 - p}°" { color: tilt }
+      slider p { label: "دوّر السهم على الأرض" }
+    }
+
+    goal "اجعل زاويته مع $x$ تساوي $30°$" {
+      when: p == 30
+      hints: ["حرّك المؤشر حتى تقرأ $30°$ عند $\theta_x$."]
+      showme: { p: 30 }
+    }
+
+    numeric {
+      ask "متجه يصنع $30°$ مع محور $x$ و $60°$ مع محور $y$. كم زاويته مع محور $z$؟"
+      skill: "sg-vec-direction"
+      answer: 90
+      expect: deg(acos(sqrt(abs(1 - cos(rad(30))^2 - cos(rad(60))^2))))
+      tolerance: 0.5
+      unit: "°"
+      wrong 30 "الزاويتان الأوليان مجموعهما $90°$، مثل سهمك على الأرض. أين يقع سهم كهذا؟"
+      wrong 0 "$0°$ مع $z$ يعني أنه يشير لأعلى، وعندها يصنع $90°$ مع $x$."
+      after: goals
+      ! "$30° + 60° = 90°$ يعني أن السهم مستلقٍ على الأرض مثل سهمك هنا، فزاويته مع $z$ هي $90°$."
+    }
+  }
+
+  slide "أسماء لما وجدته" {
+    id: "sg2-name-vec"
+    beat: name
+    cat: "الأسماء"
+    > أسماء الآن. السلك من $O$ إلى $A(2, 2, 2)$ اسمه **متجه الموضع** $\textcolor{arrow}{\vec A}$. أعداده الثلاثة $\textcolor{along}{A_x}, \textcolor{along}{A_y}, \textcolor{along}{A_z}$ هي **مركباته**، وطوله هو **معياره** $\textcolor{arrow}{\|\vec A\|}$.
+
+    scene space3 {
+      alt: "السلك من نقطة الأصل إلى A(2, 2, 2) مع درج أخضر يمشي 2 على x ثم 2 على y ثم 2 لأعلى. خطوتان تحوّلان كلمة السلك إلى رمز المتجه، وكلمة درجاته إلى رمز مركباته."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3]
+      param az = 40 { range: [0, 90], step: 5 }
+      param m1 = 0 { range: [0, 1] }
+      param m2 = 0 { range: [0, 1] }
+      camera: [az, 20]
+      segment3 s1 = (0, 0, 0) -> (2, 0, 0) { color: along, width: 3 }
+      segment3 s2 = (2, 0, 0) -> (2, 2, 0) { color: along, width: 3 }
+      segment3 s3 = (2, 2, 0) -> (2, 2, 2) { color: along, width: 3 }
+      segment3 cable = (0, 0, 0) -> (2, 2, 2) { arrow, color: arrow, width: 3 }
+      point3 A = (2, 2, 2) { label: "A(2, 2, 2)", color: arrow }
+      label3 w1 at (0.7, 0.9, 1.3) = "السلك" { color: arrow }
+      label3 t1 at (0.7, 0.9, 1.3) = "\vec{A}" { tex, color: arrow }
+      label3 w2 at (2.3, 1, 0.2) = "درجاته" { color: along }
+      label3 t2 at (2.3, 1, 0.2) = "(A_x, A_y, A_z)" { tex, color: along }
+      morph w1 -> t1 { by: m1 }
+      morph w2 -> t2 { by: m2 }
+      slider az { label: "دوّر الشكل" }
+      step "بكلماتك: السلك ودرجاته." { set: { m1: 0, m2: 0 } }
+      step "السلك صار متجه الموضع." { animate: { m1: 1 }, dur: 1000, indicate: ["cable"] }
+      step "ودرجاته صارت مركباته." { animate: { m2: 1 }, dur: 1000, indicate: ["s1", "s2", "s3"] }
+    }
+
+    numeric {
+      ask "ما معيار السلك $\|\vec A\|$؟"
+      skill: "sg-vec-norm"
+      answer: sqrt(12)
+      expect: sqrt(2^2 + 2^2 + 2^2)
+      tolerance: 0.01
+      wrong 6 "جمعت المركبات. المعيار طول، والطول يأتي من فيثاغورس." -> "sg2-d-norm" retry
+      wrong 12 "هذا مربع المعيار. بقي الجذر."
+      wrong sqrt(8) "هذا قطر الأرض فقط، والسلك يرتفع فوقه." -> "sg2-d-norm" retry
+      hint "هو المسافة من $O$ إلى $A$، كما في التسخين."
+      ! "$\|\vec A\| = \sqrt{2^2 + 2^2 + 2^2} = \sqrt{12} \approx 3.46$. معيار متجه الموضع هو بُعد النقطة عن نقطة الأصل."
+    }
+  }
+
+  slide "المعيار طول" {
+    id: "sg2-d-norm"
+    beat: detour
+    hidden: true
+    cat: "الأسماء"
+    > المعيار طول، والأطوال لا تُجمع مركبة مع مركبة. امشِ على الأرض من $O$ إلى $(2, 2, 0)$: هذا $\sqrt{8}$ بفيثاغورس. ثم اصعد $2$. مثلث قائم ثانٍ يعطي $\sqrt{8 + 4} = \sqrt{12}$.
+
+    scene space3 {
+      alt: "السلك من نقطة الأصل إلى (2, 2, 2)، وتحته قطر الأرض بطول جذر 8، ثم ضلع رأسي بطول 2."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3]
+      camera: [40, 20]
+      segment3 diag = (0, 0, 0) -> (2, 2, 0) { color: along, width: 3, style: dashed }
+      segment3 up = (2, 2, 0) -> (2, 2, 2) { color: along, width: 3 }
+      segment3 cable = (0, 0, 0) -> (2, 2, 2) { arrow, color: arrow, width: 3 }
+      label3 at (1.2, 0.8, 0.1) = "√8" { color: along }
+      label3 at (2.1, 2.3, 1) = "2" { color: along }
+      label3 at (0.8, 0.8, 1.4) = "√12" { color: arrow }
+    }
+
+    numeric {
+      ask "$\vec A = (-2, 1, 2)$. ما $\|\vec A\|$؟"
+      skill: "sg-vec-norm"
+      answer: 3
+      expect: sqrt((-2)^2 + 1^2 + 2^2)
+      tolerance: 0.01
+      wrong 1 "جمعت المركبات، والإشارة ألغت بعضها. ربّع أولًا: $(-2)^2 = 4$."
+      wrong 5 "جمعت أطوال المركبات. ربّع كل واحدة ثم اجمع ثم خذ الجذر."
+      wrong 9 "هذا مربع المعيار. بقي الجذر."
+      ! "$\sqrt{4 + 1 + 4} = 3$. التربيع يمحو الإشارة، فالمعيار لا يكون سالبًا أبدًا."
+    }
+  }
+
+  slide "زاوية من مثلث قائم" {
+    id: "sg2-name-cos"
+    beat: name
+    cat: "الأسماء"
+    > من $A$ أسقط عمودًا على محور $x$ فيقع عند $(2, 0, 0)$. صار عندك مثلث قائم: [المركبة]{along} $\textcolor{along}{A_x}$ ضلع، و[السلك]{arrow} وتر، وبينهما [زاوية السلك مع $x$]{tilt}، واسمها $\textcolor{tilt}{\theta_x}$.
+
+    scene space3 {
+      alt: "السلك من نقطة الأصل إلى A(2, 2, 2)، وعمود متقطع منه إلى النقطة (2, 0, 0) على محور x، والجزء الأخضر من نقطة الأصل إليها على محور x. الزاوية بين السلك ومحور x مكتوبة عند نقطة الأصل."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3]
+      param az = 40 { range: [0, 90], step: 5 }
+      camera: [az, 20]
+      segment3 ax = (0, 0, 0) -> (2, 0, 0) { color: along, width: 4 }
+      segment3 drop = (2, 0, 0) -> (2, 2, 2) { color: neutral, style: dashed }
+      segment3 cable = (0, 0, 0) -> (2, 2, 2) { arrow, color: arrow, width: 3 }
+      point3 A = (2, 2, 2) { label: "A(2, 2, 2)", color: arrow }
+      point3 F = (2, 0, 0) { label: "(2, 0, 0)", color: along }
+      label3 at (1, -0.5, 0) = "2" { color: along }
+      label3 at (0.8, 0.9, 1.3) = "√12" { color: arrow }
+      label3 at (0.7, 0.25, 0.25) = "θx" { color: tilt }
+      slider az { label: "دوّر الشكل" }
+    }
+
+    build {
+      ask "كوّن $\cos\theta_x$ بالرموز، ثم بأعداد سلكك."
+      skill: "sg-vec-direction"
+      template: "$\cos\theta_x =$ ___ $=$ ___"
+      bank: ["$\dfrac{A_x}{\|\vec A\|}$", "$\dfrac{\|\vec A\|}{A_x}$", "$\dfrac{A_x}{A_y}$", "$\dfrac{2}{\sqrt{12}}$", "$\dfrac{2}{\sqrt{8}}$", "$\dfrac{\sqrt{12}}{2}$"]
+      answer: ["$\dfrac{A_x}{\|\vec A\|}$", "$\dfrac{2}{\sqrt{12}}$"]
+      miss "$\dfrac{2}{\sqrt{8}}$" "$\sqrt{8}$ هو قطر الأرض. الوتر في هذا المثلث هو السلك نفسه."
+      miss "$\dfrac{\|\vec A\|}{A_x}$" "هذا مقلوب جيب التمام، وهو أكبر من $1$. المجاور فوق، والوتر تحت."
+      miss "$\dfrac{\sqrt{12}}{2}$" "مقلوب. جيب التمام لا يزيد على $1$."
+      miss "$\dfrac{A_x}{A_y}$" "$A_y$ ليس ضلعًا في هذا المثلث. الوتر هو السلك."
+      hint "جيب التمام هو المجاور على الوتر. أي ضلع هو الوتر؟"
+      hint "الوتر هو السلك نفسه، لا قطر الأرض."
+      ! "$\frac{2}{\sqrt{12}} \approx 0.577$، و $\cos^{-1} 0.577 \approx 54.7°$، زاويتك بالضبط. الزوايا $(\theta_x, \theta_y, \theta_z)$ اسمها **زوايا الاتجاه**، وجيوب تمامها **جيوب تمام الاتجاه**."
+    }
+  }
+
+  slide "لماذا هي مربوطة؟" {
+    id: "sg2-name-sum"
+    beat: name
+    cat: "الأسماء"
+    > كل جيب تمام اتجاه هو مركبة على المعيار: $\cos\theta_x = \dfrac{A_x}{\|\vec A\|}$، وكذلك مع $y$ و $z$. ربّع الثلاثة واجمعها، وسترى لماذا سقطت في الفخ.
+
+    build {
+      ask "أكمل."
+      skill: "sg-vec-direction"
+      template: "$\cos^2\theta_x + \cos^2\theta_y + \cos^2\theta_z =$ ___ $=$ ___"
+      bank: ["$\dfrac{A_x^2 + A_y^2 + A_z^2}{\|\vec A\|^2}$", "$\dfrac{A_x + A_y + A_z}{\|\vec A\|}$", "$1$", "$0$", "$3$"]
+      answer: ["$\dfrac{A_x^2 + A_y^2 + A_z^2}{\|\vec A\|^2}$", "$1$"]
+      miss "$\dfrac{A_x + A_y + A_z}{\|\vec A\|}$" "هذا مجموع جيوب التمام بلا تربيع. المطلوب مجموع مربعاتها."
+      miss "$3$" "كل جيب تمام أصغر من $1$، ومربعاتها معًا تساوي مربع المعيار على نفسه."
+      miss "$0$" "المربعات لا تكون سالبة، فمجموعها لا يكون صفرًا إلا لمتجه صفري."
+      hint "المقام نفسه في الثلاثة، فاجمع البسوط."
+      hint "ما هو $A_x^2 + A_y^2 + A_z^2$؟ فكّر في المعيار."
+      ! "البسط هو $\|\vec A\|^2$ نفسه، فالمجموع $1$ دائمًا. لسلكك: $3 \times \frac13 = 1$. ومع $45°$ و $45°$: $\frac12 + \frac12 + \cos^2\theta = 1$، إذن $\theta = 90°$."
+    }
+  }
+
+  slide "متجهات الوحدة" {
+    id: "sg2-unit"
+    beat: name
+    cat: "متجه الوحدة"
+    > المتجه الذي معياره $1$ اسمه **متجه وحدة**. أشهرها ثلاثة على المحاور: $\hat i = (1, 0, 0)$ و $\hat j = (0, 1, 0)$ و $\hat k = (0, 0, 1)$. وسلكك يمشي عليها: $\vec A = 2\hat i + 2\hat j + 2\hat k$.
+
+    scene space3 {
+      alt: "ثلاثة أسهم قصيرة خضراء بطول 1 على المحاور الثلاثة، والسلك إلى (2, 2, 2) مع درج يمشي خطوتين على كل محور."
+      x: [0, 3]
+      y: [0, 3]
+      z: [0, 3]
+      camera: [40, 20]
+      segment3 ii = (0, 0, 0) -> (1, 0, 0) { arrow, color: along, width: 4 }
+      segment3 jj = (0, 0, 0) -> (0, 1, 0) { arrow, color: along, width: 4 }
+      segment3 kk = (0, 0, 0) -> (0, 0, 1) { arrow, color: along, width: 4 }
+      segment3 s1 = (1, 0, 0) -> (2, 0, 0) { color: along, style: dashed }
+      segment3 s2 = (2, 0, 0) -> (2, 2, 0) { color: along, style: dashed }
+      segment3 s3 = (2, 2, 0) -> (2, 2, 2) { color: along, style: dashed }
+      segment3 cable = (0, 0, 0) -> (2, 2, 2) { arrow, color: arrow, width: 3 }
+      label3 at (0.6, -0.4, 0) = "\hat i" { tex, color: along }
+      label3 at (-0.3, 0.6, 0) = "\hat j" { tex, color: along }
+      label3 at (-0.3, 0, 0.7) = "\hat k" { tex, color: along }
+    }
+
+    match {
+      ask "صِل كل متجه بكتابته بدلالة $\hat i, \hat j, \hat k$."
+      skill: "sg-vec-components"
+      pair "$(-1, 0, 0)$" -> "$-\hat i$"
+      pair "$(0, -1, 0)$" -> "$-\hat j$"
+      pair "$(0, 0, -1)$" -> "$-\hat k$"
+      pair "$(-5, 7, 3\sqrt2)$" -> "$-5\hat i + 7\hat j + 3\sqrt2\,\hat k$"
+      decoy "$-5\hat i + 7\hat k$"
+      decoy "$\hat i - \hat j - \hat k$"
+      miss "$(-5, 7, 3\sqrt2)$" -> "$-5\hat i + 7\hat k$" "المركبة $7$ في الموضع الثاني، فهي معامل $\hat j$ لا $\hat k$. والمركبة الثالثة لا تختفي."
+      miss "$(-1, 0, 0)$" -> "$\hat i - \hat j - \hat k$" "الصفر يعني أن متجه الوحدة لا يظهر أصلًا، والإشارة السالبة على $\hat i$."
+      ! "كل مركبة تصير معامل متجه الوحدة على محورها، والمركبة الصفرية لا تظهر. لذلك $(-1, 0, 0) = -\hat i$."
+    }
+  }
+
+  slide "متجه الوحدة في اتجاه متجه" {
+    id: "sg2-unit-dir"
+    beat: name
+    cat: "متجه الوحدة"
+    > اقسم أي متجه على معياره تحصل على **متجه الوحدة في اتجاهه**: $\hat e_A = \dfrac{\vec A}{\|\vec A\|}$. مركباته هي جيوب تمام الاتجاه نفسها. لسلكك: $\hat e_A = \left(\tfrac{1}{\sqrt3}, \tfrac{1}{\sqrt3}, \tfrac{1}{\sqrt3}\right)$.
+
+    table {
+      ask "أوجد $\hat e_A$ للمتجه $\vec A = (-2, 2, -1)$. اكتب كل مركبة مقرّبة لرقمين عشريين."
+      skill: "sg-vec-unit"
+      header: ["x", "y", "z"]
+      row: blank(-2/3), blank(2/3), blank(-1/3)
+      tolerance: 0.01
+      hint "المعيار أولًا: $\sqrt{4 + 4 + 1}$."
+      ! "$\|\vec A\| = 3$، فـ $\hat e_A = \left(-\tfrac23, \tfrac23, -\tfrac13\right)$. الإشارات تبقى كما هي، لأن القسمة على عدد موجب."
+    }
+  }
+
+  slide "مثال محلول" {
+    id: "sg2-dir-worked"
+    beat: example
+    cat: "زوايا الاتجاه"
+    > مثال محلول. $\vec A = (2, -2, 2\sqrt2)$:
+    > $$\|\vec A\| = \sqrt{4 + 4 + 8} = 4$$
+    > $$\hat e_A = \tfrac14\,(2, -2, 2\sqrt2) = \left(\tfrac12, -\tfrac12, \tfrac{\sqrt2}{2}\right)$$
+    > $$(\theta_x, \theta_y, \theta_z) = (60°, 120°, 45°)$$
+    > المركبة السالبة جعلت $\theta_y$ منفرجة.
+
+    quiz {
+      ask "والمتجه $2\vec A = (4, -4, 4\sqrt2)$، ما زوايا اتجاهه؟"
+      skill: "sg-vec-direction"
+      - "$(120°, 240°, 90°)$" { why: "الضرب في $2$ يطيل السهم ولا يديره. ثم إن زاوية الاتجاه لا تتجاوز $180°$." }
+      - "$(30°, 60°, 22.5°)$" { why: "الطول تضاعف، والزوايا لا تتضاعف ولا تنتصف. احسب $\hat e$ من جديد وقارن." }
+      * "$(60°, 120°, 45°)$"
+      - "$(60°, 60°, 45°)$" { why: "المركبة $-4$ ما زالت سالبة، فالزاوية مع $y$ تبقى منفرجة." }
+      ! "معياره $8$، و $\tfrac18(4, -4, 4\sqrt2) = \left(\tfrac12, -\tfrac12, \tfrac{\sqrt2}{2}\right)$، المتجه نفسه. الضرب في عدد موجب لا يغيّر الاتجاه."
+    }
+  }
+
+  slide "أكمل أنت" {
+    id: "sg2-dir-faded"
+    beat: example
+    cat: "زوايا الاتجاه"
+    > دورك في الخطوة الأخيرة. $\vec B = (-2, 2\sqrt2, 2)$، ومعياره $\sqrt{4 + 8 + 4} = 4$.
+
+    numeric {
+      ask "كم $\theta_x$ للمتجه $\vec B$؟"
+      skill: "sg-vec-direction"
+      answer: 120
+      expect: deg(acos(-2/sqrt(4 + 8 + 4)))
+      tolerance: 0.3
+      unit: "°"
+      wrong 60 "أسقطت الإشارة. $\cos\theta_x = -\frac24$، سالب." -> "sg2-d-sign" retry
+      wrong 30 "هذه زاوية $\sin^{-1}$. زاوية الاتجاه من جيب التمام."
+      hint "$\cos\theta_x = \dfrac{B_x}{\|\vec B\|}$."
+      ! "$\cos\theta_x = -\frac12$، إذن $\theta_x = 120°$. المركبة السالبة تعطي زاوية منفرجة."
+    }
+  }
+
+  slide "الإشارة السالبة" {
+    id: "sg2-d-sign"
+    beat: detour
+    hidden: true
+    cat: "زوايا الاتجاه"
+    > مركبة سالبة تعني أن السهم يشير إلى الجهة السالبة من المحور، فيبتعد عنه أكثر من $90°$. حرّك طرف السهم نحو $y$ السالب وراقب زاويته مع $y$.
+
+    scene space3 {
+      alt: "سهم من نقطة الأصل إلى النقطة (2, y, 1)، ومؤشر يحرّك مركبة y من الموجب إلى السالب، مع قراءة لزاوية السهم مع محور y."
+      x: [-1, 3]
+      y: [-3, 3]
+      z: [0, 2.5]
+      param py = 2 { range: [-3, 3], step: 0.5 }
+      camera: [40, 20]
+      segment3 v = (0, 0, 0) -> (2, py, 1) { arrow, color: arrow, width: 3 }
+      point3 T = (2, py, 1) { guides, color: arrow }
+      label3 ry at (0, 1.5, 2.3) = "θy = ${deg(acos(py/sqrt(5 + py^2)))}°" { color: tilt }
+      slider py { label: "مركبة y" }
+    }
+
+    goal "اجعل مركبة $y$ سالبة" {
+      when: py < 0
+      hints: ["اسحب المؤشر إلى يسار الصفر، وراقب الزاوية تتجاوز $90°$."]
+      showme: { py: -2 }
+    }
+
+    numeric {
+      ask "كم زاوية المتجه $(3, -4, 0)$ مع محور $y$؟"
+      skill: "sg-vec-direction"
+      answer: deg(acos(-4/5))
+      expect: deg(acos(-4/sqrt(3^2 + 4^2)))
+      tolerance: 0.3
+      unit: "°"
+      wrong deg(acos(4/5)) "أسقطت الإشارة مرة أخرى. $\cos\theta_y = -\frac45$."
+      after: goals
+      ! "$\cos\theta_y = -\frac45$، إذن $\theta_y \approx 143.1°$. بدون الإشارة كنت ستحصل على زاوية السهم المعاكس."
+    }
+  }
+
+  slide "دورك: زاوية مع محور x" {
+    id: "sg2-dir-own1"
+    beat: example
+    cat: "زوايا الاتجاه"
+    > ثلاثة على حدة الآن.
+
+    numeric {
+      ask "المتجه $\vec A = 3\hat i + \hat j - 2\hat k$ يصنع زاوية مع الاتجاه الموجب لمحور $x$. كم قياسها لأقرب درجة؟"
+      skill: "sg-vec-direction"
+      answer: deg(acos(3/sqrt(14)))
+      expect: deg(acos(3/sqrt(3^2 + 1^2 + 2^2)))
+      tolerance: 0.6
+      unit: "°"
+      wrong deg(acos(1/sqrt(14))) "هذه الزاوية مع $y$. مع $x$ خذ المركبة الأولى."
+      wrong 180 - deg(acos(3/sqrt(14))) "هذه زاوية $-\vec A$. المركبة $3$ موجبة، فالزاوية حادة."
+      wrong 60 "قسمت على مجموع أطوال المركبات $6$. القسمة تكون على المعيار." -> "sg2-d-norm" retry
+      hint "المعيار أولًا، ثم $\cos\theta_x = \dfrac{A_x}{\|\vec A\|}$."
+      ! "$\|\vec A\| = \sqrt{9 + 1 + 4} = \sqrt{14}$، و $\cos\theta_x = \frac{3}{\sqrt{14}}$، إذن $\theta_x \approx 37°$."
+    }
+  }
+
+  slide "دورك: الزاوية الثالثة" {
+    id: "sg2-dir-own2"
+    beat: example
+    cat: "زوايا الاتجاه"
+
+    numeric {
+      ask "زوايا اتجاه متجه هي $(135°, 60°, \theta)$. أوجد قيمة $\theta$ المنفرجة."
+      skill: "sg-vec-direction"
+      answer: 120
+      expect: 180 - deg(acos(sqrt(1 - cos(rad(135))^2 - cos(rad(60))^2)))
+      tolerance: 0.3
+      unit: "°"
+      wrong 60 "هذه القيمة الحادة، وهي صحيحة أيضًا. المطلوب المنفرجة."
+      wrong 45 "نسيت $\cos^2 60° = \frac14$ في المجموع."
+      wrong 165 "زوايا الاتجاه ليس لها مجموع ثابت. الرابط هو مجموع مربعات جيوب التمام."
+      hint "$\cos^2 135° + \cos^2 60° + \cos^2\theta = 1$."
+      ! "$\frac12 + \frac14 + \cos^2\theta = 1$، إذن $\cos\theta = \pm\frac12$، و $\theta = 60°$ أو $120°$. متجهان مختلفان يحققان الزاويتين الأوليين."
+    }
+  }
+
+  slide "دورك: من الزوايا إلى المركبات" {
+    id: "sg2-dir-own3"
+    beat: example
+    cat: "زوايا الاتجاه"
+    > والعكس: من المعيار والزوايا إلى المركبات. $\hat e_A$ مركباته جيوب تمام الاتجاه، و $\vec A = \|\vec A\|\,\hat e_A$.
+
+    table {
+      ask "متجه معياره $6$ وزوايا اتجاهه $(135°, 60°, 60°)$. أوجد مركباته مقرّبة لرقمين عشريين."
+      skill: "sg-vec-components"
+      header: ["x", "y", "z"]
+      row: blank(6*cos(rad(135))), blank(6*cos(rad(60))), blank(6*cos(rad(60)))
+      tolerance: 0.01
+      hint "كل مركبة هي $6$ ضرب جيب تمام زاويتها."
+      ! "$6\left(-\tfrac{1}{\sqrt2}, \tfrac12, \tfrac12\right) = (-3\sqrt2, 3, 3)$، أي $-3\sqrt2\,\hat i + 3\hat j + 3\hat k$."
+    }
+  }
+
+  slide "اضرب في عدد سالب" {
+    id: "sg2-dir-breaker"
+    beat: breaker
+    cat: "زوايا الاتجاه"
+    > والآن حالة تكسر ما رأيته في $2\vec A$.
+
+    quiz {
+      ask "زوايا اتجاه $\vec A$ هي $(60°, 135°, 60°)$. ما زوايا اتجاه $-2\vec A$؟"
+      skill: "sg-vec-direction"
+      - "$(60°, 135°, 60°)$" { why: "هذا صحيح لـ $2\vec A$. الإشارة السالبة تقلب السهم إلى الجهة المعاكسة.", onwrong: "sg2-d-neg", retry }
+      - "$(120°, 270°, 120°)$" { why: "ضاعفت الزوايا. ثم إن زاوية الاتجاه بين $0°$ و $180°$ دائمًا." }
+      - "$(-60°, -135°, -60°)$" { why: "زوايا الاتجاه لا تكون سالبة، فهي بين $0°$ و $180°$." }
+      * "$(120°, 45°, 120°)$"
+      ! "$-2\vec A$ يشير عكس $\vec A$، فكل زاوية $\theta$ تصير $180° - \theta$. العدد $2$ يغيّر الطول فقط."
+    }
+  }
+
+  slide "السهم المعاكس" {
+    id: "sg2-d-neg"
+    beat: detour
+    hidden: true
+    cat: "زوايا الاتجاه"
+    > $-\vec A$ هو $\vec A$ مقلوبًا. كل مركبة تغيّر إشارتها، فكل جيب تمام يغيّر إشارته، وكل زاوية $\theta$ تصير $180° - \theta$. انظر إلى السهمين.
+
+    scene space3 {
+      alt: "سهمان من نقطة الأصل: A إلى (2, 1, 2) ومعاكسه إلى (-2, -1, -2)، مع زاوية كل منهما مع محور x."
+      x: [-3, 3]
+      y: [-3, 3]
+      z: [-3, 3]
+      camera: [40, 20]
+      segment3 a = (0, 0, 0) -> (2, 1, 2) { arrow, color: arrow, width: 3 }
+      segment3 na = (0, 0, 0) -> (-2, -1, -2) { arrow, color: danger, width: 3 }
+      label3 at (2.1, 1.1, 2.3) = "A: θx ≈ 48.2°" { color: arrow }
+      label3 at (-2.1, -1.1, -2.4) = "-A: θx ≈ 131.8°" { color: danger }
+    }
+
+    numeric {
+      vary t in [20, 35, 50, 70, 80]
+      ask "$\vec A$ يصنع $${t}°$ مع محور $x$. كم زاوية $-3\vec A$ مع محور $x$؟"
+      skill: "sg-vec-direction"
+      answer: 180 - t
+      expect: 180 - t
+      unit: "°"
+      wrong t "هذه زاوية $\vec A$ نفسه. الإشارة السالبة تقلب السهم."
+      wrong 3 * t "العدد $3$ يطيل السهم فقط، ولا يضاعف الزاوية."
+      ! "$180°$ ناقص زاوية $\vec A$. العدد $3$ يطيل السهم، والإشارة السالبة تقلبه."
+    }
+  }
+
+  slide "دورك: متجه وحدة" {
+    id: "sg2-unit-own1"
+    beat: example
+    cat: "متجه الوحدة"
+
+    table {
+      ask "أوجد متجه الوحدة في اتجاه $\vec A = (8, -4, -8)$، كل مركبة مقرّبة لرقمين عشريين."
+      skill: "sg-vec-unit"
+      header: ["x", "y", "z"]
+      row: blank(8/12), blank(-4/12), blank(-8/12)
+      tolerance: 0.01
+      hint "المعيار: $\sqrt{64 + 16 + 64}$."
+      ! "$\|\vec A\| = 12$، فـ $\hat e_A = \tfrac{1}{12}(8, -4, -8) = \left(\tfrac23, -\tfrac13, -\tfrac23\right)$."
+    }
+  }
+
+  slide "أيها متجه وحدة؟" {
+    id: "sg2-unit-own2"
+    beat: example
+    cat: "متجه الوحدة"
+
+    quiz {
+      ask "أي هذه المتجهات متجه وحدة؟"
+      skill: "sg-vec-unit"
+      - "$(-3, 2, 2)$" { why: "معياره $\sqrt{17}$. متجه الوحدة معياره $1$ بالضبط." }
+      - "$\left(\tfrac12, \tfrac13, \tfrac14\right)$" { why: "مركبات صغيرة لا تكفي. معياره $\sqrt{\tfrac14 + \tfrac19 + \tfrac{1}{16}} \approx 0.65$." }
+      * "$\left(\tfrac35, -\tfrac45, 0\right)$"
+      - "$\left(-\tfrac{1}{12}, -\tfrac{3}{12}, \tfrac{2}{12}\right)$" { why: "معياره $\frac{\sqrt{14}}{12} \approx 0.31$. ربّع كل مركبة واجمع." }
+      hint "ربّع المركبات واجمعها. متى يكون المجموع $1$؟"
+      ! "$\frac{9}{25} + \frac{16}{25} + 0 = 1$، فالمعيار $1$."
+    }
+  }
+
+  slide "دورك: المجهول داخل المتجه" {
+    id: "sg2-unit-own3"
+    beat: breaker
+    cat: "متجه الوحدة"
+
+    numeric {
+      ask "$\vec A = -\hat i + 2\hat j + k\hat k$، و $\tfrac{1}{3}\vec A$ متجه وحدة. لـ $k$ قيمتان، أدخل السالبة."
+      skill: "sg-vec-unit"
+      answer: -2
+      expect: 0 - sqrt(3^2 - 1 - 2^2)
+      tolerance: 0.01
+      wrong 2 "هذه القيمة الموجبة، وهي صحيحة أيضًا. المطلوب السالبة."
+      wrong -4 "هذه $-k^2$. خذ الجذر."
+      wrong 0 - sqrt(6) "$(-1)^2 = 1$ لا $-1$."
+      wrong 0 - sqrt(8) "إذا كان طول $\tfrac13\vec A$ هو $1$، فطول $\vec A$ هو $3$، ومربعه $9$."
+      hint "إذا كان طول $\tfrac13\vec A$ هو $1$، فكم طول $\vec A$؟"
+      ! "$\|\vec A\| = 3$، إذن $1 + 4 + k^2 = 9$ و $k^2 = 4$، أي $k = \pm 2$."
+    }
+  }
+
+  slide "الجمع والضرب مركبة مع مركبة" {
+    id: "sg2-ops-worked"
+    beat: example
+    cat: "العمليات"
+    > الجمع والضرب في عدد في الفراغ مثل المستوى تمامًا: كل مركبة مع مركبتها. قُد الحل خطوة خطوة.
+
+    moves {
+      ask "$\vec A = (3, -1, 2)$ و $\vec B = (2, 5, -3)$. أوجد $3\vec A - 2\vec B$."
+      skill: "sg-vec-ops"
+      from "$3\vec A - 2\vec B$"
+      move "$3(3, -1, 2) - 2(2, 5, -3)$" {
+        * "عوّض بمركبات المتجهين"
+        - "اجمع المعاملين: $3 - 2 = 1$، فالناتج $\vec A - \vec B$" { why: "المعاملان على متجهين مختلفين، فلا يُجمعان. هذا يصح فقط لو كان المتجه واحدًا." }
+      }
+      move "$(9, -3, 6) + (-4, -10, 6)$" {
+        * "اضرب كل مركبة في معاملها مع إشارته"
+        - "اضرب المركبة الأولى فقط" { why: "الضرب في عدد يصيب المركبات الثلاث كلها." }
+      }
+      move "$(5, -13, 12)$" {
+        * "اجمع كل مركبة مع مركبتها"
+        - "اضرب كل مركبة في مركبتها" { why: "جمع المتجهات جمع مركبات متناظرة، لا ضرب." }
+      }
+      ! "$3\vec A - 2\vec B = (5, -13, 12)$."
+    }
+  }
+
+  slide "أكمل الحساب" {
+    id: "sg2-ops-faded"
+    beat: example
+    cat: "العمليات"
+    > نصف الطريق محلول، حيث $\vec C = (-4, 2, 6)$: $4\vec A = (12, -4, 8)$ و $-2\vec B = (-4, -10, 6)$ و $3\vec C = (-12, 6, 18)$.
+
+    table {
+      ask "أكمل: أوجد $\tfrac12\left(4\vec A - 2\vec B + 3\vec C\right)$."
+      skill: "sg-vec-ops"
+      header: ["x", "y", "z"]
+      row: blank(-2), blank(-4), blank(16)
+      hint "اجمع الثلاثة مركبة مع مركبة، ثم نصّف."
+      ! "المجموع $(-4, -8, 32)$، ونصفه $(-2, -4, 16)$."
+    }
+  }
+
+  slide "دورك: عملية أطول" {
+    id: "sg2-ops-own1"
+    beat: example
+    cat: "العمليات"
+
+    table {
+      ask "$\vec A = (3, -1, 2)$ و $\vec C = (-4, 2, 6)$، و $\vec O$ المتجه الصفري. أوجد $3\vec O - 2(\vec C + 3\vec A)$."
+      skill: "sg-vec-ops"
+      header: ["x", "y", "z"]
+      row: blank(-10), blank(2), blank(-24)
+      hint "المتجه الصفري $(0, 0, 0)$. ابدأ بما داخل القوس."
+      ! "$\vec C + 3\vec A = (5, -1, 12)$، وضربه في $-2$ يعطي $(-10, 2, -24)$. المتجه الصفري لا يضيف شيئًا."
+    }
+  }
+
+  slide "دورك: متجه مجهول" {
+    id: "sg2-ops-own2"
+    beat: example
+    cat: "العمليات"
+
+    table {
+      ask "$\vec C = (2, -3, 1)$ و $\vec D = (0, 2, -2)$، و $3\vec A - 4\vec D = \vec C$. أوجد $\vec A$ مقرّبًا لرقمين عشريين."
+      skill: "sg-vec-ops"
+      header: ["x", "y", "z"]
+      row: blank(2/3), blank(5/3), blank(-7/3)
+      tolerance: 0.01
+      hint "عامل $\vec A$ كمجهول في معادلة عادية: انقل $-4\vec D$ ثم اقسم على $3$."
+      ! "$3\vec A = \vec C + 4\vec D = (2, 5, -7)$، إذن $\vec A = \left(\tfrac23, \tfrac53, -\tfrac73\right)$."
+    }
+  }
+
+  slide "ومعيار الناتج؟" {
+    id: "sg2-ops-norm"
+    beat: breaker
+    cat: "العمليات"
+
+    numeric {
+      ask "$\vec A = (1, -1, 2)$ و $\vec B = (0, 2, -3)$ و $\vec C = (-2, 1, 0)$. أوجد $\|3\vec A - \vec B + \vec C\|$."
+      skill: "sg-vec-norm"
+      answer: sqrt(98)
+      expect: sqrt(1^2 + 4^2 + 9^2)
+      tolerance: 0.01
+      wrong 3*sqrt(6) - sqrt(13) + sqrt(5) "حسبت معيار كل متجه وحده ثم جمعت. المعيار لا يتوزع على الجمع." -> "sg2-d-normlin" retry
+      wrong 98 "هذا مربع المعيار. بقي الجذر."
+      wrong 14 "جمعت أطوال المركبات. ربّع ثم اجمع ثم خذ الجذر." -> "sg2-d-norm" retry
+      hint "احسب المتجه أولًا، ثم معياره."
+      ! "$3\vec A - \vec B + \vec C = (1, -4, 9)$، ومعياره $\sqrt{1 + 16 + 81} = \sqrt{98} = 7\sqrt2 \approx 9.90$."
+    }
+  }
+
+  slide "طول المجموع" {
+    id: "sg2-d-normlin"
+    beat: detour
+    hidden: true
+    cat: "العمليات"
+    > إغراء مفهوم: طول المجموع هو مجموع الطولين؟ امشِ $3$ شرقًا ثم $4$ شمالًا. مشيت $7$، لكنك على بُعد $5$ فقط من البداية. طول المجموع أقصر، إلا إذا كان للسهمين الاتجاه نفسه.
+
+    scene plane {
+      alt: "سهم أخضر طوله 3 إلى اليمين، ثم سهم أخضر طوله 4 لأعلى، والسهم الأزرق من البداية إلى النهاية طوله 5."
+      x: [-0.6, 4.6]
+      y: [-0.8, 4.6]
+      aspect: equal
+      axes: false
+      vector a = (0, 0) -> (3, 0) { color: along, width: 3 }
+      vector b = (3, 0) -> (3, 4) { color: along, width: 3 }
+      vector s = (0, 0) -> (3, 4) { color: arrow, width: 4 }
+      label at (1.5, -0.5) = "3" { anchor: middle, color: along }
+      label at (3.3, 2) = "4" { color: along }
+      label at (1.1, 2.3) = "5" { color: arrow }
+    }
+
+    numeric {
+      ask "$\vec A = (-3, 2, 1)$ و $\vec B = (2, 3, 0)$. أوجد $\|\vec A + \vec B\|$."
+      skill: "sg-vec-norm"
+      answer: sqrt(27)
+      expect: sqrt((-1)^2 + 5^2 + 1^2)
+      tolerance: 0.01
+      wrong sqrt(14) + sqrt(13) "ما زلت تجمع الطولين. اجمع المتجهين أولًا."
+      wrong 27 "هذا مربع المعيار. بقي الجذر."
+      ! "$\vec A + \vec B = (-1, 5, 1)$، ومعياره $\sqrt{27} = 3\sqrt3 \approx 5.20$، أقل من $\|\vec A\| + \|\vec B\| \approx 7.35$."
+    }
+  }
+
+  slide "من A إلى B" {
+    id: "sg2-ab"
+    beat: name
+    cat: "من نقطة إلى نقطة"
+    > لتذهب من $A$ إلى $B$: ارجع من $A$ إلى $O$، ثم اخرج من $O$ إلى $B$. الرجوع هو $-\vec A$ والخروج هو $\vec B$، إذن $\overrightarrow{AB} = \vec B - \vec A$: **النهاية ناقص البداية**.
+
+    scene space3 {
+      alt: "نقطة الأصل O والنقطتان A و B، مع متجهي موضعهما بخطوط رمادية، والسهم الأزرق من A إلى B."
+      x: [0, 4]
+      y: [0, 4]
+      z: [0, 3]
+      param az = 40 { range: [0, 90], step: 5 }
+      camera: [az, 20]
+      segment3 oa = (0, 0, 0) -> (1, 3, 1) { arrow, color: neutral, style: dashed }
+      segment3 ob = (0, 0, 0) -> (3, 1, 2.5) { arrow, color: neutral, style: dashed }
+      segment3 ab = (1, 3, 1) -> (3, 1, 2.5) { arrow, color: arrow, width: 3 }
+      point3 A = (1, 3, 1) { label: "A", color: arrow }
+      point3 B = (3, 1, 2.5) { label: "B", color: arrow }
+      label3 at (0.2, 1.8, 0.8) = "\vec A" { tex, color: neutral }
+      label3 at (1.8, 0.2, 1.6) = "\vec B" { tex, color: neutral }
+      slider az { label: "دوّر الشكل" }
+    }
+
+    quiz {
+      ask "$\vec A = (-3, 4, 2)$ و $\vec B = (5, 0, 7)$. ما $\overrightarrow{AB}$؟"
+      skill: "sg-vec-components"
+      - "$(-8, 4, -5)$" { why: "هذا $\vec A - \vec B$، أي $\overrightarrow{BA}$: السهم نفسه مقلوبًا.", onwrong: "sg2-d-order", retry }
+      * "$(8, -4, 5)$"
+      - "$(2, 4, 9)$" { why: "هذا $\vec A + \vec B$. من $A$ إلى $B$ نطرح البداية." }
+      - "$\left(1, 2, \tfrac92\right)$" { why: "هذه منتصف $\overline{AB}$، نقطة لا متجه." }
+      ! "$(5, 0, 7) - (-3, 4, 2) = (8, -4, 5)$. والمعاكس $\overrightarrow{BA} = -\overrightarrow{AB} = (-8, 4, -5)$."
+    }
+  }
+
+  slide "النهاية ناقص البداية" {
+    id: "sg2-d-order"
+    beat: detour
+    hidden: true
+    cat: "من نقطة إلى نقطة"
+    > $\vec A - \vec B$ سهم يبدأ عند $B$ وينتهي عند $A$، أي بالعكس. القاعدة: ما يشير إليه السهم، ناقص ما يخرج منه.
+
+    scene plane {
+      alt: "النقطتان A و B، والسهم الأزرق من A إلى B، وتحته سهم أحمر متقطع من B إلى A."
+      x: [0, 5]
+      y: [0, 4]
+      aspect: equal
+      axes: false
+      point pa = (1, 1) { label: "A", color: arrow }
+      point pb = (4, 3) { label: "B", color: arrow }
+      vector ab = (1, 1) -> (4, 3) { color: arrow, width: 3 }
+      vector ba = (4, 2.4) -> (1, 0.4) { color: danger, width: 2, style: dashed }
+      label at (2.2, 2.4) = "B − A" { color: arrow }
+      label at (2.8, 0.9) = "A − B" { color: danger }
+    }
+
+    quiz {
+      ask "$\overrightarrow{AB} = (2, 5, -1)$ و $\vec A = (2, 3, 1)$. ما $\vec B$؟"
+      skill: "sg-vec-components"
+      * "$(4, 8, 0)$"
+      - "$(0, -2, 2)$" { why: "هذا $\vec A - \overrightarrow{AB}$. من $\overrightarrow{AB} = \vec B - \vec A$ تحصل على $\vec B = \vec A + \overrightarrow{AB}$." }
+      - "$(0, 2, -2)$" { why: "هذا $\overrightarrow{AB} - \vec A$، كأن $A$ هي النهاية." }
+      - "$(4, 0, 8)$" { why: "المركبات تبدّلت أماكنها. اجمع كل مركبة مع مركبتها." }
+      ! "$\vec B = \vec A + \overrightarrow{AB} = (2, 3, 1) + (2, 5, -1) = (4, 8, 0)$."
+    }
+  }
+
+  slide "دورك: طول قطعة" {
+    id: "sg2-ab-own1"
+    beat: example
+    cat: "من نقطة إلى نقطة"
+
+    numeric {
+      ask "$A(-1, 4, 6)$ و $B(2, 5, -1)$. أوجد $\|\overrightarrow{AB}\|$."
+      skill: "sg-vec-norm"
+      answer: sqrt(59)
+      expect: sqrt(3^2 + 1^2 + 7^2)
+      tolerance: 0.01
+      wrong 59 "هذا مربع المعيار. بقي الجذر."
+      wrong sqrt(107) "جمعت متجهي الموضع. $\overrightarrow{AB}$ هو النهاية ناقص البداية." -> "sg2-d-order" retry
+      wrong 11 "جمعت أطوال المركبات. ربّع ثم اجمع ثم خذ الجذر."
+      ! "$\overrightarrow{AB} = (3, 1, -7)$، ومعياره $\sqrt{9 + 1 + 49} = \sqrt{59} \approx 7.68$، وهو البعد بين النقطتين نفسه."
+    }
+  }
+
+  slide "دورك: سهمان متتاليان" {
+    id: "sg2-ab-own2"
+    beat: breaker
+    cat: "من نقطة إلى نقطة"
+    > امشِ من $A$ إلى $B$ ثم من $B$ إلى $C$: وصلت من $A$ إلى $C$. أي $\overrightarrow{AB} + \overrightarrow{BC} = \overrightarrow{AC}$.
+
+    numeric {
+      ask "$\overrightarrow{AB} = -3\hat i + 3\hat j + 7\hat k$ و $\overrightarrow{BC} = \hat j + 5\hat k$. أوجد $\|\overrightarrow{AC}\|$."
+      skill: "sg-vec-ops"
+      answer: 13
+      expect: sqrt(3^2 + 4^2 + 12^2)
+      tolerance: 0.01
+      wrong sqrt(67) + sqrt(26) "جمعت الطولين. اجمع السهمين أولًا ثم خذ المعيار." -> "sg2-d-normlin" retry
+      wrong sqrt(17) "طرحت. $\overrightarrow{AC} = \overrightarrow{AB} + \overrightarrow{BC}$."
+      hint "اكتب $\overrightarrow{BC}$ بمركباته الثلاث أولًا: مركبة $x$ فيه صفر."
+      ! "$\overrightarrow{AC} = (-3, 4, 12)$، و $\sqrt{9 + 16 + 144} = 13$. جمع الطولين كان سيعطي حوالي $13.28$، أكبر قليلًا."
+    }
+  }
+
+  slide "دورك: اتجاه قطعة" {
+    id: "sg2-ab-own3"
+    beat: example
+    cat: "من نقطة إلى نقطة"
+
+    quiz {
+      ask "$\vec A = (-9, 1, 8)$ و $\vec B = (-6, -3, -4)$. ما متجه الوحدة في اتجاه $\overrightarrow{AB}$؟"
+      skill: "sg-vec-unit"
+      - "$\left(\tfrac{3}{13}, \tfrac{4}{13}, \tfrac{12}{13}\right)$" { why: "الإشارات ضاعت. $\overrightarrow{AB} = (3, -4, -12)$." }
+      * "$\left(\tfrac{3}{13}, -\tfrac{4}{13}, -\tfrac{12}{13}\right)$"
+      - "$\left(-\tfrac{3}{13}, \tfrac{4}{13}, \tfrac{12}{13}\right)$" { why: "هذا في اتجاه $\overrightarrow{BA}$، عكس المطلوب.", onwrong: "sg2-d-order", retry }
+      - "$\left(-\tfrac{3}{13}, -\tfrac{4}{13}, -\tfrac{12}{13}\right)$" { why: "المركبة الأولى $-6 - (-9) = 3$، موجبة." }
+      hint "$\overrightarrow{AB} = \vec B - \vec A$ أولًا، ثم اقسم على معياره."
+      ! "$\overrightarrow{AB} = (3, -4, -12)$، ومعياره $\sqrt{9 + 16 + 144} = 13$."
+    }
+  }
+
+  slide "متجهان متساويان" {
+    id: "sg2-eq"
+    beat: example
+    cat: "من نقطة إلى نقطة"
+    > متجهان متساويان إذا تساوت مركباتهما المتناظرة كلها. هذا يعطيك ثلاث معادلات دفعة واحدة.
+
+    numeric {
+      ask "$(2x + 1, 5, k + 4) = (-1, y^2 - 4, x + 1)$. أوجد $k$."
+      skill: "sg-vec-ops"
+      answer: -4
+      expect: ((-1 - 1)/2 + 1) - 4
+      tolerance: 0.01
+      wrong -2 "$x = -1$ لا $1$: من $2x + 1 = -1$ تحصل على $2x = -2$."
+      wrong 4 "من $k + 4 = 0$ تحصل على $k = -4$، انتبه للإشارة."
+      hint "ابدأ بالمركبة الأولى: هي وحدها تعطيك $x$."
+      ! "من الأولى $2x + 1 = -1$، إذن $x = -1$. ومن الثالثة $k + 4 = x + 1 = 0$، إذن $k = -4$."
+    }
+  }
+
+  slide "اكتبه بدلالة متجهين" {
+    id: "sg2-lincomb"
+    beat: example
+    cat: "من نقطة إلى نقطة"
+    > $\vec C = k\vec A + l\vec B$ معادلة متجهات، أي ثلاث معادلات أعداد. ابدأ بالمركبة الأسهل.
+
+    build {
+      ask "$\vec A = (2, -1, -3)$ و $\vec B = (4, 0, 2)$ و $\vec C = (-8, -2, -12)$. عبّر عن $\vec C$ بدلالة $\vec A$ و $\vec B$."
+      skill: "sg-vec-ops"
+      template: "$\vec C =$ ___ $\vec A \;+$ ___ $\vec B$"
+      bank: ["$2$", "$-2$", "$3$", "$-3$", "$4$"]
+      answer: ["$2$", "$-3$"]
+      miss "$-2$" "من مركبة $y$: $-k = -2$، إذن $k = 2$ موجبة."
+      miss "$3$" "عوّض $k = 2$ في مركبة $x$: $4 + 4l = -8$، فـ $l$ سالبة."
+      miss "$4$" "$4$ مركبة في $\vec B$، لا معامله."
+      hint "مركبة $y$ في $\vec B$ صفر. ماذا تقول لك مركبة $y$ عن $k$؟"
+      hint "$-k = -2$. عوّض في مركبة $x$: $2k + 4l = -8$."
+      ! "من $y$: $-k = -2$ فـ $k = 2$. ومن $x$: $4 + 4l = -8$ فـ $l = -3$. تحقق بـ $z$: $-6 - 6 = -12$."
+    }
+  }
+
+  slide "قوة على قطر صندوق" {
+    id: "sg2-transfer"
+    beat: transfer
+    cat: "في مكان جديد"
+    > واحد في مكان جديد.
+
+    numeric {
+      ask "صندوق أبعاده $3$ م على محور $x$ و $4$ م على $y$ و $5$ م على $z$، وأحد أركانه في نقطة الأصل. قوة مقدارها $200$ نيوتن تشد من نقطة الأصل على قطر الصندوق إلى الركن المقابل. كم مركبتها الرأسية $F_z$؟"
+      skill: "sg-vec-unit"
+      answer: 200*5/sqrt(50)
+      expect: 200*5/sqrt(3^2 + 4^2 + 5^2)
+      tolerance: 0.1
+      unit: "نيوتن"
+      wrong 200*5/12 "قسمت على مجموع الأبعاد. طول القطر هو معياره."
+      wrong 1000 "القوة $200$ على طول القطر كله، لا على كل متر منه."
+      wrong 40 "هذا $200 \div 5$. المركبة الرأسية هي $200$ ضرب جيب تمام الزاوية مع $z$."
+      ! "القطر $(3, 4, 5)$ ومعياره $\sqrt{50} = 5\sqrt2$. القوة $200\,\hat e = 20\sqrt2\,(3, 4, 5)$، فـ $F_z = 100\sqrt2 \approx 141.4$ نيوتن."
+    }
+  }
+
+  slide "سهم وظله" {
+    id: "sg2-transfer2"
+    beat: transfer
+    cat: "في مكان جديد"
+    > وأخير.
+
+    numeric {
+      ask "سهم طوله $10$ يصنع $30°$ مع محور $z$، وظله على المستوى $xy$ يصنع $45°$ مع محور $x$. أوجد مركبته $A_x$."
+      skill: "sg-vec-components"
+      answer: 5*cos(rad(45))
+      expect: 10*sin(rad(30))*cos(rad(45))
+      tolerance: 0.02
+      wrong 10*cos(rad(30))*cos(rad(45)) "$10\cos 30°$ هي المركبة الرأسية. الظل على الأرض طوله $10\sin 30°$."
+      wrong 10*cos(rad(45)) "الظل أقصر من السهم. خذ طول الظل أولًا، ثم زاويته مع $x$."
+      wrong 10*cos(rad(30)) "هذه $A_z$، المركبة على محور $z$."
+      ! "الظل طوله $10\sin 30° = 5$، ثم $A_x = 5\cos 45° \approx 3.54$. هذه الأفكار تعود في التمارين خلال الأيام القادمة، مختلطة بغيرها."
+    }
+  }
+}
