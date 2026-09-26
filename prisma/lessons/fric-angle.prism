@@ -1,0 +1,738 @@
+lesson "The angle of friction" {
+  course: "mechanics"
+  unit: "Friction"
+  difficulty: "Advanced"
+  icon: "Triangle"
+  summary: "A surface gives one push, and friction can only tilt it so far. Find that furthest tilt with your hands, then watch it decide when things slide off a ramp."
+  skills: ["fric-limiting", "fric-resultant-reaction", "fric-angle-of-friction"]
+
+  role up = success
+  role friction = warning
+  role push = primary
+  role lean = accent
+
+  slide "Warm up" {
+    id: "fa-check"
+    beat: check
+    cat: "One push"
+    > Quick warm up before we start.
+
+    numeric {
+      ask "A crate weighing $8$ kg.wt sits on a flat floor with $\mu = 0.75$. What's the most friction the floor can give it?"
+      skill: "fric-limiting"
+      answer: 6
+      expect: 0.75 * 8
+      tolerance: 0.01
+      unit: "kg.wt"
+      wrong 8 "That's the weight, which is what the floor holds up. Friction tops out at a fraction of it." -> "fa-bridge-limit" retry
+      wrong 0.75 "That's $\mu$ on its own. It's a multiplier, so it needs something to multiply." -> "fa-bridge-limit" retry
+      wrong 8 / 0.75 "Dividing makes the ceiling bigger than the weight. $\mu$ scales the weight down here." -> "fa-bridge-limit" retry
+      hint "Friction has a ceiling. What two things set it?"
+      ! "The ceiling is $\mu R$, and on a bare flat floor $R$ is the weight. $0.75 \times 8 = 6$ kg.wt. Hang on to this crate."
+    }
+  }
+
+  slide "The friction ceiling" {
+    id: "fa-bridge-limit"
+    beat: bridge
+    hidden: true
+    cat: "One push"
+    > Friction matches your push until it hits a ceiling, $\mu R$. On a flat floor with nothing else pressing, $R$ is just the weight. So the ceiling is $\mu$ times the weight.
+
+    numeric {
+      ask "A $20$ kg.wt crate sits on a flat floor with $\mu = 0.4$. What's the most friction the floor can give?"
+      skill: "fric-limiting"
+      answer: 8
+      expect: 0.4 * 20
+      tolerance: 0.01
+      unit: "kg.wt"
+      wrong 20 "That's $R$. The ceiling is $\mu$ times it."
+      hint "Which number is $R$ here?"
+      ! "$R = 20$, so the ceiling is $0.4 \times 20 = 8$ kg.wt. Now back to the $8$ kg.wt crate."
+    }
+  }
+
+  slide "A phone on a tilted book" {
+    id: "fa-hook"
+    beat: hook
+    cat: "One push"
+    > Your phone sits on a book tilted at $20°$. It doesn't slide.
+
+    scene plane {
+      alt: "A book lying at a 20 degree tilt with a phone resting halfway up its cover. The tilt is marked at the bottom corner. No forces are drawn."
+      x: [-4.4, 4.4]
+      y: [-2.6, 2.4]
+      aspect: equal
+      axes: false
+      polygon book = [(-3, -2), (-3 + 6*cos(rad(20)), -2), (-3 + 6*cos(rad(20)), -2 + 6*sin(rad(20)))] { color: neutral, opacity: 0.22 }
+      rect phone = (-3 + 3*cos(rad(20)), -2 + 3*sin(rad(20))) { w: 1.3, h: 0.25, rotate: 20, color: primary }
+      arc tilt = (-3, -2) { r: 1.1, from: 0, to: 20, color: lean }
+      label at (-1.7, -1.8) = "20°" { color: lean }
+    }
+
+    quiz {
+      ask "The book pushes on the phone. Which way does that push point?"
+      skill: "fric-resultant-reaction"
+      - "At right angles to the cover" { why: "Most people pick this one, and it's half the story. Two slides from now you'll see the other half." }
+      - "Up the slope, along the cover" { why: "That's the grip part, and it's real. But the book is also holding the phone up. Keep going and you'll see how the two combine." }
+      * "Straight up"
+      - "Somewhere in between, but you'd need the phone's weight" { why: "The direction turns out not to need the weight at all. Stick with it for two slides." }
+      ! "It's a bet for now. The next two slides settle it, and it's the whole lesson."
+    }
+  }
+
+  slide "One push from the floor" {
+    id: "fa-floor"
+    beat: explore
+    cat: "One push"
+    > Back to the crate from the warm up. Push it and the floor pushes back two ways: [up]{up}, and [against you]{friction}. Together that's [one push]{push}. Push harder and watch which way it points.
+
+    scene plane {
+      alt: "A crate on a flat floor with a slider for how hard you push it. A dashed green arrow shows the floor holding it up, a dashed orange arrow shows friction, and a solid blue arrow shows the two combined, with an arc for how far it leans from straight up. Readouts show the lean and whether the crate slides."
+      x: [-4.6, 4.6]
+      y: [-1.8, 4.2]
+      aspect: equal
+      axes: false
+      param P = 0 { range: [0, 10], step: 0.1 }
+      line floor = (-4.4, 0) -> (4.4, 0) { color: neutral, width: 3 }
+      rect crate = (-1.2, 0) { w: 2.4, h: 1.4, color: neutral, opacity: 0.25 }
+      vector you = (-1.25 - 0.3*P, 0.7) -> (-1.25, 0.7) { color: neutral, width: 3, show: P > 0.05 }
+      vector upv = (0, 0) -> (0, 2.4) { color: up, width: 3, style: dashed }
+      vector grip = (0, 0) -> (0 - 0.3*min(P, 6), 0) { color: friction, width: 3, style: dashed, show: P > 0.05 }
+      vector pushv = (0, 0) -> (0 - 0.3*min(P, 6), 2.4) { color: push, width: 4 }
+      arc leanarc = (0, 0) { r: 1.0, from: 90, to: 90 + deg(atan(min(P, 6)/8)), color: lean, show: P > 0.05 }
+      label at (0, 3.6) = "the floor's push leans ${deg(atan(min(P, 6)/8))}° from straight up" { anchor: middle, color: push }
+      label at (0, -0.6) = "friction ${min(P, 6)} kg.wt" { anchor: middle, color: friction }
+      label at (0, -1.3) = "crate stays put" { anchor: middle, color: neutral, show: P <= 6 }
+      label at (0, -1.3) = "crate slides" { anchor: middle, color: danger, show: P > 6 }
+      slider P { label: "how hard you push, kg.wt" }
+    }
+
+    goal "Lean the [floor's push]{push} past 30° without the crate moving" {
+      when: deg(atan(min(P, 6)/8)) > 30 and P <= 6
+      hints: ["Push gently at first. The lean grows with [friction]{friction}.", "Somewhere between 5 and 6 kg.wt."]
+      showme: { P: 5.5 }
+    }
+
+    goal "Now shove it with everything you've got" {
+      when: P > 9.5
+      hints: ["All the way to the end of the slider, and keep an eye on the blue number."]
+      showme: { P: 10 }
+      dur: 3000
+    }
+
+    numeric {
+      ask "However hard you push, what's the most the [floor's push]{push} ever leans?"
+      skill: "fric-resultant-reaction"
+      answer: 36.87
+      expect: deg(atan(0.75))
+      tolerance: 0.6
+      unit: "°"
+      wrong 30 "That's where the first goal stopped. Push past the point where it starts to slide and watch again." -> "fa-detour-cap" retry
+      wrong deg(atan(10/8)) "That's what you'd get if friction kept up with a 10 kg.wt push. Look at the orange number once it slides." -> "fa-detour-cap" retry
+      hint "Watch the blue number while the crate slides."
+      hint "Once it slides, does friction still grow?"
+      after: goals
+      ! "About $36.9°$. Past $6$ kg.wt friction can't grow any more, so the push can't lean any further. On this floor, $36.9°$ is the cap."
+    }
+  }
+
+  slide "The lean has a cap" {
+    id: "fa-detour-cap"
+    beat: detour
+    hidden: true
+    cat: "One push"
+    > The lean follows [friction]{friction}, and friction has a ceiling. Here's a grippier rubber mat under the same crate. Push past the ceiling and keep going.
+
+    scene plane {
+      alt: "The same crate on a rubber mat with a push slider. The friction arrow grows until it reaches 8 kg.wt and then stops, and so does the lean of the blue arrow."
+      x: [-4.6, 4.6]
+      y: [-1.8, 4.2]
+      aspect: equal
+      axes: false
+      param P = 0 { range: [0, 12], step: 0.1 }
+      line floor = (-4.4, 0) -> (4.4, 0) { color: neutral, width: 3 }
+      rect crate = (-1.2, 0) { w: 2.4, h: 1.4, color: neutral, opacity: 0.25 }
+      vector you = (-1.25 - 0.25*P, 0.7) -> (-1.25, 0.7) { color: neutral, width: 3, show: P > 0.05 }
+      vector upv = (0, 0) -> (0, 2.4) { color: up, width: 3, style: dashed }
+      vector grip = (0, 0) -> (0 - 0.3*min(P, 8), 0) { color: friction, width: 3, style: dashed, show: P > 0.05 }
+      vector pushv = (0, 0) -> (0 - 0.3*min(P, 8), 2.4) { color: push, width: 4 }
+      label at (0, 3.6) = "the mat's push leans ${deg(atan(min(P, 8)/8))}° from straight up" { anchor: middle, color: push }
+      label at (0, -0.6) = "friction ${min(P, 8)} kg.wt" { anchor: middle, color: friction }
+      label at (0, -1.3) = "crate stays put" { anchor: middle, color: neutral, show: P <= 8 }
+      label at (0, -1.3) = "crate slides" { anchor: middle, color: danger, show: P > 8 }
+      slider P { label: "how hard you push, kg.wt" }
+    }
+
+    goal "Push until it slides, then keep pushing" {
+      when: P > 11
+      hints: ["Once it slides, keep dragging and watch the blue number."]
+      showme: { P: 12 }
+      dur: 3000
+    }
+
+    numeric {
+      ask "On the rubber mat, what's the most the push ever leans?"
+      skill: "fric-resultant-reaction"
+      answer: 45
+      expect: deg(atan(8/8))
+      tolerance: 0.6
+      unit: "°"
+      after: goals
+      ! "$45°$. The mat's ceiling is $8$ kg.wt, as big as the up part, so the push tops out halfway to flat. Grippier surface, bigger cap."
+    }
+  }
+
+  slide "Why the phone holds on" {
+    id: "fa-ramp"
+    beat: reveal
+    cat: "The ramp"
+    > You bet "${answer("fa-hook", "a guess")}". The phone sits still, so the book's push has to cancel its weight exactly. That means straight up. Now tilt the crate's board and watch that push.
+
+    scene plane {
+      alt: "The crate on a board with a tilt slider. A dashed line sticks straight out of the board, with a shaded wedge 36.9 degrees either side of it. The blue push arrow points straight up while the crate holds, then sticks at the edge of the wedge and a red arrow drags the crate down the slope."
+      x: [-4.4, 4.4]
+      y: [-4.0, 4.6]
+      aspect: equal
+      axes: false
+      param a = 10 { range: [0, 50], step: 1 }
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(a)), -2), (-3 + 6*cos(rad(a)), -2 + 6*sin(rad(a)))] { color: neutral, opacity: 0.22 }
+      polygon cone = [(-3 + 4*cos(rad(a)), -2 + 4*sin(rad(a))), (-3 + 4*cos(rad(a)) + 2.4*cos(rad(90 + a + 36.87)), -2 + 4*sin(rad(a)) + 2.4*sin(rad(90 + a + 36.87))), (-3 + 4*cos(rad(a)) + 2.4*cos(rad(90 + a - 36.87)), -2 + 4*sin(rad(a)) + 2.4*sin(rad(90 + a - 36.87)))] { color: lean, opacity: 0.14 }
+      line normal = (-3 + 4*cos(rad(a)), -2 + 4*sin(rad(a))) -> (-3 + 4*cos(rad(a)) - 2.6*sin(rad(a)), -2 + 4*sin(rad(a)) + 2.6*cos(rad(a))) { color: neutral, style: dashed, width: 2 }
+      rect block = (-3 + 3.4*cos(rad(a)), -2 + 3.4*sin(rad(a))) { w: 1.2, h: 0.65, rotate: a, color: neutral, opacity: 0.35 }
+      vector weight = (-3 + 4*cos(rad(a)) - 0.33*sin(rad(a)), -2 + 4*sin(rad(a)) + 0.33*cos(rad(a))) -> (-3 + 4*cos(rad(a)) - 0.33*sin(rad(a)), -2 + 4*sin(rad(a)) + 0.33*cos(rad(a)) - 2.0) { color: neutral, width: 3 }
+      vector pushv = (-3 + 4*cos(rad(a)), -2 + 4*sin(rad(a))) -> (-3 + 4*cos(rad(a)) + 2.0*cos(rad(a))/cos(rad(min(a, 36.87)))*cos(rad(90 + a - min(a, 36.87))), -2 + 4*sin(rad(a)) + 2.0*cos(rad(a))/cos(rad(min(a, 36.87)))*sin(rad(90 + a - min(a, 36.87)))) { color: push, width: 4 }
+      vector leftover = (-3 + 4*cos(rad(a)) - 0.33*sin(rad(a)), -2 + 4*sin(rad(a)) + 0.33*cos(rad(a))) -> (-3 + 4*cos(rad(a)) - 0.33*sin(rad(a)) - 6.0*(sin(rad(a)) - 0.75*cos(rad(a)))*cos(rad(a)), -2 + 4*sin(rad(a)) + 0.33*cos(rad(a)) - 6.0*(sin(rad(a)) - 0.75*cos(rad(a)))*sin(rad(a))) { color: danger, width: 4, show: a > 36.87 }
+      arc sweep = (-3, -2) { r: 1.1, from: 0, to: a, color: lean }
+      label at (0, 4.2) = "holding" { anchor: middle, color: neutral, show: a <= 36.87 }
+      label at (0, 4.2) = "it slides" { anchor: middle, color: danger, show: a > 36.87 }
+      label at (-4.2, -2.8) = "tilt ${a}°" { color: lean }
+      label at (-4.2, -3.5) = "push leans ${min(a, 36.87)}° from the dashed line" { color: push }
+      slider a { label: "tilt of the board" }
+    }
+
+    goal "Tilt the board until the crate lets go" {
+      when: a > 36.87
+      hints: ["Keep tilting, and watch the blue arrow.", "What happens when it reaches the edge of the shaded wedge?"]
+      showme: { a: 40 }
+      dur: 2500
+    }
+
+    quiz {
+      ask "It let go at about $37°$. Why there?"
+      skill: "fric-angle-of-friction"
+      - "At $37°$ the weight gets too big for friction" { why: "The weight never changes as you tilt. What changes is the direction the push has to lean.", onwrong: "fa-detour-weight", retry }
+      - "The board stops pressing on the crate at $37°$" { why: "At $37°$ the board still holds most of the crate up. It only stops pressing when the board is vertical." }
+      * "Holding it needs the push to lean as far as the tilt, and $37°$ is as far as it can lean"
+      - "Friction switches off past a certain steepness" { why: "Friction is still there, sitting at its ceiling. It just can't tilt the push any further." }
+      hint "While it holds, compare the two numbers under the board."
+      after: goals
+      ! "Still means straight up, and straight up leans from the dashed line by exactly the tilt. The floor showed this surface can't lean past $36.9°$. Tilt further and nothing can hold it."
+    }
+  }
+
+  slide "Two new crates" {
+    id: "fa-reveal-check"
+    beat: reveal
+    cat: "The ramp"
+
+    quiz {
+      ask "One board, tilted to $30°$, two crates. Crate A's surface lets the push lean up to $25°$. Crate B's lets it lean up to $40°$. What happens?"
+      skill: "fric-angle-of-friction"
+      - "B slides, it has the bigger lean" { why: "A bigger cap means more grip, not less. B's push can lean all the way to $40°$, and holding still only needs $30°$.", onwrong: "fa-detour-cone", retry }
+      - "Both slide, $30°$ is steep" { why: "Steep is relative. What matters is whether $30°$ fits inside each surface's cap.", onwrong: "fa-detour-cone", retry }
+      - "Can't tell without their weights" { why: "The weight never came into it. Holding still needs a lean equal to the tilt, whatever the crate weighs.", onwrong: "fa-detour-weight", retry }
+      * "A slides and B stays put"
+      hint "Holding still on a $30°$ board needs the push to lean how far?"
+      ! "Holding still needs a $30°$ lean. B can manage up to $40°$, so it holds. A tops out at $25°$, so it goes."
+    }
+  }
+
+  slide "Demand versus cap" {
+    id: "fa-detour-cone"
+    beat: detour
+    hidden: true
+    cat: "The ramp"
+    > Think demand and supply. Holding still demands a lean equal to the tilt. The surface supplies a lean up to its cap. Demand more than the cap and it slides.
+
+    scene plane {
+      alt: "A crate on a board fixed at 30 degrees, with a slider for how far the surface lets the push lean. The shaded wedge widens as the cap grows, and the crate holds once the wedge reaches straight up."
+      x: [-4.4, 4.4]
+      y: [-3.0, 4.6]
+      aspect: equal
+      axes: false
+      param c = 25 { range: [10, 50], step: 1 }
+      let cx = -3 + 4*cos(rad(30))
+      let cy = -2 + 4*sin(rad(30))
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(30)), -2), (-3 + 6*cos(rad(30)), -2 + 6*sin(rad(30)))] { color: neutral, opacity: 0.22 }
+      polygon cone = [(cx, cy), (cx + 2.4*cos(rad(120 + c)), cy + 2.4*sin(rad(120 + c))), (cx + 2.4*cos(rad(120 - c)), cy + 2.4*sin(rad(120 - c)))] { color: lean, opacity: 0.14 }
+      line normal = (cx, cy) -> (cx - 2.6*sin(rad(30)), cy + 2.6*cos(rad(30))) { color: neutral, style: dashed, width: 2 }
+      rect block = (-3 + 3.4*cos(rad(30)), -2 + 3.4*sin(rad(30))) { w: 1.2, h: 0.65, rotate: 30, color: neutral, opacity: 0.35 }
+      vector pushv = (cx, cy) -> (cx + 2.0*cos(rad(30))/cos(rad(min(30, c)))*cos(rad(120 - min(30, c))), cy + 2.0*cos(rad(30))/cos(rad(min(30, c)))*sin(rad(120 - min(30, c)))) { color: push, width: 4 }
+      arc sweep = (-3, -2) { r: 1.1, from: 0, to: 30, color: lean }
+      label at (-1.7, -1.75) = "30°" { color: lean }
+      label at (0, 4.2) = "holding" { anchor: middle, color: neutral, show: c >= 30 }
+      label at (0, 4.2) = "it slides" { anchor: middle, color: danger, show: c < 30 }
+      label at (-4.2, -2.6) = "demand 30°, cap ${c}°" { color: push }
+      slider c { label: "the surface's cap" }
+    }
+
+    goal "Give the surface a cap that holds the crate" {
+      when: c >= 30
+      hints: ["The push needs to reach straight up. Widen the wedge until it can."]
+      showme: { c: 35 }
+    }
+
+    quiz {
+      ask "A board is tilted to $20°$. Surface C lets the push lean up to $15°$, surface D up to $35°$. Which crate slides?"
+      skill: "fric-angle-of-friction"
+      - "D, it has the bigger cap" { why: "Bigger cap, more room to lean, more grip. Demand is $20°$, and $35°$ covers it." }
+      * "C, its cap is smaller than the $20°$ it needs"
+      - "Both, anything past $15°$ slides" { why: "Each surface has its own cap. D's goes all the way to $35°$." }
+      after: goals
+      ! "Demand is $20°$. C can only supply $15°$, so it slides. D supplies up to $35°$, so it holds."
+    }
+  }
+
+  slide "Heavier doesn't mean sooner" {
+    id: "fa-detour-weight"
+    beat: detour
+    hidden: true
+    cat: "The ramp"
+    > Heavier feels like it should slide sooner. But a heavier crate presses harder, so its friction ceiling grows by the same amount. Make it heavier and watch the wedge.
+
+    scene plane {
+      alt: "A crate on a board fixed at 20 degrees with a slider for its weight. The weight arrow and the blue push arrow grow together, the readouts for friction needed and friction available grow in step, and the shaded wedge never changes."
+      x: [-4.4, 4.4]
+      y: [-4.4, 4.2]
+      aspect: equal
+      axes: false
+      param W = 8 { range: [2, 20], step: 1 }
+      let cx = -3 + 4*cos(rad(20))
+      let cy = -2 + 4*sin(rad(20))
+      let gx = cx - 0.33*sin(rad(20))
+      let gy = cy + 0.33*cos(rad(20))
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(20)), -2), (-3 + 6*cos(rad(20)), -2 + 6*sin(rad(20)))] { color: neutral, opacity: 0.22 }
+      polygon cone = [(cx, cy), (cx + 2.4*cos(rad(110 + 36.87)), cy + 2.4*sin(rad(110 + 36.87))), (cx + 2.4*cos(rad(110 - 36.87)), cy + 2.4*sin(rad(110 - 36.87)))] { color: lean, opacity: 0.14 }
+      line normal = (cx, cy) -> (cx - 2.6*sin(rad(20)), cy + 2.6*cos(rad(20))) { color: neutral, style: dashed, width: 2 }
+      rect block = (-3 + 3.4*cos(rad(20)), -2 + 3.4*sin(rad(20))) { w: 1.2, h: 0.65, rotate: 20, color: neutral, opacity: 0.35 }
+      vector weight = (gx, gy) -> (gx, gy - 0.12*W) { color: neutral, width: 3 }
+      vector pushv = (cx, cy) -> (cx, cy + 0.12*W) { color: push, width: 4 }
+      label at (-4.2, 3.9) = "weight ${W} kg.wt" { color: neutral }
+      label at (-4.2, 3.3) = "friction needed ${fixed(W*sin(rad(20)), 1)} · most it can give ${fixed(0.75*W*cos(rad(20)), 1)}" { color: friction }
+      label at (-4.2, -4.0) = "push leans 20° · as far as it can lean 36.9°" { color: lean }
+      slider W { label: "crate's weight, kg.wt" }
+    }
+
+    goal "Make the crate at least twice as heavy" {
+      when: W >= 16
+      hints: ["Drag the weight slider right, and watch the two orange numbers."]
+      showme: { W: 16 }
+    }
+
+    quiz {
+      ask "A $5$ kg.wt parcel sits still on a $20°$ board. You stack a second $5$ kg.wt parcel on top. What happens?"
+      skill: "fric-angle-of-friction"
+      * "It still holds, the lean it needs hasn't changed"
+      - "It slides, it's twice as heavy now" { why: "Twice as heavy presses twice as hard, so the friction it can get doubles too. The lean it needs is still $20°$." }
+      - "It holds, but only if the board drops to $10°$" { why: "Nothing about the angles changed. Only the sizes did, and they grew together." }
+      after: goals
+      ! "Weight scales the push, the friction needed and the friction available all together. The angles don't move, so neither does the answer."
+    }
+  }
+
+  slide "The push always leans 36.9°, right?" {
+    id: "fa-trap"
+    beat: trap
+    cat: "The ramp"
+    > So on this surface the push always leans $36.9°$, right? Try it. The board is at $15°$. Lean it the full way and watch the red leftover arrow.
+
+    scene plane {
+      alt: "A crate on a board fixed at 15 degrees, with a slider for how far the blue push leans from the dashed line. A red arrow along the slope shows whatever the push and the weight leave over, and a readout says which way it shoves the crate."
+      x: [-4.4, 4.4]
+      y: [-3.4, 4.6]
+      aspect: equal
+      axes: false
+      param L = 0 { range: [-40, 40], step: 1 }
+      let cx = -3 + 4*cos(rad(15))
+      let cy = -2 + 4*sin(rad(15))
+      let gx = cx - 0.33*sin(rad(15))
+      let gy = cy + 0.33*cos(rad(15))
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(15)), -2), (-3 + 6*cos(rad(15)), -2 + 6*sin(rad(15)))] { color: neutral, opacity: 0.22 }
+      polygon cone = [(cx, cy), (cx + 2.4*cos(rad(105 + 36.87)), cy + 2.4*sin(rad(105 + 36.87))), (cx + 2.4*cos(rad(105 - 36.87)), cy + 2.4*sin(rad(105 - 36.87)))] { color: lean, opacity: 0.14 }
+      line normal = (cx, cy) -> (cx - 2.6*sin(rad(15)), cy + 2.6*cos(rad(15))) { color: neutral, style: dashed, width: 2 }
+      rect block = (-3 + 3.4*cos(rad(15)), -2 + 3.4*sin(rad(15))) { w: 1.2, h: 0.65, rotate: 15, color: neutral, opacity: 0.35 }
+      vector weight = (gx, gy) -> (gx, gy - 2.0) { color: neutral, width: 3 }
+      vector pushv = (cx, cy) -> (cx + 2.0*cos(rad(15))/cos(rad(L))*cos(rad(105 - L)), cy + 2.0*cos(rad(15))/cos(rad(L))*sin(rad(105 - L))) { color: push, width: 4 }
+      vector leftover = (gx, gy) -> (gx + 2.0*(cos(rad(15))*tan(rad(L)) - sin(rad(15)))*cos(rad(15)), gy + 2.0*(cos(rad(15))*tan(rad(L)) - sin(rad(15)))*sin(rad(15))) { color: danger, width: 4, show: abs(cos(rad(15))*tan(rad(L)) - sin(rad(15))) > 0.0125 }
+      label at (0, 4.2) = "leftover ${8*abs(cos(rad(15))*tan(rad(L)) - sin(rad(15)))} kg.wt, shoves it UP the ramp" { anchor: middle, color: danger, show: cos(rad(15))*tan(rad(L)) - sin(rad(15)) > 0.0125 }
+      label at (0, 4.2) = "leftover ${8*abs(cos(rad(15))*tan(rad(L)) - sin(rad(15)))} kg.wt, drags it DOWN the ramp" { anchor: middle, color: danger, show: cos(rad(15))*tan(rad(L)) - sin(rad(15)) < -0.0125 }
+      label at (0, 4.2) = "nothing left over, it sits still" { anchor: middle, color: neutral, show: abs(cos(rad(15))*tan(rad(L)) - sin(rad(15))) <= 0.0125 }
+      label at (-4.2, -3.15) = "push leans ${L}° from the dashed line" { color: push }
+      slider L { label: "lean of the push" }
+    }
+
+    goal "Lean the push the full 36.9°" {
+      when: L > 36
+      hints: ["Drag the slider right, towards the edge of the wedge."]
+      showme: { L: 37 }
+    }
+
+    goal "Now find the lean that leaves nothing over" {
+      when: L == 15
+      hints: ["Drag it back slowly and watch the red arrow shrink.", "Still means straight up. How far is straight up from the dashed line on a $15°$ board?"]
+      showme: { L: 15 }
+    }
+
+    quiz {
+      ask "A crate sits still on a $25°$ board, same surface, cap $36.9°$. How far does the push lean from the dashed line?"
+      skill: "fric-resultant-reaction"
+      - "$36.9°$, the cap" { why: "That's the trap you just sprang. At $36.9°$ there'd be a leftover shoving the crate uphill.", onwrong: "fa-detour-ceiling", retry }
+      - "$0°$, it pushes straight out of the board" { why: "Then nothing would hold it against sliding down. The push has to lean to cancel the weight." }
+      * "$25°$"
+      - "$11.9°$, the cap minus the tilt" { why: "That's how much room is left before it slips, not the lean itself." }
+      hint "Still means straight up. How far is straight up from the dashed line on a $25°$ board?"
+      after: goals
+      ! "Tempting to say $36.9°$, since it's the one number we've got. But friction only gives what's needed, so the push only leans what's needed. It reaches $36.9°$ only when the crate is about to go."
+    }
+  }
+
+  slide "Names for what you found" {
+    id: "fa-name"
+    beat: name
+    cat: "Naming it"
+    > Names now. The floor's [one push]{push} is the **resultant reaction**, $\textcolor{push}{S}$. Its [up]{up} part is $\textcolor{up}{R}$, its [sideways]{friction} part is $\textcolor{friction}{F}$. The most it can [lean]{lean} is the **angle of friction**, $\textcolor{lean}{\lambda}$.
+
+    scene plane {
+      alt: "The floor scene frozen at the friction ceiling: the up arrow of 8, the friction arrow of 6, the floor's push and the arc of its lean. Step through and each plain label turns into its symbol, R, F, S and lambda."
+      x: [-4.0, 3.0]
+      y: [-1.2, 3.6]
+      aspect: equal
+      axes: false
+      param m1 = 0 { range: [0, 1] }
+      param m2 = 0 { range: [0, 1] }
+      line floor = (-3.8, 0) -> (2.8, 0) { color: neutral, width: 3 }
+      rect crate = (-1.2, 0) { w: 2.4, h: 1.4, color: neutral, opacity: 0.2 }
+      vector upv = (0, 0) -> (0, 2.4) { color: up, width: 3, style: dashed }
+      vector grip = (0, 0) -> (-1.8, 0) { color: friction, width: 3, style: dashed }
+      vector pushv = (0, 0) -> (-1.8, 2.4) { color: push, width: 4 }
+      arc lam = (0, 0) { r: 1.0, from: 90, to: 126.87, color: lean }
+      label wup at (0.2, 1.8) = "up 8" { color: up }
+      label sup at (0.2, 1.8) = "R = 8" { tex, color: up }
+      label wfr at (-0.9, -0.5) = "friction 6" { anchor: middle, color: friction }
+      label sfr at (-0.9, -0.5) = "F = 6" { tex, anchor: middle, color: friction }
+      label wpu at (-2.9, 2.6) = "one push" { color: push }
+      label spu at (-2.1, 2.6) = "S" { tex, color: push }
+      label wle at (-0.8, 1.72) = "lean" { color: lean }
+      label sle at (-0.6, 1.72) = "\lambda" { tex, color: lean }
+      morph wup -> sup { by: m1 }
+      morph wfr -> sfr { by: m1 }
+      morph wpu -> spu { by: m2 }
+      morph wle -> sle { by: m2 }
+      step "In your words, from the floor." { set: { m1: 0, m2: 0 } }
+      step "The two parts get their letters." { animate: { m1: 1 }, dur: 1200, indicate: ["upv", "grip"] }
+      step "And so do the push and its lean." { animate: { m2: 1 }, dur: 1200, indicate: ["pushv", "lam"] }
+    }
+
+    build {
+      ask "At the ceiling, $\textcolor{friction}{F} = \mu \textcolor{up}{R}$. Build $\tan\textcolor{lean}{\lambda}$."
+      skill: "fric-angle-of-friction"
+      template: "$\tan\lambda =$ ___ $=$ ___ $=$ ___"
+      bank: ["$\dfrac{F}{R}$", "$\dfrac{R}{F}$", "$\dfrac{\mu R}{R}$", "$\dfrac{R}{\mu R}$", "$\mu$", "$\dfrac{1}{\mu}$"]
+      answer: ["$\dfrac{F}{R}$", "$\dfrac{\mu R}{R}$", "$\mu$"]
+      hint "$\tan$ is opposite over adjacent. Which arrow is opposite $\lambda$?"
+      hint "Now swap $F$ for what it equals at the ceiling, and cancel."
+      after: 3
+      ! "$\tan\lambda = \frac{6}{8} = 0.75 = \mu$, and $\tan^{-1} 0.75 \approx 36.9°$, your number from the floor. So $\mu = \tan\lambda$, and a board lets go once its tilt passes $\lambda$."
+    }
+  }
+
+  slide "Winch it uphill" {
+    id: "fa-winch"
+    beat: breaker
+    cat: "Naming it"
+    > Now winch the crate up a $20°$ board. Pull gently at first. [Friction]{friction} has to change its mind somewhere, so watch where the [push]{push} swings.
+
+    scene plane {
+      alt: "A crate on a board fixed at 20 degrees with a slider for how hard a winch pulls it up the slope. The blue push starts straight up, swings through the dashed line, and pins to the downhill edge of the wedge once the crate slides up."
+      x: [-4.4, 4.4]
+      y: [-3.4, 4.6]
+      aspect: equal
+      axes: false
+      param P = 0 { range: [0, 10], step: 0.1 }
+      let cx = -3 + 4*cos(rad(20))
+      let cy = -2 + 4*sin(rad(20))
+      let gx = cx - 0.33*sin(rad(20))
+      let gy = cy + 0.33*cos(rad(20))
+      let rr = 8*cos(rad(20))
+      let ww = 8*sin(rad(20))
+      let cap = 6*cos(rad(20))
+      polygon ramp = [(-3, -2), (-3 + 6*cos(rad(20)), -2), (-3 + 6*cos(rad(20)), -2 + 6*sin(rad(20)))] { color: neutral, opacity: 0.22 }
+      polygon cone = [(cx, cy), (cx + 2.4*cos(rad(110 + 36.87)), cy + 2.4*sin(rad(110 + 36.87))), (cx + 2.4*cos(rad(110 - 36.87)), cy + 2.4*sin(rad(110 - 36.87)))] { color: lean, opacity: 0.14 }
+      line normal = (cx, cy) -> (cx - 2.6*sin(rad(20)), cy + 2.6*cos(rad(20))) { color: neutral, style: dashed, width: 2 }
+      rect block = (-3 + 3.4*cos(rad(20)), -2 + 3.4*sin(rad(20))) { w: 1.2, h: 0.65, rotate: 20, color: neutral, opacity: 0.35 }
+      vector weight = (gx, gy) -> (gx, gy - 2.0) { color: neutral, width: 3 }
+      vector winch = (gx + 0.6*cos(rad(20)), gy + 0.6*sin(rad(20))) -> (gx + (0.6 + 0.25*P)*cos(rad(20)), gy + (0.6 + 0.25*P)*sin(rad(20))) { color: neutral, width: 3, show: P > 0.05 }
+      vector pushv = (cx, cy) -> (cx + 0.25*sqrt(rr^2 + max(ww - P, 0 - cap)^2)*cos(rad(110 - deg(atan(max(ww - P, 0 - cap)/rr)))), cy + 0.25*sqrt(rr^2 + max(ww - P, 0 - cap)^2)*sin(rad(110 - deg(atan(max(ww - P, 0 - cap)/rr))))) { color: push, width: 4 }
+      label at (0, 4.2) = "crate holds" { anchor: middle, color: neutral, show: P <= ww + cap }
+      label at (0, 4.2) = "crate slides up the ramp" { anchor: middle, color: danger, show: P > ww + cap }
+      label at (-4.2, -2.6) = "friction ${abs(max(ww - P, 0 - cap))} kg.wt, pointing up the ramp" { color: friction, show: ww - P > 0.05 }
+      label at (-4.2, -2.6) = "friction ${abs(max(ww - P, 0 - cap))} kg.wt, pointing down the ramp" { color: friction, show: ww - P < -0.05 }
+      label at (-4.2, -2.6) = "no friction at all" { color: friction, show: abs(ww - P) <= 0.05 }
+      label at (-4.2, -3.2) = "push leans ${abs(deg(atan(max(ww - P, 0 - cap)/rr)))}° from the dashed line" { color: push }
+      slider P { label: "winch pull, kg.wt" }
+    }
+
+    goal "Winch it until the crate starts sliding up" {
+      when: P > 8.4
+      hints: ["Keep pulling past the point where friction flips. Watch the orange line.", "It takes a bit over 8 kg.wt."]
+      showme: { P: 9 }
+      dur: 3000
+    }
+
+    quiz {
+      ask "It's sliding up now. Where's the board's push?"
+      skill: "fric-resultant-reaction"
+      - "Straight up, same as when it sat still" { why: "Straight up only happens when the push is all that holds the crate. Now the winch is in on it too." }
+      - "Leaning the full $36.9°$, on the uphill side like before" { why: "Uphill side means friction pointing up the ramp. But the crate's sliding up now, so friction points down." }
+      * "Leaning the full $36.9°$, on the downhill side"
+      - "Along the dashed line, the winch does the rest" { why: "That was only true for a moment, at about $2.7$ kg.wt, when friction had nothing to do." }
+      hint "Which way is the crate sliding? Friction points the other way, and it drags the push with it."
+      after: goals
+      ! "Downhill side, at the full $\lambda$. Friction opposes the sliding, so when the sliding flips, the lean flips. $\lambda$ is the cap on either side of the dashed line."
+    }
+  }
+
+  slide "Worked: a sledge on snow" {
+    id: "fa-worked"
+    beat: example
+    cat: "Using it"
+    > Here's the whole move once. Sledge on snow: $\mu = 0.1$. So $\tan\lambda = 0.1$, and $\lambda = \tan^{-1} 0.1 \approx 5.7°$. Any snowy slope steeper than $5.7°$ and a parked sledge sets off by itself.
+
+    quiz {
+      ask "A sledge is parked on a $4°$ snowy slope. What happens?"
+      skill: "fric-angle-of-friction"
+      - "It slides, $4$ is bigger than $0.1$" { why: "That's comparing an angle with $\mu$, degrees with a bare number. Compare the slope with $\lambda$ instead." }
+      * "It stays, $4°$ is inside the $5.7°$ the push can lean"
+      - "It slides, sledges slide on any slope" { why: "Snow is slippery, but not frictionless. Up to $5.7°$ the push can still lean far enough to hold it." }
+      - "Can't tell without the sledge's weight" { why: "Weight never came into it. Only the slope and $\lambda$ decide.", onwrong: "fa-detour-weight", retry }
+      ! "It stays. $4° < 5.7°$, so the snow's push can still point straight up."
+    }
+  }
+
+  slide "Now the other way round" {
+    id: "fa-faded"
+    beat: example
+    cat: "Using it"
+    > Other way round. A block on a plank lets go at exactly $30°$. So $\lambda = 30°$, and $\mu = \tan\lambda$. You finish it.
+
+    numeric {
+      ask "What's $\mu$ for the block and the plank?"
+      skill: "fric-angle-of-friction"
+      answer: 0.577
+      expect: tan(rad(30))
+      tolerance: 0.005
+      wrong 0.5 "That's $\sin 30°$." -> "fa-detour-tan" retry
+      wrong 0.866 "That's $\cos 30°$." -> "fa-detour-tan" retry
+      wrong tan(30) "That's $\tan$ of 30 radians. Switch your calculator to degrees."
+      hint "Calculator in degrees, then $\tan 30°$."
+      ! "$\mu = \tan 30° \approx 0.577$. A plank and a protractor just measured $\mu$, no force meter needed."
+    }
+  }
+
+  slide "Tan, not sin" {
+    id: "fa-detour-tan"
+    beat: detour
+    hidden: true
+    cat: "Using it"
+    > Easy slip, sin is the famous one. But $\mu$ is $\textcolor{friction}{F}$ over $\textcolor{up}{R}$, sideways over up, and in this triangle that's $\tan\lambda$. Sin would be $F$ over $\textcolor{push}{S}$, the slanted side.
+
+    scene plane {
+      alt: "A right-angled triangle made of the up part R, the sideways part F across the top, and the slanted push S, with the angle lambda at the bottom between R and S."
+      x: [-3.2, 2.4]
+      y: [-0.8, 3.8]
+      aspect: equal
+      axes: false
+      vector upv = (0, 0) -> (0, 3) { color: up, width: 3, style: dashed }
+      vector grip = (0, 3) -> (-1.73, 3) { color: friction, width: 3, style: dashed }
+      vector pushv = (0, 0) -> (-1.73, 3) { color: push, width: 4 }
+      arc lam = (0, 0) { r: 0.9, from: 90, to: 120, color: lean }
+      label at (0.2, 1.5) = "R, up" { color: up }
+      label at (-0.87, 3.35) = "F, sideways" { anchor: middle, color: friction }
+      label at (-2.9, 1.5) = "S, slanted" { color: push }
+      label at (-0.4, 1.1) = "\lambda" { tex, color: lean }
+    }
+
+    numeric {
+      ask "A plank lets a block go at $20°$. What's $\mu$?"
+      skill: "fric-angle-of-friction"
+      answer: 0.364
+      expect: tan(rad(20))
+      tolerance: 0.005
+      wrong 0.342 "That's $\sin 20°$ again. Sideways over up is tan."
+      hint "$\mu = \tan\lambda$, and $\lambda$ is where it let go."
+      ! "$\mu = \tan 20° \approx 0.364$. Tan every time: sideways over up."
+    }
+  }
+
+  slide "Your turn: grip" {
+    id: "fa-own-1"
+    beat: example
+    cat: "Using it"
+    > Three on your own now, with fresh numbers every try.
+
+    numeric {
+      vary m in [0.2, 0.4, 0.5, 0.8, 1, 1.2]
+      ask "Two surfaces have $\mu = ${m}$. What's the angle of friction between them?"
+      skill: "fric-angle-of-friction"
+      answer: deg(atan(m))
+      expect: deg(atan(m))
+      tolerance: 0.3
+      unit: "°"
+      wrong atan(m) "That's the angle in radians. Switch your calculator to degrees."
+      hint "$\tan\lambda = \mu$, so undo the tan."
+      ! "$\lambda = \tan^{-1}\mu$. The grippier the pair, the further the push can lean."
+    }
+  }
+
+  slide "Your turn: about to go" {
+    id: "fa-own-2"
+    beat: example
+    cat: "Using it"
+
+    numeric {
+      vary r in [10, 12, 15, 20]
+      vary f in [3, 4, 5, 6]
+      ask "A crate is on the point of sliding. The floor holds it up with $R = ${r}$ kg.wt, and friction is $${f}$ kg.wt. What's $\lambda$?"
+      skill: "fric-angle-of-friction"
+      answer: deg(atan(f / r))
+      expect: deg(atan(f / r))
+      tolerance: 0.2
+      unit: "°"
+      wrong deg(atan(r / f)) "That's up over sideways, the angle measured from the floor." -> "fa-detour-flip" retry
+      hint "On the point of sliding means friction is at its ceiling, so this lean is $\lambda$."
+      ! "$\tan\lambda = F/R$, sideways over up. On the point of sliding, that lean is the cap."
+    }
+  }
+
+  slide "Measured from the up line" {
+    id: "fa-detour-flip"
+    beat: detour
+    hidden: true
+    cat: "Using it"
+    > $\lambda$ is measured from the [up]{up} line, $R$, not from the floor. So it's sideways over up: $\tan\lambda = F/R$. Flip it and you get the angle at the floor instead.
+
+    scene plane {
+      alt: "The push triangle standing on the floor: R = 15 going up, F = 8 across the top, and the push S. The angle lambda is marked between R and S, and the other angle, between S and the floor, is marked not this one."
+      x: [-3.4, 2.4]
+      y: [-0.8, 3.8]
+      aspect: equal
+      axes: false
+      line floor = (-3.2, 0) -> (2.2, 0) { color: neutral, width: 3 }
+      vector upv = (0, 0) -> (0, 3) { color: up, width: 3, style: dashed }
+      vector grip = (0, 3) -> (-1.6, 3) { color: friction, width: 3, style: dashed }
+      vector pushv = (0, 0) -> (-1.6, 3) { color: push, width: 4 }
+      arc lam = (0, 0) { r: 1.0, from: 90, to: 118.07, color: lean }
+      arc other = (0, 0) { r: 0.6, from: 118.07, to: 180, color: neutral, style: dashed }
+      label at (0.2, 1.5) = "R = 15" { color: up }
+      label at (-0.8, 3.35) = "F = 8" { anchor: middle, color: friction }
+      label at (0.2, 0.8) = "λ, from the up line" { color: lean }
+      label at (-0.8, 0.25) = "not this one" { anchor: end, color: neutral }
+    }
+
+    numeric {
+      ask "On the point of sliding, $R = 15$ kg.wt and $F = 8$ kg.wt. What's $\lambda$?"
+      skill: "fric-angle-of-friction"
+      answer: 28.07
+      expect: deg(atan(8/15))
+      tolerance: 0.2
+      unit: "°"
+      wrong deg(atan(15/8)) "Still flipped. Sideways on top, up underneath."
+      ! "$\tan\lambda = \frac{8}{15}$, so $\lambda \approx 28.1°$. The other corner would be $61.9°$, the angle from the floor."
+    }
+  }
+
+  slide "Your turn: a gentle shove" {
+    id: "fa-own-3"
+    beat: example
+    cat: "Using it"
+
+    numeric {
+      vary w in [10, 12, 16, 20]
+      vary mu in [0.5, 0.75]
+      vary p in [2, 3, 4]
+      ask "A $${w}$ kg.wt crate sits on a floor with $\mu = ${mu}$. You push it sideways with $${p}$ kg.wt. How far does the floor's push lean from straight up?"
+      skill: "fric-resultant-reaction"
+      answer: deg(atan(p / w))
+      expect: deg(atan(p / w))
+      tolerance: 0.2
+      unit: "°"
+      wrong deg(atan(mu)) "That's $\lambda$, the most it can lean. Is friction at its ceiling here?" -> "fa-detour-ceiling" retry
+      hint "First: is friction at its ceiling here?"
+      ! "The ceiling is $\mu$ times the weight, and this push doesn't reach it, so friction just matches your push. The lean is $\tan^{-1}$ of push over weight, under $\lambda$."
+    }
+  }
+
+  slide "Only what's needed" {
+    id: "fa-detour-ceiling"
+    beat: detour
+    hidden: true
+    cat: "Using it"
+    > $\lambda$ is the most the push can lean, not what it always leans. Below the ceiling [friction]{friction} just matches your push, so the [push]{push} leans only as far as that friction tilts it.
+
+    scene plane {
+      alt: "A 10 kg.wt crate on a floor with a push slider and a dashed line at the 38.66 degree cap. The blue push leans further as you push, and stays inside the cap until friction reaches its ceiling of 8."
+      x: [-4.6, 4.6]
+      y: [-1.8, 4.2]
+      aspect: equal
+      axes: false
+      param P = 0 { range: [0, 10], step: 0.1 }
+      line floor = (-4.4, 0) -> (4.4, 0) { color: neutral, width: 3 }
+      rect crate = (-1.2, 0) { w: 2.4, h: 1.4, color: neutral, opacity: 0.25 }
+      line capline = (0, 0) -> (-3*sin(rad(38.66)), 3*cos(rad(38.66))) { color: lean, style: dashed, width: 2 }
+      vector you = (-1.25 - 0.3*P, 0.7) -> (-1.25, 0.7) { color: neutral, width: 3, show: P > 0.05 }
+      vector upv = (0, 0) -> (0, 2.5) { color: up, width: 3, style: dashed }
+      vector pushv = (0, 0) -> (0 - 0.25*min(P, 8), 2.5) { color: push, width: 4 }
+      label at (0, 3.6) = "push leans ${deg(atan(min(P, 8)/10))}°, cap 38.66°" { anchor: middle, color: push }
+      label at (0, -0.6) = "10 kg.wt crate, friction ${min(P, 8)} kg.wt" { anchor: middle, color: friction }
+      slider P { label: "how hard you push, kg.wt" }
+    }
+
+    goal "Push with 4 kg.wt and see where the lean sits" {
+      when: P == 4
+      hints: ["Drag until the orange number says 4."]
+      showme: { P: 4 }
+    }
+
+    numeric {
+      ask "A $20$ kg.wt crate on a floor with $\mu = 0.6$ gets a $7$ kg.wt sideways push. How far does the floor's push lean?"
+      skill: "fric-resultant-reaction"
+      answer: 19.29
+      expect: deg(atan(7/20))
+      tolerance: 0.2
+      unit: "°"
+      wrong deg(atan(0.6)) "That's the cap. Is $7$ at the ceiling?"
+      hint "The ceiling is $0.6 \times 20 = 12$. Is $7$ under it?"
+      after: goals
+      ! "$7 < 12$, so friction is just $7$ and the lean is $\tan^{-1}\frac{7}{20} \approx 19.3°$. The cap here is $31.0°$, but nothing's asking for it."
+    }
+  }
+
+  slide "Measure it yourself" {
+    id: "fa-transfer"
+    beat: transfer
+    cat: "Using it"
+    > One more, somewhere new.
+
+    numeric {
+      ask "You want $\mu$ for a coin on a wooden plank. The plank is $65$ cm long. You lift one end slowly, and the coin starts to slip when that end is $25$ cm off the table. What's $\mu$?"
+      skill: "fric-angle-of-friction"
+      answer: 25 / 60
+      expect: 25 / sqrt(65^2 - 25^2)
+      tolerance: 0.005
+      wrong 25 / 65 "That's rise over the plank, which is $\sin$. The plank is the slanted side. $\tan$ wants rise over the run along the table."
+      wrong deg(atan(25 / 60)) "That's the angle the plank let go at. $\mu$ is its tan."
+      ! "It slips at $\lambda$, so $\mu = \tan\lambda$, rise over run. The run along the table is $\sqrt{65^2 - 25^2} = 60$ cm, so $\mu = 25/60 \approx 0.42$. The angle of friction comes back in practice over the next few days, mixed in with the rest of the unit."
+    }
+  }
+}
