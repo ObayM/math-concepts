@@ -1,0 +1,1312 @@
+lesson "الضرب الاتجاهي والضرب الثلاثي القياسي" {
+  course: "solid-geometry-g12-ar"
+  unit: "الهندسة والقياس في ثلاثة أبعاد"
+  difficulty: "Advanced"
+  icon: "Move"
+  summary: "متجه عمودي على متجهين، طوله مساحة متوازي الأضلاع بينهما، وترتيبه يقلب اتجاهه. ثم الضرب الثلاثي القياسي وحجم متوازي السطوح."
+  skills: ["sg-cross-product", "sg-cross-area", "sg-cross-parallel", "sg-triple-product"]
+  requires: ["sg-vec-norm", "sg-dot-product"]
+
+  role va = primary
+  role vb = accent
+  role cross = success
+  role area = warning
+
+  slide "تسخين: طول متجه" {
+    id: "sg4-check-norm"
+    beat: check
+    cat: "تسخين"
+    > سؤالان سريعان قبل أن نبدأ.
+
+    numeric {
+      ask "ما معيار المتجه $\vec{v} = (2, 3, 6)$؟"
+      skill: "sg-vec-norm"
+      answer: 7
+      expect: sqrt(2^2 + 3^2 + 6^2)
+      wrong 49 "هذا مجموع المربعات، وبقي الجذر." -> "sg4-bridge-norm" retry
+      wrong 11 "جمعت المركبات مباشرة. المعيار يربّعها أولًا." -> "sg4-bridge-norm" retry
+      hint "ربّع كل مركبة، اجمع، ثم خذ الجذر."
+      ! "$\sqrt{4 + 9 + 36} = \sqrt{49} = 7$. سنحتاج المعيار في كل مساحة نحسبها اليوم."
+    }
+  }
+
+  slide "المعيار من جديد" {
+    id: "sg4-bridge-norm"
+    beat: bridge
+    hidden: true
+    cat: "تسخين"
+    > المعيار هو طول السهم، وهو فيثاغورس في ثلاثة أبعاد: $\|\vec{v}\| = \sqrt{v_x^2 + v_y^2 + v_z^2}$. ربّع، اجمع، ثم جذر.
+
+    numeric {
+      ask "ما معيار $\vec{u} = (1, 2, 2)$؟"
+      skill: "sg-vec-norm"
+      answer: 3
+      expect: sqrt(1 + 4 + 4)
+      wrong 9 "هذا ما تحت الجذر. خذ جذره."
+      wrong 5 "هذا مجموع المركبات، لا طول السهم."
+      ! "$\sqrt{1 + 4 + 4} = 3$. نعود الآن إلى السؤال الأول."
+    }
+  }
+
+  slide "تسخين: الضرب القياسي" {
+    id: "sg4-check-dot"
+    beat: check
+    cat: "تسخين"
+
+    numeric {
+      ask "احسب $(1, 2, 3) \cdot (4, -1, 2)$."
+      skill: "sg-dot-product"
+      answer: 8
+      expect: 1*4 + 2*(-1) + 3*2
+      wrong 12 "ضاعت إشارة السالب في $2 \times (-1)$." -> "sg4-bridge-dot" retry
+      hint "اضرب المركبات المتناظرة ثم اجمع النواتج."
+      ! "$4 - 2 + 6 = 8$، عدد وليس متجهًا. اليوم نقابل ضربًا آخر نتيجته متجه."
+    }
+  }
+
+  slide "الضرب القياسي من جديد" {
+    id: "sg4-bridge-dot"
+    beat: bridge
+    hidden: true
+    cat: "تسخين"
+    > الضرب القياسي: اضرب $x$ في $x$، و $y$ في $y$، و $z$ في $z$، ثم اجمع. انتبه لكل إشارة سالبة.
+
+    numeric {
+      ask "احسب $(2, 0, 1) \cdot (4, 3, -1)$."
+      skill: "sg-dot-product"
+      answer: 7
+      expect: 2*4 + 0*3 + 1*(-1)
+      wrong 9 "الحد الأخير $1 \times (-1) = -1$، لا $+1$."
+      ! "$8 + 0 - 1 = 7$. نعود للسؤال."
+    }
+  }
+
+  slide "عمودي على الاثنين" {
+    id: "sg4-hook"
+    beat: hook
+    cat: "الفكرة"
+    > على أرض الفصل سهمان من نفس الركن: [$\vec{A}$]{va} يشير شرقًا و [$\vec{B}$]{vb} يشير شمالًا.
+
+    scene space3 {
+      alt: "أرضية مربعة، ومن أحد أركانها سهمان: سهم أزرق نحو الشرق وسهم برتقالي نحو الشمال. لا يوجد أي سهم آخر."
+      x: [-1, 4]
+      y: [-1, 4]
+      z: [-2, 3]
+      camera: [35, 24]
+      polygon3 floor = [(0, 0, 0), (3.5, 0, 0), (3.5, 3.5, 0), (0, 3.5, 0)] { color: neutral, opacity: 0.08 }
+      segment3 segA = (0, 0, 0) -> (3, 0, 0) { arrow, color: va, label: "A  شرق" }
+      segment3 segB = (0, 0, 0) -> (0, 3, 0) { arrow, color: vb, label: "B  شمال" }
+    }
+
+    quiz {
+      ask "أي اتجاه عمودي على السهمين معًا؟"
+      skill: "sg-cross-product"
+      - "لأعلى فقط، نحو السقف" { why: "لأعلى عمودي عليهما فعلًا. لكن هل هو الوحيد؟ الشريحتان القادمتان تجيبان." }
+      - "الشمال الشرقي، في المنتصف بينهما" { why: "المنتصف يصنع $45°$ مع كل سهم، لا $90°$. العمودي يخرج من الأرض كلها." }
+      * "اتجاهان: لأعلى ولأسفل"
+      - "لا يوجد، فالأرض فيها اتجاهان فقط" { why: "على الورقة نعم، لكننا في غرفة لها ارتفاع. هناك اتجاه يخرج من الأرض." }
+      ! "رهانك محفوظ. الشريحة القادمة تبني متجهًا عموديًا على الاثنين، وسترى أيهما يختار."
+    }
+  }
+
+  slide "السهم الثالث" {
+    id: "sg4-explore"
+    beat: explore
+    cat: "الفكرة"
+    > طول [$\vec{A}$]{va} هو $3$ وطول [$\vec{B}$]{vb} هو $2$. [السهم الأخضر]{cross} عمودي على الاثنين دائمًا. دوّر [$\vec{B}$]{vb} على الأرض وراقب طول [السهم الأخضر]{cross} واتجاهه.
+
+    scene space3 {
+      alt: "سهم أزرق ثابت على المحور x طوله 3، وسهم برتقالي طوله 2 يدور على الأرض حسب منزلق الزاوية، ومتوازي أضلاع مظلل بينهما. سهم أخضر رأسي يخرج من الركن، يطول ويقصر وقد ينقلب لأسفل. منزلق ثان لتدوير المشهد."
+      x: [-3, 3.5]
+      y: [-3, 3]
+      z: [-3.2, 3.2]
+      param t = 40 { range: [0, 360], step: 5 }
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 20]
+      polygon3 para = [(0, 0, 0), (3, 0, 0), (3 + 2*cos(rad(t)), 2*sin(rad(t)), 0), (2*cos(rad(t)), 2*sin(rad(t)), 0)] { color: area, opacity: 0.18 }
+      segment3 segA = (0, 0, 0) -> (3, 0, 0) { arrow, color: va, label: "A" }
+      segment3 segB = (0, 0, 0) -> (2*cos(rad(t)), 2*sin(rad(t)), 0) { arrow, color: vb, label: "B" }
+      segment3 segC = (0, 0, 0) -> (0, 0, 0.5*6*sin(rad(t))) { arrow, color: cross, show: abs(sin(rad(t))) > 0.02 }
+      label3 at (-2.8, -2.8, 3.0) = "طول السهم الأخضر ${fixed(6*abs(sin(rad(t))), 2)}" { color: cross }
+      slider t { label: "زاوية B عن A" }
+      slider az { label: "دوّر المشهد" }
+    }
+
+    scene plane {
+      alt: "المنظر نفسه من أعلى: السهمان A و B على الأرض وقوس الدوران من A إلى B، وعبارة تقول هل السهم الأخضر يخرج نحوك أم يبتعد عنك."
+      x: [-3, 3.5]
+      y: [-2.6, 2.6]
+      aspect: equal
+      axes: false
+      vector ta = (0, 0) -> (3, 0) { color: va, width: 3 }
+      vector tb = (0, 0) -> (2*cos(rad(t)), 2*sin(rad(t))) { color: vb, width: 3 }
+      arc turn = (0, 0) { r: 0.7, from: 0, to: t, color: neutral, show: t <= 180 }
+      arc turnback = (0, 0) { r: 0.7, from: t, to: 360, color: neutral, show: t > 180 }
+      label at (-2.9, 2.3) = "من أعلى: السهم الأخضر يخرج نحوك" { color: cross, show: sin(rad(t)) > 0.02 }
+      label at (-2.9, 2.3) = "من أعلى: السهم الأخضر يبتعد عنك" { color: cross, show: sin(rad(t)) < -0.02 }
+      label at (-2.9, 2.3) = "من أعلى: لا يوجد سهم أخضر" { color: cross, show: abs(sin(rad(t))) <= 0.02 }
+    }
+
+    goal "اجعل [السهم الأخضر]{cross} أطول ما يمكن وهو يشير لأعلى" {
+      when: t == 90
+      hints: ["راقب الرقم الأخضر وأنت تدوّر $B$ ببطء.", "أطول سهم عندما يصير متوازي الأضلاع مستطيلًا."]
+      showme: { t: 90 }
+    }
+
+    goal "الآن اجعله يشير لأسفل" {
+      when: sin(rad(t)) < -0.5
+      hints: ["استمر في تدوير $b$ حتى يعبر $A$ من الجهة الأخرى.", "جرّب زاوية أكبر من $180°$."]
+      showme: { t: 270 }
+      dur: 2500
+    }
+
+    numeric {
+      ask "متجهان طولاهما $5$ و $4$ والزاوية بينهما $90°$. كم طول سهمهما الأخضر؟"
+      skill: "sg-cross-product"
+      answer: 20
+      expect: 5*4*sin(rad(90))
+      wrong 9 "جمعت الطولين. تذكّر ما رأيته: عند $90°$ مع $3$ و $2$ كان الطول $6$."
+      wrong 0 "عند $90°$ ينعدم الضرب القياسي، لكن هذا السهم كان في أطول حالاته." -> "sg4-d-dot" retry
+      hint "عند $90°$ كان الطول $6$، والطولان $3$ و $2$. ما العلاقة؟"
+      after: goals
+      ! "$5 \times 4 = 20$. عند الزاوية القائمة طول السهم هو حاصل ضرب الطولين."
+    }
+  }
+
+  slide "ضرب قياسي أم اتجاهي؟" {
+    id: "sg4-d-dot"
+    beat: detour
+    hidden: true
+    cat: "الفكرة"
+    > الخلط مفهوم، فالاثنان ضرب لمتجهين. لكن [الضرب القياسي]{va} يتبع $\cos$، و [طول السهم الأخضر]{cross} يتبع $\sin$. حرّك الزاوية وقارن.
+
+    scene plane {
+      alt: "سهم ثابت طوله 3 وسهم طوله 2 يدور حسب منزلق الزاوية. قراءتان: الضرب القياسي وطول السهم العمودي، واحدة تكبر حين تصغر الأخرى."
+      x: [-3.5, 3.5]
+      y: [-1, 3]
+      aspect: equal
+      axes: false
+      param t = 60 { range: [0, 180], step: 5 }
+      vector va1 = (0, 0) -> (3, 0) { color: neutral, width: 3 }
+      vector vb1 = (0, 0) -> (2*cos(rad(t)), 2*sin(rad(t))) { color: vb, width: 3 }
+      label at (-3.3, 2.7) = "الضرب القياسي ${fixed(6*cos(rad(t)), 2)}" { color: va }
+      label at (-3.3, 2.2) = "طول السهم العمودي ${fixed(6*abs(sin(rad(t))), 2)}" { color: cross }
+      slider t { label: "الزاوية" }
+    }
+
+    goal "اجعل [طول السهم العمودي]{cross} صفرًا" {
+      when: t == 0 or t == 180
+      hints: ["ضع السهمين على خط واحد."]
+      showme: { t: 0 }
+    }
+
+    goal "الآن اجعل [الضرب القياسي]{va} صفرًا" {
+      when: t == 90
+      hints: ["متى ينعدم $\cos$؟"]
+      showme: { t: 90 }
+    }
+
+    numeric {
+      ask "متجهان طولاهما $2$ و $7$ والزاوية بينهما $90°$. كم طول السهم العمودي عليهما؟"
+      skill: "sg-cross-product"
+      answer: 14
+      expect: 2*7*sin(rad(90))
+      wrong 0 "صفر هو الضرب القياسي عند $90°$. السهم العمودي يتبع $\sin$، و $\sin 90° = 1$."
+      after: goals
+      ! "$2 \times 7 \times 1 = 14$. عند $90°$ القياسي صفر والاتجاهي في قمته."
+    }
+  }
+
+  slide "ماذا وجدت" {
+    id: "sg4-reveal"
+    beat: reveal
+    cat: "الفكرة"
+    > راهنت على «${answer("sg4-hook", "اتجاه")}». الحقيقة: هناك اتجاهان عموديان، والسهم يختار واحدًا وينقلب حين يعبر [$\vec{B}$]{vb} الخط. أما طوله فانظر إلى [الارتفاع]{area} المتقطع.
+
+    scene space3 {
+      alt: "المشهد نفسه من أعلى قليلًا: متوازي الأضلاع بين A و B، وخط متقطع برتقالي من رأس B عموديًا على A يمثل الارتفاع، والسهم الأخضر الرأسي. منزلق للزاوية."
+      x: [-3, 3.5]
+      y: [-3, 3]
+      z: [-3.2, 3.2]
+      param t = 60 { range: [0, 180], step: 5 }
+      camera: [20, 35]
+      polygon3 para = [(0, 0, 0), (3, 0, 0), (3 + 2*cos(rad(t)), 2*sin(rad(t)), 0), (2*cos(rad(t)), 2*sin(rad(t)), 0)] { color: area, opacity: 0.18 }
+      segment3 segA = (0, 0, 0) -> (3, 0, 0) { arrow, color: va, label: "A" }
+      segment3 segB = (0, 0, 0) -> (2*cos(rad(t)), 2*sin(rad(t)), 0) { arrow, color: vb, label: "B" }
+      segment3 hgt = (2*cos(rad(t)), 2*sin(rad(t)), 0) -> (2*cos(rad(t)), 0, 0) { color: area, style: dashed, width: 3 }
+      segment3 segC = (0, 0, 0) -> (0, 0, 3*sin(rad(t))) { arrow, color: cross, show: sin(rad(t)) > 0.02 }
+      label3 at (-2.8, -2.8, 3.0) = "الارتفاع ${fixed(2*sin(rad(t)), 2)}" { color: area }
+      slider t { label: "زاوية B عن A" }
+    }
+
+    quiz {
+      ask "لماذا كان السهم الأخضر أطول ما يمكن عند $90°$ واختفى عند $0°$ و $180°$؟"
+      skill: "sg-cross-product"
+      * "طوله يساوي مساحة متوازي الأضلاع: القاعدة $3$ في الارتفاع، والارتفاع أكبر ما يمكن عند $90°$ وصفر حين ينطبق السهمان"
+      - "طوله يساوي $\vec{A} \cdot \vec{B}$" { why: "الضرب القياسي أكبر ما يمكن عند $0°$ وصفر عند $90°$، أي عكس ما رأيت تمامًا.", onwrong: "sg4-d-dot", retry }
+      - "طوله يساوي $\|\vec{A}\| + \|\vec{B}\|$" { why: "هذا المجموع $5$ دائمًا ولا يتغير مع الزاوية، والسهم كان يتغير." }
+      - "السهم لا يقصر فعلًا، بل يبدو أقصر من زاوية النظر" { why: "النظر لا يغير شيئًا هنا، فالرقم الأخضر نفسه كان يصل إلى صفر." }
+      hint "حرّك الزاوية وقارن الخط المتقطع بالسهم الأخضر."
+      ! "القاعدة $3$، والارتفاع $2\sin\theta$، فالمساحة $6\sin\theta$، وهي طول السهم بالضبط."
+    }
+  }
+
+  slide "ثلاثة في اثنين تساوي اثنين في ثلاثة" {
+    id: "sg4-trap"
+    beat: trap
+    cat: "الفكرة"
+    > في الأعداد $3 \times 2 = 2 \times 3$. إذن [$\vec{A}$]{va} في [$\vec{B}$]{vb} هو نفسه [$\vec{B}$]{vb} في [$\vec{A}$]{va}، صحيح؟ بدّل الترتيب وراقب [السهم]{cross}.
+
+    scene space3 {
+      alt: "سهم أزرق A على المحور x وسهم برتقالي B على الأرض بزاوية 60 درجة منه، ومتوازي الأضلاع بينهما. زر اختيار الترتيب: A × B أو B × A. السهم الأخضر يشير لأعلى في ترتيب ولأسفل في الآخر."
+      x: [-3, 3.5]
+      y: [-3, 3]
+      z: [-3.2, 3.2]
+      param az = 35 { range: [0, 360], step: 5 }
+      choice ord = "A × B" { options: ["A × B", "B × A"] }
+      camera: [az, 20]
+      polygon3 para = [(0, 0, 0), (3, 0, 0), (4, 1.73, 0), (1, 1.73, 0)] { color: area, opacity: 0.18 }
+      segment3 segA = (0, 0, 0) -> (3, 0, 0) { arrow, color: va, label: "A" }
+      segment3 segB = (0, 0, 0) -> (1, 1.73, 0) { arrow, color: vb, label: "B" }
+      segment3 up = (0, 0, 0) -> (0, 0, 2.6) { arrow, color: cross, label: "A × B", show: ord == "A × B" }
+      segment3 down = (0, 0, 0) -> (0, 0, -2.6) { arrow, color: cross, label: "B × A", show: ord == "B × A" }
+      picker ord { label: "الترتيب" }
+      slider az { label: "دوّر المشهد" }
+    }
+
+    goal "بدّل الترتيب إلى B × A" {
+      when: ord == "B × A"
+      hints: ["اضغط الزر الثاني فوق المشهد."]
+    }
+
+    quiz {
+      ask "في مثال الكتاب $\vec{A} \times \vec{B} = 3\hat{i} + \hat{j} - 5\hat{k}$. ما $\vec{B} \times \vec{A}$؟"
+      skill: "sg-cross-product"
+      - "$3\hat{i} + \hat{j} - 5\hat{k}$، الترتيب لا يهم" { why: "هذا هو الفخ. السهم انقلب أمامك حين بدّلت الترتيب.", onwrong: "sg4-d-order", retry }
+      * "$-3\hat{i} - \hat{j} + 5\hat{k}$"
+      - "$-5\hat{i} + \hat{j} + 3\hat{k}$" { why: "بدّلت أماكن المركبات، لكن الطول والاتجاه لا يتغيران هكذا. الذي يتغير هو الإشارة فقط." }
+      - "$\vec{0}$" { why: "الصفر يأتي حين يتوازى المتجهان. هنا السهم موجود لكنه يشير للجهة الأخرى." }
+      hint "حين بدّلت الترتيب، هل تغير طول السهم أم اتجاهه؟"
+      after: goals
+      ! "مغرٍ لأن الأعداد تسمح بالتبديل. لكن الاتجاه يتبع الدوران من الأول إلى الثاني، فالتبديل يعكسه: $\vec{B} \times \vec{A} = -\,\vec{A} \times \vec{B}$."
+    }
+  }
+
+  slide "الترتيب يقلب السهم" {
+    id: "sg4-d-order"
+    beat: detour
+    hidden: true
+    cat: "الفكرة"
+    > لف أصابع يدك اليمنى من المتجه الأول إلى الثاني، والإبهام يعطي الاتجاه. بدّل الترتيب ينعكس الدوران فينقلب الإبهام. الطول نفسه والإشارة تنعكس.
+
+    quiz {
+      ask "في الكتاب $\hat{i} \times \hat{k} = -\hat{j}$. إذن $\hat{k} \times \hat{i} = $ ؟"
+      skill: "sg-cross-product"
+      * "$\hat{j}$"
+      - "$-\hat{j}$" { why: "هذا الترتيب الأول نفسه. بدّلت الترتيب فتنعكس الإشارة." }
+      - "$\vec{0}$" { why: "$\hat{k}$ و $\hat{i}$ متعامدان، فحاصل ضربهما طوله $1$ وليس صفرًا." }
+      - "$\hat{i}$" { why: "الناتج عمودي على $\hat{k}$ و $\hat{i}$ معًا، و $\hat{i}$ ليس عموديًا على نفسه." }
+      ! "$\hat{k} \times \hat{i} = -(\hat{i} \times \hat{k}) = \hat{j}$."
+    }
+  }
+
+  slide "الاسم الرسمي" {
+    id: "sg4-name"
+    beat: name
+    cat: "الفكرة"
+    > هذا السهم هو **حاصل الضرب الاتجاهي** $\vec{A} \times \vec{B}$. ما قلته بكلماتك يصير رموزًا. في الكتاب: أ بدل $\vec{A}$، وحا بدل $\sin$، وى بدل $\hat{n}$.
+
+    scene space3 {
+      alt: "متوازي الأضلاع بين A و B والسهم الأخضر. خطوات تحول عبارة «الطول = المساحة» إلى الرمز |A||B| sin θ، وعبارة «الاتجاه باليد اليمنى» إلى n."
+      x: [-3, 3.5]
+      y: [-3, 3]
+      z: [-1, 3.4]
+      param m1 = 0 { range: [0, 1] }
+      param m2 = 0 { range: [0, 1] }
+      camera: [30, 22]
+      polygon3 para = [(0, 0, 0), (3, 0, 0), (4, 1.73, 0), (1, 1.73, 0)] { color: area, opacity: 0.18 }
+      segment3 segA = (0, 0, 0) -> (3, 0, 0) { arrow, color: va, label: "A" }
+      segment3 segB = (0, 0, 0) -> (1, 1.73, 0) { arrow, color: vb, label: "B" }
+      segment3 segC = (0, 0, 0) -> (0, 0, 2.6) { arrow, color: cross }
+      label3 wlen at (-2.6, -2.6, 3.0) = "الطول = المساحة" { color: cross }
+      label3 slen at (-2.6, -2.6, 3.0) = "\|\vec A\|\,\|\vec B\|\sin\theta" { tex, color: cross }
+      label3 wdir at (0.3, 0.3, 2.2) = "اتجاهه باليد اليمنى" { color: cross }
+      label3 sdir at (0.3, 0.3, 2.2) = "\hat n" { tex, color: cross }
+      morph wlen -> slen { by: m1 }
+      morph wdir -> sdir { by: m2 }
+      step "بكلماتك: طول يساوي المساحة، واتجاه تحدده اليد اليمنى." { set: { m1: 0, m2: 0 } }
+      step "المساحة قاعدة في ارتفاع: $\|\vec A\|\,\|\vec B\|\sin\theta$." { animate: { m1: 1 }, dur: 1200, indicate: ["para"] }
+      step "والاتجاه متجه وحدة عمودي على المستوى، نسميه $\hat n$." { animate: { m2: 1 }, dur: 1200, indicate: ["segC"] }
+    }
+
+    build {
+      ask "ركّب تعريف الكتاب."
+      skill: "sg-cross-product"
+      template: "$\vec{A} \times \vec{B} = ($ ___ ___ ___ $)$ ___"
+      bank: ["$\|\vec{A}\|$", "$\|\vec{B}\|$", "$\sin\theta$", "$\cos\theta$", "$\hat{n}$", "$\vec{A} \cdot \vec{B}$"]
+      answer: ["$\|\vec{A}\|$", "$\|\vec{B}\|$", "$\sin\theta$", "$\hat{n}$"]
+      answer: ["$\|\vec{B}\|$", "$\|\vec{A}\|$", "$\sin\theta$", "$\hat{n}$"]
+      miss "$\cos\theta$" "مع $\cos$ يصير الطول أكبر ما يمكن عند $0°$، والسهم عندها اختفى."
+      miss "$\vec{A} \cdot \vec{B}$" "هذا الضرب القياسي، عدد يتبع $\cos$. الطول هنا يتبع $\sin$."
+      hint "بين القوسين عدد: الطول الذي رأيته. وخارجهما الاتجاه."
+      hint "$\cos$ هو الضرب القياسي. أيهما كان صفرًا عند $0°$؟"
+      after: 3
+      ! "$\vec{A} \times \vec{B} = (\|\vec{A}\|\|\vec{B}\|\sin\theta)\,\hat{n}$، حيث $\theta$ الزاوية الصغرى بينهما. الناتج **متجه**، بينما $\vec{A} \cdot \vec{B}$ عدد."
+    }
+  }
+
+  slide "قاعدة اليد اليمنى" {
+    id: "sg4-rhr"
+    beat: example
+    cat: "الفكرة"
+    > جرّب القاعدة على زوج جديد: [$\vec{A}$]{va} على محور $x$، و [$\vec{B}$]{vb} رأسي على محور $z$. لف أصابع يدك اليمنى من $\vec{A}$ إلى $\vec{B}$.
+
+    scene space3 {
+      alt: "المحاور الثلاثة. سهم أزرق A على محور x الموجب وسهم برتقالي B على محور z الموجب. لا يوجد سهم للناتج. منزلق لتدوير المشهد."
+      x: [-3, 3]
+      y: [-3, 3]
+      z: [-3, 3]
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 22]
+      segment3 segA = (0, 0, 0) -> (2.5, 0, 0) { arrow, color: va, label: "A" }
+      segment3 segB = (0, 0, 0) -> (0, 0, 2.5) { arrow, color: vb, label: "B" }
+      slider az { label: "دوّر المشهد" }
+    }
+
+    quiz {
+      ask "إلى أين يشير $\vec{A} \times \vec{B}$؟"
+      skill: "sg-cross-product"
+      - "اتجاه $y$ الموجب" { why: "هذا اتجاه $\vec{B} \times \vec{A}$. الأصابع تبدأ من $\vec{A}$ وتنتهي عند $\vec{B}$.", onwrong: "sg4-d-order", retry }
+      * "اتجاه $y$ السالب"
+      - "لأعلى، اتجاه $z$" { why: "$z$ هو $\vec{B}$ نفسه، والناتج عمودي على $\vec{B}$." }
+      - "اتجاه $x$ السالب" { why: "هذا على نفس خط $\vec{A}$، والناتج عمودي على $\vec{A}$." }
+      hint "الناتج عمودي على $x$ وعلى $z$، فهو على محور $y$. يبقى: الموجب أم السالب؟"
+      ! "من $x$ إلى $z$ يشير الإبهام إلى $y$ السالب. هذا ما في جدول الكتاب: $\hat{i} \times \hat{k} = -\hat{j}$."
+    }
+  }
+
+  slide "مثال محلول: المعيار" {
+    id: "sg4-mag-worked"
+    beat: example
+    cat: "المعيار والزاوية"
+    > مثال الكتاب: $\|\vec{A}\| = 5$ ، $\|\vec{B}\| = 8$ ، $\theta = 30°$. إذن $\|\vec{A} \times \vec{B}\| = 5 \times 8 \times \sin 30° = 20$. المعيار عدد، بلا $\hat{n}$.
+
+    quiz {
+      ask "$\|\vec{A}\| = 5$ ، $\|\vec{B}\| = 4$ ، والزاوية بينهما $30°$. إذن $\|\vec{A} \times \vec{B}\| = $ ؟"
+      skill: "sg-cross-product"
+      - "$20\hat{n}$" { why: "نسيت $\sin 30° = \frac{1}{2}$، ثم إن المعيار طول، عدد بلا اتجاه." }
+      - "$10\hat{n}$" { why: "الرقم صحيح، لكن $\|\ldots\|$ طول، أي عدد. $\hat{n}$ يظهر في المتجه نفسه لا في معياره." }
+      * "$10$"
+      - "$-20$" { why: "الطول لا يكون سالبًا أبدًا، و $\sin 30°$ نصف لا سالب واحد." }
+      ! "$5 \times 4 \times \frac{1}{2} = 10$، عدد موجب."
+    }
+  }
+
+  slide "زاوية منفرجة" {
+    id: "sg4-mag-faded"
+    beat: example
+    cat: "المعيار والزاوية"
+    > الزاوية هذه المرة منفرجة، و $\sin 120° = \sin 60° = \frac{\sqrt{3}}{2}$. أكمل أنت.
+
+    numeric {
+      ask "$\|\vec{A}\| = 8$ ، $\|\vec{B}\| = 5$ ، والزاوية بينهما $120°$. أوجد $\|\vec{A} \times \vec{B}\|$ (لأقرب منزلتين)."
+      skill: "sg-cross-product"
+      answer: 34.64
+      expect: 8*5*sin(rad(120))
+      tolerance: 0.05
+      wrong -20 "هذا $8 \times 5 \times \cos 120°$، أي الضرب القياسي." -> "sg4-d-dot" retry
+      wrong 20 "استعملت $\cos$. الاتجاهي يتبع $\sin$." -> "sg4-d-dot" retry
+      hint "$8 \times 5 \times \frac{\sqrt{3}}{2}$."
+      ! "$40 \times \frac{\sqrt{3}}{2} = 20\sqrt{3} \approx 34.64$."
+    }
+  }
+
+  slide "دورك: المعيار" {
+    id: "sg4-mag-own"
+    beat: example
+    cat: "المعيار والزاوية"
+    > واحد عليك، بأرقام جديدة في كل محاولة.
+
+    numeric {
+      vary p in [3, 4, 6]
+      vary q in [5, 8, 10]
+      vary t in [30, 90, 150]
+      ask "$\|\vec{A}\| = ${p}$ ، $\|\vec{B}\| = ${q}$ ، والزاوية بينهما $${t}°$. أوجد $\|\vec{A} \times \vec{B}\|$."
+      skill: "sg-cross-product"
+      answer: p*q*sin(rad(t))
+      expect: p*q*sin(rad(t))
+      tolerance: 0.01
+      wrong p*q*cos(rad(t)) "هذا بـ $\cos$، أي الضرب القياسي." -> "sg4-d-dot" retry
+      hint "طول في طول في جيب الزاوية."
+      ! "$\|\vec{A}\|\,\|\vec{B}\|\sin\theta$. و $\sin 150° = \sin 30° = \frac{1}{2}$."
+    }
+  }
+
+  slide "مثال محلول: الزاوية" {
+    id: "sg4-angle-worked"
+    beat: example
+    cat: "المعيار والزاوية"
+    > العكس: مثال الكتاب $\vec{A} \times \vec{B} = -35\sqrt{3}\,\hat{n}$ ، $\|\vec{A}\| = 14$ ، $\|\vec{B}\| = 5$. إذن $\sin\theta = \frac{35\sqrt{3}}{14 \times 5} = \frac{\sqrt{3}}{2}$ ، و $\theta = 60°$ أو $120°$.
+
+    quiz {
+      ask "لماذا جوابان؟"
+      skill: "sg-cross-product"
+      * "لأن $\sin 60° = \sin 120°$، وكلاهما ممكن كزاوية بين متجهين"
+      - "لأن الإشارة السالبة تعطي زاوية ثانية" { why: "الإشارة تخص اتجاه $\hat{n}$، لأعلى أو لأسفل. الجيب نأخذه من المعيار، وهو موجب." }
+      - "لأن الزاوية قد تكون $60°$ أو $-60°$" { why: "الزاوية بين متجهين من $0°$ إلى $180°$، لا تكون سالبة." }
+      - "لأن $\vec{A} \times \vec{B}$ و $\vec{B} \times \vec{A}$ يعطيان زاويتين" { why: "الترتيبان يشتركان في الزاوية نفسها، ويختلفان في الاتجاه فقط." }
+      ! "الزاوية بين متجهين من $0°$ إلى $180°$، والجيب يأخذ كل قيمة موجبة مرتين في هذا المدى."
+    }
+  }
+
+  slide "دورك: الزاوية" {
+    id: "sg4-angle-own"
+    beat: breaker
+    cat: "المعيار والزاوية"
+
+    quiz {
+      ask "$\vec{A} \times \vec{B} = -65\,\hat{n}$ ، $\|\vec{A}\| = 5$ ، $\|\vec{B}\| = 26$. أوجد قياس الزاوية بين المتجهين."
+      skill: "sg-cross-product"
+      - "$30°$ فقط" { why: "$\sin 30° = \frac{1}{2}$ فعلًا، لكن هناك زاوية أخرى جيبها $\frac{1}{2}$.", onwrong: "sg4-d-twoangles", retry }
+      - "$150°$ فقط، بسبب الإشارة السالبة" { why: "السالب يقول إن السهم ضد $\hat{n}$، ولا يختار الزاوية.", onwrong: "sg4-d-twoangles", retry }
+      * "$30°$ أو $150°$"
+      - "$60°$ أو $120°$" { why: "$\sin 60° = \frac{\sqrt{3}}{2}$ لا $\frac{1}{2}$. احسب $\frac{65}{5 \times 26}$ من جديد." }
+      hint "$\sin\theta = \frac{65}{5 \times 26}$."
+      ! "$\sin\theta = \frac{65}{130} = \frac{1}{2}$، فالزاوية $30°$ أو $150°$."
+    }
+  }
+
+  slide "زاويتان بجيب واحد" {
+    id: "sg4-d-twoangles"
+    beat: detour
+    hidden: true
+    cat: "المعيار والزاوية"
+    > الجيب هو ارتفاع النقطة على نصف الدائرة. حرّك النقطة وابحث عن ارتفاع $\frac{1}{2}$، ستجده في مكانين.
+
+    scene plane {
+      alt: "نصف دائرة الوحدة العلوي ونقطة تتحرك عليه حسب منزلق الزاوية، مع خط رأسي منها إلى المحور يمثل الجيب، وقراءة للزاوية وللجيب."
+      x: [-1.4, 1.4]
+      y: [-0.3, 1.3]
+      aspect: equal
+      param ang = 90 { range: [0, 180], step: 5 }
+      curve semi = (cos(t), sin(t)) { t: [0, 3.1416], color: neutral }
+      point P = (cos(rad(ang)), sin(rad(ang))) { color: cross }
+      line h = (cos(rad(ang)), 0) -> (cos(rad(ang)), sin(rad(ang))) { color: area, width: 3, style: dashed }
+      label at (-1.3, 1.2) = "الزاوية ${ang}° ، الجيب ${fixed(sin(rad(ang)), 2)}" { color: cross }
+      slider ang { label: "الزاوية" }
+    }
+
+    goal "ضع النقطة على زاوية حادة جيبها 0.5" {
+      when: ang == 30
+      hints: ["حرّك نحو اليمين."]
+      showme: { ang: 30 }
+    }
+
+    goal "والآن على زاوية منفرجة جيبها 0.5" {
+      when: ang == 150
+      hints: ["الارتفاع نفسه، على الجهة الأخرى."]
+      showme: { ang: 150 }
+    }
+
+    quiz {
+      ask "$\|\vec{A} \times \vec{B}\| = 12\sqrt{2}$ ، $\|\vec{A}\| = 4$ ، $\|\vec{B}\| = 6$. ما الزاوية بينهما؟"
+      skill: "sg-cross-product"
+      - "$45°$ فقط" { why: "هناك نقطة ثانية بالارتفاع نفسه." }
+      * "$45°$ أو $135°$"
+      - "$135°$ فقط" { why: "و $45°$ أيضًا جيبها $\frac{\sqrt{2}}{2}$." }
+      after: goals
+      ! "$\sin\theta = \frac{12\sqrt{2}}{24} = \frac{\sqrt{2}}{2}$، فالزاوية $45°$ أو $135°$."
+    }
+  }
+
+  slide "متجهات الوحدة" {
+    id: "sg4-ijk"
+    beat: example
+    cat: "متجهات الوحدة"
+    > $\hat{i}$ و $\hat{j}$ و $\hat{k}$ (س و ص و ع بسهم في الكتاب) على المحاور، كل منها طوله $1$ وكل زاوية بينها $90°$. طبّق اليد اليمنى على كل زوج.
+
+    scene space3 {
+      alt: "المحاور الثلاثة ومتجهات الوحدة i على x و j على y و k على z، مع منزلق لتدوير المشهد."
+      x: [-2, 2]
+      y: [-2, 2]
+      z: [-2, 2]
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 22]
+      segment3 ei = (0, 0, 0) -> (1.4, 0, 0) { arrow, color: va, label: "i" }
+      segment3 ej = (0, 0, 0) -> (0, 1.4, 0) { arrow, color: vb, label: "j" }
+      segment3 ek = (0, 0, 0) -> (0, 0, 1.4) { arrow, color: cross, label: "k" }
+      slider az { label: "دوّر المشهد" }
+    }
+
+    match {
+      ask "طابق كل حاصل ضرب بناتجه."
+      skill: "sg-cross-product"
+      pair "$\hat{i} \times \hat{j}$" -> "$\hat{k}$"
+      pair "$\hat{j} \times \hat{k}$" -> "$\hat{i}$"
+      pair "$\hat{k} \times \hat{i}$" -> "$\hat{j}$"
+      pair "$\hat{j} \times \hat{i}$" -> "$-\hat{k}$"
+      pair "$\hat{i} \times \hat{i}$" -> "$\vec{0}$"
+      decoy "$1$"
+      decoy "$-\hat{j}$"
+      miss "$\hat{j} \times \hat{i}$" -> "$\hat{k}$" "هذا $\hat{i} \times \hat{j}$. بدّلت الترتيب، فالسهم ينقلب إلى $-\hat{k}$."
+      miss "$\hat{i} \times \hat{i}$" -> "$1$" "هذا $\hat{i} \cdot \hat{i}$. الضرب الاتجاهي لمتجه في نفسه هو المتجه الصفري."
+      hint "متجه في نفسه: الزاوية صفر، فالجيب صفر."
+      hint "مع الدورة $\hat{i} \to \hat{j} \to \hat{k} \to \hat{i}$ الناتج موجب، وعكسها سالب."
+      ! "مع الدورة $\hat{i}, \hat{j}, \hat{k}$ يخرج الثالث موجبًا، وعكسها يخرج سالبًا، والمتجه في نفسه $\vec{0}$، متجه صفري لا العدد $1$."
+    }
+  }
+
+  slide "قياسي واتجاهي معًا" {
+    id: "sg4-ijk-mix"
+    beat: example
+    cat: "متجهات الوحدة"
+
+    quiz {
+      ask "$(\hat{i} \times \hat{j}) \cdot \hat{k} + \hat{i} \cdot \hat{j} = $ ؟"
+      skill: "sg-cross-product"
+      - "$-1$" { why: "$\hat{i} \times \hat{j} = +\hat{k}$، مع الدورة لا عكسها." }
+      - "$0$" { why: "$\hat{i} \times \hat{j} = \hat{k}$، و $\hat{k} \cdot \hat{k} = 1$ لا صفر." }
+      * "$1$"
+      - "$2$" { why: "$\hat{i} \cdot \hat{j} = 0$ لأنهما متعامدان، لا $1$." }
+      ! "$\hat{k} \cdot \hat{k} + 0 = 1$."
+    }
+  }
+
+  slide "بالمركبات: المحدد" {
+    id: "sg4-det-name"
+    beat: name
+    cat: "بالمركبات"
+    > بالمركبات، يكتب الكتاب الناتج محددًا. غطِّ عمود كل متجه وحدة واضرب قطريًا، والإشارات $+\;-\;+$:
+    >
+    > $$\vec{A} \times \vec{B} = \begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\ A_x & A_y & A_z \\ B_x & B_y & B_z \end{vmatrix}$$
+
+    build {
+      ask "املأ القوسين الأولين."
+      skill: "sg-cross-product"
+      template: "$\vec{A} \times \vec{B} = ($ ___ $-$ ___ $)\hat{i} - ($ ___ $-$ ___ $)\hat{j} + (A_x B_y - A_y B_x)\hat{k}$"
+      bank: ["$A_y B_z$", "$A_z B_y$", "$A_x B_z$", "$A_z B_x$", "$A_x B_y$", "$A_y B_x$"]
+      answer: ["$A_y B_z$", "$A_z B_y$", "$A_x B_z$", "$A_z B_x$"]
+      miss "$A_x B_y$" "هذا من عمودي $x$ و $y$، وهو لمركبة $\hat{k}$. غطِّ عمود المتجه الذي تحسبه."
+      miss "$A_y B_x$" "هذا من عمودي $x$ و $y$، وهو لمركبة $\hat{k}$. غطِّ عمود المتجه الذي تحسبه."
+      hint "لـ $\hat{i}$ غطِّ عمود $\hat{i}$، فيبقى محدد $2 \times 2$ من أعمدة $y$ و $z$."
+      hint "لـ $\hat{j}$ يبقى عمودا $x$ و $z$، والسالب مكتوب خارج القوس."
+      ! "القطر الرئيسي ناقص القطر الآخر في كل مرة. والسالب أمام $\hat{j}$ هو أكثر ما يُنسى."
+    }
+  }
+
+  slide "مثال محلول بالمحدد" {
+    id: "sg4-det-worked"
+    beat: example
+    cat: "بالمركبات"
+    > مثال الكتاب: $\vec{A} = (1, 2, 1)$ ، $\vec{B} = (3, 1, 2)$.
+    >
+    > $$\begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\ 1 & 2 & 1 \\ 3 & 1 & 2 \end{vmatrix} = (4 - 1)\hat{i} - (2 - 3)\hat{j} + (1 - 6)\hat{k} = 3\hat{i} + \hat{j} - 5\hat{k}$$
+
+    numeric {
+      ask "ما طول هذا المتجه، $\|\vec{A} \times \vec{B}\|$؟ (لأقرب منزلتين)"
+      skill: "sg-cross-product"
+      answer: 5.92
+      expect: sqrt(3^2 + 1^2 + 5^2)
+      tolerance: 0.01
+      wrong 35 "هذا ما تحت الجذر."
+      wrong -1 "جمعت المركبات. المعيار يربّعها أولًا."
+      hint "$\sqrt{9 + 1 + 25}$."
+      ! "$\sqrt{35} \approx 5.92$. وبالقسمة عليه نحصل على متجهي الوحدة العموديين: $\pm\frac{1}{\sqrt{35}}(3\hat{i} + \hat{j} - 5\hat{k})$."
+    }
+  }
+
+  slide "أكمل المحدد" {
+    id: "sg4-det-faded"
+    beat: example
+    cat: "بالمركبات"
+    > $\vec{A} = (-2, 3, 1)$ ، $\vec{B} = (1, 3, -4)$. مركبة $\hat{i}$ جاهزة: $3 \times (-4) - 1 \times 3 = -15$. أكمل الباقي.
+
+    table {
+      ask "أكمل مركبات $\vec{A} \times \vec{B}$."
+      skill: "sg-cross-product"
+      header: ["$\hat{i}$", "$\hat{j}$", "$\hat{k}$"]
+      row: -15, blank(-7), blank(-9)
+      hint "$\hat{j}$: $-\big((-2)(-4) - (1)(1)\big)$. لا تنس السالب في الخارج."
+      hint "$\hat{k}$: $(-2)(3) - (3)(1)$."
+      ! "$\hat{j}$: $-(8 - 1) = -7$ ، و $\hat{k}$: $-6 - 3 = -9$. الناتج $(-15, -7, -9)$."
+    }
+  }
+
+  slide "دورك: اختر الناتج" {
+    id: "sg4-det-own1"
+    beat: example
+    cat: "بالمركبات"
+
+    quiz {
+      ask "$\vec{A} = (3, 0, 4)$ ، $\vec{B} = \hat{i} - 2\hat{j} + 3\hat{k}$. إذن $\vec{A} \times \vec{B} = $ ؟"
+      skill: "sg-cross-product"
+      * "$(8, -5, -6)$"
+      - "$(8, 5, 6)$" { why: "نسيت السالب أمام قوس $\hat{j}$، وانعكست مركبة $\hat{k}$ أيضًا.", onwrong: "sg4-d-middle", retry }
+      - "$(8, -5, 6)$" { why: "مركبة $\hat{k}$ هي $3(-2) - 0 \times 1 = -6$." }
+      - "$(-8, -5, -6)$" { why: "مركبة $\hat{i}$ هي $0 \times 3 - 4(-2) = +8$." }
+      hint "اكتب $\vec{B}$ أولًا كـ $(1, -2, 3)$."
+      ! "$\hat{i}$: $0 - (-8) = 8$ ، $\hat{j}$: $-(9 - 4) = -5$ ، $\hat{k}$: $-6 - 0 = -6$."
+    }
+  }
+
+  slide "السالب في الوسط" {
+    id: "sg4-d-middle"
+    beat: detour
+    hidden: true
+    cat: "بالمركبات"
+    > أكثر خطأ شائع في المحدد: الإشارات $+\;-\;+$. قوس $\hat{j}$ يُحسب مثل غيره، ثم يُضرب كله في سالب.
+
+    numeric {
+      ask "$\vec{A} = (1, 0, 2)$ ، $\vec{B} = (3, 1, 0)$. ما مركبة $\hat{j}$ في $\vec{A} \times \vec{B}$؟"
+      skill: "sg-cross-product"
+      answer: 6
+      expect: -(1*0 - 2*3)
+      wrong -6 "هذا القوس $(1 \times 0 - 2 \times 3)$ بدون السالب الذي أمامه."
+      hint "القوس $1 \times 0 - 2 \times 3$، ثم ضع السالب أمامه."
+      ! "$-(0 - 6) = 6$."
+    }
+  }
+
+  slide "دورك: مركبة واحدة" {
+    id: "sg4-det-own2"
+    beat: example
+    cat: "بالمركبات"
+
+    numeric {
+      vary p in [2, 3]
+      vary q in [1, -2]
+      vary r in [-1, 3]
+      vary s in [4, 5]
+      ask "$\vec{A} = (${p}, ${q}, 1)$ ، $\vec{B} = (${r}, ${s}, 2)$. ما مركبة $\hat{k}$ في $\vec{A} \times \vec{B}$؟"
+      skill: "sg-cross-product"
+      answer: p*s - q*r
+      expect: p*s - q*r
+      wrong q*r - p*s "بدأت بالقطر الخطأ. لـ $\hat{k}$: $A_x B_y - A_y B_x$."
+      wrong p*s + q*r "بين القطرين طرح، لا جمع."
+      hint "غطِّ عمود $\hat{k}$: يبقى $A_x B_y - A_y B_x$."
+      ! "$A_x B_y - A_y B_x$، والمركبتان $z$ لا تدخلان في مركبة $\hat{k}$ أصلًا."
+    }
+  }
+
+  slide "دورك: المعيار بالمركبات" {
+    id: "sg4-det-own3"
+    beat: example
+    cat: "بالمركبات"
+
+    numeric {
+      ask "$\vec{A} = \hat{i} - 3\hat{j} + \hat{k}$ ، $\vec{B} = \hat{i} + \hat{j} + \hat{k}$. أوجد $\|\vec{A} \times \vec{B}\|$ (لأقرب منزلتين)."
+      skill: "sg-cross-product"
+      answer: 5.66
+      expect: sqrt((-3*1 - 1*1)^2 + (1*1 - 1*1)^2 + (1*1 - (-3)*1)^2)
+      tolerance: 0.01
+      wrong 32 "هذا ما تحت الجذر."
+      hint "احسب $\vec{A} \times \vec{B}$ أولًا بالمحدد، ثم معياره."
+      ! "$\vec{A} \times \vec{B} = (-4, 0, 4)$، ومعياره $\sqrt{32} = 4\sqrt{2} \approx 5.66$."
+    }
+  }
+
+  slide "متجه وحدة عمودي" {
+    id: "sg4-unit-normal"
+    beat: example
+    cat: "بالمركبات"
+
+    quiz {
+      ask "متجه وحدة عمودي على كل من $(\hat{i} + \hat{j})$ و $(\hat{j} + \hat{k})$ هو:"
+      skill: "sg-cross-product"
+      - "$\hat{i} - \hat{j} + \hat{k}$" { why: "عمودي عليهما فعلًا، لكن طوله $\sqrt{3}$ لا $1$. اقسم على معياره." }
+      * "$\frac{\hat{i} - \hat{j} + \hat{k}}{\sqrt{3}}$"
+      - "$\frac{\hat{i} + \hat{j} + \hat{k}}{\sqrt{3}}$" { why: "اضربه قياسيًا في $\hat{i} + \hat{j}$: الناتج $\frac{2}{\sqrt{3}}$ لا صفر، فهو ليس عموديًا." }
+      - "$\frac{\hat{i} + \hat{j} - \hat{k}}{\sqrt{3}}$" { why: "مع $\hat{i} + \hat{j}$ يعطي $\frac{2}{\sqrt{3}}$، فهو ليس عموديًا. راجع إشارة قوس $\hat{j}$." }
+      hint "$(1, 1, 0) \times (0, 1, 1)$، ثم اقسم على المعيار."
+      ! "$(1, 1, 0) \times (0, 1, 1) = (1, -1, 1)$، طوله $\sqrt{3}$. ومعكوسه أيضًا متجه وحدة عمودي، فهما اثنان."
+    }
+  }
+
+  slide "بطول محدد" {
+    id: "sg4-len3"
+    beat: breaker
+    cat: "بالمركبات"
+    > المطلوب هذه المرة ليس متجه وحدة، بل متجه طوله $3$ وحدات.
+
+    table {
+      ask "أوجد المتجه الذي طوله $3$ والعمودي على $\vec{A} = 3\hat{i} + \hat{j} - 4\hat{k}$ و $\vec{B} = 6\hat{i} + 5\hat{j} - 2\hat{k}$، وأول مركبة فيه موجبة."
+      skill: "sg-cross-product"
+      header: ["$x$", "$y$", "$z$"]
+      row: blank(2), blank(-2), blank(1)
+      hint "$\vec{A} \times \vec{B} = (18, -18, 9)$. كم طوله؟"
+      hint "طوله $27$. متجه الوحدة ثم اضرب في $3$."
+      ! "$\vec{A} \times \vec{B} = (18, -18, 9)$ طوله $27$، فالمطلوب $\frac{3}{27}(18, -18, 9) = (2, -2, 1)$، والآخر $(-2, 2, -1)$."
+    }
+  }
+
+  slide "لا اختصار هنا" {
+    id: "sg4-cancel"
+    beat: breaker
+    cat: "بالمركبات"
+    > في الأعداد، إذا كان $3b = 3c$ فإن $b = c$. هل ينجح هذا مع الضرب الاتجاهي؟
+
+    quiz {
+      ask "إذا كان $\vec{A} \times \vec{B} = \vec{A} \times \vec{C}$ فإن:"
+      skill: "sg-cross-product"
+      - "$\vec{B} = \vec{C}$" { why: "الاختصار ينجح في الأعداد فقط. أضف إلى $\vec{B}$ أي مضاعف لـ $\vec{A}$ ولن يتغير الناتج، لأن $\vec{A} \times \vec{A} = \vec{0}$." }
+      - "$\vec{A}$ و $\vec{B}$ متوازيان" { why: "لا شيء يجبرهما على ذلك. $\vec{B}$ و $\vec{C}$ قد يكونان أي متجهين مختلفين بمضاعف لـ $\vec{A}$." }
+      - "المتجهات الثلاثة متعامدة مثنى مثنى" { why: "لا شيء في المعادلة يتحدث عن التعامد." }
+      * "المتجهات الثلاثة في مستوى واحد"
+      hint "انقل كل شيء لطرف: $\vec{A} \times (\vec{B} - \vec{C}) = \vec{0}$. ماذا يعني هذا؟"
+      ! "$\vec{A} \times (\vec{B} - \vec{C}) = \vec{0}$، إذن $\vec{B} - \vec{C}$ يوازي $\vec{A}$، أي $\vec{C} = \vec{B} - m\vec{A}$، فيقع في مستوى $\vec{A}$ و $\vec{B}$."
+    }
+  }
+
+  slide "مثال محلول: التوازي" {
+    id: "sg4-par-worked"
+    beat: example
+    cat: "التوازي"
+    > السهم الأخضر اختفى عند $0°$ و $180°$، فالمتوازيان حاصل ضربهما $\vec{0}$، ومركباتهما متناسبة. مثال الكتاب: $(5, -4, m) \parallel (6, l, -12)$ ، إذن $\frac{5}{6} = \frac{-4}{l} = \frac{m}{-12}$ ، أي $l = -4.8$ ، $m = -10$.
+
+    numeric {
+      ask "إذا كان المتجهان $(2, m, -3)$ و $(4, 6, -6)$ متوازيين، فما $m$؟"
+      skill: "sg-cross-parallel"
+      answer: 3
+      expect: 6 * 2 / 4
+      wrong 12 "قلبت إحدى النسبتين. $\frac{2}{4} = \frac{m}{6}$." -> "sg4-d-ratio" retry
+      wrong -3 "$\frac{-3}{-6}$ موجبة، فالنسبة $\frac{1}{2}$ و $m$ موجب."
+      hint "النسبة $\frac{-3}{-6}$ تعطيك الثابت."
+      ! "كل المركبات بنسبة $\frac{1}{2}$، فـ $m = \frac{6}{2}$."
+    }
+  }
+
+  slide "نسبة واحدة للجميع" {
+    id: "sg4-d-ratio"
+    beat: detour
+    hidden: true
+    cat: "التوازي"
+    > التوازي يعني أن أحدهما مضاعف للآخر: كل مركبة في الأول هي المركبة المناظرة في الثاني مضروبة في العدد نفسه. ابحث عن النسبة من زوج كامل أولًا.
+
+    numeric {
+      ask "$(1, 6, 2) \parallel (m, 3, n)$. ما $m$؟"
+      skill: "sg-cross-parallel"
+      answer: 0.5
+      expect: 1 * 3 / 6
+      wrong 2 "$6$ في الأول تقابل $3$ في الثاني، فالثاني نصف الأول، و $m$ نصف $1$."
+      hint "الزوج الكامل: $6$ و $3$. الثاني ضعف أم نصف؟"
+      ! "الثاني نصف الأول، فـ $m = \frac{1}{2}$ و $n = 1$."
+    }
+  }
+
+  slide "دورك: حاصل ضرب صفري" {
+    id: "sg4-par-own"
+    beat: example
+    cat: "التوازي"
+
+    table {
+      ask "$(2\hat{i} + 6\hat{j} - 27\hat{k}) \times (\hat{i} + l\hat{j} + m\hat{k}) = \vec{0}$. أوجد $l$ و $m$."
+      skill: "sg-cross-parallel"
+      header: ["$l$", "$m$"]
+      row: blank(3), blank(-13.5)
+      tolerance: 0.01
+      hint "حاصل ضرب صفري يعني متوازيين، فالمركبات متناسبة."
+      hint "$\frac{2}{1} = \frac{6}{l} = \frac{-27}{m}$."
+      ! "النسبة $2$، فـ $l = 3$ و $m = -\frac{27}{2} = -13.5$."
+    }
+  }
+
+  slide "توازي أم تعامد؟" {
+    id: "sg4-par-sort"
+    beat: example
+    cat: "التوازي"
+    > الضرب القياسي يكشف التعامد، والتناسب يكشف التوازي. ضع كل زوج في مكانه.
+
+    sort {
+      ask "صنّف كل زوج من المتجهات."
+      skill: "sg-cross-parallel"
+      bin "متوازيان": ["$(-2, 1, -2)$ و $(8, -4, 8)$", "$(2, -3)$ و $(6, -9)$"]
+      bin "متعامدان": ["$(2, 3, 0)$ و $(-3, 2, 0)$", "$(3, 1, -5)$ و $(1, 2, 1)$"]
+      bin "غير ذلك": ["$(0, 2, 3)$ و $(3, 0, -4)$", "$(3, 0, 4)$ و $(1, -2, 3)$"]
+      hint "لكل زوج: هل الضرب القياسي صفر؟ وإن لم يكن، هل المركبات بنسبة واحدة؟"
+      ! "المتعامدان ضربهما القياسي صفر، والمتوازيان مركباتهما بنسبة ثابتة، وما عدا ذلك لا هذا ولا ذاك."
+    }
+  }
+
+  slide "على استقامة واحدة" {
+    id: "sg4-collinear"
+    beat: example
+    cat: "التوازي"
+    > تذكير: $\vec{AB} = B - A$. والكتاب يقول: إذا كان $\vec{AB} \times \vec{BC} = \vec{0}$، أي $\vec{AB} \parallel \vec{BC}$، فالنقط على استقامة واحدة.
+
+    quiz {
+      ask "$A(5, 6, 7)$ ، $B(7, -8, 9)$ ، $C(3, 20, 5)$. هل النقط على استقامة واحدة؟"
+      skill: "sg-cross-parallel"
+      * "نعم، لأن $\vec{BC} = -2\,\vec{AB}$"
+      - "لا، لأن $\vec{AB} \ne \vec{BC}$" { why: "التساوي ليس مطلوبًا. يكفي أن يكون أحدهما مضاعفًا للآخر." }
+      - "لا، لأن $\vec{BC}$ عكس اتجاه $\vec{AB}$" { why: "العكس توازٍ أيضًا. من $B$ نعود في الخط نفسه نحو ما بعد $A$." }
+      - "نعم، لأن $\vec{AB} \cdot \vec{BC} = 0$" { why: "الضرب القياسي الصفري يعني التعامد، وهو هنا $-408$ أصلًا." }
+      hint "$\vec{AB} = (2, -14, 2)$. احسب $\vec{BC}$ وقارن."
+      ! "$\vec{BC} = (-4, 28, -4) = -2(2, -14, 2)$، فهما متوازيان ويشتركان في $B$."
+    }
+  }
+
+  slide "مثال محلول: المساحة" {
+    id: "sg4-area-worked"
+    beat: example
+    cat: "المساحات"
+    > طول السهم هو المساحة. مثال الكتاب: $\vec{A} = (3, 6, 3)$ ، $\vec{B} = (-6, -2, -4)$، فـ $\vec{A} \times \vec{B} = (-18, -6, 30)$، ومساحة [متوازي الأضلاع]{area} $\sqrt{1260} = 6\sqrt{35}$.
+
+    scene plane {
+      alt: "متوازي أضلاع ضلعاه المتجاوران A و B، يقسمه قطر إلى مثلثين متطابقين، أحدهما مظلل."
+      x: [-0.5, 5]
+      y: [-0.5, 2.8]
+      aspect: equal
+      axes: false
+      polygon whole = [(0, 0), (3.2, 0), (4.4, 2.2), (1.2, 2.2)] { color: area, opacity: 0.1 }
+      polygon half = [(0, 0), (3.2, 0), (1.2, 2.2)] { color: area, opacity: 0.35 }
+      vector ea = (0, 0) -> (3.2, 0) { color: va, width: 3 }
+      vector eb = (0, 0) -> (1.2, 2.2) { color: vb, width: 3 }
+      line diag = (3.2, 0) -> (1.2, 2.2) { color: neutral, style: dashed }
+      label at (1.5, -0.35) = "A" { color: va }
+      label at (0.2, 1.3) = "B" { color: vb }
+    }
+
+    quiz {
+      ask "وما مساحة المثلث الذي فيه $\vec{A}$ و $\vec{B}$ ضلعان؟"
+      skill: "sg-cross-area"
+      * "$3\sqrt{35}$"
+      - "$6\sqrt{35}$" { why: "هذه مساحة متوازي الأضلاع كله، والقطر يقسمه إلى مثلثين." }
+      - "$12\sqrt{35}$" { why: "المثلث أصغر من متوازي الأضلاع، لا أكبر." }
+      - "$2\sqrt{35}$" { why: "القطر يقسم متوازي الأضلاع إلى جزأين لا ثلاثة." }
+      ! "المثلث نصف متوازي الأضلاع: $\frac{1}{2}\|\vec{A} \times \vec{B}\| = 3\sqrt{35}$."
+    }
+  }
+
+  slide "أكمل: متوازي أضلاع" {
+    id: "sg4-area-faded"
+    beat: example
+    cat: "المساحات"
+    > $\vec{A} = (-3, 1, 2)$ ، $\vec{B} = (3, 4, -1)$، والمحدد يعطي $\vec{A} \times \vec{B} = (-9, 3, -15)$. أكمل أنت.
+
+    numeric {
+      ask "ما مساحة متوازي الأضلاع الذي فيه $\vec{A}$ و $\vec{B}$ ضلعان متجاوران؟ (لأقرب منزلتين)"
+      skill: "sg-cross-area"
+      answer: 17.75
+      expect: sqrt(9^2 + 3^2 + 15^2)
+      tolerance: 0.01
+      unit: "وحدة مربعة"
+      wrong 315 "هذا ما تحت الجذر."
+      wrong -21 "جمعت المركبات. المساحة هي المعيار."
+      wrong 8.87 "هذه مساحة المثلث. متوازي الأضلاع هو الطول كله."
+      hint "المساحة $= \|\vec{A} \times \vec{B}\|$."
+      ! "$\sqrt{81 + 9 + 225} = \sqrt{315} = 3\sqrt{35} \approx 17.75$."
+    }
+  }
+
+  slide "دورك: مثلث" {
+    id: "sg4-area-tri"
+    beat: example
+    cat: "المساحات"
+
+    numeric {
+      ask "أوجد مساحة المثلث الذي فيه $\vec{A} = 3\hat{i} + \hat{j} - 2\hat{k}$ و $\vec{B} = \hat{i} - 3\hat{j} + 4\hat{k}$ ضلعان. (لأقرب منزلتين)"
+      skill: "sg-cross-area"
+      answer: 8.66
+      expect: sqrt((1*4 - (-2)*(-3))^2 + (3*4 - (-2)*1)^2 + (3*(-3) - 1*1)^2) / 2
+      tolerance: 0.01
+      unit: "وحدة مربعة"
+      wrong 17.32 "هذا متوازي الأضلاع كله." -> "sg4-d-half" retry
+      wrong 150 "نسيت الجذر."
+      hint "احسب $\vec{A} \times \vec{B}$ بالمحدد، ثم نصف معياره."
+      ! "$\vec{A} \times \vec{B} = (-2, -14, -10)$، معياره $\sqrt{300} = 10\sqrt{3}$، والمثلث نصفه: $5\sqrt{3} \approx 8.66$."
+    }
+  }
+
+  slide "المثلث نصف متوازي الأضلاع" {
+    id: "sg4-d-half"
+    beat: detour
+    hidden: true
+    cat: "المساحات"
+    > معيار $\vec{A} \times \vec{B}$ هو مساحة [متوازي الأضلاع]{area} المبني على الضلعين. القطر يقسمه إلى مثلثين متطابقين، فالمثلث نصف المعيار.
+
+    scene plane {
+      alt: "متوازي أضلاع يقسمه قطر إلى مثلثين، أحدهما مظلل بلون أغمق."
+      x: [-0.5, 5]
+      y: [-0.5, 2.8]
+      aspect: equal
+      axes: false
+      polygon whole = [(0, 0), (3.2, 0), (4.4, 2.2), (1.2, 2.2)] { color: area, opacity: 0.1 }
+      polygon half = [(0, 0), (3.2, 0), (1.2, 2.2)] { color: area, opacity: 0.35 }
+      line diag = (3.2, 0) -> (1.2, 2.2) { color: neutral, style: dashed }
+    }
+
+    numeric {
+      ask "$\vec{A} \times \vec{B} = (0, 6, 8)$. ما مساحة المثلث الذي فيه $\vec{A}$ و $\vec{B}$ ضلعان؟"
+      skill: "sg-cross-area"
+      answer: 5
+      expect: sqrt(0 + 36 + 64) / 2
+      wrong 10 "هذا متوازي الأضلاع. المثلث نصفه."
+      ! "المعيار $10$، والمثلث $5$."
+    }
+  }
+
+  slide "مثلث من ثلاث نقاط" {
+    id: "sg4-area-pts"
+    beat: example
+    cat: "المساحات"
+    > هنا نقاط لا متجهات. خذ ضلعين من رأس واحد: $\vec{AB} = B - A$ و $\vec{AC} = C - A$.
+
+    numeric {
+      ask "أوجد مساحة المثلث $ABC$ حيث $A(5, 1, -2)$ ، $B(4, -4, 3)$ ، $C(2, 4, 0)$. (لأقرب منزلتين)"
+      skill: "sg-cross-area"
+      answer: 16.72
+      expect: sqrt(25^2 + 13^2 + 18^2) / 2
+      tolerance: 0.02
+      unit: "وحدة مربعة"
+      wrong 33.44 "هذا متوازي الأضلاع. المثلث نصفه." -> "sg4-d-half" retry
+      hint "$\vec{AB} = (-1, -5, 5)$ ، $\vec{AC} = (-3, 3, 2)$."
+      ! "$\vec{AB} \times \vec{AC} = (-25, -13, -18)$، معياره $\sqrt{1118}$، والمساحة نصفه $\approx 16.72$."
+    }
+  }
+
+  slide "متوازي أضلاع من رؤوسه" {
+    id: "sg4-area-para-pts"
+    beat: example
+    cat: "المساحات"
+
+    numeric {
+      ask "$LMNH$ متوازي أضلاع فيه $L(2, 1, 3)$ ، $M(1, 4, 5)$ ، $N(2, 5, 3)$. أوجد مساحته. (لأقرب منزلتين)"
+      skill: "sg-cross-area"
+      answer: 8.94
+      expect: sqrt(8^2 + 0^2 + 4^2)
+      tolerance: 0.01
+      unit: "وحدة مربعة"
+      wrong 4.47 "هذه مساحة المثلث $LMN$. متوازي الأضلاع ضعفها." -> "sg4-d-half" retry
+      wrong 80 "نسيت الجذر."
+      hint "ضلعان متجاوران: $\vec{LM}$ و $\vec{MN}$."
+      ! "$\vec{LM} = (-1, 3, 2)$ ، $\vec{MN} = (1, 1, -2)$، وحاصل ضربهما $(-8, 0, -4)$، فالمساحة $\sqrt{80} = 4\sqrt{5} \approx 8.94$."
+    }
+  }
+
+  slide "في المستوى: بالقطرين" {
+    id: "sg4-area-2d"
+    beat: example
+    cat: "المساحات"
+    > في المستوى $xy$ يختصر المحدد إلى رقم واحد: $\vec{A} \times \vec{B} = (A_x B_y - A_y B_x)\,\hat{k}$. ومساحة أي شكل رباعي $= \frac{1}{2}\|\vec{d_1} \times \vec{d_2}\|$ حيث $\vec{d_1}$ و $\vec{d_2}$ قطراه.
+
+    quiz {
+      ask "مساحة متوازي الأضلاع الذي قطراه $\vec{d_1} = 2\hat{i} - \hat{j}$ و $\vec{d_2} = 4\hat{i} - 5\hat{j}$ تساوي:"
+      skill: "sg-cross-area"
+      * "$3$"
+      - "$6$" { why: "هذا معيار حاصل الضرب كاملًا. مع القطرين نأخذ النصف." }
+      - "$7$" { why: "جمعت: $|-10| + |-4|$ ثم نصفت. بين الحدين طرح: $2(-5) - (-1)(4)$." }
+      - "$-3$" { why: "المساحة لا تكون سالبة. خذ القيمة المطلقة." }
+      hint "$2 \times (-5) - (-1) \times 4$."
+      ! "$\vec{d_1} \times \vec{d_2} = (-10 + 4)\hat{k} = -6\hat{k}$، والمساحة $\frac{1}{2} \times 6 = 3$."
+    }
+  }
+
+  slide "بلا إحداثيات" {
+    id: "sg4-area-height"
+    beat: breaker
+    cat: "المساحات"
+    > في متوازي الأضلاع $ABCD$ رسمنا $DM$ عموديًا على $AB$.
+
+    scene plane {
+      alt: "متوازي أضلاع ABCD، والرأس D أعلى اليسار، ومنه عمود متقطع ساقط على الضلع AB عند النقطة M، مكتوب عليه 3 سم، والضلع DC العلوي مكتوب عليه 8 سم."
+      x: [-0.5, 6]
+      y: [-0.6, 2.6]
+      aspect: equal
+      axes: false
+      polygon para = [(0, 0), (4.4, 0), (5.6, 1.8), (1.2, 1.8)] { color: area, opacity: 0.12 }
+      line dm = (1.2, 1.8) -> (1.2, 0) { color: neutral, style: dashed, width: 2 }
+      label at (-0.3, -0.4) = "A"
+      label at (4.5, -0.4) = "B"
+      label at (5.7, 1.95) = "C"
+      label at (0.9, 1.95) = "D"
+      label at (1.25, -0.4) = "M"
+      label at (1.35, 0.9) = "3 سم" { color: neutral }
+      label at (3.2, 2.1) = "8 سم" { color: neutral }
+    }
+
+    quiz {
+      ask "$\|\vec{AB} \times \vec{AD}\| = $ ؟"
+      skill: "sg-cross-area"
+      - "$48$" { why: "هذا ضعف المساحة. المعيار هو المساحة نفسها." }
+      * "$24$"
+      - "$12$" { why: "هذا المثلث $ABD$. المعيار يعطي متوازي الأضلاع كله." }
+      - "$6$" { why: "المعيار قاعدة في ارتفاع: $8 \times 3$، بلا قسمة." }
+      hint "$AB = DC$، والارتفاع $DM$."
+      ! "المعيار هو المساحة: القاعدة $8$ في الارتفاع $3$، أي $24$ سم²."
+    }
+  }
+
+  slide "نصف القطرين" {
+    id: "sg4-area-diag"
+    beat: breaker
+    cat: "المساحات"
+    > $ABCD$ متوازي أضلاع تقاطع قطراه في $M$، و $\|\vec{AC} \times \vec{BD}\| = 24$.
+
+    scene plane {
+      alt: "متوازي أضلاع ABCD بقطريه المتقاطعين في النقطة M في المنتصف."
+      x: [-0.5, 6]
+      y: [-0.6, 2.6]
+      aspect: equal
+      axes: false
+      polygon para = [(0, 0), (4.4, 0), (5.6, 1.8), (1.2, 1.8)] { color: area, opacity: 0.12 }
+      line ac = (0, 0) -> (5.6, 1.8) { color: va, width: 2 }
+      line bd = (4.4, 0) -> (1.2, 1.8) { color: vb, width: 2 }
+      label at (-0.3, -0.4) = "A"
+      label at (4.5, -0.4) = "B"
+      label at (5.7, 1.95) = "C"
+      label at (0.9, 1.95) = "D"
+      label at (2.8, 1.15) = "M"
+    }
+
+    quiz {
+      ask "$\|\vec{BM} \times \vec{MC}\| = $ ؟"
+      skill: "sg-cross-area"
+      - "$3$" { why: "كل من $\vec{BM}$ و $\vec{MC}$ نصف قطر، فالناتج ربع $24$، لا ثمنه." }
+      - "$4$" { why: "النصفان يعطيان $\frac{1}{2} \times \frac{1}{2}$، أي ربع $24$." }
+      * "$6$"
+      - "$12$" { why: "قسمت على $2$ مرة واحدة، لكن المتجهين كلاهما نصف قطر." }
+      hint "$\vec{BM} = \frac{1}{2}\vec{BD}$ و $\vec{MC} = \frac{1}{2}\vec{AC}$."
+      ! "$\frac{1}{2} \times \frac{1}{2} \times 24 = 6$. الترتيب يغير الإشارة فقط، والمعيار لا يتأثر."
+    }
+  }
+
+  slide "لوح شمسي" {
+    id: "sg4-transfer-panel"
+    beat: transfer
+    cat: "المساحات"
+    > شيء جديد تمامًا.
+
+    numeric {
+      ask "لوح شمسي على شكل رباعي رؤوسه بالمتر $A(3, 0, 2)$ ، $B(6, 2, 5)$ ، $C(4, 4, 5)$ ، $D(1, 2, 2)$ بهذا الترتيب. ما مساحته بالمتر المربع؟ (لأقرب منزلتين)"
+      skill: "sg-cross-area"
+      answer: 13.11
+      expect: sqrt((2*0 - 3*2)^2 + (3*0 - 3*(-2))^2 + (3*2 - 2*(-2))^2)
+      tolerance: 0.02
+      unit: "م²"
+      wrong 6.56 "هذا نصف اللوح، مثلث واحد. اللوح متوازي أضلاع لأن $\vec{AB} = \vec{DC}$."
+      wrong 26.23 "هذا معيار ضرب القطرين. مع القطرين نأخذ النصف."
+      ! "$\vec{AB} = \vec{DC} = (3, 2, 3)$، فهو متوازي أضلاع. $\vec{AB} \times \vec{AD} = (-6, -6, 10)$، والمساحة $\sqrt{172} = 2\sqrt{43} \approx 13.11$ م²."
+    }
+  }
+
+  slide "صندوق مائل" {
+    id: "sg4-box-explore"
+    beat: explore
+    cat: "الضرب الثلاثي"
+    > صندوق مائل، قاعدته متوازي أضلاع على الأرض، و [السهم الأخضر]{cross} هو حاصل الضرب الاتجاهي لضلعي القاعدة. حرّك ارتفاع [الحرف الثالث]{vb} وراقب الحجم.
+
+    scene space3 {
+      alt: "متوازي سطوح: قاعدته متوازي أضلاع على الأرض بين سهمين أزرقين، وحرف ثالث برتقالي يخرج من الركن. منزلق يرفع رأس الحرف الثالث ويخفضه فيطول الصندوق أو ينبسط. سهم أخضر رأسي من الركن يمثل حاصل ضرب ضلعي القاعدة. قراءة للحجم."
+      x: [-1, 5.5]
+      y: [-1, 4]
+      z: [-2.5, 3.5]
+      param h = 1 { range: [-2, 3], step: 0.25 }
+      param az = 30 { range: [0, 360], step: 5 }
+      camera: [az, 18]
+      polygon3 bottom = [(0, 0, 0), (3, 0, 0), (4, 2.5, 0), (1, 2.5, 0)] { color: area, opacity: 0.2 }
+      polygon3 top = [(0.8, 0.6, h), (3.8, 0.6, h), (4.8, 3.1, h), (1.8, 3.1, h)] { color: neutral, opacity: 0.12 }
+      polygon3 front = [(0, 0, 0), (3, 0, 0), (3.8, 0.6, h), (0.8, 0.6, h)] { color: neutral, opacity: 0.1 }
+      polygon3 back = [(1, 2.5, 0), (4, 2.5, 0), (4.8, 3.1, h), (1.8, 3.1, h)] { color: neutral, opacity: 0.1 }
+      polygon3 left = [(0, 0, 0), (1, 2.5, 0), (1.8, 3.1, h), (0.8, 0.6, h)] { color: neutral, opacity: 0.1 }
+      polygon3 right = [(3, 0, 0), (4, 2.5, 0), (4.8, 3.1, h), (3.8, 0.6, h)] { color: neutral, opacity: 0.1 }
+      segment3 e1 = (0, 0, 0) -> (3, 0, 0) { arrow, color: va }
+      segment3 e2 = (0, 0, 0) -> (1, 2.5, 0) { arrow, color: va }
+      segment3 e3 = (0, 0, 0) -> (0.8, 0.6, h) { arrow, color: vb }
+      segment3 nrm = (0, 0, 0) -> (0, 0, 2.25) { arrow, color: cross }
+      label3 at (-0.8, -0.8, 3.3) = "الحجم ${fixed(7.5*abs(h), 2)}" { color: vb }
+      slider h { label: "ارتفاع رأس الحرف الثالث" }
+      slider az { label: "دوّر المشهد" }
+    }
+
+    goal "اجعل الحجم صفرًا" {
+      when: h == 0
+      hints: ["حرّك رأس الحرف الثالث نحو الأرض.", "ضع الحرف الثالث على الأرض نفسها."]
+      showme: { h: 0 }
+    }
+
+    goal "الآن اجعل الحجم ضعف ما كان في البداية" {
+      when: h == 2 or h == -2
+      hints: ["الحجم بدأ بارتفاع $1$.", "ضاعف الارتفاع."]
+      showme: { h: 2 }
+    }
+
+    quiz {
+      ask "متى ينعدم حجم الصندوق؟"
+      skill: "sg-triple-product"
+      * "عندما يقع الحرف الثالث في مستوى القاعدة نفسه"
+      - "عندما يكون الحرف الثالث عموديًا على القاعدة" { why: "العمودي يعطي أكبر ارتفاع لطوله، أي العكس تمامًا." }
+      - "عندما يكون الحرف الثالث أقصر من ضلعي القاعدة" { why: "المهم ارتفاعه لا طوله. حرف طويل ممدد على الأرض حجمه صفر." }
+      - "لا ينعدم ما دامت الأحرف الثلاثة غير صفرية" { why: "أنت جعلته صفرًا للتو، والأحرف كلها موجودة." }
+      after: goals
+      ! "الحجم مساحة القاعدة في الارتفاع. إذا انبسط الحرف الثالث في مستوى القاعدة صار الارتفاع صفرًا."
+    }
+  }
+
+  slide "الضرب الثلاثي القياسي" {
+    id: "sg4-triple-name"
+    beat: name
+    cat: "الضرب الثلاثي"
+    > [السهم الأخضر]{cross} $\vec{B} \times \vec{C}$ عمودي على القاعدة وطوله مساحتها. ضربه قياسيًا في [الحرف الثالث]{vb} $\vec{A}$ يأخذ الارتفاع. هذا هو **الضرب الثلاثي القياسي**، والحجم قيمته المطلقة:
+    >
+    > $$\vec{A} \cdot \vec{B} \times \vec{C} = \begin{vmatrix} A_x & A_y & A_z \\ B_x & B_y & B_z \\ C_x & C_y & C_z \end{vmatrix}$$
+
+    quiz {
+      ask "لماذا نحسب $\vec{B} \times \vec{C}$ أولًا ولا نبدأ بـ $\vec{A} \cdot \vec{B}$؟"
+      skill: "sg-triple-product"
+      * "لأن $\vec{A} \cdot \vec{B}$ عدد، ولا يوجد ضرب اتجاهي لعدد في متجه"
+      - "الترتيبان يعطيان النتيجة نفسها" { why: "$(\vec{A} \cdot \vec{B}) \times \vec{C}$ ليس له معنى أصلًا: عدد في متجه ضربًا اتجاهيًا." }
+      - "لأن الضرب الاتجاهي أسهل حسابًا" { why: "السهولة ليست السبب. البدء بالقياسي يعطي عددًا، والعدد لا يدخل في ضرب اتجاهي." }
+      - "لأننا نحتاج متجهًا في النهاية" { why: "الناتج النهائي عدد، هو الحجم بإشارة." }
+      ! "لهذا يكتب الكتاب $\vec{A} \cdot \vec{B} \times \vec{C}$ بلا أقواس: لا توجد إلا قراءة واحدة لها معنى."
+    }
+  }
+
+  slide "مثال محلول: الحجم" {
+    id: "sg4-triple-worked"
+    beat: example
+    cat: "الضرب الثلاثي"
+    > مثال الكتاب: $\vec{A} = (1, 2, -1)$ ، $\vec{B} = (-1, 2, 2)$ ، $\vec{C} = (2, 0, 1)$:
+    >
+    > $$\begin{vmatrix} 1 & 2 & -1 \\ -1 & 2 & 2 \\ 2 & 0 & 1 \end{vmatrix} = 1(2 - 0) - 2(-1 - 4) - 1(0 - 4) = 16$$
+    >
+    > الآن أكمل أنت: $\begin{vmatrix} 1 & 1 & 3 \\ 2 & 1 & 4 \\ 5 & 1 & -2 \end{vmatrix} = 1(-2 - 4) - 1(\ldots) + 3(\ldots)$
+
+    numeric {
+      ask "أوجد $\vec{A} \cdot \vec{B} \times \vec{C}$ للمتجهات $(1, 1, 3)$ ، $(2, 1, 4)$ ، $(5, 1, -2)$."
+      skill: "sg-triple-product"
+      answer: 9
+      expect: 1*(1*(-2) - 4*1) - 1*(2*(-2) - 4*5) + 3*(2*1 - 1*5)
+      wrong -39 "السالب أمام الحد الأوسط: $-1 \times (-24) = +24$."
+      wrong 27 "القوس الأخير $2 \times 1 - 1 \times 5 = -3$، لا $+3$."
+      hint "القوس الأوسط $2(-2) - 4 \times 5$، والأخير $2 \times 1 - 1 \times 5$."
+      ! "$-6 + 24 - 9 = 9$."
+    }
+  }
+
+  slide "دورك: حجم متوازي سطوح" {
+    id: "sg4-triple-own"
+    beat: example
+    cat: "الضرب الثلاثي"
+
+    numeric {
+      ask "أوجد حجم متوازي السطوح الذي أحرفه المتجاورة $(3, -4, 1)$ ، $(0, 2, -3)$ ، $(3, 2, 2)$."
+      skill: "sg-triple-product"
+      answer: 60
+      expect: abs(3*(2*2 - (-3)*2) - (-4)*(0*2 - (-3)*3) + 1*(0*2 - 2*3))
+      unit: "وحدة مكعبة"
+      wrong -12 "السالب أمام الحد الأوسط: $-(-4) \times 9 = +36$."
+      wrong 12 "انتبه للحد الأوسط: $-(-4) \times 9 = +36$."
+      hint "$3(4 + 6) - (-4)(0 + 9) + 1(0 - 6)$."
+      ! "$30 + 36 - 6 = 60$ وحدة مكعبة."
+    }
+  }
+
+  slide "بدّل اثنين" {
+    id: "sg4-cyclic"
+    beat: breaker
+    cat: "الضرب الثلاثي"
+    > الكتاب: القيمة لا تتغير بالتدوير $\vec{A} \to \vec{B} \to \vec{C}$، ويمكن تبديل علامتي $\cdot$ و $\times$ مع الحفاظ على الترتيب. أما تبديل متجهين فقط فيقلب الإشارة، كما قلبها في الضرب الاتجاهي.
+
+    quiz {
+      ask "$\vec{B} \cdot (\vec{A} \times \vec{C}) = $ ؟"
+      skill: "sg-triple-product"
+      * "$(\vec{B} \times \vec{A}) \cdot \vec{C}$"
+      - "$\vec{A} \cdot (\vec{B} \times \vec{C})$" { why: "من $\vec{B}, \vec{A}, \vec{C}$ إلى $\vec{A}, \vec{B}, \vec{C}$ بدّلنا متجهين، فالإشارة تنعكس." }
+      - "$(\vec{A} \times \vec{B}) \times \vec{C}$" { why: "هذا متجه، والطرف الأيسر عدد." }
+      - "$\vec{C} \cdot (\vec{A} \times \vec{C})$" { why: "هذا دائمًا صفر، لأن $\vec{C}$ عمودي على $\vec{A} \times \vec{C}$." }
+      hint "أي خيار حافظ على الترتيب $\vec{B}, \vec{A}, \vec{C}$ كما هو؟"
+      ! "الترتيب $\vec{B}, \vec{A}, \vec{C}$ بقي كما هو، وتبدلت العلامتان فقط، فالقيمة لا تتغير."
+    }
+  }
+
+  slide "في مستوى واحد" {
+    id: "sg4-coplanar"
+    beat: example
+    cat: "الضرب الثلاثي"
+    > الصندوق المنبسط حجمه صفر: ثلاثة متجهات في مستوى واحد ضربها الثلاثي صفر.
+
+    numeric {
+      ask "أوجد قيمة $l$ التي تجعل $(1, -1, 1)$ ، $(3, 1, 2)$ ، $(1, l, -3)$ في مستوى واحد."
+      skill: "sg-triple-product"
+      answer: 15
+      expect: -((1*(1*(-3)) - (-1)*(3*(-3) - 2*1) + 1*(0 - 1*1))) / (1*(-2) + 1*3)
+      wrong -15 "راجع الإشارات: المحدد يساوي $l - 15$."
+      hint "اكتب المحدد بدلالة $l$ وساوه بالصفر."
+      hint "$1(-3 - 2l) + 1(-9 - 2) + 1(3l - 1)$."
+      ! "المحدد $= -3 - 2l - 11 + 3l - 1 = l - 15$، فـ $l = 15$."
+    }
+  }
+
+  slide "القيمة المطلقة لها وجهان" {
+    id: "sg4-abs"
+    beat: breaker
+    cat: "الضرب الثلاثي"
+    > الحجم هو القيمة المطلقة للضرب الثلاثي، والإشارة تضيع. انتبه لهذا حين يكون المجهول داخل المحدد.
+
+    quiz {
+      ask "حجم متوازي السطوح الذي أحرفه $(-12\hat{i} + l\hat{k})$ ، $(3\hat{j} - \hat{k})$ ، $(2\hat{i} + \hat{j} - 15\hat{k})$ يساوي $546$. أوجد $l$."
+      skill: "sg-triple-product"
+      - "$l = -3$ فقط" { why: "المحدد $528 - 6l$ قد يساوي $546$ أو $-546$، والاثنان حجمهما $546$.", onwrong: "sg4-d-abs", retry }
+      - "$l = 179$ فقط" { why: "هذا من $-546$ فقط. و $+546$ يعطي قيمة أخرى.", onwrong: "sg4-d-abs", retry }
+      * "$l = -3$ أو $l = 179$"
+      - "$l = 3$ أو $l = -179$" { why: "الفكرة صحيحة والإشارات لا: $528 - 6l = 546$ تعطي $l = -3$." }
+      hint "المحدد $= 528 - 6l$، والمطلوب $|528 - 6l| = 546$."
+      ! "$528 - 6l = 546$ تعطي $l = -3$، و $528 - 6l = -546$ تعطي $l = 179$."
+    }
+  }
+
+  slide "حالتان للإشارة" {
+    id: "sg4-d-abs"
+    beat: detour
+    hidden: true
+    cat: "الضرب الثلاثي"
+    > المعادلة $|x| = 7$ لها حلان: $x = 7$ و $x = -7$. الحجم قيمة مطلقة، فكل معادلة حجم تنقسم إلى معادلتين.
+
+    quiz {
+      ask "$(m, -3, 1)$ ، $(1, 0, -2)$ ، $(-2, -1, 4)$ أحرف متوازي سطوح حجمه $7$. المحدد يساوي $-2m - 1$. ما $m$؟"
+      skill: "sg-triple-product"
+      * "$-4$ أو $3$"
+      - "$-4$ فقط" { why: "هذا من $-2m - 1 = 7$ وحدها. الحالة $-7$ تعطي حلًا آخر." }
+      - "$3$ فقط" { why: "هذا من $-7$ وحدها. الحالة $+7$ تعطي $-4$." }
+      - "$4$ أو $-3$" { why: "$-2m - 1 = 7$ تعطي $-2m = 8$، أي $m = -4$." }
+      ! "$-2m - 1 = 7$ تعطي $m = -4$، و $-2m - 1 = -7$ تعطي $m = 3$."
+    }
+  }
+
+  slide "الارتفاع" {
+    id: "sg4-height3"
+    beat: example
+    cat: "الضرب الثلاثي"
+    > الحجم مساحة القاعدة في الارتفاع، فالارتفاع هو الحجم مقسومًا على مساحة القاعدة.
+
+    numeric {
+      ask "متوازي سطوح أحرفه المتجاورة $\vec{A} = (1, 4, 2)$ ، $\vec{B} = (-3, 2, 1)$ ، $\vec{C} = (-1, 1, 4)$. أوجد ارتفاعه على القاعدة التي يحددها $\vec{A}$ و $\vec{B}$. (لأقرب منزلتين)"
+      skill: "sg-triple-product"
+      answer: 3.13
+      expect: abs(1*(2*4 - 1*1) - 4*((-3)*4 - 1*(-1)) + 2*((-3)*1 - 2*(-1))) / sqrt(0^2 + 7^2 + 14^2)
+      tolerance: 0.01
+      unit: "وحدة طول"
+      wrong 49 "هذا الحجم. اقسمه على مساحة القاعدة."
+      wrong 15.65 "هذه مساحة القاعدة $\|\vec{A} \times \vec{B}\|$."
+      hint "الحجم $49$، ومساحة القاعدة $\|\vec{A} \times \vec{B}\|$."
+      ! "$\vec{A} \times \vec{B} = (0, -7, 14)$ طوله $7\sqrt{5}$، فالارتفاع $\frac{49}{7\sqrt{5}} = \frac{7\sqrt{5}}{5} \approx 3.13$."
+    }
+  }
+
+  slide "طاولة لا تهتز" {
+    id: "sg4-transfer-table"
+    beat: transfer
+    cat: "الضرب الثلاثي"
+    > آخر واحدة، وهي جديدة.
+
+    numeric {
+      ask "طاولة بأربع أرجل لا تهتز إلا إذا وقعت أطراف الأرجل في مستوى واحد. الأطراف عند $A(3, -2, -1)$ ، $B(2, 3, -4)$ ، $C(-1, 1, 2)$ ، $D(4, 5, m)$. ما $m$؟ (لأقرب منزلتين)"
+      skill: "sg-triple-product"
+      answer: -8.59
+      expect: -(-1*(3*1 - 3*7) - 5*((-4)*1 - 3*1) + (-3)*((-4)*7 - 3*1)) / ((-1)*3 - 5*(-4))
+      tolerance: 0.01
+      wrong 8.59 "راجع الإشارات: المحدد $17m + 146$."
+      ! "$\vec{AB} = (-1, 5, -3)$ ، $\vec{AC} = (-4, 3, 3)$ ، $\vec{AD} = (1, 7, m + 1)$. الضرب الثلاثي $17m + 146 = 0$، فـ $m = -\frac{146}{17} \approx -8.59$. هذه المهارات ستعود في التدريب خلال الأيام القادمة."
+    }
+  }
+}
