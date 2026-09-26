@@ -1,0 +1,1019 @@
+lesson "The cross product" {
+  course: "pure-maths"
+  unit: "Vectors"
+  difficulty: "Advanced"
+  icon: "Move"
+  summary: "Two edges make a panel, and one arrow stands square to both, exactly as long as the panel's area. Find it with your hands, then work it out from components."
+  skills: ["vec-cross-meaning", "vec-cross-compute", "vec-cross-area"]
+  requires: ["vec-parallelogram-area", "vec-3d-components"]
+
+  role a = primary
+  role b = accent
+  role cross = success
+
+  slide "Warm up" {
+    id: "cp-check-area"
+    beat: check
+    > Quick warm-up. This panel's bottom edge is 3 long, and its slanted edge is 4 long, at $30°$ to the bottom.
+
+    scene plane {
+      alt: "A parallelogram with a bottom edge labelled 3 and a slanted edge labelled 4, with a 30 degree angle marked between them. No height is drawn."
+      x: [-0.6, 7.2]
+      y: [-0.9, 2.7]
+      aspect: equal
+      axes: false
+      polygon panel = [(0, 0), (3, 0), (3 + 4*cos(rad(30)), 4*sin(rad(30))), (4*cos(rad(30)), 4*sin(rad(30)))] { color: neutral, opacity: 0.18 }
+      line ea = (0, 0) -> (3, 0) { color: a, width: 4 }
+      line eb = (0, 0) -> (4*cos(rad(30)), 4*sin(rad(30))) { color: b, width: 4 }
+      arc ang = (0, 0) { r: 0.9, from: 0, to: 30, color: neutral }
+      label at (1.5, -0.45) = "3" { anchor: middle, color: a }
+      label at (1.45, 1.35) = "4" { anchor: middle, color: b }
+      label at (1.05, 0.18) = "30°" { color: neutral }
+    }
+
+    numeric {
+      ask "What's its area?"
+      skill: "vec-parallelogram-area"
+      answer: 6
+      expect: 3 * 4 * sin(rad(30))
+      tolerance: 0.01
+      wrong 12 "That uses the slanted edge as the height. The height is how far the top edge sits above the bottom, and that's less than 4." -> "cp-bridge-area" retry
+      wrong 3 * 4 * cos(rad(30)) "That's cos. The height is the slanted edge's up part, which is sin." -> "cp-bridge-area" retry
+      wrong 3 "That's the triangle formula, half base times height. A parallelogram is two of those triangles." -> "cp-bridge-area" retry
+      hint "Area is base times height. How high does the top edge sit?"
+      ! "The top edge sits $4 \sin 30° = 2$ above the bottom, so the area is $3 \times 2 = 6$. Hang on to this panel."
+    }
+  }
+
+  slide "An arrow in space" {
+    id: "cp-check-3d"
+    beat: check
+    > One more. Here's an arrow in space, starting where the three axes meet. Spin it round if that helps.
+
+    scene space3 {
+      alt: "An arrow from the origin to a point in space, with dashed guides dropped from its tip to the floor and along to each axis. Unit dots mark the axes, and no coordinates are written. A slider spins the view."
+      x: [-0.5, 3]
+      y: [-0.5, 3]
+      z: [0, 3.5]
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 20]
+      segment3 v = (0, 0, 0) -> (2, 1, 3) { arrow, color: primary }
+      point3 tip = (2, 1, 3) { guides, color: primary }
+      slider az { label: "spin" }
+    }
+
+    numeric {
+      ask "Written as some $\mathbf{i}$'s, some $\mathbf{j}$'s and some $\mathbf{k}$'s, how many $\mathbf{k}$'s is it?"
+      skill: "vec-3d-components"
+      answer: 3
+      wrong 1 "That's how far it goes along $y$, the $\mathbf{j}$ part." -> "cp-bridge-3d" retry
+      wrong 2 "That's how far it goes along $x$, the $\mathbf{i}$ part." -> "cp-bridge-3d" retry
+      hint "$\mathbf{k}$ is the straight-up direction. How high is the tip?"
+      ! "The tip sits 3 up, so the arrow is $2\mathbf{i} + \mathbf{j} + 3\mathbf{k}$."
+    }
+  }
+
+  slide "Height, not the slanted edge" {
+    id: "cp-bridge-area"
+    beat: bridge
+    hidden: true
+    > Area is base times height, and the height is how far the top edge sits above the bottom one. Not the slanted edge. Lean the panel and watch.
+
+    scene plane {
+      alt: "A parallelogram with a base of 3 and its top edge held at height 1. A slider leans the top edge sideways. Readouts show the slanted edge growing while the area stays 3."
+      x: [-0.4, 6.6]
+      y: [-0.7, 2.3]
+      aspect: equal
+      axes: false
+      param L = 0 { range: [0, 3], step: 0.1 }
+      polygon panel = [(0, 0), (3, 0), (3 + L, 1), (L, 1)] { color: neutral, opacity: 0.18 }
+      line base = (0, 0) -> (3, 0) { color: a, width: 4 }
+      line slant = (0, 0) -> (L, 1) { color: b, width: 4 }
+      line drop = (L, 1) -> (L, 0) { color: neutral, style: dashed, width: 2 }
+      label at (0, 2.0) = "slanted edge = ${fixed(sqrt(L^2 + 1), 2)}" { color: b }
+      label at (3.6, 2.0) = "area = 3, height = 1" { color: neutral }
+      slider L { label: "lean" }
+    }
+
+    goal "Lean it until the [slanted edge]{b} is longer than 2.5" {
+      when: sqrt(L^2 + 1) > 2.5
+      hints: ["Drag the lean slider right and watch the slanted edge readout."]
+      showme: { L: 2.5 }
+    }
+
+    numeric {
+      ask "Base 5, slanted edge 4 at $30°$ to it. What's the area?"
+      skill: "vec-parallelogram-area"
+      answer: 10
+      expect: 5 * 4 * sin(rad(30))
+      tolerance: 0.01
+      wrong 20 "Still the slanted edge as the height. Its up part is $4 \sin 30°$."
+      hint "The height is the slanted edge's up part: $4 \sin 30°$."
+      after: goals
+      ! "Height $4 \sin 30° = 2$, so the area is $5 \times 2 = 10$. Back to the warm-up."
+    }
+  }
+
+  slide "A third direction" {
+    id: "cp-bridge-3d"
+    beat: bridge
+    hidden: true
+    then: "cp-bridge-3d-2"
+    > Space needs a third direction. $\mathbf{i}$ runs east along $x$, $\mathbf{j}$ north along $y$, and $\mathbf{k}$ straight up along $z$. Every arrow in space is some $\mathbf{i}$'s, some $\mathbf{j}$'s and some $\mathbf{k}$'s.
+
+    scene space3 {
+      alt: "An arrow from the origin to a dot with guides to the floor and the axes. Three sliders move the tip east, north and up, and a fourth spins the view."
+      x: [-3.5, 3.5]
+      y: [-3.5, 3.5]
+      z: [-3.5, 3.5]
+      param az = 35 { range: [0, 360], step: 5 }
+      param px = 1 { range: [-3, 3], step: 1 }
+      param py = 1 { range: [-3, 3], step: 1 }
+      param pz = 1 { range: [-3, 3], step: 1 }
+      camera: [az, 20]
+      segment3 v = (0, 0, 0) -> (px, py, pz) { arrow, color: primary }
+      point3 tip = (px, py, pz) { guides, color: primary }
+      slider px { label: "east, i" }
+      slider py { label: "north, j" }
+      slider pz { label: "up, k" }
+      slider az { label: "spin" }
+    }
+
+    goal "Put the tip at $3\mathbf{i} - \mathbf{j} + 2\mathbf{k}$" {
+      when: px == 3 and py == -1 and pz == 2
+      hints: ["One slider per letter. The number in front of each letter is how far to go.", "East 3, north $-1$ (so one step south), up 2."]
+      showme: { px: 3, py: -1, pz: 2 }
+    }
+  }
+
+  slide "Read one off" {
+    id: "cp-bridge-3d-2"
+    beat: bridge
+    hidden: true
+    > Its length is Pythagoras with one more square: $\sqrt{x^2 + y^2 + z^2}$. You'll want that later. Now read this one.
+
+    scene space3 {
+      alt: "A fixed arrow from the origin to a point in space, with guides to the floor and the axes, and a slider to spin the view."
+      x: [-0.5, 3.5]
+      y: [-0.5, 3.5]
+      z: [0, 3.5]
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 20]
+      segment3 v = (0, 0, 0) -> (1, 3, 2) { arrow, color: primary }
+      point3 tip = (1, 3, 2) { guides, color: primary }
+      slider az { label: "spin" }
+    }
+
+    numeric {
+      ask "How many $\mathbf{j}$'s is this arrow?"
+      skill: "vec-3d-components"
+      answer: 3
+      wrong 1 "That's the east part, $\mathbf{i}$. $\mathbf{j}$ runs north, along $y$."
+      wrong 2 "That's the up part, $\mathbf{k}$. $\mathbf{j}$ runs north, along $y$."
+      hint "Follow the guide from the tip down to the floor, then across to the $y$ axis."
+      ! "It's $\mathbf{i} + 3\mathbf{j} + 2\mathbf{k}$. Back to the warm-up."
+    }
+  }
+
+  slide "Which way does it face?" {
+    id: "cp-hook"
+    beat: hook
+    > A solar panel rests on two edges, [a]{a} and [b]{b}. To aim it at the sun you need the way it faces: an arrow at right angles to both edges. How many directions do that?
+
+    scene space3 {
+      alt: "A tilted rectangular solar panel resting on two edges, a in blue along the bottom and b in purple up the slope. No arrow is drawn off the panel."
+      x: [-0.5, 3.5]
+      y: [-0.5, 2.2]
+      z: [0, 1.6]
+      axes: false
+      camera: [-60, 22]
+      polygon3 panel = [(0, 0, 0), (3, 0, 0), (3, 1.64, 1.15), (0, 1.64, 1.15)] { color: neutral, opacity: 0.3 }
+      segment3 ea = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (0, 1.64, 1.15) { arrow, color: b }
+      label3 at (1.5, -0.35, 0) = "a" { color: a }
+      label3 at (-0.25, 0.8, 0.75) = "b" { color: b }
+    }
+
+    quiz {
+      ask "How many directions are at right angles to both edges?"
+      skill: "vec-cross-meaning"
+      - "None, you can't be square to two different arrows at once" { why: "That's true on flat paper, where there's no room. A panel lives in space, which has one more direction to play with." }
+      - "Exactly one" { why: "The way it faces is one. Is there another that works just as well? You'll find out next." }
+      * "Two, straight out of the front and straight out of the back"
+      - "Infinitely many, a whole circle of them" { why: "That's what one edge allows on its own: a whole circle round it. Does asking for b as well keep all of them?" }
+      ! "It's a bet for now. On the next slide you find them with your hands."
+    }
+  }
+
+  slide "Find them" {
+    id: "cp-square"
+    beat: explore
+    > Lay the panel flat on the floor so it's easier to see. Tilt the grey arrow and watch its angle to each edge.
+
+    scene space3 {
+      alt: "A panel lying flat on the floor with edge a along one side and edge b along the other. A grey arrow from the corner tilts in an upright plane, and readouts beside each edge show its angle to that edge."
+      x: [-3.2, 3.6]
+      y: [-3.2, 4.4]
+      z: [-3.2, 3.2]
+      axes: false
+      camera: [-65, 32]
+      param t = 20 { range: [0, 360], step: 5 }
+      polygon3 panel = [(0, 0, 0), (3, 0, 0), (3, 4, 0), (0, 4, 0)] { color: neutral, opacity: 0.25 }
+      segment3 ea = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (0, 4, 0) { arrow, color: b }
+      segment3 grey = (0, 0, 0) -> (3*cos(rad(t))*cos(rad(30)), 3*cos(rad(t))*sin(rad(30)), 3*sin(rad(t))) { arrow, color: neutral }
+      label3 at (3.4, -0.7, 0) = "angle to a = ${fixed(deg(acos(cos(rad(t))*cos(rad(30)))), 0)}°" { color: a }
+      label3 at (-0.9, 4.2, 0) = "angle to b = ${fixed(deg(acos(cos(rad(t))*sin(rad(30)))), 0)}°" { color: b }
+      slider t { label: "tilt" }
+    }
+
+    goal "Get the grey arrow square to both edges, out of the top" {
+      when: t == 90
+      hints: ["Watch both readouts at once. They need to say 90° together.", "Square to a floor edge, and to the other floor edge too. Which way is that?"]
+      showme: { t: 90 }
+    }
+
+    goal "Now find one out of the bottom" {
+      when: t == 270
+      hints: ["Keep tilting, past the floor and underneath it.", "Straight up worked. What's the opposite of straight up?"]
+      showme: { t: 270 }
+      dur: 3000
+    }
+  }
+
+  slide "One line, two ends" {
+    id: "cp-reveal"
+    beat: reveal
+    > You bet "${answer("cp-hook", "a guess")}". There are two, straight up and straight down: one line through the panel. Flat paper has no room for it, which is why "none" feels right. Space does.
+
+    scene space3 {
+      alt: "A square panel standing against the wall made by the y and z axes, with one edge along y and one edge up z. A slider spins the view."
+      x: [-0.5, 2.5]
+      y: [-0.5, 2.5]
+      z: [0, 2.5]
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 20]
+      polygon3 panel = [(0, 0, 0), (0, 2, 0), (0, 2, 2), (0, 0, 2)] { color: neutral, opacity: 0.3 }
+      segment3 ej = (0, 0, 0) -> (0, 2, 0) { arrow, color: a }
+      segment3 ek = (0, 0, 0) -> (0, 0, 2) { arrow, color: b }
+      slider az { label: "spin" }
+    }
+
+    quiz {
+      ask "This panel stands against a wall, with edges along $\mathbf{j}$ and $\mathbf{k}$. Which directions are square to both edges?"
+      skill: "vec-cross-meaning"
+      * "Straight out of the wall, along $\mathbf{i}$ or $-\mathbf{i}$"
+      - "Up and down, along $\mathbf{k}$ or $-\mathbf{k}$" { why: "Up runs along one of the edges now, so it can't be square to it." }
+      - "Every direction along the floor" { why: "The floor includes $\mathbf{j}$, and $\mathbf{j}$ is one of the edges." }
+      - "None, a panel on a wall doesn't face anywhere" { why: "It faces into the room, the way a painting does." }
+      hint "Square to both edges, wherever the panel happens to sit."
+      ! "Always the line straight through the panel. On the floor that's up and down. On this wall it's $\mathbf{i}$ and $-\mathbf{i}$."
+    }
+  }
+
+  slide "How long is it?" {
+    id: "cp-swing"
+    beat: explore
+    > Of those two directions, the cross product picks one and gives it a length. Swing [b]{b} round and watch the [green arrow]{cross}.
+
+    scene space3 {
+      alt: "Edge a, 3 long, lies along the floor, and edge b, 4 long, swings across the floor from a. The panel between them is shaded, and a green arrow stands straight up from the corner with its length written at its tip. A slider swings b."
+      x: [-4.5, 7.5]
+      y: [-0.5, 4.5]
+      z: [0, 12.8]
+      axes: false
+      camera: [-70, 32]
+      param th = 30 { range: [0, 180], step: 5 }
+      param sa = 0 { range: [0, 1], step: 1 }
+      polygon3 panel = [(0, 0, 0), (3, 0, 0), (3 + 4*cos(rad(th)), 4*sin(rad(th)), 0), (4*cos(rad(th)), 4*sin(rad(th)), 0)] { color: neutral, opacity: 0.25 }
+      segment3 ea = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (4*cos(rad(th)), 4*sin(rad(th)), 0) { arrow, color: b }
+      segment3 up = (0, 0, 0) -> (0, 0, 12*sin(rad(th))) { arrow, color: cross, width: 4, show: th > 0 and th < 180 }
+      label3 at (0, 0, 12*sin(rad(th)) + 0.8) = "green arrow's length = ${fixed(12*sin(rad(th)), 2)}" { color: cross }
+      label3 at ((3 + 4*cos(rad(th)))/2, 2*sin(rad(th)), 0) = "panel area = ${fixed(12*sin(rad(th)), 2)}" { color: neutral, show: sa == 1 }
+      label3 at (1.5, -1.0, 0) = "edge a" { color: a }
+      label3 at (4.7*cos(rad(th)), 4.7*sin(rad(th)), 0) = "edge b" { color: b }
+      slider th { label: "swing b" }
+    }
+
+    goal "Make the [green arrow]{cross} as long as it gets" {
+      when: th == 90
+      hints: ["Watch the panel while the arrow grows.", "The arrow is longest when the panel is as big as it gets."]
+      showme: { th: 90, sa: 1 }
+      dur: 3000
+    }
+
+    goal "Now make it vanish, without shortening [a]{a} or [b]{b}" {
+      when: th == 0 or th == 180
+      hints: ["Watch the panel while the arrow shrinks.", "Squash the panel flat: swing b until it lies along a's line."]
+      showme: { th: 180, sa: 1 }
+      dur: 3000
+    }
+
+    quiz {
+      ask "The [green arrow]{cross}'s length always matches..."
+      skill: "vec-cross-meaning"
+      * "the panel's area"
+      - "a's length times b's length, so 12" { why: "Only at a right angle. At $30°$ the arrow was 6." }
+      - "$\mathbf{a} \cdot \mathbf{b}$" { why: "$\mathbf{a} \cdot \mathbf{b}$ is biggest when they line up. That's exactly when this arrow vanishes." }
+      - "a's length plus b's length" { why: "That's 7, and the arrow reached 12." }
+      hint "Watch the panel while the arrow shrinks."
+      hint "At $30°$ you've met this exact panel already, in the warm-up."
+      after: goals
+      ! "The arrow is exactly as long as the panel's area. Squash the panel flat and there's no area, so no arrow."
+    }
+  }
+
+  slide "Does order matter?" {
+    id: "cp-order"
+    beat: trap
+    > Every product you've met ignores order: $3 \times 4$ is $4 \times 3$, and $\mathbf{a} \cdot \mathbf{b}$ is $\mathbf{b} \cdot \mathbf{a}$. So putting [b]{b} first won't change the [green arrow]{cross}. Right? Go on, swap them.
+
+    scene space3 {
+      alt: "The same floor panel, with b swung 30 degrees from a, and the green arrow standing up from the corner. A toggle puts b first, and the green arrow flips to point down out of the bottom face while its length readout stays the same."
+      x: [-0.5, 7]
+      y: [-1, 2.8]
+      z: [-7.4, 7.4]
+      axes: false
+      camera: [-70, 32]
+      bool bf = false
+      polygon3 panel = [(0, 0, 0), (3, 0, 0), (3 + 4*cos(rad(30)), 4*sin(rad(30)), 0), (4*cos(rad(30)), 4*sin(rad(30)), 0)] { color: neutral, opacity: 0.3 }
+      segment3 ea = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (4*cos(rad(30)), 4*sin(rad(30)), 0) { arrow, color: b }
+      segment3 up = (0, 0, 0) -> (0, 0, 12*sin(rad(30))) { arrow, color: cross, width: 4, show: not bf }
+      segment3 down = (0, 0, 0) -> (0, 0, 0 - 12*sin(rad(30))) { arrow, color: cross, width: 4, show: bf }
+      label3 at (0, 0, 12*sin(rad(30)) + 0.8) = "green arrow's length = 6.00" { color: cross, show: not bf }
+      label3 at (0, 0, 0 - 12*sin(rad(30)) - 0.8) = "green arrow's length = 6.00" { color: cross, show: bf }
+      label3 at (1.5, -1.0, 0) = "edge a" { color: a }
+      label3 at (4.7*cos(rad(30)), 4.7*sin(rad(30)), 0) = "edge b" { color: b }
+      toggle bf { label: "put b first" }
+    }
+
+    goal "Put [b]{b} first" {
+      when: bf
+      hints: ["Flip the toggle under the picture."]
+      showme: { bf: true }
+    }
+
+    quiz {
+      ask "So with [b]{b} first, the [green arrow]{cross}..."
+      skill: "vec-cross-meaning"
+      - "is the same arrow" { why: "Look again. It came out of the other face." }
+      * "is the same length, pointing the opposite way"
+      - "disappears" { why: "The panel didn't change, so neither did its area." }
+      - "gets shorter" { why: "Same panel, same area, same length." }
+      after: goals
+      ! "Tempting, because order has never mattered before. Here it has to: the panel has two faces, and the order is how the cross product picks one."
+    }
+  }
+
+  slide "Which face?" {
+    id: "cp-face"
+    beat: explore
+    > So which face? Look down from above. If the short turn from the [first edge]{a} to the [second]{b} is anticlockwise, the [arrow]{cross} points up at you. Clockwise, it points away.
+
+    scene space3 {
+      alt: "The floor panel in 3D, edge a along the floor and edge b swinging round the corner, with the green arrow on the corner. It points up out of the top face or down out of the bottom face as b swings, and vanishes when the panel is flat. The arrow is drawn at a third of its length so the panel stays in view."
+      x: [-4.5, 7.5]
+      y: [-4.5, 4.5]
+      z: [-4.6, 4.6]
+      axes: false
+      camera: [-70, 28]
+      param th = 60 { range: [-180, 180], step: 5 }
+      polygon3 panel3 = [(0, 0, 0), (3, 0, 0), (3 + 4*cos(rad(th)), 4*sin(rad(th)), 0), (4*cos(rad(th)), 4*sin(rad(th)), 0)] { color: neutral, opacity: 0.25 }
+      segment3 ea3 = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb3 = (0, 0, 0) -> (4*cos(rad(th)), 4*sin(rad(th)), 0) { arrow, color: b }
+      segment3 up3 = (0, 0, 0) -> (0, 0, 4*sin(rad(th))) { arrow, color: cross, width: 4, show: abs(th) > 0 and abs(th) < 180 }
+      label3 at (0, 0, 4*sin(rad(th)) + 0.6*sign(sin(rad(th)))) = "green arrow" { color: cross, show: abs(th) > 0 and abs(th) < 180 }
+    }
+
+    scene plane {
+      alt: "The same floor seen from straight above. Edge a points right and edge b swings round the corner, with a curved line showing the short turn from a to b. A marker in the corner says whether the green arrow points up at you or away from you. A slider swings b in both views."
+      x: [-5, 5]
+      y: [-5, 5]
+      aspect: equal
+      axes: false
+      polygon panel = [(0, 0), (3, 0), (3 + 4*cos(rad(th)), 4*sin(rad(th))), (4*cos(rad(th)), 4*sin(rad(th)))] { color: neutral, opacity: 0.15 }
+      vector va = (0, 0) -> (3, 0) { color: a, width: 4 }
+      vector vb = (0, 0) -> (4*cos(rad(th)), 4*sin(rad(th))) { color: b, width: 4 }
+      arc turn = (0, 0) { r: 1.3, from: min(0, th), to: max(0, th), color: neutral, width: 2 }
+      point head = (1.3*cos(rad(th)), 1.3*sin(rad(th))) { r: 5, color: neutral, show: abs(th) > 0 and abs(th) < 180 }
+      label at (3.2, -0.5) = "first" { color: a }
+      label at (4.5*cos(rad(th)), 4.5*sin(rad(th))) = "second" { anchor: middle, color: b }
+      circle ring = (-3.9, -4.1) { r: 0.4, color: cross, opacity: 0, show: abs(th) > 0 and abs(th) < 180 }
+      point dot = (-3.9, -4.1) { r: 5, color: cross, show: th > 0 and th < 180 }
+      line cross1 = (-4.15, -4.35) -> (-3.65, -3.85) { color: cross, width: 3, show: th < 0 and th > -180 }
+      line cross2 = (-4.15, -3.85) -> (-3.65, -4.35) { color: cross, width: 3, show: th < 0 and th > -180 }
+      label at (-3.3, -4.25) = "anticlockwise: green arrow points up at you" { color: cross, show: th > 0 and th < 180 }
+      label at (-3.3, -4.25) = "clockwise: green arrow points away from you" { color: cross, show: th < 0 and th > -180 }
+      label at (-3.3, -4.25) = "flat panel: no arrow at all" { color: neutral, show: th == 0 or abs(th) == 180 }
+      slider th { label: "swing b" }
+    }
+
+    goal "Make the [green arrow]{cross} point away from you" {
+      when: th < 0 and th > -180
+      hints: ["Swing b round the other way, below a.", "The short turn from a to b has to go clockwise."]
+      showme: { th: -60 }
+    }
+
+    numeric {
+      ask "New pair, square to each other: first edge $2\mathbf{j}$, second edge $3\mathbf{i}$. How many $\mathbf{k}$'s is the green arrow? Up is +."
+      skill: "vec-cross-meaning"
+      answer: -6
+      expect: 0 - 2 * 3 * sin(rad(90))
+      tolerance: 0.001
+      wrong 6 "Right size, wrong face. Check the turn from north to east." -> "cp-detour-face" retry
+      wrong 0 "0 is what the dot product gives for edges at right angles. The cross product works the other way." -> "cp-detour-dot" retry
+      hint "$\mathbf{j}$ points north and $\mathbf{i}$ points east. Which way do you turn to get from north to east?"
+      after: goals
+      ! "Length $2 \times 3 = 6$, since they're square. North to east is clockwise, so it points away: $-6\mathbf{k}$."
+    }
+  }
+
+  slide "What it's called" {
+    id: "cp-name"
+    beat: name
+    > Real names now. The [green arrow]{cross} is $\textcolor{cross}{\mathbf{a} \times \mathbf{b}}$, said "a cross b". The swing is $\theta$. The panel's height is [b]{b}'s up part, $|\mathbf{b}| \sin\theta$, the same sin you used to resolve a force.
+
+    scene space3 {
+      alt: "The swing scene frozen at 30 degrees, with a dashed height line from the tip of b down to a. Step through and each label written in words turns into its symbol: a, b, theta, the height, and the length of a cross b."
+      x: [-0.5, 7]
+      y: [-0.8, 2.6]
+      z: [0, 7]
+      axes: false
+      camera: [-70, 32]
+      param m = 0 { range: [0, 1] }
+      polygon3 panel = [(0, 0, 0), (3, 0, 0), (3 + 4*cos(rad(30)), 2, 0), (4*cos(rad(30)), 2, 0)] { color: neutral, opacity: 0.25 }
+      segment3 ea = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (4*cos(rad(30)), 2, 0) { arrow, color: b }
+      segment3 height = (4*cos(rad(30)), 2, 0) -> (4*cos(rad(30)), 0, 0) { color: neutral, style: dashed }
+      segment3 up = (0, 0, 0) -> (0, 0, 6) { arrow, color: cross, width: 4 }
+      label3 w1 at (1.3, -0.7, 0) = "edge a" { color: a }
+      label3 s1 at (1.3, -0.7, 0) = "a" { color: a }
+      label3 w2 at (1.0, 2.0, 0) = "edge b" { color: b }
+      label3 s2 at (1.0, 2.0, 0) = "b" { color: b }
+      label3 w3 at (2.2, 0.59, 0) = "swing" { color: neutral }
+      label3 s3 at (2.2, 0.59, 0) = "θ" { color: neutral }
+      label3 w4 at (4.5, -0.7, 0) = "height = 2" { color: neutral }
+      label3 s4 at (4.5, -0.7, 0) = "|b| sin θ = 2" { color: neutral }
+      label3 w5 at (0, 0, 6.8) = "green arrow's length = 6.00" { color: cross }
+      label3 s5 at (0, 0, 6.8) = "|a × b| = 6.00" { color: cross }
+      morph w1 -> s1 { by: m }
+      morph w2 -> s2 { by: m }
+      morph w3 -> s3 { by: m }
+      morph w4 -> s4 { by: m }
+      morph w5 -> s5 { by: m }
+      step "In your words, the way you've been saying it." { set: { m: 0 } }
+      step "In symbols, the way it gets written." { animate: { m: 1 }, dur: 1600 }
+    }
+
+    build {
+      ask "Build the length of $\textcolor{cross}{\mathbf{a} \times \mathbf{b}}$."
+      skill: "vec-cross-meaning"
+      template: "$|\mathbf{a} \times \mathbf{b}| =$ ___ ___ ___"
+      bank: ["$|\mathbf{a}|$", "$|\mathbf{b}|$", "$\sin\theta$", "$\cos\theta$", "$\mathbf{a} \cdot \mathbf{b}$", "$\tfrac{1}{2}$"]
+      answer: ["$|\mathbf{a}|$", "$|\mathbf{b}|$", "$\sin\theta$"]
+      answer: ["$|\mathbf{b}|$", "$|\mathbf{a}|$", "$\sin\theta$"]
+      answer: ["$|\mathbf{a}|$", "$\sin\theta$", "$|\mathbf{b}|$"]
+      answer: ["$|\mathbf{b}|$", "$\sin\theta$", "$|\mathbf{a}|$"]
+      answer: ["$\sin\theta$", "$|\mathbf{a}|$", "$|\mathbf{b}|$"]
+      answer: ["$\sin\theta$", "$|\mathbf{b}|$", "$|\mathbf{a}|$"]
+      miss "$\cos\theta$" "$\cos\theta$ is the dot product's. The panel's height is b's up part, $|\mathbf{b}|\sin\theta$."
+      miss "$\mathbf{a} \cdot \mathbf{b}$" "$\mathbf{a} \cdot \mathbf{b}$ is biggest when the panel is flat. The area is base times height."
+      miss "$\tfrac{1}{2}$" "$\tfrac{1}{2}$ would make it a triangle, half the panel. The arrow matches the whole panel."
+      hint "It's the panel's area. Area is base times height."
+      hint "The base is $|\mathbf{a}|$, and the height is b's up part."
+      after: 2
+      ! "Base $|\mathbf{a}|$ times height $|\mathbf{b}|\sin\theta$: the panel's area, which is the arrow's length."
+    }
+  }
+
+  slide "All of it at once" {
+    id: "cp-summary"
+    beat: name
+    > $\textcolor{cross}{\mathbf{a} \times \mathbf{b}}$ is square to both, $|\mathbf{a}||\mathbf{b}|\sin\theta$ long, and out of the face an anticlockwise turn from [a]{a} to [b]{b} picks. That's the right-hand rule: curl your right hand from a to b, and the thumb points along it.
+
+    quiz {
+      ask "Some $\mathbf{a}$ and $\mathbf{b}$ have $\mathbf{a} \times \mathbf{b} = 5\mathbf{k}$. What's $\mathbf{b} \times \mathbf{a}$?"
+      skill: "vec-cross-meaning"
+      * "$-5\mathbf{k}$"
+      - "$5\mathbf{k}$" { why: "That's the trap. Swapping the order flips the turn, so it flips the face." }
+      - "$\mathbf{0}$" { why: "Same panel, same area, so the arrow is still 5 long." }
+      - "$-5$" { why: "A cross product is always an arrow, never a plain number." }
+      ! "Same panel, same length, other face: $\mathbf{b} \times \mathbf{a} = -(\mathbf{a} \times \mathbf{b})$."
+    }
+  }
+
+  slide "Long edges, no arrow" {
+    id: "cp-parallel"
+    beat: breaker
+    > Quick one. $\textcolor{a}{\mathbf{a}} = 2\mathbf{i} + \mathbf{j}$ and $\textcolor{b}{\mathbf{b}} = 6\mathbf{i} + 3\mathbf{j}$. Both good and long.
+
+    numeric {
+      ask "How long is $\textcolor{cross}{\mathbf{a} \times \mathbf{b}}$?"
+      skill: "vec-cross-meaning"
+      answer: 0
+      expect: 2 * 3 - 1 * 6
+      wrong 15 "That's $|\mathbf{a}||\mathbf{b}|$, and for these two it's $\mathbf{a} \cdot \mathbf{b}$ as well." -> "cp-detour-flat" retry
+      hint "Sketch them roughly. What shape does the panel make?"
+      ! "$\mathbf{b}$ is just $3\mathbf{a}$, so they point the same way and the panel is squashed flat. No area, no arrow. Anything crossed with itself is $\mathbf{0}$ too."
+    }
+  }
+
+  slide "i, j and k crossed" {
+    id: "cp-units"
+    beat: name
+    > To work with components you only need $\mathbf{i}$, $\mathbf{j}$ and $\mathbf{k}$ crossed with each other. Each pair makes a 1 by 1 panel. Spin the cube and match them up.
+
+    scene space3 {
+      alt: "The corner of a unit cube at the origin, with arrows i, j and k along the three axes and faint one by one squares on the three faces that meet at the corner. Sliders spin and tilt the view."
+      x: [-0.4, 1.6]
+      y: [-0.4, 1.6]
+      z: [-0.4, 1.6]
+      axes: false
+      param az = 35 { range: [0, 360], step: 5 }
+      param el = 25 { range: [0, 90], step: 5 }
+      camera: [az, el]
+      polygon3 fxy = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)] { color: neutral, opacity: 0.12 }
+      polygon3 fyz = [(0, 0, 0), (0, 1, 0), (0, 1, 1), (0, 0, 1)] { color: neutral, opacity: 0.12 }
+      polygon3 fzx = [(0, 0, 0), (0, 0, 1), (1, 0, 1), (1, 0, 0)] { color: neutral, opacity: 0.12 }
+      segment3 vi = (0, 0, 0) -> (1.3, 0, 0) { arrow, color: neutral }
+      segment3 vj = (0, 0, 0) -> (0, 1.3, 0) { arrow, color: neutral }
+      segment3 vk = (0, 0, 0) -> (0, 0, 1.3) { arrow, color: neutral }
+      label3 at (1.5, 0, 0) = "i" { fontSize: 18 }
+      label3 at (0, 1.5, 0) = "j" { fontSize: 18 }
+      label3 at (0, 0, 1.5) = "k" { fontSize: 18 }
+      slider az { label: "spin" }
+      slider el { label: "tilt" }
+    }
+
+    match {
+      ask "Match each cross product to what it makes."
+      skill: "vec-cross-compute"
+      pair "$\mathbf{i} \times \mathbf{j}$" -> "$\mathbf{k}$"
+      pair "$\mathbf{j} \times \mathbf{i}$" -> "$-\mathbf{k}$"
+      pair "$\mathbf{j} \times \mathbf{k}$" -> "$\mathbf{i}$"
+      pair "$\mathbf{k} \times \mathbf{i}$" -> "$\mathbf{j}$"
+      pair "$\mathbf{i} \times \mathbf{i}$" -> "$\mathbf{0}$"
+      decoy "$1$"
+      decoy "$-\mathbf{i}$"
+      miss "$\mathbf{j} \times \mathbf{i}$" -> "$\mathbf{k}$" "That's the order trap. $\mathbf{j} \times \mathbf{i}$ is $\mathbf{i} \times \mathbf{j}$ the other way round, so it comes out of the other face: $-\mathbf{k}$."
+      miss "$\mathbf{i} \times \mathbf{j}$" -> "$-\mathbf{k}$" "East to north is anticlockwise, so $\mathbf{i} \times \mathbf{j}$ comes out of the top: $+\mathbf{k}$."
+      miss "$\mathbf{j} \times \mathbf{k}$" -> "$-\mathbf{i}$" "Look straight down $\mathbf{i}$: the turn from $\mathbf{j}$ to $\mathbf{k}$ is anticlockwise, so it's $+\mathbf{i}$. $-\mathbf{i}$ is $\mathbf{k} \times \mathbf{j}$."
+      miss "$\mathbf{i} \times \mathbf{i}$" -> "$1$" "That's the dot product, $\mathbf{i} \cdot \mathbf{i} = 1$. Crossed with itself, the panel is flat, so it's $\mathbf{0}$."
+      miss "$\mathbf{i} \times \mathbf{j}$" -> "$\mathbf{0}$" "Two different axes make a 1 by 1 panel, area 1, so the answer is 1 long, not $\mathbf{0}$."
+      hint "Every panel here has area 1, so every answer is 1 long, unless the panel is flat."
+      hint "For $\mathbf{j} \times \mathbf{k}$, tilt and spin until you look straight down $\mathbf{i}$. Is the turn from $\mathbf{j}$ to $\mathbf{k}$ anticlockwise?"
+      ! "Round the loop $\mathbf{i} \to \mathbf{j} \to \mathbf{k} \to \mathbf{i}$ gives +, backwards gives −. Anything crossed with itself is $\mathbf{0}$."
+    }
+  }
+
+  slide "Worked: on the floor" {
+    id: "cp-flat"
+    beat: example
+    > Back on the floor with numbers: $\textcolor{a}{\mathbf{a}} = 3\mathbf{i} + \mathbf{j}$ and $\textcolor{b}{\mathbf{b}} = \mathbf{i} + 3\mathbf{j}$. Multiply out like brackets, but keep every pair in order. Step through it.
+
+    scene plane {
+      alt: "A grid with the panel made by a from the origin to (3, 1) and b from the origin to (1, 3). Beside it, the four pairs of the multiplied-out brackets appear one per step, then their total."
+      x: [-0.5, 12]
+      y: [-0.5, 4.5]
+      aspect: equal
+      grid
+      axes
+      param s = 0 { range: [0, 5], step: 1 }
+      polygon panel = [(0, 0), (3, 1), (4, 4), (1, 3)] { color: neutral, opacity: 0.18 }
+      vector va = (0, 0) -> (3, 1) { color: a, width: 4 }
+      vector vb = (0, 0) -> (1, 3) { color: b, width: 4 }
+      label at (5.2, 4.1) = "3\mathbf{i} \times \mathbf{i} = \mathbf{0}" { tex, size: 18, show: s >= 1 }
+      label at (5.2, 3.3) = "3\mathbf{i} \times 3\mathbf{j} = 9\mathbf{k}" { tex, size: 18, show: s >= 2 }
+      label at (5.2, 2.5) = "\mathbf{j} \times \mathbf{i} = -\mathbf{k}" { tex, size: 18, show: s >= 3 }
+      label at (5.2, 1.7) = "\mathbf{j} \times 3\mathbf{j} = \mathbf{0}" { tex, size: 18, show: s >= 4 }
+      label at (5.2, 0.7) = "\textcolor{cross}{\mathbf{a} \times \mathbf{b}} = 8\mathbf{k}" { tex, size: 18, show: s >= 5 }
+      step "3i from a, times i from b. Parallel, so no panel." { set: { s: 1 } }
+      step "3i times 3j. East to north is anticlockwise: up." { set: { s: 2 } }
+      step "j times i. The pair the other way round." { set: { s: 3 } }
+      step "j times 3j. Parallel again." { set: { s: 4 } }
+      step "Add up what's left." { set: { s: 5 } }
+    }
+
+    quiz {
+      ask "Why is the third step $-\mathbf{k}$ and not $\mathbf{k}$?"
+      skill: "vec-cross-compute"
+      * "$\mathbf{j} \times \mathbf{i}$ is $\mathbf{i} \times \mathbf{j}$ the other way round, so it comes out of the other face"
+      - "It should be $+\mathbf{k}$, order doesn't matter when you multiply out" { why: "That was the trap. Order picks the face, in algebra too." }
+      - "Because $\mathbf{i} \times \mathbf{j}$ is $-\mathbf{k}$, so $\mathbf{j} \times \mathbf{i}$ is too" { why: "East to north is anticlockwise, so $\mathbf{i} \times \mathbf{j}$ is $+\mathbf{k}$." }
+      after: 3
+      ! "Swapping the order flips the face, so $\mathbf{j} \times \mathbf{i} = -\mathbf{k}$. Add up: $9\mathbf{k} - \mathbf{k} = 8\mathbf{k}$."
+    }
+  }
+
+  slide "Count it" {
+    id: "cp-flat-count"
+    beat: example
+    > Don't trust the algebra? Count. The box round the panel is 16 squares. Take away the four grey corner triangles and the two little grey squares.
+
+    scene plane {
+      alt: "The same panel on a grid inside a 4 by 4 box. The four right-angled triangles in the corners of the box and the two single squares in the other corners are shaded grey."
+      x: [-0.5, 4.5]
+      y: [-0.5, 4.5]
+      aspect: equal
+      grid
+      axes
+      polygon box = [(0, 0), (4, 0), (4, 4), (0, 4)] { color: neutral, opacity: 0 }
+      polygon t1 = [(0, 0), (3, 0), (3, 1)] { color: neutral, opacity: 0.35 }
+      polygon t2 = [(3, 1), (4, 1), (4, 4)] { color: neutral, opacity: 0.35 }
+      polygon t3 = [(4, 4), (1, 4), (1, 3)] { color: neutral, opacity: 0.35 }
+      polygon t4 = [(1, 3), (0, 3), (0, 0)] { color: neutral, opacity: 0.35 }
+      polygon q1 = [(3, 0), (4, 0), (4, 1), (3, 1)] { color: neutral, opacity: 0.35 }
+      polygon q2 = [(0, 3), (1, 3), (1, 4), (0, 4)] { color: neutral, opacity: 0.35 }
+      polygon panel = [(0, 0), (3, 1), (4, 4), (1, 3)] { color: success, opacity: 0.2 }
+      vector va = (0, 0) -> (3, 1) { color: a, width: 4 }
+      vector vb = (0, 0) -> (1, 3) { color: b, width: 4 }
+    }
+
+    numeric {
+      ask "How many squares does the panel cover?"
+      skill: "vec-cross-area"
+      answer: 8
+      expect: 16 - 4 * (3 * 1 / 2) - 2
+      wrong 10 "That takes away the triangles but not the two little squares. They're outside the panel too."
+      wrong 14 "That takes away the little squares but leaves the triangles in."
+      hint "Each corner triangle is half of a 3 by 1 rectangle."
+      ! "8, the same as $8\mathbf{k}$. For any two floor vectors, $\mathbf{a} \times \mathbf{b} = (a_1b_2 - a_2b_1)\mathbf{k}$, where $a_1, a_2$ are $\mathbf{a}$'s $x$ and $y$ parts."
+    }
+  }
+
+  slide "Worked: tilted" {
+    id: "cp-tilt"
+    beat: example
+    > Lift [a]{a}'s tip 2 up: $\mathbf{a} = 3\mathbf{i} + \mathbf{j} + 2\mathbf{k}$. Its shadow on the floor hasn't changed, so the $\mathbf{k}$ part is still 8. The other two parts are its shadows on the walls.
+
+    scene space3 {
+      alt: "The tilted panel made by a = 3i + j + 2k and b = i + 3j, with its three shadows drawn as faint flat copies on the floor, on the wall made by y and z, and on the wall made by z and x. Each step lights one shadow, then the green arrow a cross b appears. A slider spins the view."
+      x: [-6.5, 4.5]
+      y: [-0.5, 4.5]
+      z: [-0.5, 8.5]
+      param az = 115 { range: [0, 360], step: 5 }
+      param s = 0 { range: [0, 5], step: 1 }
+      camera: [az, 28]
+      polygon3 panel = [(0, 0, 0), (3, 1, 2), (4, 4, 2), (1, 3, 0)] { color: neutral, opacity: 0.35 }
+      polygon3 floor = [(0, 0, 0), (3, 1, 0), (4, 4, 0), (1, 3, 0)] { color: neutral, opacity: 0.08, style: dashed }
+      polygon3 wallyz = [(0, 0, 0), (0, 1, 2), (0, 4, 2), (0, 3, 0)] { color: neutral, opacity: 0.08, style: dashed }
+      polygon3 wallzx = [(0, 0, 0), (3, 0, 2), (4, 0, 2), (1, 0, 0)] { color: neutral, opacity: 0.08, style: dashed }
+      polygon3 floorlit = [(0, 0, 0), (3, 1, 0), (4, 4, 0), (1, 3, 0)] { color: warning, opacity: 0.35, show: s == 1 }
+      polygon3 wallyzlit = [(0, 0, 0), (0, 1, 2), (0, 4, 2), (0, 3, 0)] { color: warning, opacity: 0.35, show: s == 2 }
+      polygon3 wallzxlit = [(0, 0, 0), (3, 0, 2), (4, 0, 2), (1, 0, 0)] { color: warning, opacity: 0.35, show: s == 3 }
+      segment3 ea = (0, 0, 0) -> (3, 1, 2) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (1, 3, 0) { arrow, color: b }
+      segment3 axb = (0, 0, 0) -> (-6, 2, 8) { arrow, color: cross, width: 4, show: s >= 4 }
+      label3 at (-6, 2, 8.4) = "a × b" { color: cross, show: s >= 4 }
+      slider az { label: "spin" }
+      step "The panel, and its shadows on the floor and on two walls." { set: { s: 0 } }
+      step "k part, floor shadow, uses x and y: 3×3 − 1×1 = 8" { set: { s: 1 } }
+      step "i part, yz wall shadow, uses y and z: 1×0 − 2×3 = −6" { set: { s: 2 } }
+      step "j part, zx wall shadow, uses z and x: 2×1 − 3×0 = 2" { set: { s: 3 } }
+      step "So a × b = −6i + 2j + 8k." { set: { s: 4 } }
+      step "Check: a · (a × b) = 3(−6) + 1(2) + 2(8) = 0" { set: { s: 5 } }
+    }
+
+    quiz {
+      ask "Why check with a dot product at the end?"
+      skill: "vec-cross-compute"
+      * "$\mathbf{a} \times \mathbf{b}$ has to be square to $\mathbf{a}$, and a zero dot product is the test for square"
+      - "The dot product and the cross product should come out equal" { why: "One's a number and the other's an arrow, so they can't be equal." }
+      - "The dot product gives the panel's area" { why: "The area is the length of $\mathbf{a} \times \mathbf{b}$. This dot product is 0, and the panel isn't." }
+      hint "The dot product in 3D is the one you know with a third product added: $a_1b_1 + a_2b_2 + a_3b_3$."
+      after: 5
+      ! "A cross product is square to both edges, so its dot product with each one is 0. An arithmetic slip almost never passes that test."
+    }
+  }
+
+  slide "Every cross product" {
+    id: "cp-formula"
+    beat: name
+    > Every cross product goes the same way. Each part uses the other two letters, in loop order: $y$ then $z$ for $\mathbf{i}$, $z$ then $x$ for $\mathbf{j}$, $x$ then $y$ for $\mathbf{k}$.
+
+    build {
+      ask "Build the formula. $a_1, a_2, a_3$ are $\mathbf{a}$'s $x$, $y$ and $z$ parts, and the same for $\mathbf{b}$."
+      skill: "vec-cross-compute"
+      template: "$\mathbf{a} \times \mathbf{b} =$ ___ $\mathbf{i} \;+$ ___ $\mathbf{j} \;+$ ___ $\mathbf{k}$"
+      bank: ["$(a_2b_3 - a_3b_2)$", "$(a_3b_1 - a_1b_3)$", "$(a_1b_2 - a_2b_1)$", "$(a_1b_3 - a_3b_1)$", "$(a_2b_1 - a_1b_2)$", "$(a_1b_1 + a_2b_2)$"]
+      answer: ["$(a_2b_3 - a_3b_2)$", "$(a_3b_1 - a_1b_3)$", "$(a_1b_2 - a_2b_1)$"]
+      miss "$(a_1b_3 - a_3b_1)$" "That's $x$ before $z$, off the loop. The $\mathbf{j}$ part goes $z$ then $x$: $a_3b_1 - a_1b_3$."
+      miss "$(a_2b_1 - a_1b_2)$" "That's the $\mathbf{k}$ part the wrong way round. Loop order is $x$ then $y$: $a_1b_2 - a_2b_1$."
+      miss "$(a_1b_1 + a_2b_2)$" "Matching letters is the dot product's move. Every cross product part pairs two different letters."
+      hint "The $\mathbf{i}$ part uses $y$ and $z$, so only $a_2, a_3, b_2, b_3$."
+      hint "In each part, the first letter of the loop goes with $\mathbf{a}$ in the term you add."
+      ! "Test it on the tilted panel: the $\mathbf{i}$ part is $a_2b_3 - a_3b_2 = 1 \times 0 - 2 \times 3 = -6$, the wall shadow's number. The other two tiles break the loop, and the last one is the dot product."
+    }
+  }
+
+  slide "You finish it" {
+    id: "cp-faded"
+    beat: example
+    > Last step's yours. $\mathbf{a} = 2\mathbf{i} + \mathbf{k}$ and $\mathbf{b} = \mathbf{i} + 3\mathbf{j}$. The $\mathbf{k}$ part is $2 \times 3 - 0 \times 1 = 6$. The $\mathbf{i}$ part is $0 \times 0 - 1 \times 3 = -3$.
+
+    numeric {
+      ask "What's the $\mathbf{j}$ part?"
+      skill: "vec-cross-compute"
+      answer: 1
+      expect: 1 * 1 - 2 * 0
+      wrong -1 "That's $x$ before $z$, off the loop." -> "cp-detour-loop" retry
+      wrong 2 "That multiplies matching parts, $x$ with $x$." -> "cp-detour-componentwise" retry
+      wrong 0 "That multiplies matching parts, $y$ with $y$." -> "cp-detour-componentwise" retry
+      hint "Which two letters does the $\mathbf{j}$ part use, and in which order?"
+      ! "$z$ then $x$: $a_3b_1 - a_1b_3 = 1 \times 1 - 2 \times 0 = 1$. So $\mathbf{a} \times \mathbf{b} = -3\mathbf{i} + \mathbf{j} + 6\mathbf{k}$."
+    }
+  }
+
+  slide "Your turn" {
+    id: "cp-own-1"
+    beat: example
+    > Your turn, three of them. Fresh numbers every try, same moves.
+
+    numeric {
+      vary p in [2, 3]
+      vary q in [4, 5]
+      vary r in [4, 5]
+      vary s in [2, 3]
+      ask "$(${p}\mathbf{i} + ${q}\mathbf{j}) \times (${r}\mathbf{i} + ${s}\mathbf{j})$. What's the $\mathbf{k}$ part?"
+      skill: "vec-cross-compute"
+      answer: p * s - q * r
+      expect: p * s - q * r
+      wrong q * r - p * s "Right size, flipped sign. Every pair keeps a's letter first." -> "cp-detour-jxi" retry
+      wrong p * s + q * r "That treats $\mathbf{j} \times \mathbf{i}$ as $+\mathbf{k}$." -> "cp-detour-jxi" retry
+      wrong p * r + q * s "That multiplies matching parts, the dot product's move." -> "cp-detour-componentwise" retry
+      hint "Multiply out. Which two pairs make a $\mathbf{k}$, and with which signs?"
+      ! "$\mathbf{i} \times \mathbf{j} = \mathbf{k}$ and $\mathbf{j} \times \mathbf{i} = -\mathbf{k}$, so the $\mathbf{k}$ part is ${p} \times ${s} - ${q} \times ${r}$."
+    }
+  }
+
+  slide "A whole one" {
+    id: "cp-own-2"
+    beat: example
+    > Now all three parts. $\mathbf{a} = 3\mathbf{i} - \mathbf{k}$ and $\mathbf{b} = 2\mathbf{j} - \mathbf{k}$.
+
+    table {
+      ask "Fill in $\mathbf{a} \times \mathbf{b}$."
+      skill: "vec-cross-compute"
+      header: ["i part", "j part", "k part"]
+      row: blank(2), blank(3), blank(6)
+      onwrong: "cp-detour-loop" retry
+      hint "Write $\mathbf{a} = (3, 0, -1)$ and $\mathbf{b} = (0, 2, -1)$ first. Mind the minus signs."
+      ! "$\mathbf{a} \times \mathbf{b} = 2\mathbf{i} + 3\mathbf{j} + 6\mathbf{k}$. Check: $\mathbf{a} \cdot (2, 3, 6) = 6 + 0 - 6 = 0$."
+    }
+  }
+
+  slide "How big is it?" {
+    id: "cp-own-3"
+    beat: example
+    > Last one, and it's the one that catches people.
+
+    numeric {
+      ask "Those two edges, $\mathbf{a}$ and $\mathbf{b}$, make a panel. What's its area?"
+      skill: "vec-cross-area"
+      answer: 7
+      expect: sqrt(2^2 + 3^2 + 6^2)
+      wrong 11 "That adds the parts. The area is how long the arrow is." -> "cp-detour-length" retry
+      wrong 49 "That's the length squared. Take the root." -> "cp-detour-length" retry
+      hint "Which bit of the green arrow was the area?"
+      hint "Length in space: $\sqrt{x^2 + y^2 + z^2}$."
+      ! "The area is the length of $\mathbf{a} \times \mathbf{b} = 2\mathbf{i} + 3\mathbf{j} + 6\mathbf{k}$: $\sqrt{4 + 9 + 36} = 7$."
+    }
+  }
+
+  slide "A sail" {
+    id: "cp-transfer"
+    beat: transfer
+    > A triangular sail is pinned at three corners: $A(0, 2, 4)$, $B(2, 1, 4)$ and $C(0, 4, 2)$, in metres.
+
+    numeric {
+      ask "How much sail is there?"
+      skill: "vec-cross-area"
+      unit: "m²"
+      answer: 3
+      expect: 0.5 * sqrt(2^2 + 4^2 + 4^2)
+      tolerance: 0.01
+      wrong 6 "That's the whole parallelogram with those two edges. The sail is half of it." -> "cp-detour-half" retry
+      wrong -2 "That's $\overrightarrow{AB} \cdot \overrightarrow{AC}$, the dot product, a number with no area in it." -> "cp-detour-componentwise" retry
+      wrong 18 "That's half the length squared. Take the root first." -> "cp-detour-length" retry
+      wrong 36 "That's the length squared, of the whole parallelogram." -> "cp-detour-length" retry
+      wrong 5 "That adds the parts. The area comes from the arrow's length." -> "cp-detour-length" retry
+      ! "Edges $\overrightarrow{AB} = 2\mathbf{i} - \mathbf{j}$ and $\overrightarrow{AC} = 2\mathbf{j} - 2\mathbf{k}$ cross to $2\mathbf{i} + 4\mathbf{j} + 4\mathbf{k}$, length 6. The sail is half: 3 m². The cross product comes back in practice over the next few days."
+    }
+  }
+
+  slide "Right size, wrong face" {
+    id: "cp-detour-face"
+    beat: detour
+    hidden: true
+    > Right size, wrong face. Looking down, north to east is a clockwise turn, so the arrow points away from you.
+
+    scene plane {
+      alt: "The floor from above: the first edge 2j points up the page, the second edge 3i points right, and a curved line turns clockwise from the first to the second. A cross in the corner means the arrow points away from you."
+      x: [-1.5, 4]
+      y: [-1.8, 3]
+      aspect: equal
+      axes: false
+      vector v1 = (0, 0) -> (0, 2) { color: a, width: 4 }
+      vector v2 = (0, 0) -> (3, 0) { color: b, width: 4 }
+      arc turn = (0, 0) { r: 1, from: 0, to: 90, color: neutral, width: 2 }
+      point head = (1, 0) { r: 5, color: neutral }
+      label at (0.2, 2.2) = "first: 2j, north" { color: a }
+      label at (2.2, -0.45) = "second: 3i, east" { anchor: middle, color: b }
+      line c1 = (-1.2, -1.5) -> (-0.8, -1.1) { color: cross, width: 3 }
+      line c2 = (-1.2, -1.1) -> (-0.8, -1.5) { color: cross, width: 3 }
+      label at (-0.6, -1.4) = "clockwise, so away from you" { color: cross }
+    }
+
+    numeric {
+      ask "$4\mathbf{i} \times (-2\mathbf{j})$: how many $\mathbf{k}$'s? Up is +."
+      skill: "vec-cross-meaning"
+      answer: -8
+      expect: 4 * (0 - 2)
+      wrong 8 "Right size again. East to south: which way is that turn?"
+      hint "$-\mathbf{j}$ points south. Turn from east to south, the short way."
+      ! "East to south is clockwise, so it points away: $-8\mathbf{k}$."
+    }
+  }
+
+  slide "Square means biggest" {
+    id: "cp-detour-dot"
+    beat: detour
+    hidden: true
+    > 0 is the dot product's answer for edges at right angles. The cross product is the other way round: at right angles the panel is as big as it gets.
+
+    scene space3 {
+      alt: "The swing scene with two readouts: a dot b, and the green arrow's length. A slider swings b."
+      x: [-4.5, 7.5]
+      y: [-0.5, 4.5]
+      z: [0, 12.8]
+      axes: false
+      camera: [-70, 32]
+      param th = 30 { range: [0, 180], step: 5 }
+      polygon3 panel = [(0, 0, 0), (3, 0, 0), (3 + 4*cos(rad(th)), 4*sin(rad(th)), 0), (4*cos(rad(th)), 4*sin(rad(th)), 0)] { color: neutral, opacity: 0.25 }
+      segment3 ea = (0, 0, 0) -> (3, 0, 0) { arrow, color: a }
+      segment3 eb = (0, 0, 0) -> (4*cos(rad(th)), 4*sin(rad(th)), 0) { arrow, color: b }
+      segment3 up = (0, 0, 0) -> (0, 0, 12*sin(rad(th))) { arrow, color: cross, width: 4, show: th > 0 and th < 180 }
+      label3 at (0, 0, 12*sin(rad(th)) + 0.8) = "green arrow's length = ${fixed(12*sin(rad(th)), 2)}" { color: cross }
+      label3 at ((3 + 4*cos(rad(th)))/2, 2*sin(rad(th)), 0) = "a · b = ${fixed(12*cos(rad(th)), 2)}" { color: neutral }
+      slider th { label: "swing b" }
+    }
+
+    goal "Find the swing where $\mathbf{a} \cdot \mathbf{b}$ is 0" {
+      when: th == 90
+      hints: ["Watch the a · b readout as you swing.", "The dot product is 0 when the edges are square."]
+      showme: { th: 90 }
+    }
+
+    numeric {
+      ask "$(4\mathbf{j}) \times \mathbf{i}$: how many $\mathbf{k}$'s? Up is +."
+      skill: "vec-cross-meaning"
+      answer: -4
+      expect: 0 - 4 * 1
+      wrong 0 "That's still the dot product's 0. Square edges make the biggest panel."
+      wrong 4 "Right size. North to east: which way is that turn?"
+      after: goals
+      ! "Square, so the length is $4 \times 1 = 4$. North to east is clockwise: $-4\mathbf{k}$."
+    }
+  }
+
+  slide "Flat panel, no arrow" {
+    id: "cp-detour-flat"
+    beat: detour
+    hidden: true
+    > 15 is $|\mathbf{a}||\mathbf{b}|$, and for these two it's $\mathbf{a} \cdot \mathbf{b}$ as well. But $\mathbf{b} = 3\mathbf{a}$, so they point the same way and the panel is flat. No area, no arrow.
+
+    scene plane {
+      alt: "Edge a and edge b lying along the same line from the origin, with a slider that stretches b. A readout shows the green arrow's length staying at 0."
+      x: [-0.5, 7.5]
+      y: [-0.5, 4]
+      aspect: equal
+      grid
+      axes
+      param k = 1.5 { range: [0.5, 3.5], step: 0.25 }
+      vector vb = (0, 0) -> (2*k, k) { color: b, width: 6 }
+      vector va = (0, 0) -> (2, 1) { color: a, width: 3 }
+      label at (0.2, 3.6) = "a's length × b's length = ${fixed(sqrt(5) * k*sqrt(5), 2)}" { color: neutral }
+      label at (0.2, 3.0) = "green arrow's length = ${fixed(sqrt(5) * k*sqrt(5) * sin(0), 2)}" { color: cross }
+      slider k { label: "stretch b" }
+    }
+
+    goal "Make [b]{b} as long as it goes" {
+      when: k == 3.5
+      hints: ["Drag the stretch slider all the way, and watch the readout."]
+      showme: { k: 3.5 }
+    }
+
+    numeric {
+      ask "$|\mathbf{a}| = 6$, $|\mathbf{b}| = 3$, and they're $150°$ apart. How long is $\mathbf{a} \times \mathbf{b}$?"
+      skill: "vec-cross-meaning"
+      answer: 9
+      expect: 6 * 3 * sin(rad(150))
+      tolerance: 0.01
+      wrong 18 "That's $|\mathbf{a}||\mathbf{b}|$ again. Where's the $\sin\theta$?"
+      wrong 6 * 3 * cos(rad(150)) "That's cos, the dot product's. The cross product uses sin."
+      after: goals
+      ! "$6 \times 3 \times \sin 150° = 18 \times 0.5 = 9$. Only square edges give the full $|\mathbf{a}||\mathbf{b}|$."
+    }
+  }
+
+  slide "The order trap, in algebra" {
+    id: "cp-detour-jxi"
+    beat: detour
+    hidden: true
+    > $\mathbf{j} \times \mathbf{i}$ is $-\mathbf{k}$, not $\mathbf{k}$. It's the order trap again, hiding in the algebra. Every pair keeps [a]{a}'s letter first.
+
+    numeric {
+      ask "$(2\mathbf{i} + \mathbf{j}) \times (\mathbf{i} + 4\mathbf{j})$: what's the $\mathbf{k}$ part?"
+      skill: "vec-cross-compute"
+      answer: 7
+      expect: 2 * 4 - 1 * 1
+      wrong 9 "Still $+\mathbf{k}$ for $\mathbf{j} \times \mathbf{i}$. It's $-\mathbf{k}$."
+      wrong -7 "Flipped. a's letter goes first in every pair."
+      hint "Two pairs make a $\mathbf{k}$: $2\mathbf{i} \times 4\mathbf{j}$ and $\mathbf{j} \times \mathbf{i}$."
+      ! "$2\mathbf{i} \times 4\mathbf{j} = 8\mathbf{k}$ and $\mathbf{j} \times \mathbf{i} = -\mathbf{k}$, so $8 - 1 = 7$."
+    }
+  }
+
+  slide "Round the loop" {
+    id: "cp-detour-loop"
+    beat: detour
+    hidden: true
+    > The $\mathbf{j}$ part trips up nearly everyone. Go round the loop: $yz$ for $\mathbf{i}$, $zx$ for $\mathbf{j}$, $xy$ for $\mathbf{k}$. So the $\mathbf{j}$ part is $a_3b_1 - a_1b_3$, $z$ first.
+
+    numeric {
+      ask "$\mathbf{a} = \mathbf{i} + 2\mathbf{k}$ and $\mathbf{b} = 3\mathbf{i} + \mathbf{j}$. What's the $\mathbf{j}$ part?"
+      skill: "vec-cross-compute"
+      answer: 6
+      expect: 2 * 3 - 1 * 0
+      wrong -6 "Off the loop again: $z$ goes before $x$."
+      hint "$a_3 = 2$, $b_1 = 3$, $a_1 = 1$, $b_3 = 0$."
+      ! "$a_3b_1 - a_1b_3 = 2 \times 3 - 1 \times 0 = 6$."
+    }
+  }
+
+  slide "Different letters" {
+    id: "cp-detour-componentwise"
+    beat: detour
+    hidden: true
+    > Multiplying matching parts, $x$ with $x$ and $y$ with $y$, is the dot product's move, and it gives a number. The cross product always pairs different letters, and gives an arrow.
+
+    numeric {
+      ask "$(2\mathbf{i} + 5\mathbf{j}) \times (3\mathbf{i} + \mathbf{j})$: what's the $\mathbf{k}$ part?"
+      skill: "vec-cross-compute"
+      answer: -13
+      expect: 2 * 1 - 5 * 3
+      wrong 11 "That's the dot product: $2 \times 3 + 5 \times 1$."
+      wrong 13 "Right size, flipped. a's letter goes first in every pair."
+      hint "The $\mathbf{k}$ part pairs $x$ with $y$: $a_1b_2 - a_2b_1$."
+      ! "$a_1b_2 - a_2b_1 = 2 \times 1 - 5 \times 3 = -13$."
+    }
+  }
+
+  slide "Area is length" {
+    id: "cp-detour-length"
+    beat: detour
+    hidden: true
+    > The area is the length of $\mathbf{a} \times \mathbf{b}$, and length in space is $\sqrt{x^2 + y^2 + z^2}$. Adding the parts, or leaving off the root, measures something else.
+
+    numeric {
+      ask "$\mathbf{a} \times \mathbf{b} = \mathbf{i} + 2\mathbf{j} + 2\mathbf{k}$. What's the panel's area?"
+      skill: "vec-cross-area"
+      answer: 3
+      expect: sqrt(1 + 4 + 4)
+      wrong 5 "That adds the parts. Square them, add, then root."
+      wrong 9 "That's the length squared. Take the root."
+      ! "$\sqrt{1 + 4 + 4} = \sqrt{9} = 3$."
+    }
+  }
+
+  slide "Half the panel" {
+    id: "cp-detour-half"
+    beat: detour
+    hidden: true
+    > 6 is the whole parallelogram with those two edges. Cut it along the diagonal and you get two copies of the sail.
+
+    scene plane {
+      alt: "A parallelogram cut along one diagonal into two matching triangles, one shaded as the sail."
+      x: [-0.5, 6]
+      y: [-0.5, 3]
+      aspect: equal
+      axes: false
+      polygon whole = [(0, 0), (4, 0), (5.5, 2.5), (1.5, 2.5)] { color: neutral, opacity: 0.08 }
+      polygon sail = [(0, 0), (4, 0), (1.5, 2.5)] { color: cross, opacity: 0.3 }
+      line diag = (4, 0) -> (1.5, 2.5) { color: neutral, style: dashed, width: 2 }
+      label at (1.6, 0.6) = "sail" { color: cross }
+    }
+
+    numeric {
+      ask "Two edges of a triangle cross to $2\mathbf{i} + 3\mathbf{j} + 6\mathbf{k}$. What's its area?"
+      skill: "vec-cross-area"
+      answer: 3.5
+      expect: 0.5 * sqrt(2^2 + 3^2 + 6^2)
+      tolerance: 0.01
+      wrong 7 "That's the whole parallelogram again. Halve it."
+      ! "The arrow is $\sqrt{4 + 9 + 36} = 7$ long, so the parallelogram is 7 and the triangle is 3.5."
+    }
+  }
+}
