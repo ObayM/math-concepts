@@ -862,3 +862,407 @@ Drag the point and watch it ride the curve.",
   "version": 2,
 }
 `;
+
+exports[`unified Prism lesson grammar (v2) > compiles panes.prism, two linked scenes sharing one state, to a stable Lesson IR 1`] = `
+{
+  "slides": [
+    {
+      "goals": [
+        {
+          "prompt": "Make the panel as big as it gets",
+          "showme": {
+            "set": {
+              "th": 1.57,
+            },
+          },
+          "when": {
+            "k": "bin",
+            "l": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "th",
+              },
+              "op": ">",
+              "r": {
+                "k": "num",
+                "v": 1.5,
+              },
+            },
+            "op": "and",
+            "r": {
+              "k": "bin",
+              "l": {
+                "k": "id",
+                "name": "th",
+              },
+              "op": "<",
+              "r": {
+                "k": "num",
+                "v": 1.65,
+              },
+            },
+          },
+        },
+      ],
+      "id": "which-face",
+      "pane": {
+        "objects": [
+          {
+            "color": "primary",
+            "id": "a",
+            "type": "vector",
+            "x1": 0,
+            "x2": 1.5,
+            "y1": 0,
+            "y2": 0,
+          },
+          {
+            "color": "accent",
+            "id": "b",
+            "type": "vector",
+            "x1": 0,
+            "x2": {
+              "k": "bin",
+              "l": {
+                "k": "num",
+                "v": 1.5,
+              },
+              "op": "*",
+              "r": {
+                "args": [
+                  {
+                    "k": "id",
+                    "name": "th",
+                  },
+                ],
+                "fn": "cos",
+                "k": "call",
+              },
+            },
+            "y1": 0,
+            "y2": {
+              "k": "bin",
+              "l": {
+                "k": "num",
+                "v": 1.5,
+              },
+              "op": "*",
+              "r": {
+                "args": [
+                  {
+                    "k": "id",
+                    "name": "th",
+                  },
+                ],
+                "fn": "sin",
+                "k": "call",
+              },
+            },
+          },
+          {
+            "id": "__lbl_0",
+            "text": {
+              "parts": [
+                "area ",
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 2.25,
+                  },
+                  "op": "*",
+                  "r": {
+                    "args": [
+                      {
+                        "k": "id",
+                        "name": "th",
+                      },
+                    ],
+                    "fn": "sin",
+                    "k": "call",
+                  },
+                },
+              ],
+            },
+            "type": "label",
+            "x": 0.2,
+            "y": -0.3,
+          },
+        ],
+        "space": {
+          "alt": "the same floor seen from above",
+          "aspect": "equal",
+          "grid": true,
+          "type": "plane",
+          "xDomain": [
+            -2,
+            2,
+          ],
+          "yDomain": [
+            -2,
+            2,
+          ],
+        },
+      },
+      "prose": "Swing $\\vec b$ and watch the panel from both sides.",
+      "scene": {
+        "controls": [
+          {
+            "as": "slider",
+            "bind": "th",
+            "label": "swing b",
+          },
+          {
+            "as": "toggle",
+            "bind": "showN",
+            "label": "show a × b",
+          },
+        ],
+        "objects": [
+          {
+            "arrow": true,
+            "color": "primary",
+            "id": "a",
+            "label": "a",
+            "type": "segment3",
+            "x1": 0,
+            "x2": 1.5,
+            "y1": 0,
+            "y2": 0,
+            "z1": 0,
+            "z2": 0,
+          },
+          {
+            "arrow": true,
+            "color": "accent",
+            "id": "b",
+            "label": "b",
+            "type": "segment3",
+            "x1": 0,
+            "x2": {
+              "k": "bin",
+              "l": {
+                "k": "num",
+                "v": 1.5,
+              },
+              "op": "*",
+              "r": {
+                "args": [
+                  {
+                    "k": "id",
+                    "name": "th",
+                  },
+                ],
+                "fn": "cos",
+                "k": "call",
+              },
+            },
+            "y1": 0,
+            "y2": {
+              "k": "bin",
+              "l": {
+                "k": "num",
+                "v": 1.5,
+              },
+              "op": "*",
+              "r": {
+                "args": [
+                  {
+                    "k": "id",
+                    "name": "th",
+                  },
+                ],
+                "fn": "sin",
+                "k": "call",
+              },
+            },
+            "z1": 0,
+            "z2": 0,
+          },
+          {
+            "id": "panel",
+            "opacity": 0.2,
+            "points": [
+              [
+                0,
+                0,
+                0,
+              ],
+              [
+                1.5,
+                0,
+                0,
+              ],
+              [
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 1.5,
+                  },
+                  "op": "+",
+                  "r": {
+                    "k": "bin",
+                    "l": {
+                      "k": "num",
+                      "v": 1.5,
+                    },
+                    "op": "*",
+                    "r": {
+                      "args": [
+                        {
+                          "k": "id",
+                          "name": "th",
+                        },
+                      ],
+                      "fn": "cos",
+                      "k": "call",
+                    },
+                  },
+                },
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 1.5,
+                  },
+                  "op": "*",
+                  "r": {
+                    "args": [
+                      {
+                        "k": "id",
+                        "name": "th",
+                      },
+                    ],
+                    "fn": "sin",
+                    "k": "call",
+                  },
+                },
+                0,
+              ],
+              [
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 1.5,
+                  },
+                  "op": "*",
+                  "r": {
+                    "args": [
+                      {
+                        "k": "id",
+                        "name": "th",
+                      },
+                    ],
+                    "fn": "cos",
+                    "k": "call",
+                  },
+                },
+                {
+                  "k": "bin",
+                  "l": {
+                    "k": "num",
+                    "v": 1.5,
+                  },
+                  "op": "*",
+                  "r": {
+                    "args": [
+                      {
+                        "k": "id",
+                        "name": "th",
+                      },
+                    ],
+                    "fn": "sin",
+                    "k": "call",
+                  },
+                },
+                0,
+              ],
+            ],
+            "type": "polygon3",
+          },
+          {
+            "arrow": true,
+            "color": "success",
+            "id": "n",
+            "type": "segment3",
+            "visibleIf": {
+              "k": "id",
+              "name": "showN",
+            },
+            "x1": 0,
+            "x2": 0,
+            "y1": 0,
+            "y2": 0,
+            "z1": 0,
+            "z2": {
+              "args": [
+                {
+                  "k": "id",
+                  "name": "th",
+                },
+              ],
+              "fn": "sin",
+              "k": "call",
+            },
+          },
+        ],
+        "space": {
+          "alt": "a panel on the floor with edges a and b; the slider swings b",
+          "camera": [
+            30,
+            25,
+          ],
+          "type": "space3",
+          "xDomain": [
+            -2,
+            2,
+          ],
+          "yDomain": [
+            -2,
+            2,
+          ],
+          "zDomain": [
+            -1,
+            2,
+          ],
+        },
+        "state": {
+          "showN": {
+            "init": false,
+            "type": "boolean",
+          },
+          "th": {
+            "init": 0.6,
+            "max": 3,
+            "min": 0.1,
+            "step": 0.01,
+            "type": "number",
+          },
+        },
+        "timeline": [
+          {
+            "narrate": "a and b span a panel",
+          },
+          {
+            "animate": {
+              "th": 1.57,
+            },
+            "duration": 1200,
+            "indicate": [
+              "panel",
+            ],
+            "narrate": "swing b and the panel grows",
+          },
+        ],
+        "version": 2,
+      },
+      "title": "Which face?",
+    },
+  ],
+  "title": "Linked views",
+  "version": 2,
+}
+`;

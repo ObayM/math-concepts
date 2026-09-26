@@ -1,4 +1,4 @@
-import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
+import { slideScenes, type LessonIR, type SlideIR } from '@/engine/ir/lesson';
 import type { SceneIR } from '@/engine/ir/types';
 import { evalNum } from '@/engine/expr';
 import { checkStandard } from './standard';
@@ -55,10 +55,14 @@ function sampleCurve(
 }
 
 function checkCurves(slide: SlideIR, out: Finding[]) {
-  const dom = planeDomain(slide.scene);
+  for (const scene of slideScenes(slide)) checkSceneCurves(slide, scene, out);
+}
+
+function checkSceneCurves(slide: SlideIR, scene: SceneIR, out: Finding[]) {
+  const dom = planeDomain(scene);
   if (!dom) return;
-  const state = initialState(slide.scene);
-  for (const c of sceneCurves(slide.scene)) {
+  const state = initialState(scene);
+  for (const c of sceneCurves(scene)) {
     if (c.xExpr || c.yExpr || c.where) continue;
     if (c.expr === undefined) continue;
     const { finite, threw, total } = sampleCurve(c.expr, dom.x[0], dom.x[1], state);
@@ -82,9 +86,9 @@ function checkCurves(slide: SlideIR, out: Finding[]) {
 function checkTable(slide: SlideIR, out: Finding[]) {
   const ex = slide.exercise;
   if (ex?.kind !== 'table') return;
-  const curves = sceneCurves(slide.scene).filter(
-    (c) => !c.xExpr && !c.where && c.expr !== undefined
-  );
+  const curves = slideScenes(slide)
+    .flatMap(sceneCurves)
+    .filter((c) => !c.xExpr && !c.where && c.expr !== undefined);
   if (curves.length !== 1) return;
   const curve = curves[0];
 
@@ -264,7 +268,11 @@ function checkBuild(slide: SlideIR, out: Finding[]) {
 }
 
 function checkAlongDragRange(slide: SlideIR, out: Finding[]) {
-  const objects = slide.scene?.objects ?? [];
+  for (const scene of slideScenes(slide)) checkSceneAlong(slide, scene, out);
+}
+
+function checkSceneAlong(slide: SlideIR, scene: SceneIR, out: Finding[]) {
+  const objects = scene.objects;
   const circles = new Set(objects.filter((o) => o.type === 'circle').map((o) => o.id));
 
   for (const o of objects) {
@@ -272,7 +280,7 @@ function checkAlongDragRange(slide: SlideIR, out: Finding[]) {
     const ref = o.draggable?.along?.ref;
     if (!ref || !circles.has(ref)) continue;
 
-    const def = slide.scene?.state?.[o.draggable!.bind];
+    const def = scene.state[o.draggable!.bind];
     if (def?.type !== 'number') continue;
     const { min, max } = def;
     if (min == null && max == null) continue;
@@ -287,7 +295,7 @@ function checkAlongDragRange(slide: SlideIR, out: Finding[]) {
 }
 
 function checkFreeDragAnchor(slide: SlideIR, out: Finding[]) {
-  for (const o of slide.scene?.objects ?? []) {
+  for (const o of slideScenes(slide).flatMap((sc) => sc.objects)) {
     if (o.type !== 'point' || !o.draggable || o.draggable.along) continue;
     const { axis, bind, bindY } = o.draggable;
 

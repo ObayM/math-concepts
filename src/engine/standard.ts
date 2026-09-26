@@ -1,4 +1,4 @@
-import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
+import { slideScenes, type LessonIR, type SlideIR } from '@/engine/ir/lesson';
 import type { SceneIR } from '@/engine/ir/types';
 import type { ExprIR } from '@/engine/expr';
 import { evalExpr, evalText } from '@/engine/expr';
@@ -72,7 +72,7 @@ function studentText(slide: SlideIR): string[] {
     if (ex.kind === 'quiz') for (const o of ex.options) out.push(o.text, o.why ?? '');
     if (ex.kind === 'hotspot') out.push(ex.miss ?? '');
   }
-  out.push(...labelTexts(slide.scene));
+  out.push(...slideScenes(slide).flatMap(labelTexts));
   return out.filter(Boolean);
 }
 
@@ -88,10 +88,12 @@ function checkGoals(slide: SlideIR, out: Finding[]) {
   const scope = initialScope(slide.scene);
   const state = slide.scene?.state ?? {};
   const snapped = new Set(
-    (slide.scene?.objects ?? []).flatMap((o) => {
-      const d = (o as { draggable?: { bind: string; bindY?: string; snap?: unknown } }).draggable;
-      return d?.snap != null ? [d.bind, d.bindY].filter((b): b is string => Boolean(b)) : [];
-    })
+    slideScenes(slide)
+      .flatMap((sc) => sc.objects)
+      .flatMap((o) => {
+        const d = (o as { draggable?: { bind: string; bindY?: string; snap?: unknown } }).draggable;
+        return d?.snap != null ? [d.bind, d.bindY].filter((b): b is string => Boolean(b)) : [];
+      })
   );
 
   slide.goals.forEach((g, i) => {
@@ -157,7 +159,7 @@ function floatEquals(e: ExprIR | undefined): string[] {
 
 function checkTask(slide: SlideIR, out: Finding[]) {
   if (slide.exercise || slide.goals?.length) return;
-  if (isInteractive(slide.scene)) {
+  if (slideScenes(slide).some(isInteractive)) {
     out.push(
       warn(
         slide.id,
@@ -210,7 +212,7 @@ function checkAnswerOnScreen(slide: SlideIR, out: Finding[]) {
   const answers = ex.answers;
   const hit = (n: number) => answers.some((a) => Math.abs(a - n) <= Math.max(ex.tolerance, 1e-9));
 
-  for (const text of labelTexts(slide.scene)) {
+  for (const text of slideScenes(slide).flatMap(labelTexts)) {
     if (standaloneNumbers(text).some(hit)) {
       out.push(
         warn(
@@ -321,14 +323,17 @@ function checkRequires(lesson: LessonIR, out: Finding[]) {
 }
 
 function checkAlt(slide: SlideIR, out: Finding[]) {
-  if (!slide.scene || slide.hidden || slide.scene.space.alt) return;
-  out.push(
-    warn(
-      slide.id,
-      'V_SCENE_NO_ALT',
-      'the scene has no alt: description, so a screen reader gets nothing. Say what the picture shows and what the student can change'
-    )
-  );
+  if (slide.hidden) return;
+  slideScenes(slide).forEach((scene, i) => {
+    if (scene.space.alt) return;
+    out.push(
+      warn(
+        slide.id,
+        'V_SCENE_NO_ALT',
+        `the ${i ? 'second ' : ''}scene has no alt: description, so a screen reader gets nothing. Say what the picture shows and what the student can change`
+      )
+    );
+  });
 }
 
 export function checkStandard(lesson: LessonIR): Finding[] {

@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { sceneSchema } from './schema';
+import { sceneSchema, paneSchema } from './schema';
+import type { SceneIR } from './types';
 import { exprIRSchema } from '@/engine/expr';
 import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from '@/engine/lang/icons';
 
@@ -181,6 +182,7 @@ const slide = z.object({
   then: z.string().optional(),
   prose: z.string().optional(),
   scene: sceneSchema.optional(),
+  pane: paneSchema.optional(),
   exercise: exercise.optional(),
   goals: z.array(goal).optional(),
 });
@@ -202,3 +204,9 @@ export type LessonIR = z.infer<typeof lessonSchema>;
 export type SlideIR = z.infer<typeof slide>;
 export type ExerciseIR = z.infer<typeof exercise>;
 export type GoalIR = z.infer<typeof goal>;
+
+export function slideScenes(slide: Pick<SlideIR, 'scene' | 'pane'> | null | undefined): SceneIR[] {
+  if (!slide?.scene) return [];
+  if (!slide.pane) return [slide.scene];
+  return [slide.scene, { ...slide.pane, state: slide.scene.state }];
+}

@@ -36,6 +36,7 @@ export interface TutorContext {
   };
   scene?: {
     space: string;
+    pane?: string;
     values: Record<string, number | boolean | string>;
   };
   skill?: string;
@@ -184,6 +185,7 @@ export function buildTutorContext(
   if (slide.scene) {
     ctx.scene = {
       space: slide.scene.space.type,
+      ...(slide.pane && { pane: slide.pane.space.type }),
       values: sanitizeScope(slide, state.scope),
     };
   }
@@ -206,7 +208,12 @@ export function renderContext(ctx: TutorContext): string {
 
   if (ctx.scene) {
     const values = Object.entries(ctx.scene.values);
-    lines.push('', `There is an interactive ${ctx.scene.space} diagram.`);
+    lines.push(
+      '',
+      ctx.scene.pane
+        ? `There are two linked interactive diagrams side by side, a ${ctx.scene.space} and a ${ctx.scene.pane}, driven by the same values.`
+        : `There is an interactive ${ctx.scene.space} diagram.`
+    );
     if (values.length) {
       lines.push(`Right now they have set: ${values.map(([k, v]) => `${k} = ${v}`).join(', ')}`);
     }

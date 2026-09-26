@@ -11,8 +11,12 @@ const LESSONS_DIR = path.resolve(process.cwd(), 'prisma/lessons');
 function lessonScenes(text: string) {
   const lesson = compileLesson(text);
   return lesson.slides
-    .map((slide, i) => ({ title: slide.title ?? `Slide ${i + 1}`, scene: slide.scene }))
-    .filter((s): s is { title: string; scene: NonNullable<typeof s.scene> } => Boolean(s.scene));
+    .map((slide, i) => ({
+      title: slide.title ?? `Slide ${i + 1}`,
+      scene: slide.scene,
+      pane: slide.pane,
+    }))
+    .filter((s): s is typeof s & { scene: NonNullable<typeof s.scene> } => Boolean(s.scene));
 }
 
 export async function GET(req: NextRequest) {
@@ -67,7 +71,7 @@ export async function GET(req: NextRequest) {
   }
 
   const idx = Math.max(0, Math.min(sceneN - 1, scenes.length - 1));
-  const { title, scene } = scenes[idx];
+  const { title, scene, pane } = scenes[idx];
 
   return NextResponse.json({
     file,
@@ -75,6 +79,7 @@ export async function GET(req: NextRequest) {
     scene: idx + 1,
     title,
     ir: scene,
+    pane,
     mtime,
   });
 }

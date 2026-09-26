@@ -1,5 +1,5 @@
 import type { Expr, PropMap, Stmt, SlideStmt, Branch } from './ast';
-import type { SceneIR } from '@/engine/ir/types';
+import type { SceneIR, PaneIR } from '@/engine/ir/types';
 import type { LessonIR } from '@/engine/ir/lesson';
 import type { ExprIR, NumExpr, UnOp, BinOp, Value } from '@/engine/expr';
 import { sceneSchema, MAX_CURVE_STEPS } from '@/engine/ir/schema';
@@ -344,11 +344,44 @@ function niceNum(v: number): string {
   return String(Math.round(v * 1e9) / 1e9);
 }
 
-export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): SceneIR {
-  const ir: any = { version: 2, state: {}, space: null, objects: [], controls: [], timeline: [] };
+type Attention = { ids: string[]; key: string; ln: number };
+
+type PaneLink = {
+  shared?: SceneIR['state'];
+  stateOnly?: boolean;
+  attention?: Attention[];
+};
+
+const DECLARING = new Set([
+  'let',
+  'def',
+  'for_s',
+  'if_s',
+  'call_s',
+  'scene',
+  'param',
+  'bool_d',
+  'choice_d',
+]);
+
+export function emit(
+  stmts: Stmt[],
+  seedMacros?: Macros,
+  roles: Roles = {},
+  link: PaneLink = {}
+): SceneIR {
+  const ir: any = {
+    version: 2,
+    state: { ...link.shared },
+    space: null,
+    objects: [],
+    controls: [],
+    timeline: [],
+  };
+  const shared = Object.keys(link.shared ?? {});
   const macros: Macros = seedMacros ? new Map(seedMacros) : new Map();
   const morphs: { from: string; to: string; by: ExprIR; ln: number }[] = [];
-  const attention: { ids: string[]; key: string; ln: number }[] = [];
+  const attention: Attention[] = link.attention ?? [];
   let autoLabelId = 0;
   // vars bound by an enclosing `repeat` — valid runtime ids inside its body,
   // resolved by the renderer at expand time, not here
@@ -509,11 +542,21 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
     }
   }
 
+  function declare(name: string, def: SceneIR['state'][string], ln: number) {
+    if (shared.includes(name))
+      throw new CompileError(
+        `"${name}" is already declared in the other scene; the two scenes share one state, so declare it once`,
+        ln
+      );
+    ir.state[name] = def;
+  }
+
   function run(stmts: Stmt[], cScope: CompileScope) {
     for (const s of stmts) emitStmt(s, cScope);
   }
 
   function emitStmt(s: Stmt, cScope: CompileScope) {
+    if (link.stateOnly && !DECLARING.has(s.k)) return;
     switch (s.k) {
       case 'let': {
         (cScope as any)[s.name] = compileEval(s.value, cScope);
@@ -611,6 +654,10 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
       }
 
       case 'scene': {
+        if (link.stateOnly) {
+          run(s.children, cScope);
+          break;
+        }
         const xV = s.props.get('x');
         const yV = s.props.get('y');
         if (!xV || xV === true || xV.k !== 'list')
@@ -717,12 +764,12 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
         const step = propNum(s.props, 'step', s.ln, cScope);
         if (step != null) varDef.step = step;
         if (s.props.get('keep') === true) varDef.keep = true;
-        ir.state[s.name] = varDef;
+        declare(s.name, varDef, s.ln);
         break;
       }
 
       case 'bool_d': {
-        ir.state[s.name] = { type: 'boolean', init: Boolean(compileEval(s.init, cScope)) };
+        declare(s.name, { type: 'boolean', init: Boolean(compileEval(s.init, cScope)) }, s.ln);
         break;
       }
 
@@ -740,7 +787,7 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
         if (!options.includes(s.init.v)) {
           throw new CompileError(`choice init "${s.init.v}" is not in options`, s.ln);
         }
-        ir.state[s.name] = { type: 'enum', init: s.init.v, options };
+        declare(s.name, { type: 'enum', init: s.init.v, options }, s.ln);
         break;
       }
 
@@ -1244,14 +1291,9 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
   }
 
   run(stmts, {});
+  if (link.stateOnly) return ir;
 
-  const objectIds = ir.objects.map((o: any) => o.id);
-  for (const a of attention) {
-    for (const id of a.ids) {
-      if (!objectIds.includes(id))
-        throw new CompileError(`${a.key}: no object "${id}"${suggest(id, objectIds)}`, a.ln);
-    }
-  }
+  if (!link.attention) checkAttention(attention, ir.objects);
 
   for (const m of morphs) {
     const a = ir.objects.find((o: any) => o.id === m.from);
@@ -1290,6 +1332,7 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
   }
 
   if (!ir.space) throw new CompileError('missing scene declaration');
+  for (const name of shared) delete ir.state[name];
   if (!ir.controls.length) delete ir.controls;
   if (!ir.timeline.length) delete ir.timeline;
 
@@ -1299,6 +1342,16 @@ export function emit(stmts: Stmt[], seedMacros?: Macros, roles: Roles = {}): Sce
     throw new CompileError(`invalid scene IR: ${first.path.join('.')} - ${first.message}`);
   }
   return result.data;
+}
+
+function checkAttention(attention: Attention[], objects: { id: string }[]) {
+  const objectIds = objects.map((o) => o.id);
+  for (const a of attention) {
+    for (const id of a.ids) {
+      if (!objectIds.includes(id))
+        throw new CompileError(`${a.key}: no object "${id}"${suggest(id, objectIds)}`, a.ln);
+    }
+  }
 }
 
 // --- lesson emission --------------------------------------------------------
@@ -2033,6 +2086,40 @@ function emitGoal(s: Extract<Stmt, { k: 'goal' }>, allowedIds: string[]) {
   };
 }
 
+function emitPanes(
+  items: Extract<Stmt, { k: 'scene' }>[],
+  macros: Macros | undefined,
+  roles: Roles
+): { scene?: SceneIR; pane?: PaneIR } {
+  if (items.length < 2) return { scene: items.length ? emit(items, macros, roles) : undefined };
+  const [a, b] = items;
+  const early = (item: Stmt) => emit([item], macros, roles, { stateOnly: true }).state;
+  const ownA = early(a);
+  const laterB = Object.fromEntries(Object.entries(early(b)).filter(([k]) => !(k in ownA)));
+  const attention: Attention[] = [];
+  const first = emit([a], macros, roles, { shared: laterB, attention });
+  const second = emit([b], macros, roles, { shared: first.state, attention });
+  if (first.timeline && second.timeline)
+    throw new CompileError(
+      'only one of the two scenes can have steps; the slide plays one timeline',
+      b.ln
+    );
+  checkAttention(attention, [...first.objects, ...second.objects]);
+  const controls = [...(first.controls ?? []), ...(second.controls ?? [])];
+  const timeline = first.timeline ?? second.timeline;
+  return {
+    scene: {
+      version: first.version,
+      state: { ...first.state, ...second.state },
+      space: first.space,
+      objects: first.objects,
+      ...(controls.length && { controls }),
+      ...(timeline && { timeline }),
+    },
+    pane: { space: second.space, objects: second.objects },
+  };
+}
+
 function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles = {}) {
   // slug() keeps [a-z0-9] only, so a non-latin title either collapses to
   // nothing (leaving a positional id that moves when slides are reordered) or
@@ -2045,7 +2132,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles 
   }
   const id = slideIdFor(s.props, s.title, i);
   const prose: string[] = [];
-  let scene: SceneIR | undefined;
+  const sceneItems: Extract<Stmt, { k: 'scene' }>[] = [];
   let exercise:
     | ReturnType<typeof emitQuiz>
     | ReturnType<typeof emitNumeric>
@@ -2077,8 +2164,12 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles 
         })
       );
     } else if (item.k === 'scene') {
-      if (scene) throw new CompileError('a slide can have at most one scene', item.ln);
-      scene = emit([item], lessonMacros, roles);
+      if (sceneItems.length === 2)
+        throw new CompileError(
+          'a slide can have at most two scenes, which sit side by side and share one state',
+          item.ln
+        );
+      sceneItems.push(item);
     } else if (item.k === 'quiz') {
       if (exercise) throw new CompileError('a slide can have at most one exercise', item.ln);
       exercise = emitQuiz(item);
@@ -2114,6 +2205,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles 
     }
   }
 
+  const { scene, pane } = emitPanes(sceneItems, lessonMacros, roles);
   const allowedIds = scene ? Object.keys(scene.state ?? {}) : [];
   const tint = (t: string) => applyRoles(t, roles, () => {});
   const goals = goalItems.map((g) => {
@@ -2177,6 +2269,7 @@ function emitSlide(s: SlideStmt, i: number, lessonMacros?: Macros, roles: Roles 
     ...(hidden && { hidden }),
     ...(prose.length && { prose: prose.join('\n\n') }),
     ...(scene && { scene }),
+    ...(pane && { pane }),
     ...(exercise && { exercise: after ? { ...exercise, after: after.on } : exercise }),
     ...(goals.length && { goals }),
   };

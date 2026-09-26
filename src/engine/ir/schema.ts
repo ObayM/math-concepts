@@ -366,3 +366,5 @@ export const sceneSchema = z.object({
   controls: z.array(control).optional(),
   timeline: z.array(timelineStep).optional(),
 });
+
+export const paneSchema = sceneSchema.pick({ space: true, objects: true });

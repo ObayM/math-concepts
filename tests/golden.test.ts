@@ -21,4 +21,8 @@ describe('unified Prism lesson grammar (v2)', () => {
   it('compiles lesson.prism to a stable Lesson IR', () => {
     expect(compileLesson(fixture('lesson.prism'))).toMatchSnapshot();
   });
+
+  it('compiles panes.prism, two linked scenes sharing one state, to a stable Lesson IR', () => {
+    expect(compileLesson(fixture('panes.prism'))).toMatchSnapshot();
+  });
 });

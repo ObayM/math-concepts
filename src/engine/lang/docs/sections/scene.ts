@@ -42,6 +42,14 @@ export const sceneSection: DocSection = {
         'scene plane {\n  x: [-2, 2]\n  y: [-2, 2]\n  aspect: equal\n  grid\n  axes\n  circle unit = (0, 0) { r: 1, color: primary }\n}',
     },
     {
+      keyword: 'linked views',
+      syntax: 'slide "..." {\n  scene <type> { ... }\n  scene <type> { ... }\n}',
+      description:
+        'A slide can hold two scenes. They sit side by side (stacked on a phone) and share one state: a param, bool or choice declared in either scene can be read, dragged, bound and animated from both, and goals, `showme:` and `after:` see all of it. Declare each name once; declaring it in both scenes is an error. The controls of both scenes render as one strip under the pair, and only one of the two may have steps. Use it to show one idea two ways: a 3D view next to its top-down plan, or distance-time next to velocity-time. Each scene needs its own `alt:`.',
+      example:
+        'slide "Two views" {\n  scene plane {\n    x: [0, 4]\n    y: [0, 16]\n    alt: "distance against time"\n    param t = 1 { range: [0, 4] }\n    curve s = x^2 { color: primary }\n    point p = (t, t^2) { drag: x -> t, color: accent }\n  }\n  scene plane {\n    x: [0, 4]\n    y: [0, 8]\n    alt: "speed against time"\n    curve v = 2*x { color: primary }\n    point q = (t, 2*t) { color: accent }\n    slider t { label: "time" }\n  }\n  goal "Find when the speed hits 6" { when: t > 2.9 and t < 3.1 }\n}',
+    },
+    {
       keyword: 'param',
       syntax: 'param <name> = <number> { [range: [min,max]], [step: <number>], [keep] }',
       description:

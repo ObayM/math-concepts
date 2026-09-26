@@ -287,3 +287,30 @@ describe('space3 render (SSR smoke)', () => {
     );
   });
 });
+
+describe('linked views render both panes under one state (SSR smoke)', () => {
+  const slide = compileLesson(
+    readFileSync(fileURLToPath(new URL('./fixtures/panes.prism', import.meta.url)), 'utf8')
+  ).slides[0];
+  const html = renderToStaticMarkup(<Scene ir={slide.scene!} pane={slide.pane} />);
+
+  it('draws two diagrams, each announcing its own alt', () => {
+    expect((html.match(/<svg/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    expect(html).toContain('a panel on the floor with edges a and b');
+    expect(html).toContain('the same floor seen from above');
+  });
+
+  it('renders the controls of both scenes once, in one strip', () => {
+    expect(html.match(/type="range"/g)).toHaveLength(1);
+    expect(html).toContain('show a × b');
+  });
+
+  it('evaluates the second pane against the shared state', () => {
+    expect(html).toMatch(/area 1\.27/);
+    expect(html).not.toContain('NaN');
+  });
+
+  it('stacks the panes until there is room to sit them side by side', () => {
+    expect(html).toContain('@xl:grid-cols-2');
+  });
+});

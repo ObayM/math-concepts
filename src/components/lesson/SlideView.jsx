@@ -89,6 +89,7 @@ export default function SlideView({
         <div dir="ltr">
           <Scene
             ir={slide.scene}
+            pane={slide.pane}
             onScopeChange={onScopeChange}
             onTap={onTap}
             marker={marker}

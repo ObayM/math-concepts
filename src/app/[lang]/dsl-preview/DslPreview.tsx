@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Scene } from '@/engine';
-import type { SceneIR } from '@/engine/ir/types';
+import type { SceneIR, PaneIR } from '@/engine/ir/types';
 import s from './preview.module.css';
 
 type PreviewData = {
@@ -12,6 +12,7 @@ type PreviewData = {
   sceneCount: number;
   title: string;
   ir?: SceneIR;
+  pane?: PaneIR;
   error?: string;
   mtime: number;
 };
@@ -151,7 +152,11 @@ export default function DslPreview() {
         )}
         {currentData?.ir && (
           <div className={s.sceneInner}>
-            <Scene key={`${file}-${scene}-${currentData.mtime}`} ir={currentData.ir} />
+            <Scene
+              key={`${file}-${scene}-${currentData.mtime}`}
+              ir={currentData.ir}
+              pane={currentData.pane}
+            />
           </div>
         )}
       </div>

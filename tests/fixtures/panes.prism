@@ -1,0 +1,37 @@
+lesson "Linked views" {
+  slide "Which face?" {
+    id: "which-face"
+    > Swing $\vec b$ and watch the panel from both sides.
+
+    scene space3 {
+      x: [-2, 2]
+      y: [-2, 2]
+      z: [-1, 2]
+      camera: [30, 25]
+      alt: "a panel on the floor with edges a and b; the slider swings b"
+      segment3 a = (0, 0, 0) -> (1.5, 0, 0) { arrow, color: primary, label: "a" }
+      segment3 b = (0, 0, 0) -> (1.5*cos(th), 1.5*sin(th), 0) { arrow, color: accent, label: "b" }
+      polygon3 panel = [(0, 0, 0), (1.5, 0, 0), (1.5 + 1.5*cos(th), 1.5*sin(th), 0), (1.5*cos(th), 1.5*sin(th), 0)] { opacity: 0.2 }
+      segment3 n = (0, 0, 0) -> (0, 0, sin(th)) { arrow, color: success, show: showN }
+      slider th { label: "swing b" }
+    }
+
+    scene plane {
+      x: [-2, 2]
+      y: [-2, 2]
+      aspect: equal
+      grid
+      alt: "the same floor seen from above"
+      param th = 0.6 { range: [0.1, 3], step: 0.01 }
+      bool showN = false
+      vector a = (0, 0) -> (1.5, 0) { color: primary }
+      vector b = (0, 0) -> (1.5*cos(th), 1.5*sin(th)) { color: accent }
+      label at (0.2, -0.3) = "area ${2.25*sin(th)}"
+      toggle showN { label: "show a × b" }
+      step "a and b span a panel"
+      step "swing b and the panel grows" { animate: { th: 1.57 }, dur: 1200, indicate: [panel] }
+    }
+
+    goal "Make the panel as big as it gets" { when: th > 1.5 and th < 1.65, showme: { th: 1.57 } }
+  }
+}

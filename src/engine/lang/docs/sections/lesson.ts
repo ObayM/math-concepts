@@ -5,7 +5,7 @@ export const lessonSection: DocSection = {
   id: 'lesson',
   title: 'Lessons & Slides',
   description:
-    'A Prism file is either a bare `scene { ... }` (one visualization) or a `lesson { ... }` (a full multi-slide lesson). A slide is a *composition*: any prose, at most one scene, at most one exercise, and any number of goals — in any order. There is no "text slide" vs "quiz slide"; you just include the parts you need.',
+    'A Prism file is either a bare `scene { ... }` (one visualization) or a `lesson { ... }` (a full multi-slide lesson). A slide is a *composition*: any prose, a scene (or two, as linked views), at most one exercise, and any number of goals — in any order. There is no "text slide" vs "quiz slide"; you just include the parts you need.',
   entries: [
     {
       keyword: 'lesson',
