@@ -4,8 +4,6 @@ import type { ExprIR } from '@/engine/expr';
 import { evalExpr, evalText } from '@/engine/expr';
 import type { Finding } from './verify';
 
-export const WORD_BUDGET = 40;
-
 export const BANNED_PHRASES = [
   'note that',
   'clearly',
@@ -30,14 +28,6 @@ function initialScope(scene: SceneIR | undefined): Scope {
   const scope: Scope = {};
   for (const [name, v] of Object.entries(scene?.state ?? {})) scope[name] = v.init;
   return scope;
-}
-
-export function countWords(text: string): number {
-  return text
-    .replace(/\$\$[\s\S]*?\$\$|\$[^$]*\$/g, ' M ')
-    .replace(/[*_`#>|[\]()]/g, ' ')
-    .split(/\s+/)
-    .filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
 }
 
 function isInteractive(scene: SceneIR | undefined): boolean {
@@ -173,34 +163,6 @@ function checkTask(slide: SlideIR, out: Finding[]) {
         slide.id,
         'V_SLIDE_NO_ACTION',
         'nothing to do on this slide, so a student can click Continue without reading it'
-      )
-    );
-  }
-}
-
-function checkWordBudget(slide: SlideIR, out: Finding[]) {
-  const before = countWords(slide.prose ?? '');
-  if (before > WORD_BUDGET) {
-    out.push(
-      warn(
-        slide.id,
-        'V_PROSE_LONG',
-        `${before} words before the student does anything (budget ${WORD_BUDGET}). Split the slide and put something to do in between`
-      )
-    );
-  }
-  const ex = slide.exercise;
-  if (!ex) return;
-  const after = Math.max(
-    countWords(ex.explanation ?? ''),
-    ...(ex.kind === 'quiz' ? ex.options.map((o) => countWords(o.why ?? '')) : [0])
-  );
-  if (after > WORD_BUDGET) {
-    out.push(
-      warn(
-        slide.id,
-        'V_FEEDBACK_LONG',
-        `${after} words of feedback after answering (budget ${WORD_BUDGET}). Move the rest onto the next slide, next to something to do`
       )
     );
   }
@@ -342,7 +304,6 @@ export function checkStandard(lesson: LessonIR): Finding[] {
     checkAlt(slide, out);
     checkGoals(slide, out);
     checkTask(slide, out);
-    checkWordBudget(slide, out);
     checkAnswerOnScreen(slide, out);
     checkVoice(slide, out);
   }

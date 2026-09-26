@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { compileLesson } from '@/engine/lang';
 import { lessonSchema } from '@/engine/ir/lesson';
-import { checkStandard, countWords } from '@/engine/standard';
+import { checkStandard } from '@/engine/standard';
 import { verifyLesson, isBlocking } from '@/engine/verify';
 
 const lesson = (body: string) => lessonSchema.parse(compileLesson(`lesson "L" {\n${body}\n}`));
@@ -76,32 +76,6 @@ describe('something to do', () => {
 
   it('is happy with a slide that asks something', () => {
     expect(codes(quizSlide('q'))).toEqual([]);
-  });
-});
-
-describe('word budget', () => {
-  it('counts a formula as one word', () => {
-    expect(countWords('The slope is $\\frac{a + b}{c}$ here.')).toBe(5);
-  });
-
-  it('flags more than 40 words before the first action', () => {
-    const prose = '    > ' + Array.from({ length: 41 }, () => 'word').join(' ');
-    expect(codes(quizSlide('q', prose))).toContain('V_PROSE_LONG');
-    const short = '    > ' + Array.from({ length: 40 }, () => 'word').join(' ');
-    expect(codes(quizSlide('q', short))).not.toContain('V_PROSE_LONG');
-  });
-
-  it('counts feedback after the answer too', () => {
-    const long = Array.from({ length: 45 }, () => 'word').join(' ');
-    expect(
-      codes(`  slide "s" {
-    quiz {
-      ask "q"
-      * "a"
-      - "b" { why: "${long}" }
-    }
-  }`)
-    ).toContain('V_FEEDBACK_LONG');
   });
 });
 
