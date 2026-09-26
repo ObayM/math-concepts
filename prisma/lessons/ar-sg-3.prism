@@ -1,0 +1,1059 @@
+lesson "الضرب القياسي لمتجهين" {
+  course: "solid-geometry-g12-ar"
+  unit: "الهندسة والقياس في ثلاثة أبعاد"
+  difficulty: "Intermediate"
+  icon: "Move"
+  summary: "كم يقع من متجه على اتجاه متجه آخر؟ من ظلّ عصا إلى الضرب القياسي، والزاوية بين متجهين، واختبار التعامد، والمسقط."
+  skills: ["sg-dot-product", "sg-dot-angle", "sg-dot-projection"]
+  requires: ["sg-vec-norm", "sg-vec-components"]
+
+  role va = primary
+  role vb = success
+  role shadow = accent
+
+  slide "إحماء: طول متجه" {
+    id: "sg3-check-norm"
+    beat: check
+    cat: "إحماء"
+    > إحماء سريع قبل أن نبدأ.
+
+    numeric {
+      ask "ما معيار المتجه $\overrightarrow{A} = (2, 3, 6)$؟"
+      skill: "sg-vec-norm"
+      answer: 7
+      expect: sqrt(2^2 + 3^2 + 6^2)
+      tolerance: 0.01
+      wrong 11 "جمعت المركبات كما هي. المعيار طول، ويأتي من مربعات المركبات." -> "sg3-bridge-norm" retry
+      wrong 49 "وصلت إلى مجموع المربعات، وبقي الجذر." -> "sg3-bridge-norm" retry
+      hint "المعيار هو طول السهم. فكّر في فيثاغورس."
+      ! "$\sqrt{4 + 9 + 36} = \sqrt{49} = 7$. سنحتاج المعيار في كل خطوة تقريبًا."
+    }
+  }
+
+  slide "المعيار: فيثاغورس مرتين" {
+    id: "sg3-bridge-norm"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > المعيار هو طول المتجه. في الفراغ نطبّق فيثاغورس مرتين، فنحصل على
+    > $\|(x, y, z)\| = \sqrt{x^2 + y^2 + z^2}$: ربّع كل مركبة، اجمع، ثم خذ الجذر.
+
+    numeric {
+      ask "ما معيار المتجه $(1, 2, 2)$؟"
+      skill: "sg-vec-norm"
+      answer: 3
+      expect: sqrt(1 + 4 + 4)
+      tolerance: 0.01
+      wrong 5 "هذا مجموع المركبات. ربّعها أولًا."
+      wrong 9 "هذا ما تحت الجذر. خذ الجذر."
+      ! "$\sqrt{1 + 4 + 4} = \sqrt{9} = 3$. ارجع الآن إلى المتجه $(2, 3, 6)$."
+    }
+  }
+
+  slide "إحماء: متجه بين نقطتين" {
+    id: "sg3-check-ab"
+    beat: check
+    cat: "إحماء"
+    > وسؤال ثانٍ.
+
+    quiz {
+      ask "إذا كانت $A(2, 1, 3)$ و $B(3, 5, -2)$، فما $\overrightarrow{AB}$؟"
+      skill: "sg-vec-components"
+      * "$(1, 4, -5)$"
+      - "$(-1, -4, 5)$" { why: "هذا $\overrightarrow{BA}$، أي الطريق من $B$ إلى $A$. الاتجاه معكوس.", onwrong: "sg3-bridge-ab", retry }
+      - "$(5, 6, 1)$" { why: "جمعت النقطتين. المتجه بينهما يأتي من الطرح.", onwrong: "sg3-bridge-ab", retry }
+      - "$(6, 5, -6)$" { why: "ضربت الإحداثيات المتناظرة. المتجه بين نقطتين يأتي من الطرح.", onwrong: "sg3-bridge-ab", retry }
+      hint "من أين يبدأ $\overrightarrow{AB}$، وأين ينتهي؟"
+      ! "$\overrightarrow{AB} = B - A = (3 - 2, 5 - 1, -2 - 3) = (1, 4, -5)$."
+    }
+  }
+
+  slide "النهاية ناقص البداية" {
+    id: "sg3-bridge-ab"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > $\overrightarrow{AB}$ هو الطريق من $A$ إلى $B$. لتعرف كم تتحرك في كل اتجاه، اطرح:
+    > **النهاية ناقص البداية**، أي $\overrightarrow{AB} = B - A$.
+
+    quiz {
+      ask "إذا كانت $P(1, 0, 4)$ و $Q(3, -2, 1)$، فما $\overrightarrow{PQ}$؟"
+      skill: "sg-vec-components"
+      * "$(2, -2, -3)$"
+      - "$(-2, 2, 3)$" { why: "هذا $P - Q$. المتجه $\overrightarrow{PQ}$ ينتهي عند $Q$، فنبدأ بها." }
+      - "$(4, -2, 5)$" { why: "هذا مجموع النقطتين، والمطلوب الفرق." }
+      ! "$Q - P = (3 - 1, -2 - 0, 1 - 4) = (2, -2, -3)$. ارجع الآن إلى $\overrightarrow{AB}$."
+    }
+  }
+
+  slide "ظل العصا" {
+    id: "sg3-hook"
+    beat: hook
+    cat: "الظل"
+    > الظهر، والشمس فوق رأسك تمامًا. عصا طولها $2$ م مائلة على الأرض بزاوية $60°$.
+
+    scene plane {
+      alt: "أرض أفقية وعصا مائلة عليها بزاوية 60 درجة، والشمس فوقها مباشرة وأشعتها تنزل رأسيًا. الظل غير مرسوم."
+      x: [-1.6, 3.2]
+      y: [-0.6, 3.2]
+      aspect: equal
+      axes: false
+      line ground = (-1.4, 0) -> (3, 0) { color: vb, width: 3 }
+      line stick = (0, 0) -> (1, sqrt(3)) { color: va, width: 5 }
+      circle sun = (0.6, 2.8) { r: 0.25, color: warning, opacity: 0.6 }
+      line r1 = (0.2, 2.45) -> (0.2, 0.1) { color: warning, style: dashed }
+      line r2 = (0.6, 2.45) -> (0.6, 0.1) { color: warning, style: dashed }
+      line r3 = (1.0, 2.45) -> (1.0, 0.1) { color: warning, style: dashed }
+      arc tilt = (0, 0) { r: 0.5, from: 0, to: 60, color: neutral }
+      label at (0.55, 0.2) = "60°" { color: neutral }
+    }
+
+    quiz {
+      ask "كم طول ظل العصا على الأرض؟"
+      skill: "sg-dot-projection"
+      - "$2$ م، الظل بطول العصا" { why: "الظل بطول العصا فقط لو كانت العصا نائمة على الأرض. هي مائلة، فجزء منها يرتفع عن الأرض." }
+      * "$1$ م"
+      - "$1.73$ م تقريبًا" { why: "هذا $2 \sin 60°$، ارتفاع طرف العصا. الظل على الأرض لا في الهواء. سترى الفرق بعد قليل." }
+      - "صفر، الشمس عمودية فلا ظل" { why: "لا ظل للعصا الواقفة رأسيًا فقط. العصا المائلة لها ظل حتى والشمس فوقها." }
+      ! "هذا رهانك الآن. الشريحة التالية تحسم الأمر."
+    }
+  }
+
+  slide "حرّك السهم وراقب ظله" {
+    id: "sg3-explore"
+    beat: explore
+    cat: "الظل"
+    > لنحوّل العصا إلى [سهم A]{va} والأرض إلى [سهم B]{vb}. الضوء ينزل عموديًا على B، و[الظل]{shadow} هو ما يقع من A على B. غيّر الزاوية وراقب الظل.
+
+    scene plane {
+      alt: "سهمان يخرجان من نقطة واحدة: B أفقي طوله 4، و A طوله 3 وتتحكم بزاويته. خط متقطع ينزل من طرف A عموديًا على امتداد B، والظل مرسوم على B. قراءتان تعرضان الزاوية وطول الظل."
+      x: [-4.2, 4.6]
+      y: [-1.2, 3.8]
+      aspect: equal
+      axes: false
+      param t = 20 { range: [0, 180], step: 1 }
+      line back = (-4, 0) -> (0, 0) { color: neutral, style: dotted }
+      vector b = (0, 0) -> (4, 0) { color: vb, width: 3 }
+      line drop = (3*cos(rad(t)), 3*sin(rad(t))) -> (3*cos(rad(t)), 0) { color: neutral, style: dashed }
+      line sh = (0, 0) -> (3*cos(rad(t)), 0) { color: shadow, width: 7 }
+      vector a = (0, 0) -> (3*cos(rad(t)), 3*sin(rad(t))) { color: va, width: 3 }
+      arc ang = (0, 0) { r: 0.6, from: 0, to: t, color: neutral }
+      label at (4.2, 0.25) = "B" { color: vb }
+      label at (3.35*cos(rad(t)), 3.35*sin(rad(t))) = "A" { color: va, anchor: middle }
+      label at (0.2, 3.5) = "الزاوية ${t}°" { color: neutral, anchor: middle }
+      label at (0.2, -0.8) = "الظل ${fixed(3*cos(rad(t)), 2)}" { color: shadow, anchor: middle }
+      slider t { label: "الزاوية بين A و B" }
+    }
+
+    goal "اجعل [الظل]{shadow} نصف طول A بالضبط" {
+      when: abs(3*cos(rad(t)) - 1.5) < 0.03
+      hints: ["كلما فتحت الزاوية قصر الظل. أين يصير نصف الطول 3؟", "جرّب زوايا بين 50° و 70°."]
+      showme: { t: 60 }
+    }
+
+    goal "الآن اجعل الظل يقع خلف بداية B، وطوله أكثر من 2" {
+      when: 3*cos(rad(t)) < -2
+      hints: ["ماذا يحدث للظل حين تتجاوز الزاوية 90°؟", "افتح الزاوية أكثر نحو 180°."]
+      showme: { t: 150 }
+    }
+
+    numeric {
+      ask "سهم طوله $10$ يصنع زاوية $120°$ مع B. كم ظله؟ الظل الذي يقع خلف B نكتبه بإشارة سالبة."
+      skill: "sg-dot-projection"
+      answer: -5
+      expect: 10*cos(rad(120))
+      tolerance: 0.01
+      wrong 5 "الطول صحيح، لكن عند $120°$ يقع الظل خلف B." -> "sg3-d-sign" retry
+      wrong -1.5 "هذا ظل السهم الذي طوله 3 في المشهد. السهم هنا طوله 10."
+      wrong 10*sin(rad(120)) "هذا ارتفاع طرف السهم فوق B، لا ظله على B."
+      hint "ضع المشهد على $120°$: الظل كم من طول A؟"
+      after: goals
+      ! "عند $120°$ يقع الظل خلف B وطوله نصف السهم. نصف 10 هو 5، ولأنه للخلف نكتبه $-5$."
+    }
+  }
+
+  slide "الإشارة تحكي الاتجاه" {
+    id: "sg3-d-sign"
+    beat: detour
+    hidden: true
+    cat: "الظل"
+    > حين تكون الزاوية منفرجة يسقط طرف A خلف بداية B، فيقع الظل على الامتداد المنقّط. نعطيه إشارة سالبة لنتذكر أنه للخلف. قارن بين $60°$ و $120°$.
+
+    scene plane {
+      alt: "نفس السهمين A و B مع الظل، ومؤشر للزاوية يبدأ عند 60 درجة."
+      x: [-4.2, 4.6]
+      y: [-1.2, 3.8]
+      aspect: equal
+      axes: false
+      param t = 60 { range: [0, 180], step: 1 }
+      line back = (-4, 0) -> (0, 0) { color: neutral, style: dotted }
+      vector b = (0, 0) -> (4, 0) { color: vb, width: 3 }
+      line drop = (3*cos(rad(t)), 3*sin(rad(t))) -> (3*cos(rad(t)), 0) { color: neutral, style: dashed }
+      line sh = (0, 0) -> (3*cos(rad(t)), 0) { color: shadow, width: 7 }
+      vector a = (0, 0) -> (3*cos(rad(t)), 3*sin(rad(t))) { color: va, width: 3 }
+      label at (0.2, 3.5) = "الزاوية ${t}°" { color: neutral, anchor: middle }
+      label at (0.2, -0.8) = "الظل ${fixed(3*cos(rad(t)), 2)}" { color: shadow, anchor: middle }
+      slider t { label: "الزاوية بين A و B" }
+    }
+
+    goal "ضع الزاوية على 120° وانظر أين يقع الظل" {
+      when: abs(t - 120) < 0.5
+      hints: ["حرّك المؤشر إلى اليمين حتى 120°."]
+      showme: { t: 120 }
+    }
+
+    numeric {
+      ask "سهم طوله $8$ يصنع زاوية $120°$ مع B. كم ظله، بالإشارة؟"
+      skill: "sg-dot-projection"
+      answer: -4
+      expect: 8*cos(rad(120))
+      tolerance: 0.01
+      wrong 4 "الطول صحيح، والإشارة ناقصة. الظل خلف B."
+      after: goals
+      ! "نصف 8 هو 4، وللخلف: $-4$. الإشارة السالبة تعني أن الزاوية منفرجة."
+    }
+  }
+
+  slide "كم كان الظل؟" {
+    id: "sg3-reveal"
+    beat: reveal
+    cat: "الظل"
+    > راهنت على «${answer("sg3-hook", "تخمينك")}». عند $60°$ يقع نصف العصا تمامًا على الأرض، كما رأيت في المشهد، فالظل $1$ م. والقاعدة التي وجدتها: الظل = الطول × جيب تمام الزاوية (جتا).
+
+    numeric {
+      vary L in [3, 4, 6]
+      vary a in [30, 50]
+      ask "عصا طولها $${L}$ م تميل على الأرض بزاوية $${a}°$، والشمس فوقها تمامًا. كم طول ظلها؟"
+      skill: "sg-dot-projection"
+      answer: L*cos(rad(a))
+      expect: L*cos(rad(a))
+      tolerance: 0.02
+      unit: "م"
+      wrong L*sin(rad(a)) "هذا ارتفاع طرف العصا. الظل ملاصق للأرض، فخذ جتا الزاوية."
+      hint "الطول × $\cos$ الزاوية، والآلة على الدرجات."
+      ! "الظل = الطول × $\cos$ الزاوية. هذه الفكرة كلها، والباقي أسماء."
+    }
+  }
+
+  slide "أسماء لما وجدته" {
+    id: "sg3-name"
+    beat: name
+    cat: "التعريف"
+    > الأسماء الآن. [الظل]{shadow} يسميه كتابك **مركبة $\overrightarrow{A}$ في اتجاه $\overrightarrow{B}$**، وقيمته $\|\overrightarrow{A}\|\cos\theta$. وإذا ضربناه في [طول B]{vb} حصلنا على **الضرب القياسي** $\overrightarrow{A}\cdot\overrightarrow{B}$.
+
+    scene plane {
+      alt: "السهمان A و B بزاوية 50 درجة والظل مرسوم. مع الخطوات تتحول الكلمات إلى رموزها: الزاوية إلى ثيتا، والظل إلى معيار A في جتا ثيتا، وطول B إلى معيار B."
+      x: [-0.8, 5.2]
+      y: [-1.3, 3.0]
+      aspect: equal
+      axes: false
+      param m1 = 0 { range: [0, 1] }
+      param m2 = 0 { range: [0, 1] }
+      vector b = (0, 0) -> (4, 0) { color: vb, width: 3 }
+      line drop = (3*cos(rad(50)), 3*sin(rad(50))) -> (3*cos(rad(50)), 0) { color: neutral, style: dashed }
+      line sh = (0, 0) -> (3*cos(rad(50)), 0) { color: shadow, width: 7 }
+      vector a = (0, 0) -> (3*cos(rad(50)), 3*sin(rad(50))) { color: va, width: 3 }
+      arc ang = (0, 0) { r: 0.6, from: 0, to: 50, color: neutral }
+      label at (2.05, 2.55) = "A" { color: va }
+      label wth at (0.75, 0.3) = "الزاوية" { color: neutral }
+      label sth at (0.75, 0.3) = "\theta" { tex, color: neutral }
+      label wsh at (0.96, -0.5) = "الظل" { color: shadow, anchor: middle }
+      label ssh at (0.96, -0.5) = "\|\overrightarrow{A}\|\cos\theta" { tex, color: shadow, anchor: middle }
+      label wb at (3.4, -1.0) = "طول B" { color: vb, anchor: middle }
+      label sb at (3.4, -1.0) = "\|\overrightarrow{B}\|" { tex, color: vb, anchor: middle }
+      morph wth -> sth { by: m1 }
+      morph wsh -> ssh { by: m1 }
+      morph wb -> sb { by: m2 }
+      step "بكلماتك أنت، من المشهد السابق." { set: { m1: 0, m2: 0 } }
+      step "الزاوية والظل يأخذان رمزيهما." { animate: { m1: 1 }, dur: 1200, indicate: ["sh", "ang"] }
+      step "وطول B كذلك." { animate: { m2: 1 }, dur: 1200, indicate: ["b"] }
+    }
+
+    build {
+      ask "كتابك يعرّف الضرب القياسي بأنه معيار أحد المتجهين × مركبة الآخر عليه. ركّبه."
+      skill: "sg-dot-product"
+      template: "$\overrightarrow{A}\cdot\overrightarrow{B} =$ ___ $\times$ ___"
+      bank: ["$\|\overrightarrow{B}\|$", "$\|\overrightarrow{A}\|\cos\theta$", "$\|\overrightarrow{A}\|\sin\theta$", "$\cos\theta$", "$\|\overrightarrow{A}\| + \|\overrightarrow{B}\|$"]
+      answer: ["$\|\overrightarrow{B}\|$", "$\|\overrightarrow{A}\|\cos\theta$"]
+      answer: ["$\|\overrightarrow{A}\|\cos\theta$", "$\|\overrightarrow{B}\|$"]
+      miss "$\|\overrightarrow{A}\|\sin\theta$" "هذا ارتفاع طرف A فوق B، لا ظله. الظل هو الجزء الملاصق لـ B، وفيه $\cos$."
+      miss "$\cos\theta$" "$\cos\theta$ وحده نسبة بلا طول. الظل طول: $\|\overrightarrow{A}\|\cos\theta$."
+      miss "$\|\overrightarrow{A}\| + \|\overrightarrow{B}\|$" "التعريف ضرب لا جمع، والزاوية لا بد أن تظهر فيه."
+      hint "الظل ليس $\sin$: هو الجزء الملاصق لـ B."
+      after: 3
+      ! "$\overrightarrow{A}\cdot\overrightarrow{B} = \|\overrightarrow{A}\|\,\|\overrightarrow{B}\|\cos\theta$. الناتج **عدد** لا متجه، ولذلك اسمه قياسي. و $\theta$ هي الزاوية الصغرى بين المتجهين، من $0°$ إلى $180°$."
+    }
+  }
+
+  slide "أول ضرب قياسي" {
+    id: "sg3-def"
+    beat: example
+    cat: "التعريف"
+    > مثال كتابك: $\|\overrightarrow{A}\| = 5$ و $\|\overrightarrow{B}\| = 4$ و $\theta = 60°$، إذن $\overrightarrow{A}\cdot\overrightarrow{B} = 5 \times 4 \times \cos 60° = 10$. دورك الآن.
+
+    numeric {
+      ask "متجهان قياس الزاوية بينهما $135°$، و $\|\overrightarrow{A}\| = 6\sqrt{2}$ و $\|\overrightarrow{B}\| = 10\sqrt{2}$. أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$ لأقرب جزء من مئة."
+      skill: "sg-dot-product"
+      answer: -60*sqrt(2)
+      expect: 6*sqrt(2) * 10*sqrt(2) * cos(rad(135))
+      tolerance: 0.05
+      wrong 60*sqrt(2) "العدد صحيح والإشارة لا. الزاوية منفرجة، فالظل للخلف." -> "sg3-d-sign" retry
+      wrong 120 "هذا حاصل ضرب المعيارين فقط. أين $\cos 135°$؟"
+      hint "$6\sqrt{2} \times 10\sqrt{2}$ عدد صحيح. ثم فكّر في إشارة $\cos 135°$."
+      ! "$6\sqrt{2} \times 10\sqrt{2} = 120$، و $\cos 135° = -\frac{1}{\sqrt{2}}$، فالناتج $-60\sqrt{2} \approx -84.85$. سالب لأن الزاوية منفرجة."
+    }
+  }
+
+  slide "موجب أم سالب أم صفر؟" {
+    id: "sg3-sign"
+    beat: example
+    cat: "التعريف"
+    > رأيت أن الظل ينقلب للخلف بعد $90°$. الإشارة إذن تأتي من الزاوية وحدها، لأن المعيارين موجبان دائمًا.
+
+    sort {
+      ask "ضع كل حالة تحت إشارة $\overrightarrow{A}\cdot\overrightarrow{B}$."
+      skill: "sg-dot-product"
+      bin "موجب": ["$\theta = 30°$", "$\theta = 0°$", "$\theta = 89°$"]
+      bin "سالب": ["$\theta = 150°$", "$\theta = 180°$", "$\theta = 91°$"]
+      bin "صفر": ["$\theta = 90°$", "أحد المتجهين هو المتجه الصفري"]
+      hint "أين يقع الظل في كل حالة: أمام بداية B، أم خلفها، أم لا ظل؟"
+      ! "حادة: الظل للأمام، موجب. منفرجة: للخلف، سالب. قائمة: لا ظل، صفر. والمتجه الصفري معياره صفر فيصفّر الناتج كله."
+    }
+  }
+
+  slide "مربع وأربعة أزواج" {
+    id: "sg3-square"
+    beat: example
+    cat: "الزاوية الصحيحة"
+    > مربع $ABCD$ طول ضلعه $5$ سم، من كتابك. تابع الخطوات: السر دائمًا في الزاوية بين المتجهين.
+
+    scene plane {
+      alt: "مربع رؤوسه A أعلى اليمين و B أسفل اليمين و C أسفل اليسار و D أعلى اليسار. مع كل خطوة يظهر زوج من المتجهات على الأضلاع أو القطر، وفي الأخيرة قوس زاوية 45 درجة عند A."
+      x: [-1.2, 6.4]
+      y: [-1.2, 6.2]
+      aspect: equal
+      axes: false
+      param k = 0 { range: [0, 4], step: 1 }
+      polygon sq = [(0, 0), (5, 0), (5, 5), (0, 5)] { color: neutral, opacity: 0.06 }
+      vector ba1 = (5, 0) -> (5, 5) { color: va, width: 3, show: k == 1 }
+      vector cd = (0, 0) -> (0, 5) { color: vb, width: 3, show: k == 1 }
+      vector ad = (5, 5) -> (0, 5) { color: va, width: 3, show: k >= 2 }
+      vector cb = (0, 0) -> (5, 0) { color: vb, width: 3, show: k == 2 }
+      vector ba3 = (5, 0) -> (5, 5) { color: vb, width: 3, show: k == 3 }
+      vector ac = (5, 5) -> (0, 0) { color: vb, width: 3, show: k == 4 }
+      arc a45 = (5, 5) { r: 1.2, from: 180, to: 225, color: neutral, show: k == 4 }
+      label at (3.2, 4.4) = "45°" { color: neutral, show: k == 4 }
+      label at (5.3, 5.3) = "A" { color: neutral }
+      label at (5.3, -0.6) = "B" { color: neutral }
+      label at (-0.7, -0.6) = "C" { color: neutral }
+      label at (-0.7, 5.3) = "D" { color: neutral }
+      step "مربع ABCD طول ضلعه 5 سم." { set: { k: 0 } }
+      step "BA و CD في نفس الاتجاه: الزاوية 0°، والناتج 5 × 5 × 1." { set: { k: 1 } }
+      step "AD و CB متضادان: الزاوية 180°، والناتج 5 × 5 × (−1)." { set: { k: 2 } }
+      step "AD و BA متعامدان: الزاوية 90°، والناتج صفر." { set: { k: 3 } }
+      step "والآن AD و AC: كلاهما يخرج من A، والزاوية بينهما 45°." { set: { k: 4 } }
+    }
+
+    numeric {
+      ask "أوجد $\overrightarrow{AD}\cdot\overrightarrow{AC}$."
+      skill: "sg-dot-product"
+      answer: 25
+      expect: 5 * 5*sqrt(2) * cos(rad(45))
+      tolerance: 0.05
+      wrong 5*5*cos(rad(45)) "طول القطر $AC$ ليس 5. هو وتر مثلث قائم ضلعاه 5 و 5."
+      wrong 25*sqrt(2) "نسيت $\cos 45°$."
+      hint "كم طول القطر $AC$؟"
+      after: 5
+      ! "$\|\overrightarrow{AC}\| = 5\sqrt{2}$ لأنه القطر، فالناتج $5 \times 5\sqrt{2} \times \frac{1}{\sqrt{2}} = 25$."
+    }
+  }
+
+  slide "الزاوية في الركن، صح؟" {
+    id: "sg3-trap"
+    beat: trap
+    cat: "الزاوية الصحيحة"
+    > والآن $\overrightarrow{AC}\cdot\overrightarrow{BA}$. الزاوية بينهما هي الـ $45°$ في ركن $A$، صح؟ إذن الناتج $25$ مرة أخرى. لكن [$\overrightarrow{BA}$]{va} **ينتهي** عند $A$ ولا يخرج منها. اسحبه ليخرج من $A$.
+
+    scene plane {
+      alt: "المربع نفسه مع القطر AC خارجًا من A، والمتجه BA على الضلع الأيمن. مؤشر يزلق BA لأعلى دون أن يدور حتى يخرج من A، فتظهر الزاوية الحقيقية بينه وبين AC، 135 درجة بدل 45."
+      x: [-1.2, 7.2]
+      y: [-1.0, 10.8]
+      aspect: equal
+      axes: false
+      param s = 0 { range: [0, 1], step: 0.05 }
+      polygon sq = [(0, 0), (5, 0), (5, 5), (0, 5)] { color: neutral, opacity: 0.06 }
+      line ghost = (5, 0) -> (5, 5) { color: va, style: dashed, show: s > 0.02 }
+      vector ac = (5, 5) -> (0, 0) { color: vb, width: 3 }
+      vector ba = (5, 5*s) -> (5, 5 + 5*s) { color: va, width: 3 }
+      arc wrongarc = (5, 5) { r: 1.1, from: 225, to: 270, color: danger, show: s < 0.98 }
+      label at (3.7, 3.3) = "45°؟" { color: danger, show: s < 0.98 }
+      arc rightarc = (5, 5) { r: 1.1, from: 90, to: 225, color: shadow, show: s >= 0.98 }
+      label at (3.2, 6.0) = "135°" { color: shadow, show: s >= 0.98 }
+      label at (5.3, 5.3) = "A" { color: neutral }
+      label at (5.3, -0.6) = "B" { color: neutral }
+      label at (-0.7, -0.6) = "C" { color: neutral }
+      label at (-0.7, 5.3) = "D" { color: neutral }
+      slider s { label: "اسحب BA" }
+    }
+
+    goal "اسحب [$\overrightarrow{BA}$]{va} حتى يخرج من $A$" {
+      when: s > 0.98
+      hints: ["المتجه ينزلق دون أن يدور، فاتجاهه لا يتغير.", "اسحب المؤشر إلى آخره."]
+      showme: { s: 1 }
+    }
+
+    numeric {
+      ask "إذن كم $\overrightarrow{AC}\cdot\overrightarrow{BA}$؟"
+      skill: "sg-dot-product"
+      answer: -25
+      expect: 5*sqrt(2) * 5 * cos(rad(135))
+      tolerance: 0.05
+      wrong 25 "هذا بزاوية $45°$، وهي ليست الزاوية بين المتجهين. انظر إلى القوس بعد السحب." -> "sg3-d-tails" retry
+      wrong -25*sqrt(2) "طول $\overrightarrow{BA}$ هو 5، لا $5\sqrt{2}$."
+      hint "الزاوية بعد السحب $135°$. ما إشارة $\cos 135°$؟"
+      after: goals
+      ! "الزاوية الصغرى $135°$ لا $45°$، فالناتج $5\sqrt{2} \times 5 \times \left(-\frac{1}{\sqrt{2}}\right) = -25$. القاعدة: اجعل المتجهين يخرجان من نفس النقطة قبل قياس الزاوية."
+    }
+  }
+
+  slide "مُدّ المتجه" {
+    id: "sg3-d-tails"
+    beat: detour
+    hidden: true
+    cat: "الزاوية الصحيحة"
+    > فخ مشهور، ويظهر في كل مثلث. في المثلث $ABC$ متساوي الأضلاع، [$\overrightarrow{AB}$]{va} ينتهي عند $B$ و [$\overrightarrow{BC}$]{vb} يبدأ منها. الزاوية الداخلية $60°$ ليست الزاوية بينهما. مُدّ $\overrightarrow{AB}$ بعد $B$.
+
+    scene plane {
+      alt: "مثلث متساوي الأضلاع ABC. المتجه AB على القاعدة والمتجه BC على الضلع الأيمن. مؤشر يمد AB بعد B بخط متقطع، فتظهر الزاوية بين الامتداد و BC، 120 درجة."
+      x: [-1, 10]
+      y: [-1.2, 6]
+      aspect: equal
+      axes: false
+      param e = 0 { range: [0, 1], step: 0.05 }
+      polygon tri = [(0, 0), (6, 0), (3, 5.196)] { color: neutral, opacity: 0.06 }
+      vector ab = (0, 0) -> (6, 0) { color: va, width: 3 }
+      vector bc = (6, 0) -> (3, 5.196) { color: vb, width: 3 }
+      line ext = (6, 0) -> (6 + 3.5*e, 0) { color: va, style: dashed, show: e > 0.02 }
+      arc inner = (6, 0) { r: 0.9, from: 120, to: 180, color: danger, show: e < 0.98 }
+      label at (4.6, 0.35) = "60°" { color: danger, show: e < 0.98 }
+      arc outer = (6, 0) { r: 0.9, from: 0, to: 120, color: shadow, show: e >= 0.98 }
+      label at (6.8, 0.9) = "120°" { color: shadow, show: e >= 0.98 }
+      label at (-0.6, -0.6) = "A" { color: neutral }
+      label at (6.0, -0.7) = "B" { color: neutral }
+      label at (3.0, 5.5) = "C" { color: neutral }
+      slider e { label: "مُدّ AB" }
+    }
+
+    goal "مُدّ [$\overrightarrow{AB}$]{va} بعد $B$" {
+      when: e > 0.98
+      hints: ["اسحب المؤشر إلى آخره وراقب القوس عند B."]
+      showme: { e: 1 }
+    }
+
+    numeric {
+      ask "طول ضلع المثلث $6$. أوجد $\overrightarrow{AB}\cdot\overrightarrow{BC}$."
+      skill: "sg-dot-product"
+      answer: -18
+      expect: 6*6*cos(rad(120))
+      tolerance: 0.05
+      wrong 18 "هذا بالزاوية الداخلية $60°$. الزاوية بين المتجهين $120°$."
+      after: goals
+      ! "$6 \times 6 \times \cos 120° = -18$. إذا انتهى متجه حيث يبدأ الآخر، فالزاوية بينهما هي الخارجية."
+    }
+  }
+
+  slide "مثلث وثلاثة أزواج" {
+    id: "sg3-tri"
+    beat: breaker
+    cat: "الزاوية الصحيحة"
+    > مثلث $ABC$ متساوي الأضلاع طول ضلعه $12$ سم. قبل كل ضرب اسأل: هل يخرج المتجهان من نفس النقطة؟
+
+    scene plane {
+      alt: "مثلث متساوي الأضلاع، A في الأعلى و C أسفل اليسار و B أسفل اليمين، وطول ضلعه 12 سم."
+      x: [-1, 7]
+      y: [-1, 6]
+      aspect: equal
+      axes: false
+      polygon tri = [(0, 0), (6, 0), (3, 5.196)] { color: neutral, opacity: 0.08 }
+      label at (3.0, 5.5) = "A" { color: neutral }
+      label at (6.2, -0.6) = "B" { color: neutral }
+      label at (-0.6, -0.6) = "C" { color: neutral }
+      label at (3.0, -0.6) = "12 سم" { color: neutral, anchor: middle }
+    }
+
+    table {
+      ask "أوجد كل ضرب."
+      skill: "sg-dot-product"
+      header: ["$\overrightarrow{AB}\cdot\overrightarrow{AC}$", "$\overrightarrow{AC}\cdot\overrightarrow{CB}$", "$(4\overrightarrow{AB})\cdot(3\overrightarrow{CB})$"]
+      row: blank(12*12*cos(rad(60))), blank(12*12*cos(rad(120))), blank(12 * 12*12*cos(rad(60)))
+      tolerance: 0.05
+      hint "الأعداد أمام المتجهات تخرج من الضرب: $(4\overrightarrow{AB})\cdot(3\overrightarrow{CB}) = 12\,(\overrightarrow{AB}\cdot\overrightarrow{CB})$."
+      hint "في الثالث كلا المتجهين **يدخل** $B$. هذا يكفي أيضًا."
+      ! "الأول يخرجان من $A$: $60°$، أي $72$. الثاني: $\overrightarrow{AC}$ ينتهي حيث يبدأ $\overrightarrow{CB}$، فالزاوية $120°$، أي $-72$. الثالث يدخلان $B$ معًا: $60°$، أي $12 \times 72 = 864$."
+    }
+  }
+
+  slide "يتوزّع مثل الضرب العادي" {
+    id: "sg3-props"
+    beat: example
+    cat: "الخواص"
+    > الضرب القياسي إبدالي ويتوزّع مثل الضرب العادي، و $\overrightarrow{A}\cdot\overrightarrow{A} = \|\overrightarrow{A}\|^2$ لأن الزاوية صفر. من كتابك: $(\overrightarrow{A} - \overrightarrow{B})\cdot(\overrightarrow{A} + \overrightarrow{B}) = \|\overrightarrow{A}\|^2 - \|\overrightarrow{B}\|^2$.
+
+    numeric {
+      ask "$\|\overrightarrow{A}\| = 4$ و $\|\overrightarrow{B}\| = 6$ والزاوية بينهما $60°$. أوجد $(3\overrightarrow{A} + \overrightarrow{B})\cdot(\overrightarrow{A} - \overrightarrow{B})$."
+      skill: "sg-dot-product"
+      answer: -12
+      expect: 3*4^2 - 3*(4*6*cos(rad(60))) + 4*6*cos(rad(60)) - 6^2
+      tolerance: 0.05
+      wrong 12 "الحدان الأوسطان $-3\,\overrightarrow{A}\cdot\overrightarrow{B}$ و $+\overrightarrow{B}\cdot\overrightarrow{A}$ لا يلغيان بعضهما هنا. بقي منهما $-2\,\overrightarrow{A}\cdot\overrightarrow{B}$."
+      wrong -36 "راجع الحدين الأوسطين: $\overrightarrow{A}\cdot\overrightarrow{B} = 12$، والباقي منهما $-2 \times 12$."
+      hint "وزّع كما تفك $(3a + b)(a - b)$، ثم احسب $\overrightarrow{A}\cdot\overrightarrow{B}$ من التعريف."
+      ! "$3(16) - 3\,\overrightarrow{A}\cdot\overrightarrow{B} + \overrightarrow{A}\cdot\overrightarrow{B} - 36$، و $\overrightarrow{A}\cdot\overrightarrow{B} = 4 \times 6 \times \frac{1}{2} = 12$، فالناتج $48 - 24 - 36 = -12$."
+    }
+  }
+
+  slide "متجهات الوحدة" {
+    id: "sg3-unit"
+    beat: example
+    cat: "بالمركبات"
+    > في الفراغ عندنا متجهات الوحدة الأساسية $\hat{i}$ و $\hat{j}$ و $\hat{k}$ (في كتابك: س، ص، ع وفوقها سهم). طول كل منها $1$، وكل اثنين منها متعامدان.
+
+    match {
+      ask "طابق كل ضرب بقيمته."
+      skill: "sg-dot-product"
+      pair "$\hat{i}\cdot\hat{i}$" -> "$1$"
+      pair "$\hat{j}\cdot\hat{k}$" -> "$0$"
+      pair "$(5\hat{i})\cdot(2\hat{i})$" -> "$10$"
+      decoy "$\hat{i}$"
+      decoy "$7$"
+      miss "$\hat{i}\cdot\hat{i}$" -> "$\hat{i}$" "الضرب القياسي عدد لا متجه: $1 \times 1 \times \cos 0° = 1$."
+      miss "$(5\hat{i})\cdot(2\hat{i})$" -> "$7$" "الأعداد تُضرب لا تُجمع: $5 \times 2 \times (\hat{i}\cdot\hat{i})$."
+      hint "طبّق التعريف: المعياران × جتا الزاوية. كم الزاوية بين المتجه ونفسه؟"
+      ! "$\hat{i}\cdot\hat{i} = 1 \times 1 \times \cos 0° = 1$، و $\hat{j}\cdot\hat{k} = \cos 90° = 0$، و $(5\hat{i})\cdot(2\hat{i}) = 10\,(\hat{i}\cdot\hat{i}) = 10$. وبالمثل $(3\hat{i})\cdot(4\hat{k}) = 0$."
+    }
+  }
+
+  slide "من التوزيع إلى القاعدة" {
+    id: "sg3-coord"
+    beat: name
+    cat: "بالمركبات"
+    > الآن بالمركبات: $\overrightarrow{A} = (-2, 3, 5)$ و $\overrightarrow{B} = (7, 2, -1)$، مكتوبين بمتجهات الوحدة. قُد الحل خطوة خطوة.
+
+    moves {
+      ask "أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$."
+      skill: "sg-dot-product"
+      from "$(-2\hat{i} + 3\hat{j} + 5\hat{k})\cdot(7\hat{i} + 2\hat{j} - \hat{k})$"
+      move "$(-2)(7)\,\hat{i}\cdot\hat{i} + (3)(2)\,\hat{j}\cdot\hat{j} + (5)(-1)\,\hat{k}\cdot\hat{k}$" {
+        * "وزّع، واحذف الحدود المختلطة مثل $\hat{i}\cdot\hat{j}$ لأنها صفر"
+        - "اجمع المتجهين أولًا ثم ربّع الناتج" { why: "هذا يعطي $\|\overrightarrow{A} + \overrightarrow{B}\|^2$، وهو شيء آخر. وزّع الضرب نفسه." }
+        - "اضرب المعيارين" { why: "المعياران وحدهما لا يكفيان، ينقصك $\cos\theta$ ولا نعرفه. التوزيع يتجاوز الزاوية." }
+      }
+      move "$-14 + 6 - 5$" {
+        * "عوّض $\hat{i}\cdot\hat{i} = \hat{j}\cdot\hat{j} = \hat{k}\cdot\hat{k} = 1$"
+        - "عوّض $\hat{i}\cdot\hat{i} = 0$" { why: "الزاوية بين المتجه ونفسه صفر، و $\cos 0° = 1$." }
+      }
+      move "$-13$" {
+        * "اجمع"
+        - "اكتبها متجهًا $(-14, 6, -5)$" { why: "الضرب القياسي عدد واحد، فاجمع الحدود الثلاثة." }
+      }
+      ! "هذه هي القاعدة: $\overrightarrow{A}\cdot\overrightarrow{B} = A_x B_x + A_y B_y + A_z B_z$. اضرب المركبات المتناظرة ثم اجمع."
+    }
+  }
+
+  slide "انتبه لما هو ناقص" {
+    id: "sg3-coord-faded"
+    beat: example
+    cat: "بالمركبات"
+    > مثال آخر من كتابك، والحساب كله لك.
+
+    numeric {
+      ask "$\overrightarrow{A} = 3\hat{i} - 4\hat{j} + \hat{k}$ و $\overrightarrow{B} = -\hat{i} + 4\hat{k}$. أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$."
+      skill: "sg-dot-product"
+      answer: 1
+      expect: 3*(-1) + (-4)*0 + 1*4
+      tolerance: 0.01
+      wrong -19 "وضعت الـ 4 في خانة $\hat{j}$. في $\overrightarrow{B}$ لا يوجد $\hat{j}$ أصلًا." -> "sg3-d-missing" retry
+      wrong -3 "نسيت حد $\hat{k}$: $(1)(4)$."
+      hint "اكتب $\overrightarrow{B}$ بثلاث مركبات أولًا. أين $\hat{j}$؟"
+      ! "$\overrightarrow{B} = (-1, 0, 4)$، فالناتج $3(-1) + (-4)(0) + (1)(4) = 1$."
+    }
+  }
+
+  slide "المركبة الغائبة صفر" {
+    id: "sg3-d-missing"
+    beat: detour
+    hidden: true
+    cat: "بالمركبات"
+    > لكل متجه في الفراغ ثلاث مركبات، والغائبة منها صفر. $-\hat{i} + 4\hat{k}$ يعني $(-1, 0, 4)$، لا $(-1, 4, 0)$. اكتب الثلاث دائمًا قبل أن تضرب.
+
+    numeric {
+      ask "$\overrightarrow{A} = (2, 5, -1)$ و $\overrightarrow{B} = 3\hat{i} - 2\hat{k}$. أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$."
+      skill: "sg-dot-product"
+      answer: 8
+      expect: 2*3 + 5*0 + (-1)*(-2)
+      tolerance: 0.01
+      wrong -4 "هذا لو كان $\overrightarrow{B} = (3, -2, 0)$. الـ $-2$ مع $\hat{k}$."
+      ! "$\overrightarrow{B} = (3, 0, -2)$، فالناتج $6 + 0 + 2 = 8$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "عدد أم متجه؟" {
+    id: "sg3-scalar"
+    beat: example
+    cat: "بالمركبات"
+    > سؤال يخلط الطريقتين.
+
+    quiz {
+      ask "$\|\overrightarrow{A}\| = 5$ و $\overrightarrow{B} = (-1, 2, 2)$ والزاوية بينهما $30°$. إذن $\overrightarrow{A}\cdot\overrightarrow{B} =$"
+      skill: "sg-dot-product"
+      - "$(-5, 10, 10)$" { why: "ضربت 5 في مركبات $\overrightarrow{B}$، فخرج متجه. الضرب القياسي عدد.", onwrong: "sg3-d-vector", retry }
+      * "$7.5\sqrt{3}$"
+      - "$7.5$" { why: "هذا مع $\sin 30°$. التعريف فيه $\cos$." }
+      - "$-7.5$" { why: "الزاوية حادة، فالناتج موجب." }
+      hint "تحتاج $\|\overrightarrow{B}\|$ أولًا."
+      ! "$\|\overrightarrow{B}\| = \sqrt{1 + 4 + 4} = 3$، فالناتج $5 \times 3 \times \cos 30° = 7.5\sqrt{3}$."
+    }
+  }
+
+  slide "الناتج عدد واحد" {
+    id: "sg3-d-vector"
+    beat: detour
+    hidden: true
+    cat: "بالمركبات"
+    > الاسم يقولها: الضرب **القياسي** ناتجه كمية قياسية، أي عدد واحد بلا اتجاه. من التعريف: معيار × معيار × جتا، كلها أعداد. ومن المركبات: اضرب المتناظرة ثم **اجمع**.
+
+    quiz {
+      ask "أي هذه يمكن أن يكون ناتج $\overrightarrow{A}\cdot\overrightarrow{B}$؟"
+      skill: "sg-dot-product"
+      * "$-3$"
+      - "$(2, -1, 0)$" { why: "هذا متجه له ثلاث مركبات. الضرب القياسي يعطي عددًا واحدًا." }
+      - "$4\hat{i}$" { why: "هذا متجه في اتجاه $\hat{i}$. الناتج عدد بلا اتجاه." }
+      ! "عدد واحد، قد يكون موجبًا أو سالبًا أو صفرًا. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "ثلاثة وحدك: الأول" {
+    id: "sg3-own-1"
+    beat: example
+    cat: "بالمركبات"
+    > ثلاثة وحدك الآن.
+
+    numeric {
+      ask "أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$ إذا كان $\overrightarrow{A} = (5, 1, -2)$ و $\overrightarrow{B} = (4, -4, 3)$."
+      skill: "sg-dot-product"
+      answer: 10
+      expect: 5*4 + 1*(-4) + (-2)*3
+      tolerance: 0.01
+      wrong 22 "راجع الإشارة الأخيرة: $(-2)(3) = -6$."
+      wrong 30 "راجع الإشارات: $(1)(-4) = -4$ و $(-2)(3) = -6$."
+      ! "$20 - 4 - 6 = 10$."
+    }
+  }
+
+  slide "ثلاثة وحدك: الثاني" {
+    id: "sg3-own-2"
+    beat: example
+    cat: "بالمركبات"
+    > هذا يحتاج الإحماء الثاني.
+
+    numeric {
+      ask "$A(2, 1, 3)$ و $B(3, 5, -2)$ و $C(-1, 4, 0)$. أوجد $\overrightarrow{AB}\cdot\overrightarrow{AC}$."
+      skill: "sg-dot-product"
+      answer: 24
+      expect: (3-2)*(-1-2) + (5-1)*(4-1) + (-2-3)*(0-3)
+      tolerance: 0.01
+      wrong -24 "أحد المتجهين معكوس. كلاهما يخرج من $A$: النهاية ناقص البداية." -> "sg3-bridge-ab" retry
+      wrong 17 "ضربت متجهي موضع $B$ و $C$ مباشرة. المطلوب متجهان يخرجان من $A$."
+      hint "$\overrightarrow{AB} = B - A$ و $\overrightarrow{AC} = C - A$."
+      ! "$\overrightarrow{AB} = (1, 4, -5)$ و $\overrightarrow{AC} = (-3, 3, -3)$، فالناتج $-3 + 12 + 15 = 24$."
+    }
+  }
+
+  slide "ثلاثة وحدك: الثالث" {
+    id: "sg3-own-3"
+    beat: breaker
+    cat: "بالمركبات"
+    > والأخير فيه مفاجأة صغيرة.
+
+    numeric {
+      ask "$\overrightarrow{A} = \hat{j}$ و $\overrightarrow{B} = 2\hat{i} - 3\hat{k}$. أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$."
+      skill: "sg-dot-product"
+      answer: 0
+      expect: 0*2 + 1*0 + 0*(-3)
+      tolerance: 0.01
+      wrong -3 "وضعت $-3$ في خانة $\hat{j}$. هي مع $\hat{k}$." -> "sg3-d-missing" retry
+      wrong -1 "$\hat{j}$ ليس $1$ في كل الخانات. هو $(0, 1, 0)$."
+      hint "اكتب كل متجه بثلاث مركبات."
+      ! "$(0, 1, 0)\cdot(2, 0, -3) = 0$. الناتج صفر والمتجهان غير صفريين، فهما متعامدان. هذا ما يأتي بعد قليل."
+    }
+  }
+
+  slide "نعكس التعريف" {
+    id: "sg3-angle"
+    beat: example
+    cat: "الزاوية بين متجهين"
+    > إذا عرفنا $\overrightarrow{A}\cdot\overrightarrow{B}$ والمعيارين، نعرف الزاوية. في شكل كتابك $\overrightarrow{A} = (5, 7, 7)$ و $\overrightarrow{B} = (3, 5, -3)$. أدِر الشكل، ثم قُد الحل.
+
+    scene space3 {
+      alt: "محاور الفراغ الثلاثة والمتجهان A إلى (5, 7, 7) فوق المستوى xy و B إلى (3, 5, -3) تحته، يخرجان من نقطة الأصل، مع خطوط إرشادية لكل طرف. مؤشر يدير الشكل."
+      x: [0, 6]
+      y: [0, 8]
+      z: [-4, 8]
+      param az = 40 { range: [0, 360], step: 5 }
+      camera: [az, 20]
+      segment3 a = (0, 0, 0) -> (5, 7, 7) { arrow, color: va, label: "A" }
+      segment3 b = (0, 0, 0) -> (3, 5, -3) { arrow, color: vb, label: "B" }
+      point3 pa = (5, 7, 7) { guides, color: va, r: 4 }
+      point3 pb = (3, 5, -3) { guides, color: vb, r: 4 }
+      slider az { label: "دوران" }
+    }
+
+    moves {
+      ask "أوجد قياس الزاوية $\theta$ بين $\overrightarrow{A}$ و $\overrightarrow{B}$."
+      skill: "sg-dot-angle"
+      from "$\overrightarrow{A}\cdot\overrightarrow{B} = \|\overrightarrow{A}\|\,\|\overrightarrow{B}\|\cos\theta$"
+      move "$\cos\theta = \dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|}$" {
+        * "اقسم الطرفين على $\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|$"
+        - "اطرح $\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|$ من الطرفين" { why: "المعياران مضروبان في $\cos\theta$، لا مجموعان إليه. نتخلص منهما بالقسمة." }
+      }
+      move "$\cos\theta = \dfrac{15 + 35 - 21}{\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|} = \dfrac{29}{\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|}$" {
+        * "احسب البسط: اضرب المركبات المتناظرة واجمع"
+        - "احسب البسط: $5 \times 3$ فقط" { why: "هذه المركبة الأولى وحدها. الضرب القياسي يجمع الثلاث." }
+      }
+      move "$\cos\theta = \dfrac{29}{\sqrt{123}\,\sqrt{43}} \approx 0.399$" {
+        * "احسب المعيارين: جذر مجموع المربعات"
+        - "احسب المعيارين: مجموع المركبات" { why: "المعيار طول، ويأتي من فيثاغورس: جذر مجموع المربعات." }
+      }
+      move "$\theta \approx 66.5°$" {
+        * "خذ $\cos^{-1}$ والآلة على الدرجات"
+        - "خذ $\cos^{-1}$ والآلة على الراديان" { why: "ستحصل على $1.16$ تقريبًا، وهذا بالراديان. المطلوب بالدرجات." }
+      }
+      ! "القاعدة: $\cos\theta = \dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|}$، و $\theta$ بين $0°$ و $180°$ دائمًا."
+    }
+  }
+
+  slide "الخطوة الأخيرة لك" {
+    id: "sg3-angle-faded"
+    beat: example
+    cat: "الزاوية بين متجهين"
+    > من كتابك: $\overrightarrow{A} = 3\hat{i} - 4\hat{j} + \sqrt{11}\,\hat{k}$ و $\overrightarrow{B} = (-1, -2, 2)$. حسبنا لك: $\|\overrightarrow{A}\| = 6$ و $\|\overrightarrow{B}\| = 3$ و $\overrightarrow{A}\cdot\overrightarrow{B} = 5 + 2\sqrt{11}$.
+
+    numeric {
+      ask "أوجد $\theta$ بالدرجات، لأقرب جزء من عشرة."
+      skill: "sg-dot-angle"
+      answer: deg(acos((5 + 2*sqrt(11)) / 18))
+      expect: deg(acos((5 + 2*sqrt(11)) / (6*3)))
+      tolerance: 0.1
+      unit: "°"
+      wrong (5 + 2*sqrt(11)) / 18 "هذا $\cos\theta$. بقيت خطوة: $\cos^{-1}$."
+      wrong acos((5 + 2*sqrt(11)) / 18) "هذا بالراديان. حوّل الآلة إلى الدرجات."
+      hint "اقسم على حاصل ضرب المعيارين، ثم $\cos^{-1}$."
+      ! "$\cos\theta = \frac{5 + 2\sqrt{11}}{18} \approx 0.646$، فـ $\theta \approx 49.7°$، أي $49°\,44'$ تقريبًا كما في كتابك."
+    }
+  }
+
+  slide "ثلاث زوايا وحدك: الأولى" {
+    id: "sg3-angle-own-1"
+    beat: example
+    cat: "الزاوية بين متجهين"
+    > ثلاث زوايا وحدك.
+
+    numeric {
+      ask "$\|\overrightarrow{A}\| = 16$ و $\|\overrightarrow{B}\| = 10$ و $\overrightarrow{A}\cdot\overrightarrow{B} = 80$. أوجد قياس الزاوية بينهما."
+      skill: "sg-dot-angle"
+      answer: 60
+      expect: deg(acos(80 / (16*10)))
+      tolerance: 0.1
+      unit: "°"
+      wrong 30 "هذا $\sin^{-1} \frac{1}{2}$. القاعدة فيها $\cos$."
+      wrong 0.5 "هذا $\cos\theta$. خذ $\cos^{-1}$."
+      ! "$\cos\theta = \frac{80}{160} = \frac{1}{2}$، فـ $\theta = 60°$."
+    }
+  }
+
+  slide "ثلاث زوايا وحدك: الثانية" {
+    id: "sg3-angle-own-2"
+    beat: example
+    cat: "الزاوية بين متجهين"
+    > الآن بالمركبات.
+
+    numeric {
+      ask "أوجد قياس الزاوية بين $(5, 1, -2)$ و $(1, 1, -1)$ لأقرب جزء من عشرة."
+      skill: "sg-dot-angle"
+      answer: deg(acos(8 / (sqrt(30)*sqrt(3))))
+      expect: deg(acos((5 + 1 + 2) / (sqrt(25 + 1 + 4)*sqrt(3))))
+      tolerance: 0.1
+      unit: "°"
+      wrong deg(acos(4 / (sqrt(30)*sqrt(3)))) "راجع الحد الأخير: $(-2)(-1) = +2$."
+      wrong acos(8 / (sqrt(30)*sqrt(3))) "هذا بالراديان. حوّل الآلة إلى الدرجات."
+      hint "البسط $5 + 1 + 2$، والمعياران $\sqrt{30}$ و $\sqrt{3}$."
+      ! "$\cos\theta = \frac{8}{\sqrt{30}\,\sqrt{3}} = \frac{8}{\sqrt{90}} \approx 0.843$، فـ $\theta \approx 32.5°$."
+    }
+  }
+
+  slide "ثلاث زوايا وحدك: الثالثة" {
+    id: "sg3-angle-own-3"
+    beat: breaker
+    cat: "الزاوية بين متجهين"
+    > هذه بلا آلة حاسبة. انظر إلى المتجهين قبل أن تحسب.
+
+    quiz {
+      ask "قياس الزاوية بين $\overrightarrow{A} = (-2, -6, 1)$ و $\overrightarrow{B} = (2, 6, -1)$ هو"
+      skill: "sg-dot-angle"
+      - "$30°$" { why: "الضرب القياسي هنا $-4 - 36 - 1 = -41$، سالب، فالزاوية منفرجة." }
+      - "$60°$" { why: "الضرب القياسي هنا سالب، فالزاوية منفرجة." }
+      - "$120°$" { why: "منفرجة فعلًا. لكن قارن المركبات: $\overrightarrow{B} = -\overrightarrow{A}$ تمامًا." }
+      * "$180°$"
+      hint "ماذا تلاحظ على مركبات $\overrightarrow{B}$ مقارنة بمركبات $\overrightarrow{A}$؟"
+      ! "$\overrightarrow{B} = -\overrightarrow{A}$، فهما متوازيان ومتضادان: $\cos\theta = \frac{-41}{41} = -1$، و $\theta = 180°$."
+    }
+  }
+
+  slide "اختبار التعامد" {
+    id: "sg3-perp"
+    beat: example
+    cat: "التعامد"
+    > إذا كان المتجهان غير صفريين و $\overrightarrow{A}\cdot\overrightarrow{B} = 0$، فالزاوية $90°$ والمتجهان متعامدان. أسرع اختبار تعامد في الفراغ: لا زاوية ولا جذور.
+
+    quiz {
+      ask "$\overrightarrow{A} = (5, -4, 0)$. أي هذه يمكن أن يكون عموديًا عليه؟"
+      skill: "sg-dot-angle"
+      - "$(3, 4, 3)$" { why: "$15 - 16 + 0 = -1$. قريب من الصفر، لكنه ليس صفرًا." }
+      * "$(8, 10, -7)$"
+      - "$(1, 1, 5)$" { why: "$5 - 4 + 0 = 1$، ليس صفرًا." }
+      - "$(0, 1, 0)$" { why: "$0 - 4 + 0 = -4$، ليس صفرًا." }
+      ! "$(5)(8) + (-4)(10) + (0)(-7) = 0$، فهما متعامدان. المركبة $-7$ لا تؤثر لأنها تُضرب في صفر."
+    }
+  }
+
+  slide "أوجد المجهول" {
+    id: "sg3-perp-m"
+    beat: example
+    cat: "التعامد"
+    > التعامد يعطيك معادلة.
+
+    numeric {
+      ask "$\overrightarrow{A} = 3\hat{i} + 3\hat{j} + m\hat{k}$ و $\overrightarrow{B} = -6\hat{i} - 4\hat{j} + 6\hat{k}$ متعامدان. أوجد $m$."
+      skill: "sg-dot-angle"
+      answer: 5
+      expect: (3*6 + 3*4) / 6
+      tolerance: 0.01
+      wrong -5 "راجع الإشارات: $-18 - 12 + 6m = 0$."
+      wrong 1 "راجع الحد الثاني: $(3)(-4) = -12$."
+      hint "اكتب $\overrightarrow{A}\cdot\overrightarrow{B} = 0$ وحلّ المعادلة."
+      ! "$-18 - 12 + 6m = 0$، فـ $6m = 30$ و $m = 5$."
+    }
+  }
+
+  slide "أين الزاوية القائمة؟" {
+    id: "sg3-perp-tri"
+    beat: breaker
+    cat: "التعامد"
+    > المثلث $ABC$ حيث $A(2, -1, 1)$ و $B(1, -3, -5)$ و $C(3, -4, -4)$ قائم الزاوية.
+
+    quiz {
+      ask "عند أي رأس الزاوية القائمة؟"
+      skill: "sg-dot-angle"
+      - "عند $A$" { why: "$\overrightarrow{AB}\cdot\overrightarrow{AC} = -1 + 6 + 30 = 35$، ليس صفرًا." }
+      - "عند $B$" { why: "$\overrightarrow{BA}\cdot\overrightarrow{BC} = 2 - 2 + 6 = 6$، ليس صفرًا." }
+      * "عند $C$"
+      - "لا يمكن معرفة ذلك دون رسم" { why: "الضرب القياسي يكفي: عند الرأس القائم يكون الضرب صفرًا." }
+      hint "عند كل رأس، خذ المتجهين الخارجين منه واضربهما."
+      hint "عند $C$: $\overrightarrow{CA} = A - C$ و $\overrightarrow{CB} = B - C$."
+      ! "$\overrightarrow{CA} = (-1, 3, 5)$ و $\overrightarrow{CB} = (-2, 1, -1)$، وضربهما $2 + 3 - 5 = 0$، فالزاوية القائمة عند $C$."
+    }
+  }
+
+  slide "الظل من المركبات" {
+    id: "sg3-proj-name"
+    beat: name
+    cat: "المسقط"
+    > ارجع إلى [الظل]{shadow}: مركبة $\overrightarrow{A}$ في اتجاه $\overrightarrow{B}$ هي $\|\overrightarrow{A}\|\cos\theta$. في الفراغ نعرف المركبات عادة لا الزاوية، فعوّض $\cos\theta$ من قاعدة الزاوية.
+
+    scene plane {
+      alt: "السهمان A و B بزاوية 50 درجة، والظل مرسوم على B ومكتوب عليه معيار A في جتا ثيتا."
+      x: [-0.8, 5.2]
+      y: [-1.0, 3.0]
+      aspect: equal
+      axes: false
+      vector b = (0, 0) -> (4, 0) { color: vb, width: 3 }
+      line drop = (3*cos(rad(50)), 3*sin(rad(50))) -> (3*cos(rad(50)), 0) { color: neutral, style: dashed }
+      line sh = (0, 0) -> (3*cos(rad(50)), 0) { color: shadow, width: 7 }
+      vector a = (0, 0) -> (3*cos(rad(50)), 3*sin(rad(50))) { color: va, width: 3 }
+      label at (2.05, 2.55) = "A" { color: va }
+      label at (4.2, 0.25) = "B" { color: vb }
+      label at (0.96, -0.5) = "\|\overrightarrow{A}\|\cos\theta" { tex, color: shadow, anchor: middle }
+    }
+
+    build {
+      ask "اختر ما يساوي الظل."
+      skill: "sg-dot-projection"
+      template: "$A_B = \|\overrightarrow{A}\|\cos\theta =$ ___"
+      bank: ["$\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{B}\|}$", "$\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{A}\|}$", "$\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{B}\|^2}$", "$\overrightarrow{A}\cdot\overrightarrow{B}$"]
+      answer: ["$\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{B}\|}$"]
+      miss "$\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{A}\|}$" "هذا ظل $\overrightarrow{B}$ على $\overrightarrow{A}$. بعد الاختصار يبقى $\|\overrightarrow{B}\|$ في المقام."
+      miss "$\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{B}\|^2}$" "هذا معامل المركبة الاتجاهية. الظل نفسه يُقسم على $\|\overrightarrow{B}\|$ مرة واحدة."
+      miss "$\overrightarrow{A}\cdot\overrightarrow{B}$" "هذا الظل مضروبًا في $\|\overrightarrow{B}\|$. اقسم عليه لترجع إلى الظل."
+      hint "اكتب $\cos\theta$ كسرًا، ثم اختصر $\|\overrightarrow{A}\|$."
+      ! "$\|\overrightarrow{A}\| \times \frac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{A}\|\,\|\overrightarrow{B}\|} = \frac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{B}\|}$. يسميها كتابك أيضًا المركبة الجبرية أو المسقط. نقسم على معيار المتجه الذي **نُسقط عليه**."
+    }
+  }
+
+  slide "ظل داخل صندوق" {
+    id: "sg3-proj-box"
+    beat: example
+    cat: "المسقط"
+    > من كتابك: متوازي مستطيلات أحد رؤوسه $O$ عند الأصل، والرأس المقابل [$A(3, 4, 5)$]{va}. أدِر الشكل وتتبّع [$\overrightarrow{D'B}$]{vb}.
+
+    scene space3 {
+      alt: "متوازي مستطيلات أبعاده 3 و 4 و 5 وأحد رؤوسه عند الأصل O. المتجه OA قطر من الأصل إلى الرأس المقابل (3, 4, 5)، والمتجه D'B من الرأس (3, 0, 0) على محور x إلى الرأس (0, 4, 5). مؤشر يدير الشكل."
+      x: [0, 4]
+      y: [0, 5]
+      z: [0, 6]
+      param az = 35 { range: [0, 360], step: 5 }
+      camera: [az, 22]
+      segment3 e1 = (0, 0, 0) -> (3, 0, 0) { color: neutral }
+      segment3 e2 = (3, 0, 0) -> (3, 4, 0) { color: neutral }
+      segment3 e3 = (3, 4, 0) -> (0, 4, 0) { color: neutral }
+      segment3 e4 = (0, 4, 0) -> (0, 0, 0) { color: neutral }
+      segment3 e5 = (0, 0, 5) -> (3, 0, 5) { color: neutral }
+      segment3 e6 = (3, 0, 5) -> (3, 4, 5) { color: neutral }
+      segment3 e7 = (3, 4, 5) -> (0, 4, 5) { color: neutral }
+      segment3 e8 = (0, 4, 5) -> (0, 0, 5) { color: neutral }
+      segment3 e9 = (0, 0, 0) -> (0, 0, 5) { color: neutral }
+      segment3 e10 = (3, 0, 0) -> (3, 0, 5) { color: neutral }
+      segment3 e11 = (3, 4, 0) -> (3, 4, 5) { color: neutral }
+      segment3 e12 = (0, 4, 0) -> (0, 4, 5) { color: neutral }
+      segment3 oa = (0, 0, 0) -> (3, 4, 5) { arrow, color: va }
+      segment3 db = (3, 0, 0) -> (0, 4, 5) { arrow, color: vb }
+      point3 po = (0, 0, 0) { label: "O", r: 3 }
+      point3 pa = (3, 4, 5) { label: "A", color: va, r: 4 }
+      point3 pd = (3, 0, 0) { label: "D'", color: vb, r: 4 }
+      point3 pb = (0, 4, 5) { label: "B", color: vb, r: 4 }
+      slider az { label: "دوران" }
+    }
+
+    numeric {
+      ask "أوجد مركبة $\overrightarrow{OA}$ في اتجاه $\overrightarrow{D'B}$، حيث $D'(3, 0, 0)$ و $B(0, 4, 5)$، لأقرب جزء من مئة."
+      skill: "sg-dot-projection"
+      answer: 32 / (5*sqrt(2))
+      expect: (3*(-3) + 4*4 + 5*5) / sqrt(9 + 16 + 25)
+      tolerance: 0.01
+      wrong 32 "هذا $\overrightarrow{OA}\cdot\overrightarrow{D'B}$ وحده. بقيت القسمة على المعيار." -> "sg3-d-proj" retry
+      wrong 32 / 50 "قسمت على مربع المعيار. المركبة تُقسم على المعيار نفسه."
+      hint "$\overrightarrow{D'B} = B - D' = (-3, 4, 5)$."
+      ! "$\overrightarrow{OA}\cdot\overrightarrow{D'B} = -9 + 16 + 25 = 32$، و $\|\overrightarrow{D'B}\| = \sqrt{50} = 5\sqrt{2}$، فالمركبة $\frac{32}{5\sqrt{2}} = \frac{16}{5}\sqrt{2} \approx 4.53$."
+    }
+  }
+
+  slide "لماذا نقسم؟" {
+    id: "sg3-d-proj"
+    beat: detour
+    hidden: true
+    cat: "المسقط"
+    > الظل لا يكون أطول من المتجه نفسه. لكن $\overrightarrow{A}\cdot\overrightarrow{B}$ يساوي الظل **مضروبًا في** $\|\overrightarrow{B}\|$، فنقسم على $\|\overrightarrow{B}\|$ لنرجع إلى الظل وحده. لا نقسم على $\|\overrightarrow{A}\|$.
+
+    numeric {
+      ask "$\overrightarrow{A} = (2, 1, 2)$ و $\overrightarrow{B} = (0, 3, 4)$. أوجد مركبة $\overrightarrow{A}$ في اتجاه $\overrightarrow{B}$."
+      skill: "sg-dot-projection"
+      answer: 11 / 5
+      expect: (0 + 3 + 8) / sqrt(9 + 16)
+      tolerance: 0.01
+      wrong 11 "هذا $\overrightarrow{A}\cdot\overrightarrow{B}$. اقسم على $\|\overrightarrow{B}\| = 5$."
+      wrong 11 / 3 "قسمت على $\|\overrightarrow{A}\| = 3$. نقسم على معيار المتجه الذي نُسقط عليه."
+      ! "$\frac{0 + 3 + 8}{5} = 2.2$، وهو أقل من $\|\overrightarrow{A}\| = 3$ كما يجب لأي ظل. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "مسقطان وحدك: الأول" {
+    id: "sg3-proj-own-1"
+    beat: example
+    cat: "المسقط"
+    > دورك.
+
+    numeric {
+      ask "$\overrightarrow{A} = (-1, 4, 2)$ و $\overrightarrow{B} = (2, 2, 1)$. أوجد مركبة $\overrightarrow{A}$ في اتجاه $\overrightarrow{B}$، لأقرب جزء من مئة."
+      skill: "sg-dot-projection"
+      answer: 8 / 3
+      expect: (-2 + 8 + 2) / sqrt(4 + 4 + 1)
+      tolerance: 0.01
+      wrong 8 "هذا $\overrightarrow{A}\cdot\overrightarrow{B}$. بقيت القسمة." -> "sg3-d-proj" retry
+      wrong 8 / sqrt(21) "قسمت على $\|\overrightarrow{A}\|$." -> "sg3-d-proj" retry
+      wrong 8 / 9 "قسمت على $\|\overrightarrow{B}\|^2$. هذا معامل المركبة الاتجاهية، لا المركبة نفسها."
+      ! "$\frac{-2 + 8 + 2}{\sqrt{9}} = \frac{8}{3} \approx 2.67$."
+    }
+  }
+
+  slide "مسقطان وحدك: الثاني" {
+    id: "sg3-proj-own-2"
+    beat: example
+    cat: "المسقط"
+    > وواحد باختيارات.
+
+    quiz {
+      ask "مسقط $\overrightarrow{A} = (2, 3, -1)$ في اتجاه $\overrightarrow{B} = 3\hat{i} + 4\hat{j}$ هو"
+      skill: "sg-dot-projection"
+      - "$18$" { why: "هذا $\overrightarrow{A}\cdot\overrightarrow{B}$ دون قسمة على $\|\overrightarrow{B}\|$.", onwrong: "sg3-d-proj", retry }
+      * "$\frac{18}{5}$"
+      - "$-\frac{18}{5}$" { why: "مركبة $\hat{k}$ في $\overrightarrow{B}$ صفر، فالحد $(-1)(0) = 0$ لا يغيّر الإشارة." }
+      - "$\frac{18}{25}$" { why: "قسمت على $\|\overrightarrow{B}\|^2$. المسقط يُقسم على $\|\overrightarrow{B}\|$." }
+      hint "$\overrightarrow{B} = (3, 4, 0)$."
+      ! "$\frac{6 + 12 + 0}{\sqrt{9 + 16}} = \frac{18}{5}$."
+    }
+  }
+
+  slide "هل الظل متماثل؟" {
+    id: "sg3-proj-flip"
+    beat: breaker
+    cat: "المسقط"
+    > ظل $\overrightarrow{A}$ على $\overrightarrow{B}$، وظل $\overrightarrow{B}$ على $\overrightarrow{A}$: هل هما الشيء نفسه؟
+
+    numeric {
+      ask "$\|\overrightarrow{A}\| = 6$ و $\|\overrightarrow{B}\| = 4$، ومركبة $\overrightarrow{A}$ في اتجاه $\overrightarrow{B}$ تساوي $3$. أوجد مركبة $\overrightarrow{B}$ في اتجاه $\overrightarrow{A}$."
+      skill: "sg-dot-projection"
+      answer: 2
+      expect: (3*4) / 6
+      tolerance: 0.01
+      wrong 3 "الظلان لا يتساويان: كل واحد يُقسم على معيار مختلف."
+      wrong 4.5 "هذه $\frac{3 \times 6}{4}$. ابدأ من $\overrightarrow{A}\cdot\overrightarrow{B} = 3 \times \|\overrightarrow{B}\|$."
+      hint "أوجد $\overrightarrow{A}\cdot\overrightarrow{B}$ أولًا من المعطى."
+      ! "$\overrightarrow{A}\cdot\overrightarrow{B} = 3 \times 4 = 12$، ومركبة $\overrightarrow{B}$ في اتجاه $\overrightarrow{A}$ هي $\frac{12}{6} = 2$. الضرب القياسي متماثل، لكن الظلين لا."
+    }
+  }
+
+  slide "الظل كمتجه" {
+    id: "sg3-proj-vec"
+    beat: example
+    cat: "المسقط"
+    > كتابك يطلب أحيانًا **المركبة الاتجاهية**: الظل نفسه كمتجه. طوله المسقط، واتجاهه اتجاه $\overrightarrow{B}$، فهو $\dfrac{\overrightarrow{A}\cdot\overrightarrow{B}}{\|\overrightarrow{B}\|^2}\,\overrightarrow{B}$.
+
+    quiz {
+      ask "$\overrightarrow{A} = (1, -2, 1)$ و $\overrightarrow{B} = (-2, 1, 2)$. المركبة الاتجاهية لـ $\overrightarrow{A}$ في اتجاه $\overrightarrow{B}$ هي"
+      skill: "sg-dot-projection"
+      * "$\left(\frac{4}{9}, -\frac{2}{9}, -\frac{4}{9}\right)$"
+      - "$\left(\frac{4}{9}, \frac{2}{9}, \frac{4}{9}\right)$" { why: "المعامل $-\frac{2}{9}$ يقلب إشارة كل مركبة في $\overrightarrow{B}$، لا الأولى وحدها." }
+      - "$\left(\frac{4}{9}, \frac{2}{9}, -\frac{4}{9}\right)$" { why: "راجع المركبة الثانية: $-\frac{2}{9} \times 1 = -\frac{2}{9}$." }
+      - "$-\frac{2}{3}$" { why: "هذا المسقط، عدد. المطلوب متجه في اتجاه $\overrightarrow{B}$." }
+      hint "$\overrightarrow{A}\cdot\overrightarrow{B} = -2$ و $\|\overrightarrow{B}\|^2 = 9$."
+      ! "$\frac{-2}{9}(-2, 1, 2) = \left(\frac{4}{9}, -\frac{2}{9}, -\frac{4}{9}\right)$. عكس اتجاه $\overrightarrow{B}$ لأن الضرب القياسي سالب."
+    }
+  }
+
+  slide "زاوية مثلث في الفراغ" {
+    id: "sg3-transfer"
+    beat: transfer
+    cat: "المسقط"
+    > واحد أخير، في مكان جديد.
+
+    numeric {
+      ask "مثلث رؤوسه $A(2, -3, 4)$ و $B(0, 1, 2)$ و $C(-1, 2, 0)$. أوجد قياس زاويته عند $B$ لأقرب درجة."
+      skill: "sg-dot-angle"
+      answer: deg(acos(-10 / 12))
+      expect: deg(acos((2*(-1) + (-4)*1 + 2*(-2)) / (sqrt(4 + 16 + 4)*sqrt(1 + 1 + 4))))
+      tolerance: 0.6
+      unit: "°"
+      wrong 180 - deg(acos(-10 / 12)) "استخدمت متجهًا يدخل $B$ مع آخر يخرج منها. زاوية المثلث بين $\overrightarrow{BA}$ و $\overrightarrow{BC}$."
+      ! "$\overrightarrow{BA} = (2, -4, 2)$ و $\overrightarrow{BC} = (-1, 1, -2)$، ضربهما $-10$، والمعياران $\sqrt{24}$ و $\sqrt{6}$، فـ $\cos B = -\frac{10}{12}$ و $B \approx 146°$. الضرب القياسي يعود في التمارين خلال الأيام القادمة."
+    }
+  }
+}
