@@ -124,12 +124,13 @@ const COURSES = [
     lessons: ['ar-3d-1', 'ar-3d-2', 'ar-3d-3', 'ar-3d-4'],
   },
   {
-    name: 'الأساسيات',
-    slug: 'foundations-ar',
-    description: 'أساسيات التفاضل والتكامل، مشروحة بالعربية.',
+    name: 'التفاضل والتكامل',
+    slug: 'calculus-ar',
+    description:
+      'التفاضل للثانوية العامة: معنى المشتقة وقواعدها، ثم الاشتقاق الضمني والبارامتري.',
     lang: 'ar',
     sortOrder: 3,
-    lessons: ['ar-limits-1', 'ar-deriv-1'],
+    lessons: ['ar-calc-1', 'ar-calc-2', 'ar-calc-3', 'ar-calc-4'],
   },
 ];
 

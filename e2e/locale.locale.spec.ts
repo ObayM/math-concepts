@@ -98,17 +98,17 @@ test.describe('arabic content', () => {
   });
 
   test('the arabic lesson plays on the arabic host', async ({ page }) => {
-    await page.goto(`${host('ar')}/courses/foundations-ar/ar-limits-1`);
-    await expect(page.getByText('الاقتراب لا الوصول')).toBeVisible();
+    await page.goto(`${host('ar')}/courses/calculus-ar/ar-calc-1`);
+    await expect(page.getByText('ما ميل هذا الخط؟')).toBeVisible();
   });
 
   test('the same lesson is not served on the english host', async ({ page }) => {
-    await page.goto(`${host('en')}/courses/foundations-ar/ar-limits-1`);
-    await expect(page.getByText('الاقتراب لا الوصول')).toHaveCount(0);
+    await page.goto(`${host('en')}/courses/calculus-ar/ar-calc-1`);
+    await expect(page.getByText('ما ميل هذا الخط؟')).toHaveCount(0);
   });
 
   test('math inside arabic prose stays left to right', async ({ page }) => {
-    await page.goto(`${host('ar')}/courses/foundations-ar/ar-limits-1`);
+    await page.goto(`${host('ar')}/courses/calculus-ar/ar-calc-1`);
     const math = page.locator('.rich-text span[dir="ltr"] .katex').first();
     await expect(math).toBeVisible();
     await expect(math).toHaveCSS('direction', 'ltr');
@@ -116,7 +116,7 @@ test.describe('arabic content', () => {
 
   test('the arabic catalog shows only arabic courses', async ({ page }) => {
     await page.goto(`${host('ar')}/courses`);
-    await expect(page.getByRole('heading', { name: 'الأساسيات' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'التفاضل والتكامل' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Calculus' })).toHaveCount(0);
   });
 });
