@@ -1,0 +1,3262 @@
+lesson "الاشتقاق الضمني والبارامتري" {
+  course: "calculus-ar"
+  unit: "الاشتقاق وتطبيقاته"
+  difficulty: "Advanced"
+  icon: "FunctionSquare"
+  summary: "كيف تشتق منحنى لا تستطيع أن تكتب فيه y وحدها، أو منحنى ترسمه نقطة تتحرك مع الزمن. الدرس الأول من كتابك، بكل أمثلته وتمارينه."
+  skills: ["diff-implicit", "diff-parametric"]
+  requires: ["diff-chain-rule", "diff-product-rule", "diff-trig"]
+
+  role ypart = primary
+  role xpart = success
+  role tpart = accent
+
+  slide "إحماء: سلسلة" {
+    id: "c4-check-chain"
+    beat: check
+    cat: "إحماء"
+    > ثلاثة أسئلة إحماء قبل أن نبدأ. هذا الدرس يقف على ثلاث قواعد، وكل سؤال يختبر واحدة.
+
+    numeric {
+      ask "إذا كانت $f(x) = (2x - 1)^4$، فما $f'(1)$؟"
+      skill: "diff-chain-rule"
+      answer: 8
+      expect: 4 * (2 * 1 - 1)^3 * 2
+      wrong 4 "هذا $4(2x - 1)^3$ وحده. مشتقة الداخل $2$." -> "c4-bridge-chain" retry
+      wrong 1 "هذا $f(1)$، قيمة الدالة." -> "c4-bridge-chain" retry
+      hint "قوة لدالة: $n u^{n-1} \cdot u'$."
+      ! "$4(1)^3 \cdot 2 = 8$. قاعدة السلسلة قلب هذا الدرس كله."
+    }
+  }
+
+  slide "السلسلة باختصار" {
+    id: "c4-bridge-chain"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > اشتق الخارج وأبقِ الداخل كما هو، ثم اضرب في مشتقة الداخل. الشرح كاملًا في [الدرس الثاني](lesson:ar-calc-2).
+
+    numeric {
+      ask "إذا كانت $f(x) = (x^2 + 3)^2$، فما $f'(1)$؟"
+      skill: "diff-chain-rule"
+      answer: 16
+      expect: 2 * (1 + 3) * 2 * 1
+      wrong 8 "هذا $2(x^2 + 3)$ وحده. مشتقة الداخل $2x$."
+      ! "$2(4) \cdot 2 = 16$. ارجع الآن إلى الإحماء."
+    }
+  }
+
+  slide "إحماء: ضرب" {
+    id: "c4-check-product"
+    beat: check
+    cat: "إحماء"
+    > الثاني.
+
+    numeric {
+      ask "إذا كانت $f(x) = x^2(3x - 1)$، فما $f'(1)$؟"
+      skill: "diff-product-rule"
+      answer: 7
+      expect: 2 * 1 * (3 * 1 - 1) + 1^2 * 3
+      wrong 6 "هذا $2x \cdot 3$، حاصل ضرب المشتقتين." -> "c4-bridge-product" retry
+      wrong 2 "هذا $f(1)$." -> "c4-bridge-product" retry
+      hint "$(fg)' = f'g + fg'$."
+      ! "$2(2) + 1(3) = 7$. ستحتاج قاعدة الضرب في كل حد فيه $x$ و $y$ مضروبان."
+    }
+  }
+
+  slide "الضرب باختصار" {
+    id: "c4-bridge-product"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > مشتقة الأول في الثاني، زائد الأول في مشتقة الثاني: $(fg)' = f'g + fg'$. لماذا؟ المستطيل في [الدرس الثاني](lesson:ar-calc-2).
+
+    numeric {
+      ask "إذا كانت $f(x) = (x + 1)x^2$، فما $f'(2)$؟"
+      skill: "diff-product-rule"
+      answer: 16
+      expect: 1 * 2^2 + (2 + 1) * 2 * 2
+      wrong 4 "هذا $1 \times 2x$، حاصل ضرب المشتقتين."
+      ! "$(1)(4) + (3)(4) = 16$. ارجع الآن إلى الإحماء."
+    }
+  }
+
+  slide "إحماء: مثلثية" {
+    id: "c4-check-trig"
+    beat: check
+    cat: "إحماء"
+    > والثالث.
+
+    numeric {
+      ask "إذا كانت $f(x) = \sin 2x$، فما $f'\left(\dfrac{\pi}{6}\right)$؟"
+      skill: "diff-trig"
+      answer: 1
+      expect: 2 * cos(2 * PI / 6)
+      tolerance: 0.001
+      wrong 0.5 "هذا $\cos\frac{\pi}{3}$ وحده. مشتقة الداخل $2$." -> "c4-bridge-trig" retry
+      wrong -1 "مشتقة $\sin$ هي $+\cos$." -> "c4-bridge-trig" retry
+      hint "$f'(x) = 2\cos 2x$."
+      ! "$2\cos\frac{\pi}{3} = 1$. الآن أنت جاهز."
+    }
+  }
+
+  slide "المثلثية باختصار" {
+    id: "c4-bridge-trig"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > $(\sin u)' = \cos u \cdot u'$ و $(\cos u)' = -\sin u \cdot u'$ و $(\tan u)' = \sec^2 u \cdot u'$. والثلاث الأخرى في [الدرس الثالث](lesson:ar-calc-3).
+
+    numeric {
+      ask "إذا كانت $f(x) = \cos 3x$، فما $f'\left(\dfrac{\pi}{6}\right)$؟"
+      skill: "diff-trig"
+      answer: -3
+      expect: 0 - 3 * sin(3 * PI / 6)
+      tolerance: 0.001
+      wrong -1 "مشتقة الداخل $3$."
+      wrong 3 "مشتقة $\cos$ سالبة."
+      ! "$-3\sin\frac{\pi}{2} = -3$. ارجع الآن إلى الإحماء."
+    }
+  }
+
+  slide "ميل مماس الدائرة" {
+    id: "c4-hook"
+    beat: hook
+    cat: "الاشتقاق الضمني"
+    > هذه الدائرة $x^2 + y^2 = 25$، والنقطة $(3, 4)$ عليها. نريد ميل المماس هناك. المشكلة: $y$ ليست مكتوبة وحدها. لكل $x$ تقريبًا نقطتان على الدائرة، واحدة فوق وواحدة تحت.
+
+    scene plane {
+      alt: "دائرة مركزها الأصل ونصف قطرها 5، والنقطة (3, 4) عليها في الربع الأول."
+      x: [-6.5, 6.5]
+      y: [-6, 6]
+      aspect: equal
+      grid
+      axes
+      circle c = (0, 0) { r: 5, color: ypart, width: 3 }
+      point p = (3, 4) { label: "(3, 4)", color: ypart }
+      line rad = (0, 0) -> (3, 4) { color: neutral, style: dashed }
+    }
+
+    quiz {
+      ask "كم ميل المماس عند $(3, 4)$؟"
+      skill: "diff-implicit"
+      * "$-\dfrac{3}{4}$"
+      - "$\dfrac{3}{4}$" { why: "المماس هناك ينزل وأنت تتحرك يمينًا، لأن النقطة في الجزء العلوي بعد القمة. الميل سالب." }
+      - "$\dfrac{4}{3}$" { why: "هذا ميل نصف القطر المتقطع، من الأصل إلى النقطة. المماس عمودي عليه." }
+      - "لا يمكن، لأن الدائرة ليست دالة" { why: "صحيح أنها ليست دالة واحدة. لكن قرب $(3, 4)$ هي منحنى عادي تمامًا، وله مماس." }
+      ! "رهانك الآن. سنحصل على الجواب بطريقين، ثم نختار الأقصر."
+    }
+  }
+
+  slide "صريحة أم ضمنية؟" {
+    id: "c4-kinds"
+    beat: explore
+    cat: "الاشتقاق الضمني"
+    > كتابك يفرّق بين نوعين. **الدالة الصريحة** $y$ فيها وحدها في طرف: $y = f(x)$، مثل $y = x^2 + 3$. و**العلاقة الضمنية** $x$ و $y$ فيها مختلطتان: $F(x, y) = 0$، مثل $5x^2 + 2xy + y^2 = 0$. والعلاقة نفسها قد تُكتب بالصورتين، مثل $y = \frac{x}{1 - x}$ و $y - xy - x = 0$.
+
+    sort {
+      ask "صريحة أم ضمنية؟"
+      skill: "diff-implicit"
+      bin "صريحة": ["$y = x^2 + 3$", "$y = \dfrac{x}{1 - x}$", "$y = \sqrt{4 - x^2}$"]
+      bin "ضمنية": ["$x^2 + y^2 = 4$", "$x^2 - 3xy - y^3 = 4$", "$y - xy - x = 0$"]
+      hint "اسأل: هل $y$ وحدها في طرف، والطرف الآخر ليس فيه $y$؟"
+      ! "$y - xy - x = 0$ ضمنية الشكل، مع أنها نفس $y = \frac{x}{1 - x}$. أما $x^2 - 3xy - y^3 = 4$ فيتعذر عمليًا أن تعزل فيها $y$، كما يقول كتابك. لهذا نحتاج طريقة تعمل على الصورة الضمنية مباشرة."
+    }
+  }
+
+  slide "الطريق الطويل" {
+    id: "c4-long"
+    beat: explore
+    cat: "الاشتقاق الضمني"
+    > الطريق الأول: قسّم الدائرة. النصف العلوي دالة صريحة، $y = \sqrt{25 - x^2}$، والنقطة $(3, 4)$ عليه. اشتقه بالسلسلة كما تعلمت. قُد الحل.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ للنصف العلوي."
+      skill: "diff-implicit"
+      from "$y = \sqrt{25 - x^2}$"
+      move "$\dfrac{dy}{dx} = \dfrac{-2x}{2\sqrt{25 - x^2}}$" {
+        * "جذر دالة: $\dfrac{u'}{2\sqrt{u}}$"
+        - "$\dfrac{dy}{dx} = \dfrac{1}{2\sqrt{25 - x^2}}$" { why: "نسيت مشتقة الداخل $(25 - x^2)' = -2x$." }
+        - "$\dfrac{dy}{dx} = \sqrt{-2x}$" { why: "لا نشتق ما تحت الجذر ونتركه تحت الجذر. الجذر قوة $\frac{1}{2}$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{-x}{\sqrt{25 - x^2}}$" {
+        * "اختصر الـ $2$"
+        - "$\dfrac{dy}{dx} = \dfrac{-x}{25 - x^2}$" { why: "الجذر يبقى في المقام. اختصرنا الـ $2$ فقط." }
+      }
+      move "$\dfrac{dy}{dx} = -\dfrac{x}{y}$" {
+        * "لاحظ أن الجذر هو $y$ نفسها"
+        - "$\dfrac{dy}{dx} = -\dfrac{y}{x}$" { why: "الجذر في المقام، و $y$ هي الجذر. إذن $y$ في المقام." }
+      }
+      ! "عند $(3, 4)$: $-\frac{3}{4}$. والنصف السفلي $y = -\sqrt{25 - x^2}$ يعطي أيضًا $-\frac{x}{y}$ بالضبط، كما في كتابك مع الدائرة $x^2 + y^2 = 4$. صيغة واحدة للدائرة كلها."
+    }
+  }
+
+  slide "الطريق القصير" {
+    id: "c4-name"
+    beat: name
+    cat: "الاشتقاق الضمني"
+    > الطريق الثاني: لا تقسّم شيئًا. اشتق طرفي $x^2 + y^2 = 25$ بالنسبة إلى $x$ كما هما. السر الوحيد: [$y$]{ypart} دالة في $x$ حتى لو لم نكتبها، فكل حد فيه $y$ يُشتق بالسلسلة ويظهر معه [$\frac{dy}{dx}$]{ypart}، تمامًا كما رأيت في الدرس الثاني: $\frac{d}{dx}\left[y^2\right] = 2y\frac{dy}{dx}$.
+
+    moves {
+      ask "اشتق $x^2 + y^2 = 25$ ضمنيًا."
+      skill: "diff-implicit"
+      from "$x^2 + y^2 = 25$"
+      move "$2x + 2y\dfrac{dy}{dx} = 0$" {
+        * "اشتق كل حد بالنسبة إلى $x$، و $y^2$ بالسلسلة"
+        - "$2x + 2y = 0$" { why: "$y$ تتغير مع $x$. مشتقة $y^2$ بالنسبة إلى $x$ فيها $\frac{dy}{dx}$." }
+        - "$2x + 2y\dfrac{dy}{dx} = 25$" { why: "الطرف الأيمن ثابت، ومشتقته صفر." }
+      }
+      move "$2y\dfrac{dy}{dx} = -2x$" {
+        * "انقل ما ليس فيه $\frac{dy}{dx}$ إلى الطرف الآخر"
+        - "$2y\dfrac{dy}{dx} = 2x$" { why: "النقل يقلب الإشارة: $+2x$ يصير $-2x$." }
+      }
+      move "$\dfrac{dy}{dx} = -\dfrac{x}{y}$" {
+        * "اقسم على $2y$"
+        - "$\dfrac{dy}{dx} = -\dfrac{y}{x}$" { why: "قسمنا على $2y$، فـ $y$ في المقام." }
+      }
+      ! "نفس الجواب في ثلاثة أسطر. هذا **الاشتقاق الضمني**. وكتابك يلخصه: $\frac{d}{dx}y^n = n\,y^{n-1}\frac{dy}{dx}$."
+    }
+  }
+
+  slide "ميل في كل نقطة" {
+    id: "c4-circle"
+    beat: explore
+    cat: "الاشتقاق الضمني"
+    > صيغة واحدة، $\frac{dy}{dx} = -\frac{x}{y}$، تعطي ميل المماس في أي نقطة على الدائرة. اسحب النقطة حولها. متى يصير البسط صفرًا؟ ومتى المقام؟
+
+    scene plane {
+      alt: "دائرة نصف قطرها 5 حول الأصل، ونقطة تسحبها على محيطها، والمماس عندها."
+      x: [-7, 7]
+      y: [-6.5, 6.5]
+      aspect: equal
+      grid
+      axes
+      param th = 0.93 { range: [-3.14, 3.14], step: 0.01 }
+      circle c = (0, 0) { r: 5, color: neutral, width: 3 }
+      point p = (5*cos(th), 5*sin(th)) { drag: along(c) -> th, color: ypart }
+      line tan { through: p, slope: 0 - cos(th)/sin(th), color: xpart, width: 3, show: abs(sin(th)) > 0.03 }
+      line vtan = (5*cos(th), -6.5) -> (5*cos(th), 6.5) { color: xpart, width: 3, show: abs(sin(th)) <= 0.03 }
+    }
+
+    goal "اجعل المماس أفقيًا" {
+      when: abs(cos(th)) < 0.03
+      hints: ["أفقي يعني الميل صفر، أي البسط $x = 0$.", "أعلى الدائرة أو أسفلها."]
+      showme: { th: 1.5708 }
+    }
+
+    goal "الآن اجعله رأسيًا" {
+      when: abs(sin(th)) < 0.03
+      hints: ["رأسي يعني الميل غير معرّف: المقام $y = 0$.", "أقصى يمين الدائرة أو أقصى يسارها."]
+      showme: { th: 0 }
+    }
+
+    numeric {
+      ask "كم ميل المماس عند $(4, -3)$؟"
+      skill: "diff-implicit"
+      answer: 4/3
+      expect: 0 - 4 / (0 - 3)
+      tolerance: 0.005
+      wrong -4/3 "$-\frac{x}{y} = -\frac{4}{-3}$: سالب على سالب." -> "c4-d-sign" retry
+      wrong 3/4 "قسمت $y$ على $x$. الصيغة $-\frac{x}{y}$."
+      after: goals
+      ! "$-\frac{4}{-3} = \frac{4}{3}$. البسط صفر يعني مماسًا أفقيًا، والمقام صفر يعني مماسًا رأسيًا. ستبحث عن الاثنين كثيرًا في التمارين."
+    }
+  }
+
+  slide "مشتقة y تربيع هي 2y؟" {
+    id: "c4-trap"
+    beat: trap
+    cat: "الاشتقاق الضمني"
+    > $\frac{d}{dx}\left[x^2\right] = 2x$، إذن $\frac{d}{dx}\left[y^2\right] = 2y$، أليس كذلك؟ جرّبها على الدائرة: $2x + 2y = 0$، أي $y = -x$. هذا [الخط الأحمر]{ypart}. هل هذا ما تقوله الدائرة؟
+
+    scene plane {
+      alt: "الدائرة نفسها، والخط y = -x يقطعها في نقطتين فقط."
+      x: [-7, 7]
+      y: [-6.5, 6.5]
+      aspect: equal
+      grid
+      axes
+      circle c = (0, 0) { r: 5, color: neutral, width: 3 }
+      line bad = (-6.5, 6.5) -> (6.5, -6.5) { color: danger, width: 3 }
+      point q1 = (3.5355, -3.5355) { color: danger }
+      point q2 = (-3.5355, 3.5355) { color: danger }
+      point p = (3, 4) { label: "(3, 4)", color: ypart }
+    }
+
+    quiz {
+      ask "ما الخطأ؟"
+      skill: "diff-implicit"
+      * "$y$ تتغير مع $x$، فمشتقة $y^2$ هي $2y\dfrac{dy}{dx}$"
+      - "لا خطأ: ميل الدائرة $-1$ في كل مكان" { why: "المماس عند قمة الدائرة أفقي، وعند $(3, 4)$ ميله $-\frac{3}{4}$. ليس $-1$." }
+      - "كان يجب أن نشتق بالنسبة إلى $y$" { why: "نريد $\frac{dy}{dx}$، فنشتق بالنسبة إلى $x$. لكن نحترم أن $y$ تتحرك مع $x$." }
+      - "الدائرة لا تُشتق" { why: "رأيت للتو أن لها مماسًا في كل نقطة، وحسبنا ميله بطريقين." }
+      ! "المعادلة الخاطئة $2x + 2y = 0$ لا تحوي $\frac{dy}{dx}$ أصلًا، فلا تقول شيئًا عن الميل. خطأ مغرٍ لأن $x^2$ و $y^2$ تبدوان متشابهتين، لكن $x$ هي المتغير، و $y$ دالة فيه."
+    }
+  }
+
+  slide "و x في y؟" {
+    id: "c4-trap-xy"
+    beat: trap
+    cat: "الاشتقاق الضمني"
+    > فخ ثانٍ. $xy$ حاصل ضرب دالتين: $x$، و $y$ التي تتغير معها. فلا تكفي $\frac{d}{dx}(xy) = \frac{dy}{dx}$، ولا $x\frac{dy}{dx}$ وحدها. تحتاج قاعدة الضرب.
+
+    quiz {
+      ask "ما $\dfrac{d}{dx}(xy)$؟"
+      skill: "diff-implicit"
+      * "$x\dfrac{dy}{dx} + y$"
+      - "$x\dfrac{dy}{dx}$" { why: "هذا نصف قاعدة الضرب. $x$ نفسها تتغير، ومشتقتها $1$، فيظهر $1 \cdot y$.", onwrong: "c4-d-xy", retry }
+      - "$\dfrac{dy}{dx}$" { why: "$1 \cdot \frac{dy}{dx}$ حاصل ضرب المشتقتين، الركن الذي يذوب.", onwrong: "c4-d-xy", retry }
+      - "$y$" { why: "هذا النصف الآخر فقط. $y$ تتغير أيضًا، فيظهر $x\frac{dy}{dx}$." }
+      ! "$\frac{d}{dx}(xy) = x\frac{dy}{dx} + y \cdot 1$. كل حد فيه $x$ و $y$ مضروبتان يحتاج قاعدة الضرب، وكل حد فيه $y$ يحتاج $\frac{dy}{dx}$."
+    }
+  }
+
+  slide "الصورتان تعطيان المشتقة نفسها" {
+    id: "c4-same"
+    beat: example
+    cat: "الاشتقاق الضمني"
+    > من كتابك: $y = \dfrac{x}{1 - x}$ صريحة، وبقاعدة القسمة مشتقتها $\dfrac{1}{(1 - x)^2}$. ضرب الطرفين في $(1 - x)$ يعطي صورتها الضمنية $y - xy - x = 0$. اشتقها ضمنيًا وانظر أين تنتهي.
+
+    moves {
+      ask "اشتق $y - xy - x = 0$ ضمنيًا."
+      skill: "diff-implicit"
+      from "$y - xy - x = 0$"
+      move "$\dfrac{dy}{dx} - \left(x\dfrac{dy}{dx} + y\right) - 1 = 0$" {
+        * "اشتق كل حد، و $xy$ بقاعدة الضرب"
+        - "$\dfrac{dy}{dx} - x\dfrac{dy}{dx} - 1 = 0$" { why: "$xy$ حاصل ضرب: $x\frac{dy}{dx} + y$. الـ $y$ اختفت." }
+        - "$1 - x - y - 1 = 0$" { why: "مشتقة $y$ بالنسبة إلى $x$ هي $\frac{dy}{dx}$، لا $1$." }
+      }
+      move "$\dfrac{dy}{dx}(1 - x) = y + 1$" {
+        * "اجمع حدود $\frac{dy}{dx}$ وأخرجها عاملًا مشتركًا"
+        - "$\dfrac{dy}{dx}(1 - x) = y - 1$" { why: "ننقل $-y - 1$ إلى الطرف الآخر، فيصير $+y + 1$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{y + 1}{1 - x}$" {
+        * "اقسم على $(1 - x)$"
+        - "$\dfrac{dy}{dx} = (y + 1)(1 - x)$" { why: "العامل المضروب يُنقل بالقسمة." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{\frac{x}{1 - x} + 1}{1 - x} = \dfrac{1}{(1 - x)^2}$" {
+        * "عوّض $y = \dfrac{x}{1 - x}$ وبسّط"
+        - "$\dfrac{dy}{dx} = \dfrac{x + 1}{(1 - x)^2}$" { why: "$\frac{x}{1 - x} + 1 = \frac{x + 1 - x}{1 - x} = \frac{1}{1 - x}$." }
+      }
+      ! "النتيجة نفسها التي أعطتها قاعدة القسمة. المشتقة لا تتغير بتغير صورة العلاقة، فاختر الصورة الأسهل."
+    }
+  }
+
+  slide "خطوات الاشتقاق الضمني" {
+    id: "c4-steps"
+    beat: example
+    cat: "الاشتقاق الضمني"
+    > كل تمرين ضمني يمشي بنفس الخطوات. رتّبها.
+
+    order {
+      ask "رتّب خطوات إيجاد $\dfrac{dy}{dx}$ لعلاقة ضمنية."
+      skill: "diff-implicit"
+      item "اشتق كل حد في الطرفين بالنسبة إلى $x$"
+      item "مع كل حد فيه $y$ اضرب في $\frac{dy}{dx}$، واستخدم قاعدة الضرب مع $xy$"
+      item "اجمع حدود $\frac{dy}{dx}$ في طرف والباقي في الطرف الآخر"
+      item "أخرج $\frac{dy}{dx}$ عاملًا مشتركًا، ثم اقسم لتعزلها"
+      item "عوّض إحداثيي النقطة إن كان السؤال عند نقطة"
+      decoy "اعزل $y$ في طرف أولًا"
+      hint "آخر خطوة هي التعويض: لا تعوّض قبل أن تعزل $\frac{dy}{dx}$."
+      ! "ولا تحتاج عزل $y$ أبدًا، وهذه ميزة الطريقة كلها."
+    }
+  }
+
+  slide "مثال 1: عند نقطة" {
+    id: "c4-ex1"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > مثال 1 من كتابك. قُد الحل خطوة خطوة.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ للمنحنى $x^2 + 4xy - 3y^2 - 2x = 3$ عند النقطة $(3, 0)$."
+      skill: "diff-implicit"
+      from "$x^2 + 4xy - 3y^2 - 2x = 3$"
+      move "$2x + 4\left(x\dfrac{dy}{dx} + y\right) - 6y\dfrac{dy}{dx} - 2 = 0$" {
+        * "اشتق كل حد: $4xy$ بالضرب، و $3y^2$ بالسلسلة"
+        - "$2x + 4\dfrac{dy}{dx} - 6y\dfrac{dy}{dx} - 2 = 0$" { why: "$4xy$ حاصل ضرب: $4\left(x\frac{dy}{dx} + y\right)$." }
+        - "$2x + 4\left(x\dfrac{dy}{dx} + y\right) - 6y - 2 = 0$" { why: "$3y^2$ مشتقتها $6y\frac{dy}{dx}$. لا تنسَ $\frac{dy}{dx}$." }
+      }
+      move "$(4x - 6y)\dfrac{dy}{dx} = 2 - 2x - 4y$" {
+        * "اجمع حدود $\frac{dy}{dx}$ وانقل الباقي"
+        - "$(4x - 6y)\dfrac{dy}{dx} = 2x + 4y - 2$" { why: "النقل يقلب الإشارات: $2x + 4y - 2$ تصير $2 - 2x - 4y$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{1 - x - 2y}{2x - 3y}$" {
+        * "اقسم، واختصر $2$ من البسط والمقام"
+        - "$\dfrac{dy}{dx} = \dfrac{2x - 3y}{1 - x - 2y}$" { why: "الكسر مقلوب. ما كان مضروبًا في $\frac{dy}{dx}$ يذهب إلى المقام." }
+      }
+      move "$\left(\dfrac{dy}{dx}\right)_{(3, 0)} = -\dfrac{1}{3}$" {
+        * "عوّض $x = 3$ و $y = 0$"
+        - "$\left(\dfrac{dy}{dx}\right)_{(3, 0)} = \dfrac{1}{3}$" { why: "البسط $1 - 3 - 0 = -2$، والمقام $6$." }
+      }
+      ! "$\frac{1 - 3 - 0}{6 - 0} = -\frac{2}{6} = -\frac{1}{3}$."
+    }
+  }
+
+  slide "مثال 2: زاوية المماس" {
+    id: "c4-ex2"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > مثال 2 من كتابك: المنحنى $x^2 + y^2 - 6x - 8y + 17 = 0$ عند النقطة $(1, 2)$. بالاشتقاق: $2x + 2y\frac{dy}{dx} - 6 - 8\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = \frac{3 - x}{y - 4}$. أكمل أنت.
+
+    numeric {
+      ask "أوجد قياس الزاوية الموجبة التي يصنعها المماس مع الاتجاه الموجب لمحور $x$ عند $(1, 2)$."
+      skill: "diff-implicit"
+      answer: 135
+      expect: 180 + deg(atan((3 - 1) / (2 - 4)))
+      tolerance: 0.1
+      unit: "°"
+      wrong -45 "الآلة تعطي $-45°$، والزاوية الموجبة بين $0°$ و $180°$." -> "c4-d-angle" retry
+      wrong 45 "الميل $\frac{2}{-2} = -1$، سالب، فالزاوية منفرجة." -> "c4-d-angle" retry
+      wrong -1 "هذا الميل، وهو $\tan$ الزاوية. المطلوب الزاوية."
+      hint "الميل $\frac{3 - 1}{2 - 4}$. إذا كان $\tan\theta$ سالبًا فالزاوية بين $90°$ و $180°$."
+      ! "الميل $-1$، إذن $\tan\theta = -1$ و $\theta = 135°$."
+    }
+  }
+
+  slide "مثال 3: ثلاث علاقات" {
+    id: "c4-ex3a"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > مثال 3 من كتابك فيه ست علاقات. هذه ثلاث منها. في الأولى حيلة: $x^5y^5 = 1$ تعني $(xy)^5 = 1$، إذن $xy = 1$، وهذه أسهل بكثير.
+
+    match {
+      ask "طابق كل علاقة بمشتقتها $\dfrac{dy}{dx}$."
+      skill: "diff-implicit"
+      pair "$x^5y^5 = 1$" -> "$-\dfrac{y}{x}$"
+      pair "$x^7 + y^7 = 2$" -> "$-\left(\dfrac{x}{y}\right)^6$"
+      pair "$\sin 3y - \cos 2x = 0$" -> "$\dfrac{-2\sin 2x}{3\cos 3y}$"
+      decoy "$-\dfrac{x}{y}$"
+      decoy "$\dfrac{2\sin 2x}{3\cos 3y}$"
+      decoy "$\left(\dfrac{x}{y}\right)^6$"
+      miss "$x^5y^5 = 1$" -> "$-\dfrac{x}{y}$" "$xy = 1$ تعطي $x\frac{dy}{dx} + y = 0$، فالجواب $-\frac{y}{x}$. $-\frac{x}{y}$ للدائرة."
+      miss "$\sin 3y - \cos 2x = 0$" -> "$\dfrac{2\sin 2x}{3\cos 3y}$" "$-\cos 2x$ مشتقتها $+2\sin 2x$، وعند النقل إلى الطرف الآخر تصير $-2\sin 2x$."
+      miss "$x^7 + y^7 = 2$" -> "$\left(\dfrac{x}{y}\right)^6$" "$7x^6 + 7y^6\frac{dy}{dx} = 0$، فالإشارة سالبة."
+      hint "في الثالثة: $3\cos 3y\frac{dy}{dx} + 2\sin 2x = 0$."
+      ! "$-\frac{7x^6}{7y^6} = -\left(\frac{x}{y}\right)^6$. وفي المثلثية: مشتقة $\sin 3y$ هي $3\cos 3y\frac{dy}{dx}$، سلسلة من ثلاث حلقات."
+    }
+  }
+
+  slide "مثال 3: ثلاثة حدود" {
+    id: "c4-ex3b"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > العلاقة الثالثة من مثال 3 فيها حدان مختلطان، وكل واحد منهما حاصل ضرب.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $y^3 + 2x^2y - 3xy^2 = 0$."
+      skill: "diff-implicit"
+      from "$y^3 + 2x^2y - 3xy^2 = 0$"
+      move "$3y^2\dfrac{dy}{dx} + 2\left(x^2\dfrac{dy}{dx} + 2xy\right) - 3\left(2xy\dfrac{dy}{dx} + y^2\right) = 0$" {
+        * "اشتق: $y^3$ بالسلسلة، والحدان المختلطان بالضرب"
+        - "$3y^2\dfrac{dy}{dx} + 4xy - 3y^2 = 0$" { why: "في كل حد مختلط جزآن. $2x^2y$ مثلًا يعطي $2x^2\frac{dy}{dx}$ و $4xy$ معًا." }
+        - "$3y^2\dfrac{dy}{dx} + 2\left(x^2\dfrac{dy}{dx} + 2xy\right) - 3\left(2y\dfrac{dy}{dx} + y^2\right) = 0$" { why: "مشتقة $y^2$ هي $2y\frac{dy}{dx}$، وهي مضروبة في $x$: $x \cdot 2y\frac{dy}{dx}$." }
+      }
+      move "$\dfrac{dy}{dx}\left(3y^2 + 2x^2 - 6xy\right) = 3y^2 - 4xy$" {
+        * "اجمع حدود $\frac{dy}{dx}$ وانقل الباقي"
+        - "$\dfrac{dy}{dx}\left(3y^2 + 2x^2 - 6xy\right) = 4xy - 3y^2$" { why: "الحدود التي نُقلت: $+4xy - 3y^2$ تصير $-4xy + 3y^2$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{3y^2 - 4xy}{3y^2 + 2x^2 - 6xy}$" {
+        * "اقسم"
+        - "$\dfrac{dy}{dx} = \dfrac{3y^2 + 2x^2 - 6xy}{3y^2 - 4xy}$" { why: "مقلوب. معامل $\frac{dy}{dx}$ يذهب إلى المقام." }
+      }
+      ! "في الامتحان: ضع كل حد مختلط بين قوسين قبل أن تفك، فلا يضيع منك جزء."
+    }
+  }
+
+  slide "مثال 3: جيب وجيب تمام" {
+    id: "c4-ex3c"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > الخامسة من مثال 3: ضرب، وسلسلة، ومثلثية، معًا.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $x\cos y + y\sin 2x = 1$."
+      skill: "diff-implicit"
+      from "$x\cos y + y\sin 2x = 1$"
+      move "$\left[x\left(-\sin y\dfrac{dy}{dx}\right) + \cos y\right] + \left[y \cdot 2\cos 2x + \sin 2x\dfrac{dy}{dx}\right] = 0$" {
+        * "كل حد حاصل ضرب: اشتقه بالضرب، و $\cos y$ بالسلسلة"
+        - "$-\sin y\dfrac{dy}{dx} + 2\cos 2x\dfrac{dy}{dx} = 0$" { why: "هذا حاصل ضرب المشتقات في كل حد. كل حد يحتاج جزأين." }
+        - "$\left[-x\sin y + \cos y\right] + \left[2y\cos 2x + \sin 2x\dfrac{dy}{dx}\right] = 0$" { why: "مشتقة $\cos y$ بالنسبة إلى $x$ هي $-\sin y\frac{dy}{dx}$." }
+      }
+      move "$\left(\sin 2x - x\sin y\right)\dfrac{dy}{dx} = -2y\cos 2x - \cos y$" {
+        * "اجمع حدود $\frac{dy}{dx}$ وانقل الباقي"
+        - "$\left(\sin 2x - x\sin y\right)\dfrac{dy}{dx} = 2y\cos 2x + \cos y$" { why: "النقل يقلب الإشارتين." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{-2y\cos 2x - \cos y}{\sin 2x - x\sin y}$" {
+        * "اقسم"
+        - "$\dfrac{dy}{dx} = \dfrac{-2y\cos 2x - \cos y}{\sin 2x + x\sin y}$" { why: "في المعامل $-x\sin y$، والإشارة تبقى كما هي." }
+      }
+      ! "طويل، لكن كل سطر فيه قاعدة واحدة تعرفها."
+    }
+  }
+
+  slide "مثال 3: قاطع وظل تمام" {
+    id: "c4-ex3d"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > والسادسة. حاول أن تشتقها في ورقتك قبل أن تنظر إلى الخيارات.
+
+    quiz {
+      ask "إذا كان $\sec 2x + \cot y = xy$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{2\sec 2x\tan 2x - y}{x + \csc^2 y}$"
+      - "$\dfrac{2\sec 2x\tan 2x - y}{x - \csc^2 y}$" { why: "مشتقة $\cot y$ هي $-\csc^2 y\frac{dy}{dx}$. حين تنقلها إلى جانب $x\frac{dy}{dx}$ تصير موجبة." }
+      - "$\dfrac{2\sec 2x\tan 2x}{x + \csc^2 y}$" { why: "$xy$ في الطرف الأيمن حاصل ضرب: $x\frac{dy}{dx} + y$. أين $y$؟", onwrong: "c4-d-xy", retry }
+      - "$\dfrac{\sec 2x\tan 2x - y}{x + \csc^2 y}$" { why: "مشتقة الداخل $2x$ هي $2$." }
+      hint "$2\sec 2x\tan 2x - \csc^2 y\frac{dy}{dx} = x\frac{dy}{dx} + y$."
+      ! "اجمع: $(x + \csc^2 y)\frac{dy}{dx} = 2\sec 2x\tan 2x - y$، ثم اقسم."
+    }
+  }
+
+  slide "مثال 4: اشتق بالنسبة إلى y ثم اقلب" {
+    id: "c4-ex4"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > أحيانًا تكون $x$ هي المكتوبة وحدها، مثل $x = (y^5 - 1)^8$. عندها اشتق بالنسبة إلى $y$، ثم اقلب: $\dfrac{dy}{dx} = 1 \div \dfrac{dx}{dy}$. مثال 4 من كتابك يطلب إثبات $\dfrac{dy}{dx} = \dfrac{y^5 - 1}{40xy^4}$.
+
+    moves {
+      ask "أثبت أن $\dfrac{dy}{dx} = \dfrac{y^5 - 1}{40xy^4}$."
+      skill: "diff-implicit"
+      from "$x = (y^5 - 1)^8$"
+      move "$\dfrac{dx}{dy} = 8(y^5 - 1)^7 \cdot 5y^4 = 40y^4(y^5 - 1)^7$" {
+        * "اشتق بالنسبة إلى $y$ بالسلسلة"
+        - "$\dfrac{dx}{dy} = 8(y^5 - 1)^7$" { why: "مشتقة الداخل $5y^4$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{1}{40y^4(y^5 - 1)^7}$" {
+        * "اقلب: $\dfrac{dy}{dx} = 1 \div \dfrac{dx}{dy}$"
+        - "$\dfrac{dy}{dx} = 40y^4(y^5 - 1)^7$" { why: "هذه $\frac{dx}{dy}$ نفسها. المطلوب مقلوبها." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{y^5 - 1}{40y^4(y^5 - 1)^8} = \dfrac{y^5 - 1}{40xy^4}$" {
+        * "اضرب البسط والمقام في $(y^5 - 1)$، ثم $(y^5 - 1)^8 = x$"
+        - "$\dfrac{dy}{dx} = \dfrac{1}{40xy^4}$" { why: "$(y^5 - 1)^7$ ليست $x$. $x$ هي القوة الثامنة، فنحتاج عاملًا إضافيًا." }
+      }
+      ! "حيلة الضرب في $\frac{y^5 - 1}{y^5 - 1}$ تحوّل القوة السابعة إلى الثامنة، أي إلى $x$."
+    }
+  }
+
+  slide "مثال 5: مشتقة تركيب عند نقطة" {
+    id: "c4-ex5"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > مثال 5 من كتابك: $f(x) = \dfrac{1}{x - 2}$ و $g(x) = x^2$. المطلوب $\dfrac{d}{dx}\left[(f \circ g)(x)\right]$ عند $x = -1$. طريقان: ركّب ثم اشتق، أو $f'(g(x)) \cdot g'(x)$ مباشرة.
+
+    quiz {
+      ask "ما قيمة المشتقة عند $x = -1$؟"
+      skill: "diff-chain-rule"
+      * "$2$"
+      - "$-2$" { why: "راجع الإشارات: $f'(1) = -1$ و $g'(-1) = -2$، وسالب في سالب موجب." }
+      - "$-1$" { why: "هذا $f'(1)$ وحده. اضرب في $g'(-1)$." }
+      - "$\dfrac{2}{9}$" { why: "هذا بـ $f'(-1)$. الدالة $f$ تستقبل $g(-1) = 1$، لا $-1$." }
+      hint "$g(-1) = 1$، و $f'(x) = \frac{-1}{(x - 2)^2}$، و $g'(x) = 2x$."
+      ! "$(f \circ g)(x) = \frac{1}{x^2 - 2}$ ومشتقتها $\frac{-2x}{(x^2 - 2)^2}$، وعند $-1$: $2$. أو: $f'(1) \cdot g'(-1) = (-1)(-2) = 2$."
+    }
+  }
+
+  slide "نقطة تتحرك" {
+    id: "c4-param-explore"
+    beat: explore
+    cat: "الاشتقاق البارامتري"
+    > نوع آخر من المنحنيات. نقطة تتحرك مع الزمن [$t$]{tpart}: موضعها الأفقي $x = 2t$، والرأسي $y = t^2$. المنحنى هو الأثر الذي تتركه. القراءتان تعرضان سرعة تغير $x$ وسرعة تغير $y$ في كل لحظة.
+
+    scene plane {
+      alt: "قطع مكافئ ترسمه نقطة تتحرك: x = 2t و y = t تربيع. مؤشر يغيّر t من -2 إلى 2، ومماس المسار عند النقطة، وقراءتان لمعدل تغير x ومعدل تغير y بالنسبة إلى t."
+      x: [-4.5, 4.5]
+      y: [-0.8, 4.6]
+      aspect: equal
+      grid
+      axes
+      param s = 1 { range: [-2, 2], step: 0.05 }
+      curve path = (2*t, t^2) { t: [-2.1, 2.1], color: neutral, width: 2, style: dashed }
+      point p = (2*s, s^2) { color: tpart, trace }
+      line tan { through: p, slope: s, color: ypart, width: 3 }
+      label at (-4.3, 4.3) = "t = ${s}" { color: tpart }
+      label at (-4.3, 3.7) = "تغير x لكل ثانية = 2" { color: xpart }
+      label at (-4.3, 3.1) = "تغير y لكل ثانية = ${2*s}" { color: ypart }
+      slider s { label: "الزمن t" }
+    }
+
+    goal "جد اللحظة التي تتحرك فيها النقطة أفقيًا تمامًا" {
+      when: abs(s) < 0.01
+      hints: ["أفقيًا يعني أن $y$ لا تتغير في تلك اللحظة.", "متى يصير $2t = 0$؟"]
+      showme: { s: 0 }
+    }
+
+    numeric {
+      ask "عند $t = \frac{3}{2}$: $y$ تتغير $3$ لكل ثانية، و $x$ تتغير $2$ لكل ثانية. كم ميل المسار $\dfrac{dy}{dx}$؟"
+      skill: "diff-parametric"
+      answer: 1.5
+      expect: (2 * 1.5) / 2
+      tolerance: 0.001
+      wrong 3 "هذا $\frac{dy}{dt}$ وحده، تغير $y$ في الثانية. الميل تغير $y$ لكل خطوة في $x$."
+      wrong 2/3 "مقلوب: هذا $x$ لكل خطوة في $y$." -> "c4-d-flip" retry
+      wrong 6 "المعدلان يُقسمان لا يُضربان." -> "c4-d-flip" retry
+      after: goals
+      ! "في ثانية واحدة يصعد $3$ ويتقدم $2$، فيصعد $\frac{3}{2}$ لكل خطوة أفقية. الميل $1.5$."
+    }
+  }
+
+  slide "الاشتقاق البارامتري" {
+    id: "c4-param-name"
+    beat: name
+    cat: "الاشتقاق البارامتري"
+    > ما فعلته اسمه **الاشتقاق البارامتري**. $x = f(t)$ و $y = g(t)$ هما **المعادلتان البارامتريتان**، و $t$ هو **البارامتر** أو الوسيط. كتابك يكتبه «ن». وميل المنحنى: [تغير $y$]{ypart} مقسومًا على [تغير $x$]{xpart}، كلاهما بالنسبة إلى [$t$]{tpart}.
+
+    build {
+      ask "أكمل القاعدة."
+      skill: "diff-parametric"
+      template: "$\dfrac{dy}{dx} =$ ___ $\div$ ___"
+      bank: ["$\dfrac{dy}{dt}$", "$\dfrac{dx}{dt}$", "$\dfrac{dt}{dx}$", "$\dfrac{dt}{dy}$"]
+      answer: ["$\dfrac{dy}{dt}$", "$\dfrac{dx}{dt}$"]
+      miss "$\dfrac{dt}{dx}$" "القسمة على $\frac{dt}{dx}$ تضرب في $\frac{dx}{dt}$، فتخرج $\frac{dy}{dt} \cdot \frac{dx}{dt}$. نقسم على $\frac{dx}{dt}$ نفسها."
+      miss "$\dfrac{dt}{dy}$" "البسط تغير $y$، والمقام تغير $x$."
+      hint "$y$ في أعلى $\frac{dy}{dx}$، فـ $\frac{dy}{dt}$ في الأعلى."
+      ! "$\frac{dy}{dx} = \frac{dy}{dt} \div \frac{dx}{dt}$، وهي أيضًا $\frac{dy}{dt} \times \frac{dt}{dx}$، قاعدة السلسلة نفسها. تعمل حين $\frac{dx}{dt} \neq 0$."
+    }
+  }
+
+  slide "اضرب كالسلسلة؟" {
+    id: "c4-param-trap"
+    beat: trap
+    cat: "الاشتقاق البارامتري"
+    > قاعدة السلسلة تضرب المعدلات. إذن $\frac{dy}{dx} = \frac{dy}{dt} \times \frac{dx}{dt}$، صح؟ جرّب على $x = 3t$ و $y = t^3$ عند $t = 2$.
+
+    numeric {
+      ask "ما $\dfrac{dy}{dx}$ عند $t = 2$؟"
+      skill: "diff-parametric"
+      answer: 4
+      expect: (3 * 2^2) / 3
+      wrong 36 "هذا $\frac{dy}{dt} \times \frac{dx}{dt} = 12 \times 3$. السلسلة تضرب في $\frac{dt}{dx}$، أي مقلوب $\frac{dx}{dt}$." -> "c4-d-flip" retry
+      wrong 1/4 "مقلوب: $\frac{dx}{dt} \div \frac{dy}{dt}$." -> "c4-d-flip" retry
+      wrong 12 "هذا $\frac{dy}{dt}$ وحده."
+      hint "$\frac{dy}{dt} = 3t^2$ و $\frac{dx}{dt} = 3$."
+      ! "السلسلة تضرب فعلًا، لكن في $\frac{dt}{dx} = \frac{1}{3}$، لا في $\frac{dx}{dt}$. فـ $\frac{12}{3} = 4$. تحقّق: $t = \frac{x}{3}$، فـ $y = \frac{x^3}{27}$، وميلها عند $x = 6$ هو $\frac{3 \cdot 36}{27} = 4$."
+    }
+  }
+
+  slide "حذف البارامتر" {
+    id: "c4-eliminate"
+    beat: example
+    cat: "الاشتقاق البارامتري"
+    > من كتابك: يمكن أن نرجع من الصورة البارامترية إلى الصورة **الكارتيزية** (علاقة بين $x$ و $y$ فقط) بحذف البارامتر. $x = 2t$ و $y = t^2$: من الأولى $t = \frac{x}{2}$، فـ $y = \frac{x^2}{4}$. ومع الزوايا نستعمل $\sin^2 + \cos^2 = 1$.
+
+    match {
+      ask "طابق كل منحنى بصورته الكارتيزية."
+      skill: "diff-parametric"
+      pair "$x = 2t,\ y = t^2$" -> "$y = \dfrac{x^2}{4}$"
+      pair "$x = 3\cos\theta,\ y = 3\sin\theta$" -> "$x^2 + y^2 = 9$"
+      pair "$x = t + 1,\ y = 2t$" -> "$y = 2x - 2$"
+      decoy "$y = \dfrac{x^2}{2}$"
+      decoy "$x^2 + y^2 = 3$"
+      miss "$x = 2t,\ y = t^2$" -> "$y = \dfrac{x^2}{2}$" "$t = \frac{x}{2}$، ومربعها $\frac{x^2}{4}$: المقام يُربّع أيضًا."
+      miss "$x = 3\cos\theta,\ y = 3\sin\theta$" -> "$x^2 + y^2 = 3$" "$x^2 + y^2 = 9\cos^2\theta + 9\sin^2\theta = 9$. الـ $3$ تُربّع."
+      hint "في كل واحدة اعزل $t$ من إحدى المعادلتين وعوّض في الأخرى، أو ربّع واجمع مع الزوايا."
+      ! "الدائرة $x^2 + y^2 = 9$ رأيناها ضمنية، وهنا بارامترية. المنحنى نفسه، بصورتين."
+    }
+  }
+
+  slide "مثال 6: ثابت يختفي" {
+    id: "c4-ex6a"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > مثال 6 من كتابك. $a$ ثابت، يبقى كما هو في الاشتقاق، وقد يختفي في القسمة.
+
+    numeric {
+      ask "أوجد $\dfrac{dy}{dx}$ عند $t = 4$ إذا كان $x = 2at^2$ و $y = at^4$."
+      skill: "diff-parametric"
+      answer: 16
+      expect: (4 * 4^3) / (4 * 4)
+      wrong 1/16 "مقلوب." -> "c4-d-flip" retry
+      wrong 256 "هذا $\frac{dy}{dt} \div a = 4t^3$ عند $4$. اقسم على $\frac{dx}{dt} = 4at$ أيضًا."
+      hint "$\frac{dx}{dt} = 4at$ و $\frac{dy}{dt} = 4at^3$."
+      ! "$\frac{4at^3}{4at} = t^2$، وعند $4$: $16$. الـ $a$ اختفت، فلا حاجة لمعرفتها."
+    }
+  }
+
+  slide "مثال 6: جيب وجيب تمام مكعبان" {
+    id: "c4-ex6b"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > والثاني من مثال 6. البارامتر هنا زاوية $\theta$. قُد الحل.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ عند $\theta = \dfrac{\pi}{4}$ إذا كان $x = 2\cos^3\theta$ و $y = 5\sin^3\theta$."
+      skill: "diff-parametric"
+      from "$x = 2\cos^3\theta,\quad y = 5\sin^3\theta$"
+      move "$\dfrac{dx}{d\theta} = -6\sin\theta\cos^2\theta,\quad \dfrac{dy}{d\theta} = 15\sin^2\theta\cos\theta$" {
+        * "اشتق كلًا منهما بالنسبة إلى $\theta$، قوة لدالة"
+        - "$\dfrac{dx}{d\theta} = -6\sin^3\theta,\quad \dfrac{dy}{d\theta} = 15\cos^3\theta$" { why: "هذا فخ الدرس الثالث: $\cos^3\theta$ قوة، فمشتقتها $3\cos^2\theta \cdot (-\sin\theta)$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{15\sin^2\theta\cos\theta}{-6\sin\theta\cos^2\theta} = -\dfrac{5}{2}\tan\theta$" {
+        * "اقسم واختصر"
+        - "$\dfrac{dy}{dx} = -\dfrac{2}{5}\cot\theta$" { why: "مقلوب: $\frac{dy}{d\theta}$ في البسط." }
+      }
+      move "$\left[\dfrac{dy}{dx}\right]_{\theta = \frac{\pi}{4}} = -\dfrac{5}{2}$" {
+        * "عوّض $\tan\frac{\pi}{4} = 1$"
+        - "$\left[\dfrac{dy}{dx}\right]_{\theta = \frac{\pi}{4}} = -\dfrac{5\pi}{8}$" { why: "نعوّض في $\tan\theta$، لا نضرب في الزاوية." }
+      }
+      ! "الاختصار قبل التعويض يوفر حسابًا كثيرًا."
+    }
+  }
+
+  slide "مثال 7: مشتقة دالة بالنسبة إلى دالة" {
+    id: "c4-ex7"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > نفس الفكرة تجيب سؤالًا غريبًا: **مشتقة دالة بالنسبة إلى دالة أخرى**. سمِّ الأولى $y$ والثانية $z$، وكلتاهما دالة في $x$، فـ $x$ يلعب دور البارامتر: $\dfrac{dy}{dz} = \dfrac{dy}{dx} \div \dfrac{dz}{dx}$. مثال 7 من كتابك.
+
+    numeric {
+      ask "أوجد مشتقة $\sqrt{5 + x^2}$ بالنسبة إلى $\dfrac{x}{x + 2}$ عند $x = 2$."
+      skill: "diff-parametric"
+      answer: 16/3
+      expect: (2 / sqrt(5 + 4)) / (2 / (2 + 2)^2)
+      tolerance: 0.005
+      wrong 3/16 "مقلوب: مشتقة الأولى في البسط." -> "c4-d-flip" retry
+      wrong 1/12 "ضربت المشتقتين. نقسم $\frac{dy}{dx}$ على $\frac{dz}{dx}$."
+      wrong 2/3 "هذا $\frac{dy}{dx}$ وحده، مشتقة $\sqrt{5 + x^2}$ بالنسبة إلى $x$."
+      hint "$\frac{dy}{dx} = \frac{x}{\sqrt{5 + x^2}}$ و $\frac{dz}{dx} = \frac{2}{(x + 2)^2}$."
+      ! "عند $2$: $\frac{dy}{dx} = \frac{2}{3}$ و $\frac{dz}{dx} = \frac{2}{16}$، فالناتج $\frac{2}{3} \times 8 = \frac{16}{3}$."
+    }
+  }
+
+  slide "مثال 8: مماس أفقي ومماس رأسي" {
+    id: "c4-ex8"
+    beat: explore
+    cat: "أمثلة الكتاب"
+    > مثال 8 من كتابك: $x = 4t^3 - 15t^2 - 18t + 4$ و $y = 2t^2 - 3t + 7$. الميل كسر: $\frac{dy}{dt}$ على $\frac{dx}{dt}$. البسط صفر يعني [مماسًا أفقيًا]{ypart}، والمقام صفر يعني [مماسًا رأسيًا]{xpart}. حرّك الزمن وراقب.
+
+    scene plane {
+      alt: "منحنى بارامتري ترسمه نقطة تتحرك مع t، يمتد من اليمين إلى اليسار ثم يرجع. مؤشر يغيّر t من -1.5 إلى 4، والمماس عند النقطة، وقراءتان لمعدل تغير x ومعدل تغير y بالنسبة إلى t."
+      x: [-82, 14]
+      y: [3, 29]
+      grid
+      axes
+      param s = -1 { range: [-1.5, 4], step: 0.05 }
+      curve path = (4*t^3 - 15*t^2 - 18*t + 4, 2*t^2 - 3*t + 7) { t: [-1.5, 4], color: neutral, width: 2, style: dashed }
+      point p = (4*s^3 - 15*s^2 - 18*s + 4, 2*s^2 - 3*s + 7) { color: tpart }
+      line tan { through: p, slope: (4*s - 3)/(12*s^2 - 30*s - 18), color: ypart, width: 3, show: abs(12*s^2 - 30*s - 18) > 0.5 }
+      line vtan = (4*s^3 - 15*s^2 - 18*s + 4, 3) -> (4*s^3 - 15*s^2 - 18*s + 4, 29) { color: xpart, width: 3, show: abs(12*s^2 - 30*s - 18) <= 0.5 }
+      label at (-80, 27.5) = "t = ${s}" { color: tpart }
+      label at (-80, 25.5) = "dx/dt = ${fixed(12*s^2 - 30*s - 18, 2)}" { color: xpart }
+      label at (-80, 23.5) = "dy/dt = ${fixed(4*s - 3, 2)}" { color: ypart }
+      slider s { label: "t" }
+    }
+
+    goal "جد اللحظة التي يصير فيها المماس أفقيًا" {
+      when: abs(4*s - 3) < 0.01
+      hints: ["أفقي يعني البسط $\frac{dy}{dt} = 4t - 3 = 0$."]
+      showme: { s: 0.75 }
+    }
+
+    numeric {
+      ask "المماس يصير رأسيًا مرتين. ما قيمة $t$ **الموجبة** التي يكون عندها رأسيًا؟"
+      skill: "diff-parametric"
+      answer: 3
+      expect: (5 + sqrt(25 + 24)) / 4
+      tolerance: 0.001
+      wrong 0.75 "عند $0.75$ يكون أفقيًا: البسط صفر. الرأسي حين المقام صفر." -> "c4-d-hv" retry
+      wrong -0.5 "هذه القيمة الأخرى، السالبة."
+      hint "$\frac{dx}{dt} = 12t^2 - 30t - 18 = 0$، اقسم على $6$: $2t^2 - 5t - 3 = 0$."
+      after: goals
+      ! "$(2t + 1)(t - 3) = 0$، فـ $t = -\frac{1}{2}$ أو $t = 3$: هنا مماس رأسي. و $t = \frac{3}{4}$: مماس أفقي."
+    }
+  }
+
+  slide "مثال 9: المماس والعمودي" {
+    id: "c4-ex9"
+    beat: example
+    cat: "أمثلة الكتاب"
+    > مثال 9 من كتابك: $x = t^2 - 2$ و $y = t^4 + 3t^2 + 1$ عند $t = 1$. تذكّر من الدرس الأول: المماس $y - y_1 = m(x - x_1)$، والعمودي ميله $-\frac{1}{m}$. انتبه: النقطة $(x_1, y_1)$ تأتي من التعويض بـ $t$ في المعادلتين.
+
+    moves {
+      ask "أوجد معادلة المماس عند $t = 1$."
+      skill: "diff-parametric"
+      from "$\dfrac{dy}{dx} = \dfrac{4t^3 + 6t}{2t}$"
+      move "$\dfrac{dy}{dx} = 2t^2 + 3 = 5$" {
+        * "اختصر، ثم عوّض $t = 1$"
+        - "$\dfrac{dy}{dx} = \dfrac{2t}{4t^3 + 6t} = \dfrac{1}{5}$" { why: "مقلوب: $\frac{dy}{dt}$ في البسط." }
+      }
+      move "$(x_1, y_1) = (-1, 5)$" {
+        * "عوّض $t = 1$ في $x$ و $y$"
+        - "$(x_1, y_1) = (1, 5)$" { why: "$x_1$ ليست $t$. عوّض: $x = 1^2 - 2 = -1$." }
+      }
+      move "$y - 5 = 5(x + 1)$، أي $y - 5x - 10 = 0$" {
+        * "$y - y_1 = m(x - x_1)$"
+        - "$y - 5 = 5(x - 1)$" { why: "$x_1 = -1$، و $x - (-1) = x + 1$." }
+      }
+      ! "والعمودي: ميله $-\frac{1}{5}$، فمعادلته $y - 5 = -\frac{1}{5}(x + 1)$، أي $x + 5y - 24 = 0$."
+    }
+  }
+
+  slide "تمرين 1: الثلاث الأولى" {
+    id: "c4-e1-1"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > من هنا تمارين كتابك كلها، بترتيبها. تمرين 1: أوجد $\dfrac{dy}{dx}$. نبدأ بثلاث معًا.
+
+    match {
+      ask "طابق كل علاقة بمشتقتها $\dfrac{dy}{dx}$."
+      skill: "diff-implicit"
+      pair "$x^2 - 4y^2 + 7 = 0$" -> "$\dfrac{x}{4y}$"
+      pair "$x^4 + 3y^4 - 2 = 0$" -> "$-\dfrac{x^3}{3y^3}$"
+      pair "$(x - 3)^2 + (y + 2)^2 = 25$" -> "$-\dfrac{x - 3}{y + 2}$"
+      decoy "$-\dfrac{x}{4y}$"
+      decoy "$\dfrac{x^3}{3y^3}$"
+      decoy "$-\dfrac{x - 3}{y - 2}$"
+      miss "$x^2 - 4y^2 + 7 = 0$" -> "$-\dfrac{x}{4y}$" "$2x - 8y\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = \frac{2x}{8y}$. الإشارة موجبة لأن $-4y^2$ سالب أصلًا."
+      miss "$(x - 3)^2 + (y + 2)^2 = 25$" -> "$-\dfrac{x - 3}{y - 2}$" "مشتقة $(y + 2)^2$ هي $2(y + 2)\frac{dy}{dx}$. القوس يبقى كما هو."
+      hint "في كل واحدة: اشتق الطرفين، ثم اعزل $\frac{dy}{dx}$."
+      ! "والثالثة دائرة مركزها $(3, -2)$، فميلها $-\frac{x - 3}{y + 2}$، مثل $-\frac{x}{y}$ بعد إزاحة المركز."
+    }
+  }
+
+  slide "تمرين 1 (4)" {
+    id: "c4-e1-4"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > العلاقة الرابعة.
+
+    quiz {
+      ask "إذا كان $x^3 + y^2 - 7x + 5y = 8$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{7 - 3x^2}{2y + 5}$"
+      - "$\dfrac{2 - 3x^2}{2y}$" { why: "$5y$ فيها $y$، فمشتقتها $5\frac{dy}{dx}$ لا $5$.", onwrong: "c4-d-dydx", retry }
+      - "$\dfrac{3x^2 - 7}{2y + 5}$" { why: "عند نقل $3x^2 - 7$ إلى الطرف الآخر تنقلب إشارته." }
+      hint "$3x^2 + 2y\frac{dy}{dx} - 7 + 5\frac{dy}{dx} = 0$."
+      ! "$(2y + 5)\frac{dy}{dx} = 7 - 3x^2$."
+    }
+  }
+
+  slide "تمرين 1 (5)" {
+    id: "c4-e1-5"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > العلاقة الخامسة. حدّان فيهما $y$ هذه المرة.
+
+    quiz {
+      ask "إذا كان $x^3 + y^3 - 2x + 3y^2 = 8$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{2 - 3x^2}{3y^2 + 6y}$"
+      - "$\dfrac{2 - 3x^2}{3y^2}$" { why: "$3y^2$ فيها $y$ أيضًا: مشتقتها $6y\frac{dy}{dx}$، ويجب أن تدخل المعامل." }
+      - "$\dfrac{2 - 3x^2 - 6y}{3y^2}$" { why: "مشتقة $3y^2$ هي $6y\frac{dy}{dx}$، لا $6y$.", onwrong: "c4-d-dydx", retry }
+      - "$\dfrac{3x^2 - 2}{3y^2 + 6y}$" { why: "النقل يقلب الإشارة." }
+      ! "$3x^2 + 3y^2\frac{dy}{dx} - 2 + 6y\frac{dy}{dx} = 0$، فـ $(3y^2 + 6y)\frac{dy}{dx} = 2 - 3x^2$."
+    }
+  }
+
+  slide "تمرين 1 (6)" {
+    id: "c4-e1-6"
+    beat: breaker
+    cat: "تمارين: الاشتقاق الضمني"
+    > السادسة فيها مفاجأة. اشتق، وبسّط حتى النهاية.
+
+    numeric {
+      ask "إذا كان $x^2 + 9y^2 = 6xy + 4$، فما $\dfrac{dy}{dx}$؟"
+      skill: "diff-implicit"
+      answer: 1/3
+      expect: (6 - 2) / (18 - 6)
+      tolerance: 0.005
+      wrong 3 "مقلوب. معامل $\frac{dy}{dx}$ هو $18y - 6x$، ويذهب إلى المقام."
+      wrong -1/3 "راجع الإشارات بعد النقل."
+      hint "$2x + 18y\frac{dy}{dx} = 6\left(x\frac{dy}{dx} + y\right)$. ثم أخرج عاملًا مشتركًا من البسط والمقام."
+      ! "$\frac{dy}{dx} = \frac{6y - 2x}{18y - 6x} = \frac{2(3y - x)}{6(3y - x)} = \frac{1}{3}$. عدد ثابت! لأن العلاقة هي $(x - 3y)^2 = 4$، أي خطان مستقيمان ميلهما $\frac{1}{3}$."
+    }
+  }
+
+  slide "تمرين 1 (7)" {
+    id: "c4-e1-7"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > السابعة، خطوة خطوة.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $x^3 - 5xy + y^3 = 4x$."
+      skill: "diff-implicit"
+      from "$x^3 - 5xy + y^3 = 4x$"
+      move "$3x^2 - 5\left(x\dfrac{dy}{dx} + y\right) + 3y^2\dfrac{dy}{dx} = 4$" {
+        * "اشتق الطرفين"
+        - "$3x^2 - 5\dfrac{dy}{dx} + 3y^2\dfrac{dy}{dx} = 4$" { why: "$5xy$ حاصل ضرب." }
+        - "$3x^2 - 5\left(x\dfrac{dy}{dx} + y\right) + 3y^2\dfrac{dy}{dx} = 4x$" { why: "الطرف الأيمن يُشتق أيضًا: $(4x)' = 4$." }
+      }
+      move "$\left(3y^2 - 5x\right)\dfrac{dy}{dx} = 4 - 3x^2 + 5y$" {
+        * "اجمع حدود $\frac{dy}{dx}$ وانقل الباقي"
+        - "$\left(3y^2 - 5x\right)\dfrac{dy}{dx} = 4 - 3x^2 - 5y$" { why: "$-5y$ تنتقل فتصير $+5y$." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{4 - 3x^2 + 5y}{3y^2 - 5x}$" {
+        * "اقسم"
+        - "$\dfrac{dy}{dx} = \dfrac{3y^2 - 5x}{4 - 3x^2 + 5y}$" { why: "مقلوب." }
+      }
+      ! "لاحظ أن الطرف الأيمن $4x$ ليس ثابتًا، فمشتقته $4$ لا صفر."
+    }
+  }
+
+  slide "تمرين 1 (8)" {
+    id: "c4-e1-8"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثامنة.
+
+    quiz {
+      ask "إذا كان $xy = 100(x + y)$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{100 - y}{x - 100}$"
+      - "$\dfrac{100}{x - 100}$" { why: "$\frac{d}{dx}(xy) = x\frac{dy}{dx} + y$، والـ $y$ ضاعت.", onwrong: "c4-d-xy", retry }
+      - "$\dfrac{100 - y}{x}$" { why: "الطرف الأيمن فيه $100y$، ومشتقته $100\frac{dy}{dx}$." }
+      - "$-\dfrac{y}{x}$" { why: "هذا لو كان الطرف الأيمن ثابتًا. هنا يتغير أيضًا." }
+      hint "$x\frac{dy}{dx} + y = 100 + 100\frac{dy}{dx}$."
+      ! "$(x - 100)\frac{dy}{dx} = 100 - y$."
+    }
+  }
+
+  slide "تمرين 1 (9)" {
+    id: "c4-e1-9"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > التاسعة. طريقان: اشتق مباشرة، أو خذ الجذر أولًا كما في مثال 3.
+
+    quiz {
+      ask "إذا كان $x^2y^2 = 10$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$-\dfrac{y}{x}$"
+      - "$-\dfrac{x}{y}$" { why: "$2xy^2 + 2x^2y\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{2xy^2}{2x^2y} = -\frac{y}{x}$." }
+      - "$-\dfrac{y^2}{x^2}$" { why: "اختصر $2xy$ من البسط والمقام: يبقى $\frac{y}{x}$ لا مربعه." }
+      - "$\dfrac{y}{x}$" { why: "الإشارة: الحدان في طرف واحد، فأحدهما سالب الآخر." }
+      ! "أو: $xy = \pm\sqrt{10}$ ثابت، فـ $x\frac{dy}{dx} + y = 0$ مباشرة."
+    }
+  }
+
+  slide "تمرين 1 (10)" {
+    id: "c4-e1-10"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > العاشرة: حدّان مختلطان.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $x^2y + y^2x = 25$."
+      skill: "diff-implicit"
+      from "$x^2y + y^2x = 25$"
+      move "$\left(x^2\dfrac{dy}{dx} + 2xy\right) + \left(2xy\dfrac{dy}{dx} + y^2\right) = 0$" {
+        * "كل حد بقاعدة الضرب"
+        - "$2xy + y^2 = 0$" { why: "في كل حد جزآن. أين حدود $\frac{dy}{dx}$؟" }
+        - "$\left(x^2\dfrac{dy}{dx} + 2xy\right) + \left(2y\dfrac{dy}{dx} + y^2\right) = 0$" { why: "$y^2x$: مشتقة $y^2$ هي $2y\frac{dy}{dx}$، مضروبة في $x$." }
+      }
+      move "$\left(x^2 + 2xy\right)\dfrac{dy}{dx} = -\left(2xy + y^2\right)$" {
+        * "اجمع وانقل"
+        - "$\left(x^2 + 2xy\right)\dfrac{dy}{dx} = 2xy + y^2$" { why: "النقل يقلب الإشارة." }
+      }
+      move "$\dfrac{dy}{dx} = -\dfrac{2xy + y^2}{x^2 + 2xy}$" {
+        * "اقسم"
+        - "$\dfrac{dy}{dx} = -\dfrac{x^2 + 2xy}{2xy + y^2}$" { why: "مقلوب." }
+      }
+      ! "ويمكن اختصارها إلى $-\frac{y(2x + y)}{x(x + 2y)}$."
+    }
+  }
+
+  slide "تمرين 1 (11) و (12)" {
+    id: "c4-e1-11"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الأخيرتان عامتان: $a$ ثابت و $n$ عدد صحيح موجب. عامل $n$ كأي عدد.
+
+    match {
+      ask "طابق كل علاقة بمشتقتها $\dfrac{dy}{dx}$."
+      skill: "diff-implicit"
+      pair "$x^n y^n = a^n$" -> "$-\dfrac{y}{x}$"
+      pair "$x^n + y^n = a^n$" -> "$-\left(\dfrac{x}{y}\right)^{n-1}$"
+      decoy "$-\dfrac{x}{y}$"
+      decoy "$-\left(\dfrac{y}{x}\right)^{n-1}$"
+      decoy "$-\left(\dfrac{x}{y}\right)^{n}$"
+      miss "$x^n + y^n = a^n$" -> "$-\left(\dfrac{x}{y}\right)^{n}$" "$nx^{n-1} + ny^{n-1}\frac{dy}{dx} = 0$: الأس ينقص واحدًا."
+      miss "$x^n + y^n = a^n$" -> "$-\left(\dfrac{y}{x}\right)^{n-1}$" "$x^{n-1}$ في البسط، لأن $y^{n-1}$ معامل $\frac{dy}{dx}$ فيذهب إلى المقام."
+      hint "الأولى: $(xy)^n = a^n$، إذن $xy = a$ ثابت."
+      ! "$a^n$ ثابت في الاثنتين، فمشتقته صفر. والأولى هي مثال 3 نفسه، بـ $n$ بدل $5$."
+    }
+  }
+
+  slide "تمرين 2 (1)" {
+    id: "c4-e2-1"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > تمرين 2: أوجد $\dfrac{dy}{dx}$. الأولى كسور: اكتبها قوى سالبة.
+
+    quiz {
+      ask "إذا كان $\dfrac{2}{x} + \dfrac{3}{y} = 5$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$-\dfrac{2y^2}{3x^2}$"
+      - "$-\dfrac{2x^2}{3y^2}$" { why: "$-\frac{2}{x^2} - \frac{3}{y^2}\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{2}{x^2} \cdot \frac{y^2}{3}$. $y^2$ في البسط." }
+      - "$\dfrac{2y^2}{3x^2}$" { why: "الحدان سالبان كلاهما، فالنتيجة سالبة." }
+      - "$-\dfrac{2}{3}$" { why: "$\frac{3}{y} = 3y^{-1}$، ومشتقته $-3y^{-2}\frac{dy}{dx}$، لا $-3\frac{dy}{dx}$." }
+      ! "$-2x^{-2} - 3y^{-2}\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{2y^2}{3x^2}$."
+    }
+  }
+
+  slide "تمرين 2 (2)" {
+    id: "c4-e2-2"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثانية كسر كبير. لا تبدأ بقاعدة القسمة. هناك طريق أقصر.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $\dfrac{x^3 + y^3}{x^3 - y^3} = 7$."
+      skill: "diff-implicit"
+      from "$\dfrac{x^3 + y^3}{x^3 - y^3} = 7$"
+      move "$x^3 + y^3 = 7x^3 - 7y^3$" {
+        * "اضرب الطرفين في المقام"
+        - "$\dfrac{(3x^2 + 3y^2)(x^3 - y^3) - (x^3 + y^3)(3x^2 - 3y^2)}{(x^3 - y^3)^2} = 0$" { why: "صحيح لكنه طويل، ونسي $\frac{dy}{dx}$ أيضًا. أزل الكسر أولًا." }
+      }
+      move "$8y^3 = 6x^3$" {
+        * "اجمع الحدود المتشابهة"
+        - "$6y^3 = 8x^3$" { why: "$y^3 + 7y^3 = 8y^3$ و $7x^3 - x^3 = 6x^3$." }
+      }
+      move "$24y^2\dfrac{dy}{dx} = 18x^2$، فـ $\dfrac{dy}{dx} = \dfrac{3x^2}{4y^2}$" {
+        * "اشتق الطرفين واعزل"
+        - "$\dfrac{dy}{dx} = \dfrac{4y^2}{3x^2}$" { why: "مقلوب." }
+      }
+      ! "العلاقة في الحقيقة $y^3 = \frac{3}{4}x^3$، خط مستقيم من الأصل. أزل الكسور قبل أن تشتق كلما أمكن."
+    }
+  }
+
+  slide "تمرين 2 (3)" {
+    id: "c4-e2-3"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثالثة: جذور.
+
+    quiz {
+      ask "إذا كان $\sqrt{x} + \sqrt{y} = 4$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$-\dfrac{\sqrt{y}}{\sqrt{x}}$"
+      - "$-\dfrac{\sqrt{x}}{\sqrt{y}}$" { why: "$\frac{1}{2\sqrt{x}} + \frac{1}{2\sqrt{y}}\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{2\sqrt{y}}{2\sqrt{x}}$." }
+      - "$\dfrac{\sqrt{y}}{\sqrt{x}}$" { why: "الحدان في طرف واحد، فالنتيجة سالبة." }
+      - "$-\dfrac{1}{2\sqrt{x}}$" { why: "هذه مشتقة $\sqrt{x}$ وحدها. $\sqrt{y}$ تتغير أيضًا.", onwrong: "c4-d-dydx", retry }
+      ! "$\frac{dy}{dx} = -\frac{\frac{1}{2\sqrt{x}}}{\frac{1}{2\sqrt{y}}} = -\frac{\sqrt{y}}{\sqrt{x}}$."
+    }
+  }
+
+  slide "تمرين 2 (4)" {
+    id: "c4-e2-4"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الرابعة أصعبها: جذر لحاصل ضرب. $\sqrt{xy}$ جذر دالة، وداخله حاصل ضرب.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $y + \sqrt{xy} = 2x^2$."
+      skill: "diff-implicit"
+      from "$y + \sqrt{xy} = 2x^2$"
+      move "$\dfrac{dy}{dx} + \dfrac{x\frac{dy}{dx} + y}{2\sqrt{xy}} = 4x$" {
+        * "جذر دالة $\frac{u'}{2\sqrt{u}}$، و $u = xy$ مشتقتها بالضرب"
+        - "$\dfrac{dy}{dx} + \dfrac{1}{2\sqrt{xy}} = 4x$" { why: "نسيت مشتقة الداخل $(xy)' = x\frac{dy}{dx} + y$." }
+      }
+      move "$2\sqrt{xy}\dfrac{dy}{dx} + x\dfrac{dy}{dx} + y = 8x\sqrt{xy}$" {
+        * "اضرب الطرفين في $2\sqrt{xy}$"
+        - "$2\sqrt{xy}\dfrac{dy}{dx} + x\dfrac{dy}{dx} + y = 4x$" { why: "كل حد يُضرب، والطرف الأيمن أيضًا." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{8x\sqrt{xy} - y}{2\sqrt{xy} + x}$" {
+        * "اجمع حدود $\frac{dy}{dx}$ واعزل"
+        - "$\dfrac{dy}{dx} = \dfrac{8x\sqrt{xy} + y}{2\sqrt{xy} + x}$" { why: "$y$ تنتقل فتصير $-y$." }
+      }
+      ! "ضرب الطرفين في $2\sqrt{xy}$ أزال الكسر من البسط. حيلة تستحق أن تتذكرها."
+    }
+  }
+
+  slide "تمرين 2 (5)" {
+    id: "c4-e2-5"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > من الخامسة إلى الرابعة عشرة: مثلثية.
+
+    quiz {
+      ask "إذا كان $x\sin y = y$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{\sin y}{1 - x\cos y}$"
+      - "$\dfrac{\sin y}{x\cos y}$" { why: "الطرف الأيمن $y$ مشتقته $\frac{dy}{dx}$، فيدخل المعامل: $1 - x\cos y$." }
+      - "$\dfrac{1 - \sin y}{x\cos y}$" { why: "مشتقة $y$ بالنسبة إلى $x$ هي $\frac{dy}{dx}$، لا $1$.", onwrong: "c4-d-dydx", retry }
+      - "$\dfrac{\sin y}{1 + x\cos y}$" { why: "انقل $x\cos y\frac{dy}{dx}$ إلى طرف $\frac{dy}{dx}$ الآخر: تصير سالبة." }
+      hint "$\sin y + x\cos y\frac{dy}{dx} = \frac{dy}{dx}$."
+      ! "$\frac{dy}{dx} - x\cos y\frac{dy}{dx} = \sin y$، فـ $\frac{dy}{dx}(1 - x\cos y) = \sin y$."
+    }
+  }
+
+  slide "تمرين 2 (6)" {
+    id: "c4-e2-6"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > السادسة.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $\sin 2y = y\cos 2x$."
+      skill: "diff-implicit"
+      from "$\sin 2y = y\cos 2x$"
+      move "$2\cos 2y\dfrac{dy}{dx} = \dfrac{dy}{dx}\cos 2x - 2y\sin 2x$" {
+        * "الأيسر بالسلسلة، والأيمن بالضرب"
+        - "$2\cos 2y\dfrac{dy}{dx} = -2y\sin 2x$" { why: "$y\cos 2x$ حاصل ضرب، وفيه جزء $\frac{dy}{dx}\cos 2x$." }
+        - "$\cos 2y\dfrac{dy}{dx} = \dfrac{dy}{dx}\cos 2x - 2y\sin 2x$" { why: "مشتقة $2y$ داخل الجيب $2\frac{dy}{dx}$." }
+      }
+      move "$\left(2\cos 2y - \cos 2x\right)\dfrac{dy}{dx} = -2y\sin 2x$" {
+        * "اجمع حدود $\frac{dy}{dx}$"
+        - "$\left(2\cos 2y + \cos 2x\right)\dfrac{dy}{dx} = -2y\sin 2x$" { why: "$\frac{dy}{dx}\cos 2x$ تنتقل إلى اليسار سالبة." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{2y\sin 2x}{\cos 2x - 2\cos 2y}$" {
+        * "اقسم، واضرب البسط والمقام في $-1$"
+        - "$\dfrac{dy}{dx} = \dfrac{2y\sin 2x}{2\cos 2y - \cos 2x}$" { why: "ضربت البسط في $-1$ ولم تضرب المقام." }
+      }
+      ! "الصورتان $\frac{-2y\sin 2x}{2\cos 2y - \cos 2x}$ و $\frac{2y\sin 2x}{\cos 2x - 2\cos 2y}$ متساويتان."
+    }
+  }
+
+  slide "تمرين 2 (7)" {
+    id: "c4-e2-7"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > السابعة.
+
+    quiz {
+      ask "إذا كان $3y = \sin 2x\cos y$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{2\cos 2x\cos y}{3 + \sin 2x\sin y}$"
+      - "$\dfrac{2\cos 2x\cos y}{3 - \sin 2x\sin y}$" { why: "مشتقة $\cos y$ هي $-\sin y\frac{dy}{dx}$. عند نقلها إلى اليسار تصير موجبة." }
+      - "$\dfrac{2\cos 2x\cos y}{3}$" { why: "$\cos y$ تتغير أيضًا. الطرف الأيمن حاصل ضرب.", onwrong: "c4-d-dydx", retry }
+      - "$\dfrac{\cos 2x\cos y}{3 + \sin 2x\sin y}$" { why: "مشتقة $\sin 2x$ هي $2\cos 2x$." }
+      hint "$3\frac{dy}{dx} = 2\cos 2x\cos y - \sin 2x\sin y\frac{dy}{dx}$."
+      ! "$(3 + \sin 2x\sin y)\frac{dy}{dx} = 2\cos 2x\cos y$."
+    }
+  }
+
+  slide "تمرين 2 (8)" {
+    id: "c4-e2-8"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثامنة: حاصلا ضرب.
+
+    quiz {
+      ask "إذا كان $x\cos y + y\cos x = 1$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{y\sin x - \cos y}{\cos x - x\sin y}$"
+      - "$\dfrac{y\sin x + \cos y}{\cos x - x\sin y}$" { why: "$\cos y$ تنتقل من اليسار إلى اليمين، فتصير $-\cos y$." }
+      - "$\dfrac{y\sin x}{\cos x - x\sin y}$" { why: "$x\cos y$ حاصل ضرب، وجزؤه الأول $1 \cdot \cos y$ ضاع." }
+      - "$\dfrac{y\sin x - \cos y}{\cos x + x\sin y}$" { why: "مشتقة $\cos y$ هي $-\sin y\frac{dy}{dx}$، فالمعامل $-x\sin y$." }
+      hint "$\left(\cos y - x\sin y\frac{dy}{dx}\right) + \left(\frac{dy}{dx}\cos x - y\sin x\right) = 0$."
+      ! "$(\cos x - x\sin y)\frac{dy}{dx} = y\sin x - \cos y$."
+    }
+  }
+
+  slide "تمرين 2 (9)" {
+    id: "c4-e2-9"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > التاسعة.
+
+    quiz {
+      ask "إذا كان $x^2\sin y - y^2\sin x = 9$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{y^2\cos x - 2x\sin y}{x^2\cos y - 2y\sin x}$"
+      - "$\dfrac{y^2\cos x - 2x\sin y}{x^2\cos y + 2y\sin x}$" { why: "معامل $\frac{dy}{dx}$ من $-y^2\sin x$ هو $-2y\sin x$، سالب." }
+      - "$\dfrac{2x\sin y - y^2\cos x}{x^2\cos y - 2y\sin x}$" { why: "البسط نُقل إلى الطرف الآخر، فتنقلب إشارته." }
+      - "$\dfrac{y^2\cos x}{x^2\cos y}$" { why: "كل حد حاصل ضرب بجزأين. ضاع جزء من كل واحد." }
+      hint "$2x\sin y + x^2\cos y\frac{dy}{dx} - 2y\frac{dy}{dx}\sin x - y^2\cos x = 0$."
+      ! "$(x^2\cos y - 2y\sin x)\frac{dy}{dx} = y^2\cos x - 2x\sin y$."
+    }
+  }
+
+  slide "تمرين 2 (10)" {
+    id: "c4-e2-10"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > العاشرة: قاطع التمام وظل التمام، ومشتقتاهما سالبتان.
+
+    moves {
+      ask "أوجد $\dfrac{dy}{dx}$ إذا كان $x\csc y = y\cot x$."
+      skill: "diff-implicit"
+      from "$x\csc y = y\cot x$"
+      move "$\csc y - x\csc y\cot y\dfrac{dy}{dx} = \dfrac{dy}{dx}\cot x - y\csc^2 x$" {
+        * "الطرفان بقاعدة الضرب"
+        - "$\csc y + x\csc y\cot y\dfrac{dy}{dx} = \dfrac{dy}{dx}\cot x + y\csc^2 x$" { why: "مشتقتا $\csc$ و $\cot$ سالبتان." }
+      }
+      move "$\left(\cot x + x\csc y\cot y\right)\dfrac{dy}{dx} = \csc y + y\csc^2 x$" {
+        * "اجمع حدود $\frac{dy}{dx}$ في طرف"
+        - "$\left(\cot x - x\csc y\cot y\right)\dfrac{dy}{dx} = \csc y + y\csc^2 x$" { why: "$-x\csc y\cot y\frac{dy}{dx}$ تنتقل إلى اليمين موجبة." }
+      }
+      move "$\dfrac{dy}{dx} = \dfrac{\csc y + y\csc^2 x}{\cot x + x\csc y\cot y}$" {
+        * "اقسم"
+        - "$\dfrac{dy}{dx} = \dfrac{\cot x + x\csc y\cot y}{\csc y + y\csc^2 x}$" { why: "مقلوب." }
+      }
+      ! "في كتابك $\csc$ «قتا» و $\cot$ «ظتا»."
+    }
+  }
+
+  slide "تمرين 2 (11)" {
+    id: "c4-e2-11"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الحادية عشرة. قارنها بالسادسة من مثال 3.
+
+    quiz {
+      ask "إذا كان $\tan 2x + \cot y = xy$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{2\sec^2 2x - y}{x + \csc^2 y}$"
+      - "$\dfrac{\sec^2 2x - y}{x + \csc^2 y}$" { why: "مشتقة $\tan 2x$ هي $2\sec^2 2x$." }
+      - "$\dfrac{2\sec^2 2x - y}{x - \csc^2 y}$" { why: "مشتقة $\cot y$ سالبة، ونقلها إلى جانب $x\frac{dy}{dx}$ يجعلها موجبة." }
+      - "$\dfrac{2\sec^2 2x}{x + \csc^2 y}$" { why: "$xy$ حاصل ضرب: أين $y$؟", onwrong: "c4-d-xy", retry }
+      ! "$2\sec^2 2x - \csc^2 y\frac{dy}{dx} = x\frac{dy}{dx} + y$، فـ $(x + \csc^2 y)\frac{dy}{dx} = 2\sec^2 2x - y$."
+    }
+  }
+
+  slide "تمرين 2 (12)" {
+    id: "c4-e2-12"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثانية عشرة. تذكّر $2\sin x\cos x = \sin 2x$.
+
+    quiz {
+      ask "إذا كان $\sin^2 x + 2\cos y + xy = 0$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{\sin 2x + y}{2\sin y - x}$"
+      - "$\dfrac{\sin 2x + y}{2\sin y + x}$" { why: "$-2\sin y\frac{dy}{dx} + x\frac{dy}{dx}$: المعامل $x - 2\sin y$. انقل بعناية." }
+      - "$\dfrac{2\cos x + y}{2\sin y - x}$" { why: "$\sin^2 x$ قوة لدالة: $2\sin x\cos x$، لا $2\cos x$." }
+      - "$\dfrac{\sin 2x}{2\sin y - x}$" { why: "$xy$ يعطي $x\frac{dy}{dx} + y$، والـ $y$ ضاعت.", onwrong: "c4-d-xy", retry }
+      hint "$2\sin x\cos x - 2\sin y\frac{dy}{dx} + x\frac{dy}{dx} + y = 0$."
+      ! "$(x - 2\sin y)\frac{dy}{dx} = -(\sin 2x + y)$، ثم اضرب البسط والمقام في $-1$."
+    }
+  }
+
+  slide "تمرين 2 (13)" {
+    id: "c4-e2-13"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثالثة عشرة.
+
+    quiz {
+      ask "إذا كان $y\sec x + \tan x + x^2y = 0$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$-\dfrac{y\sec x\tan x + \sec^2 x + 2xy}{\sec x + x^2}$"
+      - "$-\dfrac{y\sec x\tan x + \sec^2 x}{\sec x + x^2}$" { why: "$x^2y$ حاصل ضرب: $x^2\frac{dy}{dx} + 2xy$. الـ $2xy$ ضاعت." }
+      - "$\dfrac{y\sec x\tan x + \sec^2 x + 2xy}{\sec x + x^2}$" { why: "الحدود التي ليس فيها $\frac{dy}{dx}$ تنتقل إلى الطرف الآخر سالبة." }
+      - "$-\dfrac{\sec x\tan x + \sec^2 x + 2x}{\sec x + x^2}$" { why: "في $y\sec x$ الجزء الثاني $y \cdot \sec x\tan x$، و $y$ لا تختفي." }
+      ! "$\frac{dy}{dx}\sec x + y\sec x\tan x + \sec^2 x + x^2\frac{dy}{dx} + 2xy = 0$."
+    }
+  }
+
+  slide "تمرين 2 (14)" {
+    id: "c4-e2-14"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الأخيرة: $a$ و $b$ و $c$ ثوابت.
+
+    quiz {
+      ask "إذا كان $a\cos bx + b\sin ay = c$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$\dfrac{\sin bx}{\cos ay}$"
+      - "$-\dfrac{\sin bx}{\cos ay}$" { why: "$-ab\sin bx + ab\cos ay\frac{dy}{dx} = 0$. نقل $-ab\sin bx$ يجعله موجبًا." }
+      - "$\dfrac{b\sin bx}{a\cos ay}$" { why: "كل حد يخرج منه $ab$: من $a\cos bx$ و من $b\sin ay$. يلغيان بعضهما." }
+      - "$\dfrac{a\sin bx}{b\cos ay}$" { why: "انظر: $a \cdot b$ في الحدين، فتختصر كلها." }
+      ! "$ab\cos ay\frac{dy}{dx} = ab\sin bx$، فـ $\frac{dy}{dx} = \frac{\sin bx}{\cos ay}$."
+    }
+  }
+
+  slide "تمرين 3 (1)" {
+    id: "c4-e3-1"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > تمرين 3: أوجد ميل المماس عند النقطة المعطاة. اشتق، واعزل، ثم عوّض.
+
+    numeric {
+      ask "$x^2 - 3xy + y^2 = 11$ عند النقطة $(2, -1)$."
+      skill: "diff-implicit"
+      answer: 7/8
+      expect: (2 * 2 - 3 * (0 - 1)) / (3 * 2 - 2 * (0 - 1))
+      tolerance: 0.005
+      wrong 0.5 "$3xy$ حاصل ضرب: $3\left(x\frac{dy}{dx} + y\right)$. الـ $3y$ ضاعت." -> "c4-d-xy" retry
+      wrong -7/8 "راجع الإشارات عند النقل."
+      hint "$2x - 3\left(x\frac{dy}{dx} + y\right) + 2y\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = \frac{2x - 3y}{3x - 2y}$."
+      ! "$\frac{4 + 3}{6 + 2} = \frac{7}{8}$."
+    }
+  }
+
+  slide "تمرين 3 (2)" {
+    id: "c4-e3-2"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثانية.
+
+    numeric {
+      ask "$xy^3 = 3$ عند النقطة $(3, 1)$."
+      skill: "diff-implicit"
+      answer: -1/9
+      expect: 0 - 1 / (3 * 3)
+      tolerance: 0.002
+      wrong -1/3 "$y^3 + 3xy^2\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{y}{3x}$. أين الـ $3$؟"
+      wrong -9 "مقلوب."
+      hint "قاعدة الضرب: $y^3 + x \cdot 3y^2\frac{dy}{dx} = 0$."
+      ! "$-\frac{y}{3x} = -\frac{1}{9}$."
+    }
+  }
+
+  slide "تمرين 3 (3)" {
+    id: "c4-e3-3"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثالثة. عوّض الأرقام مبكرًا إن شئت: بعد الاشتقاق مباشرة.
+
+    numeric {
+      ask "$x^4 - 2x^3y^2 + xy^3 = 1$ عند النقطة $(1, 2)$."
+      skill: "diff-implicit"
+      answer: 3
+      expect: (4 - 6 * 4 + 8) / (4 * 2 - 3 * 4)
+      tolerance: 0.001
+      wrong -1 "الحدان المختلطان يحتاجان قاعدة الضرب، وكلاهما فيه جزء بلا $\frac{dy}{dx}$." -> "c4-d-xy" retry
+      wrong -3 "راجع الإشارات."
+      hint "$4x^3 - \left(6x^2y^2 + 4x^3y\frac{dy}{dx}\right) + \left(y^3 + 3xy^2\frac{dy}{dx}\right) = 0$."
+      ! "عند $(1, 2)$: $4 - 24 - 8\frac{dy}{dx} + 8 + 12\frac{dy}{dx} = 0$، فـ $4\frac{dy}{dx} = 12$ و $\frac{dy}{dx} = 3$."
+    }
+  }
+
+  slide "تمرين 3 (4)" {
+    id: "c4-e3-4"
+    beat: breaker
+    cat: "تمارين: الاشتقاق الضمني"
+    > الرابعة. احسب بعناية، فالجواب ليس عددًا عاديًا.
+
+    quiz {
+      ask "ما ميل المماس للمنحنى $x^2 - xy + y^2 = 27$ عند النقطة $(6, 3)$؟"
+      skill: "diff-implicit"
+      * "غير معرّف، والمماس رأسي"
+      - "$0$، والمماس أفقي" { why: "البسط $y - 2x = -9$ ليس صفرًا. المقام هو الصفر.", onwrong: "c4-d-hv", retry }
+      - "$-3$" { why: "راجع المقام: $2y - x = 6 - 6 = 0$." }
+      - "$\dfrac{1}{2}$" { why: "راجع الاشتقاق: $2x - \left(x\frac{dy}{dx} + y\right) + 2y\frac{dy}{dx} = 0$." }
+      hint "$\frac{dy}{dx} = \frac{y - 2x}{2y - x}$. عوّض."
+      ! "$\frac{3 - 12}{6 - 6} = \frac{-9}{0}$: غير معرّف، فالمماس رأسي، يوازي محور $y$."
+    }
+  }
+
+  slide "تمرين 3 (5)" {
+    id: "c4-e3-5"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الخامسة: جذور مع ضرب.
+
+    numeric {
+      ask "$x\sqrt{y} + y\sqrt{x} = 6$ عند النقطة $(1, 4)$."
+      skill: "diff-implicit"
+      answer: -16/5
+      expect: (0 - (sqrt(4) + 4 / (2 * sqrt(1)))) / (1 / (2 * sqrt(4)) + sqrt(1))
+      tolerance: 0.005
+      wrong -5/16 "مقلوب."
+      wrong -4 "معامل $\frac{dy}{dx}$ فيه حدان: $\frac{x}{2\sqrt{y}}$ و $\sqrt{x}$."
+      hint "$\sqrt{y} + \frac{x}{2\sqrt{y}}\frac{dy}{dx} + \sqrt{x}\frac{dy}{dx} + \frac{y}{2\sqrt{x}} = 0$."
+      ! "عند $(1, 4)$: $2 + \frac{1}{4}\frac{dy}{dx} + \frac{dy}{dx} + 2 = 0$، فـ $\frac{5}{4}\frac{dy}{dx} = -4$ و $\frac{dy}{dx} = -\frac{16}{5}$."
+    }
+  }
+
+  slide "تمرين 3 (6)" {
+    id: "c4-e3-6"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > السادسة: جيب تمام لجذر. ثلاث حلقات.
+
+    numeric {
+      ask "$\cos\sqrt{\pi y} = 3x + 1$ عند النقطة $\left(-\dfrac{1}{3}, \dfrac{\pi}{4}\right)$."
+      skill: "diff-implicit"
+      answer: -3
+      expect: 0 - 3 / (sin(PI/2) * PI / (2 * (PI/2)))
+      tolerance: 0.001
+      wrong 3 "مشتقة $\cos$ سالبة."
+      wrong -3 * PI / 2 "مشتقة $\sqrt{\pi y}$ هي $\frac{\pi}{2\sqrt{\pi y}}\frac{dy}{dx}$، وعند النقطة $\sqrt{\pi y} = \frac{\pi}{2}$."
+      hint "$-\sin\sqrt{\pi y} \cdot \frac{\pi}{2\sqrt{\pi y}}\frac{dy}{dx} = 3$. عند النقطة $\sqrt{\pi y} = \sqrt{\frac{\pi^2}{4}} = \frac{\pi}{2}$."
+      ! "$-1 \cdot \frac{\pi}{2 \cdot \frac{\pi}{2}}\frac{dy}{dx} = 3$، أي $-\frac{dy}{dx} = 3$، فـ $\frac{dy}{dx} = -3$."
+    }
+  }
+
+  slide "تمرين 3 (7)" {
+    id: "c4-e3-7"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > السابعة قطع ناقص، والنقطة مكتوبة بزاوية $\theta$. $a$ و $b$ ثابتان.
+
+    quiz {
+      ask "ما ميل المماس للمنحنى $\dfrac{x^2}{a^2} + \dfrac{y^2}{b^2} = 1$ عند $(a\cos\theta, b\sin\theta)$؟"
+      skill: "diff-implicit"
+      * "$-\dfrac{b}{a}\cot\theta$"
+      - "$-\dfrac{a}{b}\cot\theta$" { why: "$\frac{dy}{dx} = -\frac{b^2x}{a^2y}$، وبالتعويض $-\frac{b^2 a\cos\theta}{a^2 b\sin\theta}$: $b$ فوق و $a$ تحت." }
+      - "$-\dfrac{b}{a}\tan\theta$" { why: "$\frac{\cos\theta}{\sin\theta} = \cot\theta$، لا $\tan\theta$." }
+      - "$\dfrac{b}{a}\cot\theta$" { why: "$\frac{2x}{a^2} + \frac{2y}{b^2}\frac{dy}{dx} = 0$: الإشارة سالبة." }
+      hint "$\frac{dy}{dx} = -\frac{b^2x}{a^2y}$. عوّض $x = a\cos\theta$ و $y = b\sin\theta$."
+      ! "$-\frac{b^2 \cdot a\cos\theta}{a^2 \cdot b\sin\theta} = -\frac{b}{a}\cot\theta$."
+    }
+  }
+
+  slide "تمرين 4 (1)" {
+    id: "c4-e4-1"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > تمرين 4: قياس الزاوية التي يصنعها المماس مع الاتجاه الموجب لمحور $x$. كتابك يكتب الأجزاء بالدقائق، و $1° = 60'$.
+
+    numeric {
+      ask "$x^3 - x^2y - x - 3y = 0$ عند النقطة $(1, 0)$. أعطِ الزاوية بالدرجات العشرية."
+      skill: "diff-implicit"
+      answer: deg(atan(0.5))
+      expect: deg(atan((3 - 0 - 1) / (1 + 3)))
+      tolerance: 0.05
+      unit: "°"
+      wrong 0.5 "هذا الميل. المطلوب الزاوية التي ظلها $0.5$."
+      wrong deg(atan(2)) "الزاوية ظلها الميل $\frac{1}{2}$، لا $2$."
+      hint "$3x^2 - \left(x^2\frac{dy}{dx} + 2xy\right) - 1 - 3\frac{dy}{dx} = 0$."
+      ! "عند $(1, 0)$: $3 - \frac{dy}{dx} - 1 - 3\frac{dy}{dx} = 0$، فالميل $\frac{1}{2}$، والزاوية $\tan^{-1}\frac{1}{2} \approx 26.57° = 26°\,34'$."
+    }
+  }
+
+  slide "تمرين 4 (2)" {
+    id: "c4-e4-2"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثانية. أزل الكسور أولًا: اضرب الطرفين في $xy$.
+
+    numeric {
+      ask "$\dfrac{x}{y} - \dfrac{4y}{x} = 3$ عند النقطة $(1, -1)$."
+      skill: "diff-implicit"
+      answer: 135
+      expect: 180 + deg(atan((2 * 1 - 3 * (0 - 1)) / (8 * (0 - 1) + 3 * 1)))
+      tolerance: 0.1
+      unit: "°"
+      wrong -45 "الميل $-1$، والزاوية الموجبة $180° - 45°$." -> "c4-d-angle" retry
+      wrong 45 "الميل سالب." -> "c4-d-angle" retry
+      hint "$x^2 - 4y^2 = 3xy$، فـ $2x - 8y\frac{dy}{dx} = 3y + 3x\frac{dy}{dx}$."
+      ! "$\frac{dy}{dx} = \frac{2x - 3y}{8y + 3x} = \frac{2 + 3}{-8 + 3} = -1$، والزاوية $135°$."
+    }
+  }
+
+  slide "تمرين 4 (3)" {
+    id: "c4-e4-3"
+    beat: example
+    cat: "تمارين: الاشتقاق الضمني"
+    > الثالثة.
+
+    numeric {
+      ask "$\sin 2x = \tan y$ عند النقطة $\left(\dfrac{3\pi}{4}, \dfrac{3\pi}{4}\right)$."
+      skill: "diff-implicit"
+      answer: 0
+      expect: 2 * cos(3 * PI / 2) * cos(3 * PI / 4)^2
+      tolerance: 0.05
+      unit: "°"
+      wrong 90 "الميل صفر يعني مماسًا أفقيًا، والزاوية صفر. الـ $90°$ للمماس الرأسي."
+      wrong 180 "الزاوية بين $0°$ و $180°$، والصفر نفسه داخلها."
+      hint "$2\cos 2x = \sec^2 y\frac{dy}{dx}$، و $\cos\frac{3\pi}{2} = 0$."
+      ! "$\frac{dy}{dx} = \frac{2\cos 2x}{\sec^2 y} = 0$ عند النقطة، فالمماس أفقي والزاوية صفر."
+    }
+  }
+
+  slide "تمرين 5 (1)" {
+    id: "c4-e5-1"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > تمرين 5: أوجد $\dfrac{dy}{dx}$ عند القيمة المعطاة.
+
+    numeric {
+      ask "$x = 5t + 3$ و $y = 16t^2 + 9$ عند $t = 5$."
+      skill: "diff-parametric"
+      answer: 32
+      expect: (32 * 5) / 5
+      wrong 1/32 "مقلوب." -> "c4-d-flip" retry
+      wrong 160 "هذا $\frac{dy}{dt}$ وحده. اقسم على $\frac{dx}{dt} = 5$."
+      hint "$\frac{dy}{dt} = 32t$ و $\frac{dx}{dt} = 5$."
+      ! "$\frac{32t}{5}$ عند $5$: $32$."
+    }
+  }
+
+  slide "تمرين 5 (2)" {
+    id: "c4-e5-2"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثانية. $a$ ثابت.
+
+    numeric {
+      ask "$x = at^2$ و $y = 2at^6$ عند $t = 1$."
+      skill: "diff-parametric"
+      answer: 6
+      expect: (12 * 1^5) / (2 * 1)
+      wrong 1/6 "مقلوب." -> "c4-d-flip" retry
+      wrong 12 "هذا $\frac{dy}{dt} \div a$. اقسم على $\frac{dx}{dt} = 2at$."
+      hint "$\frac{dy}{dt} = 12at^5$ و $\frac{dx}{dt} = 2at$."
+      ! "$\frac{12at^5}{2at} = 6t^4$، وعند $1$: $6$."
+    }
+  }
+
+  slide "تمرين 5 (3)" {
+    id: "c4-e5-3"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثالثة.
+
+    numeric {
+      ask "$x = 4t$ و $y = \dfrac{4}{t}$ عند $t = 3$."
+      skill: "diff-parametric"
+      answer: -1/9
+      expect: (0 - 4 / 3^2) / 4
+      tolerance: 0.002
+      wrong -9 "مقلوب." -> "c4-d-flip" retry
+      wrong 1/9 "مشتقة $\frac{4}{t}$ سالبة: $-\frac{4}{t^2}$."
+      hint "$\frac{dy}{dt} = -\frac{4}{t^2}$ و $\frac{dx}{dt} = 4$."
+      ! "$\frac{-4/t^2}{4} = -\frac{1}{t^2} = -\frac{1}{9}$."
+    }
+  }
+
+  slide "تمرين 5 (4)" {
+    id: "c4-e5-4"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الرابعة. فك الأقواس أولًا.
+
+    numeric {
+      ask "$x = (t + 7)(t - 2)$ و $y = (t^2 + 1)(t - 2)$ عند $t = 1$."
+      skill: "diff-parametric"
+      answer: 0
+      expect: (3 - 4 + 1) / (2 + 5)
+      tolerance: 0.001
+      wrong 7 "هذا $\frac{dx}{dt}$ عند $1$."
+      hint "$x = t^2 + 5t - 14$ و $y = t^3 - 2t^2 + t - 2$."
+      ! "$\frac{dy}{dt} = 3t^2 - 4t + 1 = 0$ عند $t = 1$، و $\frac{dx}{dt} = 7$، فالميل $0$: مماس أفقي."
+    }
+  }
+
+  slide "تمرين 5 (5)" {
+    id: "c4-e5-5"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الخامسة: جذران.
+
+    numeric {
+      ask "$x = \sqrt{3t - 2}$ و $y = \sqrt{4t + 1}$ عند $t = 2$."
+      skill: "diff-parametric"
+      answer: 8/9
+      expect: (4 / (2 * sqrt(4 * 2 + 1))) / (3 / (2 * sqrt(3 * 2 - 2)))
+      tolerance: 0.005
+      wrong 9/8 "مقلوب." -> "c4-d-flip" retry
+      wrong 1 "لا تنسَ مشتقتي الداخل: $4$ و $3$."
+      hint "$\frac{dy}{dt} = \frac{4}{2\sqrt{4t + 1}}$ و $\frac{dx}{dt} = \frac{3}{2\sqrt{3t - 2}}$."
+      ! "عند $2$: $\frac{dy}{dt} = \frac{4}{6} = \frac{2}{3}$ و $\frac{dx}{dt} = \frac{3}{4}$، فالناتج $\frac{2}{3} \div \frac{3}{4} = \frac{8}{9}$."
+    }
+  }
+
+  slide "تمرين 6 (1)" {
+    id: "c4-e6-1"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > تمرين 6: البارامتر زاوية $\theta$. أوجد $\dfrac{dy}{dx}$ عند القيمة المعطاة، لأقرب جزء من مئة.
+
+    numeric {
+      ask "$x = 3\cos 2\theta$ و $y = 4\sin 3\theta$ عند $\theta = \dfrac{\pi}{4}$."
+      skill: "diff-parametric"
+      answer: sqrt(2)
+      expect: (12 * cos(3 * PI / 4)) / (0 - 6 * sin(PI / 2))
+      tolerance: 0.01
+      wrong 0 - sqrt(2) "$\cos\frac{3\pi}{4}$ سالب و $-6\sin\frac{\pi}{2}$ سالب: الناتج موجب."
+      wrong 1/sqrt(2) "مقلوب." -> "c4-d-flip" retry
+      hint "$\frac{dy}{d\theta} = 12\cos 3\theta$ و $\frac{dx}{d\theta} = -6\sin 2\theta$."
+      ! "$\frac{12 \cdot (-\frac{\sqrt{2}}{2})}{-6} = \sqrt{2} \approx 1.41$."
+    }
+  }
+
+  slide "تمرين 6 (2)" {
+    id: "c4-e6-2"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثانية.
+
+    numeric {
+      ask "$x = \sin 2\pi\theta$ و $y = \cos 2\pi\theta$ عند $\theta = \dfrac{1}{6}$."
+      skill: "diff-parametric"
+      answer: 0 - sqrt(3)
+      expect: (0 - 2 * PI * sin(PI / 3)) / (2 * PI * cos(PI / 3))
+      tolerance: 0.01
+      wrong sqrt(3) "مشتقة $\cos$ سالبة."
+      wrong 0 - 1/sqrt(3) "مقلوب." -> "c4-d-flip" retry
+      hint "$\frac{dy}{d\theta} = -2\pi\sin 2\pi\theta$ و $\frac{dx}{d\theta} = 2\pi\cos 2\pi\theta$، والزاوية $\frac{\pi}{3}$."
+      ! "$-\tan\frac{\pi}{3} = -\sqrt{3} \approx -1.73$."
+    }
+  }
+
+  slide "تمرين 6 (3)" {
+    id: "c4-e6-3"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثالثة.
+
+    numeric {
+      ask "$x = 5\cos^2\theta$ و $y = 4\sin^2\theta$ عند $\theta = \dfrac{\pi}{6}$."
+      skill: "diff-parametric"
+      answer: -0.8
+      expect: (8 * sin(PI/6) * cos(PI/6)) / (0 - 10 * cos(PI/6) * sin(PI/6))
+      tolerance: 0.005
+      wrong -1.25 "مقلوب." -> "c4-d-flip" retry
+      wrong 0.8 "مشتقة $\cos^2\theta$ سالبة."
+      hint "$\frac{dy}{d\theta} = 8\sin\theta\cos\theta$ و $\frac{dx}{d\theta} = -10\cos\theta\sin\theta$."
+      ! "$\frac{8\sin\cos}{-10\cos\sin} = -\frac{4}{5}$ لأي $\theta$. المنحنى قطعة مستقيمة: $\frac{x}{5} + \frac{y}{4} = 1$."
+    }
+  }
+
+  slide "تمرين 6 (4)" {
+    id: "c4-e6-4"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الرابعة، مثل مثال 6.
+
+    numeric {
+      ask "$x = a\cos^3\theta$ و $y = a\sin^3\theta$ عند $\theta = \dfrac{\pi}{4}$."
+      skill: "diff-parametric"
+      answer: -1
+      expect: 0 - tan(PI/4)
+      tolerance: 0.001
+      wrong 1 "مشتقة $\cos^3\theta$ سالبة."
+      hint "$\frac{dy}{dx} = \frac{3a\sin^2\theta\cos\theta}{-3a\cos^2\theta\sin\theta} = -\tan\theta$."
+      ! "$-\tan\frac{\pi}{4} = -1$."
+    }
+  }
+
+  slide "تمرين 6 (5)" {
+    id: "c4-e6-5"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الخامسة. اشتققنا $\sec^2 3\theta$ في الدرس الثالث.
+
+    numeric {
+      ask "$x = 5 + \sec^2 3\theta$ و $y = 1 - \tan 3\theta$ عند $\theta = \dfrac{\pi}{4}$."
+      skill: "diff-parametric"
+      answer: 0.5
+      expect: (0 - 3) / (6 * tan(3 * PI / 4))
+      tolerance: 0.005
+      wrong 2 "مقلوب." -> "c4-d-flip" retry
+      wrong -0.5 "$\tan\frac{3\pi}{4} = -1$، سالب."
+      hint "$\frac{dx}{d\theta} = 6\sec^2 3\theta\tan 3\theta$ و $\frac{dy}{d\theta} = -3\sec^2 3\theta$."
+      ! "$\frac{-3\sec^2 3\theta}{6\sec^2 3\theta\tan 3\theta} = -\frac{1}{2\tan 3\theta} = -\frac{1}{2(-1)} = \frac{1}{2}$."
+    }
+  }
+
+  slide "تمرين 6 (6)" {
+    id: "c4-e6-6"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > السادسة. زاوية سالبة، فانتبه للإشارات.
+
+    numeric {
+      ask "$x = \sec^2\theta - 1$ و $y = \tan\theta$ عند $\theta = -\dfrac{3\pi}{4}$."
+      skill: "diff-parametric"
+      answer: 0.5
+      expect: 1 / (2 * tan(0 - 3 * PI / 4))
+      tolerance: 0.005
+      wrong -0.5 "$\tan\left(-\frac{3\pi}{4}\right) = +1$: الزاوية في الربع الثالث، والظل موجب هناك."
+      wrong 2 "مقلوب." -> "c4-d-flip" retry
+      hint "$\frac{dy}{dx} = \frac{\sec^2\theta}{2\sec^2\theta\tan\theta} = \frac{1}{2\tan\theta}$."
+      ! "$\frac{1}{2 \cdot 1} = \frac{1}{2}$."
+    }
+  }
+
+  slide "تمرين 6 (7)" {
+    id: "c4-e6-7"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > السابعة. $a$ و $b$ ثابتان.
+
+    quiz {
+      ask "$x = a\sec\theta$ و $y = b\tan\theta$. ما $\dfrac{dy}{dx}$ عند $\theta = \dfrac{3\pi}{4}$؟"
+      skill: "diff-parametric"
+      * "$\dfrac{\sqrt{2}\,b}{a}$"
+      - "$-\dfrac{\sqrt{2}\,b}{a}$" { why: "$\frac{dy}{dx} = \frac{b\sec^2\theta}{a\sec\theta\tan\theta} = \frac{b}{a\sin\theta}$، و $\sin\frac{3\pi}{4}$ موجب." }
+      - "$\dfrac{\sqrt{2}\,a}{b}$" { why: "مقلوب: $\frac{dy}{d\theta}$ فيها $b$، وهي في البسط.", onwrong: "c4-d-flip", retry }
+      - "$\dfrac{b}{\sqrt{2}\,a}$" { why: "$\frac{1}{\sin\frac{3\pi}{4}} = \frac{1}{\frac{\sqrt{2}}{2}} = \sqrt{2}$." }
+      ! "$\frac{\sec\theta}{\tan\theta} = \frac{1}{\sin\theta}$، فـ $\frac{b}{a} \cdot \sqrt{2}$."
+    }
+  }
+
+  slide "تمرين 6 (8)" {
+    id: "c4-e6-8"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثامنة. لأقرب جزء من ألف.
+
+    numeric {
+      ask "$x = \cos\theta + \cos 2\theta$ و $y = \sin\theta + \sin 2\theta$ عند $\theta = \dfrac{\pi}{3}$."
+      skill: "diff-parametric"
+      answer: sqrt(3)/9
+      expect: (cos(PI/3) + 2 * cos(2 * PI/3)) / (0 - sin(PI/3) - 2 * sin(2 * PI/3))
+      tolerance: 0.002
+      wrong 3 * sqrt(3) "مقلوب." -> "c4-d-flip" retry
+      wrong 0 - sqrt(3)/9 "البسط $\frac{1}{2} - 1 = -\frac{1}{2}$ والمقام $-\frac{3\sqrt{3}}{2}$: سالب على سالب."
+      hint "$\frac{dy}{d\theta} = \cos\theta + 2\cos 2\theta$ و $\frac{dx}{d\theta} = -\sin\theta - 2\sin 2\theta$."
+      ! "$\frac{-\frac{1}{2}}{-\frac{3\sqrt{3}}{2}} = \frac{1}{3\sqrt{3}} = \frac{\sqrt{3}}{9} \approx 0.192$."
+    }
+  }
+
+  slide "تمرين 6 (9)" {
+    id: "c4-e6-9"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > التاسعة.
+
+    numeric {
+      ask "$x = 3\cos\theta - 2\cos^3\theta$ و $y = 3\sin\theta - 2\sin^3\theta$ عند $\theta = \dfrac{\pi}{2}$."
+      skill: "diff-parametric"
+      answer: 0
+      expect: (3 * cos(PI/2) - 6 * sin(PI/2)^2 * cos(PI/2)) / (0 - 3 * sin(PI/2) + 6 * cos(PI/2)^2 * sin(PI/2))
+      tolerance: 0.001
+      wrong -3 "هذا $\frac{dx}{d\theta}$ عند $\frac{\pi}{2}$."
+      hint "كل حد في $\frac{dy}{d\theta}$ فيه $\cos\theta$، و $\cos\frac{\pi}{2} = 0$."
+      ! "$\frac{dy}{d\theta} = 3\cos\theta - 6\sin^2\theta\cos\theta = 0$ عند $\frac{\pi}{2}$، و $\frac{dx}{d\theta} = -3$، فالميل $0$."
+    }
+  }
+
+  slide "تمرين 6 (10)" {
+    id: "c4-e6-10"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > العاشرة: ضرب داخل كل معادلة. لأقرب جزء من ألف.
+
+    numeric {
+      ask "$x = a(\cos\theta + \theta\sin\theta)$ و $y = a(\sin\theta - \theta\cos\theta)$ عند $\theta = \dfrac{\pi}{6}$."
+      skill: "diff-parametric"
+      answer: 1/sqrt(3)
+      expect: tan(PI/6)
+      tolerance: 0.002
+      wrong sqrt(3) "مقلوب." -> "c4-d-flip" retry
+      hint "$\frac{dx}{d\theta} = a(-\sin\theta + \sin\theta + \theta\cos\theta) = a\theta\cos\theta$."
+      ! "$\frac{dy}{d\theta} = a\theta\sin\theta$ و $\frac{dx}{d\theta} = a\theta\cos\theta$، فالميل $\tan\theta = \frac{1}{\sqrt{3}} \approx 0.577$."
+    }
+  }
+
+  slide "تمرين 7 (1)" {
+    id: "c4-e7-1"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > تمرين 7: باستخدام الاشتقاق البارامتري. مثل مثال 7: $x$ هو البارامتر.
+
+    quiz {
+      ask "مشتقة $(4x^3 - 9x^2 + 5)$ بالنسبة إلى $(3x^2 + 7)$ هي"
+      skill: "diff-parametric"
+      * "$2x - 3$"
+      - "$12x^2 - 18x$" { why: "هذه مشتقة الأولى بالنسبة إلى $x$ فقط. اقسم على مشتقة الثانية $6x$." }
+      - "$\dfrac{1}{2x - 3}$" { why: "مقلوب: مشتقة الأولى في البسط.", onwrong: "c4-d-flip", retry }
+      - "$6x(12x^2 - 18x)$" { why: "المشتقتان تُقسمان لا تُضربان." }
+      ! "$\frac{12x^2 - 18x}{6x} = 2x - 3$."
+    }
+  }
+
+  slide "تمرين 7 (2)" {
+    id: "c4-e7-2"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثانية: «معدل تغير» كذا بالنسبة إلى كذا يعني المشتقة نفسها.
+
+    quiz {
+      ask "معدل تغير $(x + 3)(x - 2)$ بالنسبة إلى $\dfrac{x - 3}{x + 2}$ هو"
+      skill: "diff-parametric"
+      * "$\dfrac{(2x + 1)(x + 2)^2}{5}$"
+      - "$\dfrac{5(2x + 1)}{(x + 2)^2}$" { why: "ضربت في مشتقة الثانية بدل أن تقسم عليها." }
+      - "$\dfrac{(2x + 1)(x + 2)}{5}$" { why: "مشتقة الكسر $\frac{5}{(x + 2)^2}$، والمربع يصعد كله." }
+      - "$2x + 1$" { why: "هذه مشتقة الأولى وحدها." }
+      hint "مشتقة $(x + 3)(x - 2) = x^2 + x - 6$ هي $2x + 1$، ومشتقة $\frac{x - 3}{x + 2}$ هي $\frac{5}{(x + 2)^2}$."
+      ! "$(2x + 1) \div \frac{5}{(x + 2)^2} = \frac{(2x + 1)(x + 2)^2}{5}$."
+    }
+  }
+
+  slide "تمرين 7 (3)" {
+    id: "c4-e7-3"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الثالثة، عند نقطة.
+
+    numeric {
+      ask "أوجد مشتقة $\dfrac{x + 1}{x - 1}$ بالنسبة إلى $\sqrt{2x + 1}$ عندما $x = 4$."
+      skill: "diff-parametric"
+      answer: -2/3
+      expect: (0 - 2 / (4 - 1)^2) / (1 / sqrt(2 * 4 + 1))
+      tolerance: 0.005
+      wrong -3/2 "مقلوب." -> "c4-d-flip" retry
+      wrong 2/3 "مشتقة الكسر سالبة: $-\frac{2}{(x - 1)^2}$."
+      hint "مشتقة الأولى $\frac{-2}{(x - 1)^2}$، ومشتقة الثانية $\frac{1}{\sqrt{2x + 1}}$."
+      ! "عند $4$: $-\frac{2}{9} \div \frac{1}{3} = -\frac{2}{3}$."
+    }
+  }
+
+  slide "تمرين 7 (4)" {
+    id: "c4-e7-4"
+    beat: example
+    cat: "تمارين: الاشتقاق البارامتري"
+    > الرابعة. لأقرب جزء من ألف.
+
+    numeric {
+      ask "أوجد مشتقة $(x - \sin x)$ بالنسبة إلى $(1 - \cos x)$ عندما $x = \dfrac{\pi}{3}$."
+      skill: "diff-parametric"
+      answer: sqrt(3)/3
+      expect: (1 - cos(PI/3)) / sin(PI/3)
+      tolerance: 0.002
+      wrong sqrt(3) "مقلوب." -> "c4-d-flip" retry
+      wrong 0 - sqrt(3)/3 "مشتقة $1 - \cos x$ هي $+\sin x$."
+      hint "$\frac{1 - \cos x}{\sin x}$ عند $\frac{\pi}{3}$."
+      ! "$\frac{\frac{1}{2}}{\frac{\sqrt{3}}{2}} = \frac{1}{\sqrt{3}} = \frac{\sqrt{3}}{3} \approx 0.577$."
+    }
+  }
+
+  slide "تمرين 8 (1)" {
+    id: "c4-e8-1"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 8. $f$ و $g$ و $k$ دوال قابلة للاشتقاق (في كتابك «د» و «ر» و «ق»). من الجدول: $f(1) = -1$ و $f(2) = 4$ و $g(1) = 2$ و $g(2) = 1$ و $f'(1) = 1$ و $f'(2) = 5$ و $g'(1) = 2$ و $g'(2) = -3$.
+
+    numeric {
+      ask "$k(x) = 3f(x) - 2g(x)$. ما $k'(1)$؟"
+      skill: "diff-sum-rule"
+      answer: -1
+      expect: 3 * 1 - 2 * 2
+      wrong -7 "هذا $k(1) = 3(-1) - 2(2)$، قيمة الدالة. المطلوب بالمشتقات."
+      wrong 7 "$3f'(1) - 2g'(1) = 3 - 4$."
+      hint "$k' = 3f' - 2g'$."
+      ! "$3(1) - 2(2) = -1$."
+    }
+  }
+
+  slide "تمرين 8 (2)" {
+    id: "c4-e8-2"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > نفس الجدول: $f(2) = 4$ و $f'(2) = 5$ و $g(2) = 1$ و $g'(2) = -3$.
+
+    numeric {
+      ask "$k(x) = f(x)\left[5 + g(x)\right]$. ما $k'(2)$؟"
+      skill: "diff-product-rule"
+      answer: 18
+      expect: 5 * (5 + 1) + 4 * (0 - 3)
+      wrong -15 "هذا $f'(2) \cdot g'(2)$، حاصل ضرب المشتقتين."
+      wrong 30 "هذا الحد الأول فقط. $f(2) \cdot g'(2) = 4 \times (-3)$."
+      wrong 42 "$g'(2) = -3$، سالب."
+      hint "$k' = f'\,(5 + g) + f\,g'$."
+      ! "$5(5 + 1) + 4(-3) = 30 - 12 = 18$."
+    }
+  }
+
+  slide "تمرين 8 (3)" {
+    id: "c4-e8-3"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > نفس الجدول: $f(1) = -1$ و $f'(1) = 1$ و $g(1) = 2$ و $g'(1) = 2$.
+
+    numeric {
+      ask "$k(x) = f(x) \div \left[g(x) + 2\right]$. ما $k'(1)$؟"
+      skill: "diff-quotient-rule"
+      answer: 3/8
+      expect: (1 * (2 + 2) - (0 - 1) * 2) / (2 + 2)^2
+      tolerance: 0.002
+      wrong 1/8 "$-f(1)\,g'(1) = -(-1)(2) = +2$."
+      wrong -3/8 "الترتيب في البسط: المقام في مشتقة البسط أولًا."
+      wrong 3/2 "المقام يُربّع: $(g + 2)^2 = 16$."
+      hint "$k' = \frac{f'(g + 2) - f\,g'}{(g + 2)^2}$."
+      ! "$\frac{(1)(4) - (-1)(2)}{16} = \frac{6}{16} = \frac{3}{8}$."
+    }
+  }
+
+  slide "تمرين 8 (4)" {
+    id: "c4-e8-4"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > نفس الجدول: $g(1) = 2$ و $g'(1) = 2$ و $f'(1) = 1$ و $f'(2) = 5$.
+
+    numeric {
+      ask "$k(x) = f\left[g(x)\right]$. ما $k'(1)$؟"
+      skill: "diff-chain-rule"
+      answer: 10
+      expect: 5 * 2
+      wrong 2 "هذا $f'(1) \cdot g'(1)$. $f$ تستقبل $g(1) = 2$، فنحتاج $f'(2)$."
+      wrong 5 "هذا $f'(g(1))$ وحده. اضرب في $g'(1)$."
+      hint "$k'(1) = f'(g(1)) \cdot g'(1)$."
+      ! "$f'(2) \cdot g'(1) = 5 \times 2 = 10$."
+    }
+  }
+
+  slide "تمرين 8 (5)" {
+    id: "c4-e8-5"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > نفس الجدول: $f(2) = 4$ و $f'(2) = 5$ و $g'(2) = -3$.
+
+    numeric {
+      ask "$k(x) = g\left[3x - f(x)\right]$. ما $k'(2)$؟"
+      skill: "diff-chain-rule"
+      answer: 6
+      expect: (0 - 3) * (3 - 5)
+      wrong -6 "مشتقة الداخل $3 - f'(2) = -2$، و $g'(2) = -3$: سالب في سالب."
+      wrong -3 "هذا $g'(\ldots)$ وحده. اضرب في مشتقة الداخل $3 - f'(2)$."
+      hint "الداخل عند $2$: $3(2) - f(2) = 2$. ومشتقته $3 - f'(x)$."
+      ! "$g'(2) \cdot (3 - 5) = (-3)(-2) = 6$."
+    }
+  }
+
+  slide "تمرين 8 (6)" {
+    id: "c4-e8-6"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > نفس الجدول: $g(1) = 2$ و $g'(1) = 2$.
+
+    numeric {
+      ask "$k(x) = \left[x^3 + g(x)\right]^{-2}$. ما $k'(1)$؟ لأقرب جزء من ألف."
+      skill: "diff-chain-rule"
+      answer: -10/27
+      expect: -2 * (1 + 2)^(-3) * (3 + 2)
+      tolerance: 0.002
+      wrong -2/27 "مشتقة الداخل $3x^2 + g'(x) = 5$، لا $1$."
+      wrong -10/9 "الأس بعد النقص $-3$، و $3^{-3} = \frac{1}{27}$."
+      hint "$k' = -2\left[x^3 + g\right]^{-3} \cdot (3x^2 + g')$."
+      ! "$-2(3)^{-3}(5) = -\frac{10}{27} \approx -0.370$."
+    }
+  }
+
+  slide "اختر: 9 (1)" {
+    id: "c4-e9-1"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > تمرين 9: اختر الإجابة الصحيحة. سبعة وأربعون سؤالًا قصيرًا، كل واحد يختبر فكرة واحدة.
+
+    quiz {
+      ask "إذا كان $f(x) = 2a^6 + 5b^4$ حيث $a$ و $b$ ثابتان، فإن $f'(x) =$"
+      skill: "diff-power-rule"
+      - "$12a^5 + 20b^3$" { why: "$a$ و $b$ ثابتان، لا متغيران. لا يوجد $x$ في الدالة أصلًا." }
+      - "$6a^5 + 4b^3$" { why: "الدالة عدد ثابت، فلا نطبق قاعدة القوة على $a$ و $b$." }
+      - "$1$" { why: "ميل الخط الأفقي صفر، لا $1$." }
+      * "صفر"
+      ! "$2a^6 + 5b^4$ عدد واحد مهما كان شكله، ومشتقة الثابت صفر."
+    }
+  }
+
+  slide "اختر: 9 (2)" {
+    id: "c4-e9-2"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثاني.
+
+    quiz {
+      ask "إذا كان $q(x) = |x|$، فإن $q'(-5) =$"
+      skill: "diff-meaning"
+      - "$5$" { why: "هذا $q(-5)$، القيمة. المطلوب الميل." }
+      - "$-5$" { why: "هذا $x$ نفسه." }
+      - "$1$" { why: "هذا ميل الجزء الأيمن. يسار الصفر $|x| = -x$." }
+      * "$-1$"
+      ! "يسار الصفر $|x| = -x$، خط ميله $-1$."
+    }
+  }
+
+  slide "اختر: 9 (3)" {
+    id: "c4-e9-3"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثالث.
+
+    quiz {
+      ask "إذا كانت $y = \sqrt{g(x)}$، وكان $g'(2) = 4$ و $g(2) = 9$، فإن $\dfrac{dy}{dx}$ عندما $x = 2$ يساوي"
+      skill: "diff-chain-rule"
+      - "$\dfrac{4}{3}$" { why: "$\frac{g'}{\sqrt{g}}$ ينقصها $2$ في المقام: $\frac{g'}{2\sqrt{g}}$." }
+      - "$\dfrac{2}{9}$" { why: "هذا $\frac{g'}{2g}$. المقام فيه $\sqrt{g}$، لا $g$." }
+      - "$\dfrac{1}{6}$" { why: "هذا $\frac{1}{2\sqrt{g}}$ وحده. اضرب في مشتقة الداخل $g' = 4$." }
+      * "$\dfrac{2}{3}$"
+      ! "$\frac{g'(2)}{2\sqrt{g(2)}} = \frac{4}{2 \times 3} = \frac{2}{3}$."
+    }
+  }
+
+  slide "اختر: 9 (4)" {
+    id: "c4-e9-4"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الرابع. أوجد $x$ أولًا.
+
+    quiz {
+      ask "إذا كان $x^3y^2 = 1$، فإن $\left[\dfrac{dy}{dx}\right]_{y = 1} =$"
+      skill: "diff-implicit"
+      - "$-\dfrac{2}{3}$" { why: "مقلوب: $\frac{dy}{dx} = -\frac{3x^2y^2}{2x^3y} = -\frac{3y}{2x}$." }
+      * "$-\dfrac{3}{2}$"
+      - "$\dfrac{2}{3}$" { why: "الإشارة سالبة، والكسر مقلوب." }
+      - "$\dfrac{3}{2}$" { why: "الحدان في طرف واحد، فالإشارة سالبة." }
+      ! "$y = 1$ يعطي $x = 1$. و $3x^2y^2 + 2x^3y\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{3y}{2x} = -\frac{3}{2}$."
+    }
+  }
+
+  slide "اختر: 9 (5)" {
+    id: "c4-e9-5"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الخامس. انتبه: ما داخل $f$ هو $5x$، لا $x$.
+
+    quiz {
+      ask "إذا كان $f(5x) = x^2 + x$، فإن $f'(2) =$"
+      skill: "diff-chain-rule"
+      - "$5$" { why: "هذا $2x + 1$ عند $x = 2$. لكن $f'(2)$ تعني أن ما داخل $f$ يساوي $2$، أي $5x = 2$." }
+      - "$1$" { why: "هذا $\frac{2x + 1}{5}$ عند $x = 2$. المطلوب عند $5x = 2$، أي $x = \frac{2}{5}$." }
+      - "$\dfrac{3}{25}$" { why: "راجع: عند $x = \frac{2}{5}$ يكون $2x + 1 = \frac{9}{5}$." }
+      * "$\dfrac{9}{25}$"
+      hint "اشتق الطرفين: $5f'(5x) = 2x + 1$. متى يكون $5x = 2$؟"
+      ! "$5f'(5x) = 2x + 1$. عند $x = \frac{2}{5}$: $5f'(2) = \frac{9}{5}$، فـ $f'(2) = \frac{9}{25}$."
+    }
+  }
+
+  slide "اختر: 9 (6)" {
+    id: "c4-e9-6"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السادس.
+
+    quiz {
+      ask "إذا كان $f(x) = 3x + g(x)$، وكان $g'(2) = -5$، فإن ميل المماس لمنحنى $f$ عند $x = 2$ يساوي"
+      skill: "diff-sum-rule"
+      * "$-2$"
+      - "$3$" { why: "هذا ميل $3x$ وحده. $g$ تساهم بـ $-5$." }
+      - "$-15$" { why: "المجموع يُشتق بالجمع لا بالضرب." }
+      - "$\dfrac{1}{2}$" { why: "هذا مقلوب $-2$ مع إشارة معكوسة، ميل العمودي لا المماس." }
+      ! "$f'(2) = 3 + g'(2) = 3 - 5 = -2$."
+    }
+  }
+
+  slide "اختر: 9 (7)" {
+    id: "c4-e9-7"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السابع: ابحث عن الخطأ الوحيد.
+
+    quiz {
+      ask "إذا كان $xy = 1$، فإن $\dfrac{dy}{dx}$ يساوي كلًّا مما يأتي **ما عدا**"
+      skill: "diff-implicit"
+      * "$x^{-2}$"
+      - "$-\dfrac{1}{x^2}$" { why: "هذه صحيحة: $y = x^{-1}$، فـ $\frac{dy}{dx} = -x^{-2}$." }
+      - "$-\dfrac{y}{x}$" { why: "هذه صحيحة: $x\frac{dy}{dx} + y = 0$." }
+      - "$-y^2$" { why: "هذه صحيحة: $y = \frac{1}{x}$، فـ $y^2 = \frac{1}{x^2}$، و $-y^2 = -\frac{1}{x^2}$." }
+      ! "كلها $-\frac{1}{x^2}$ بصور مختلفة، إلا $x^{-2}$ فإشارتها موجبة."
+    }
+  }
+
+  slide "اختر: 9 (8)" {
+    id: "c4-e9-8"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثامن. $a$ ثابت. اضرب في $xy$ أولًا.
+
+    quiz {
+      ask "إذا كانت $\dfrac{x}{y} + \dfrac{y}{x} = a$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      - "$\dfrac{x}{y}$" { why: "مقلوب." }
+      * "$\dfrac{y}{x}$"
+      - "$\dfrac{ax}{y}$" { why: "$a$ تختفي بعد التعويض عنها بـ $\frac{x^2 + y^2}{xy}$." }
+      - "$\dfrac{ay}{x}$" { why: "$a$ تختفي بعد التعويض." }
+      hint "$x^2 + y^2 = axy$، فـ $2x + 2y\frac{dy}{dx} = a\left(x\frac{dy}{dx} + y\right)$."
+      ! "$\frac{dy}{dx} = \frac{ay - 2x}{2y - ax}$، وبالتعويض عن $a$ يصير $\frac{y}{x}$. معناه: $\frac{y}{x}$ ثابت، فالمنحنى خطوط من الأصل."
+    }
+  }
+
+  slide "اختر: 9 (9)" {
+    id: "c4-e9-9"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > التاسع. قارن $x$ و $y$ قبل أن تشتق.
+
+    quiz {
+      ask "إذا كان $y = \dfrac{z + 1}{z - 1}$ و $x = \dfrac{z - 1}{z + 1}$، فإن $\dfrac{dy}{dx}$ عند $x = 2$ يساوي"
+      skill: "diff-parametric"
+      - "$-\dfrac{1}{8}$" { why: "راجع: $y = \frac{1}{x}$، ومشتقتها $-\frac{1}{x^2}$ لا $-\frac{1}{x^3}$." }
+      * "$-\dfrac{1}{4}$"
+      - "$\dfrac{1}{4}$" { why: "مشتقة $\frac{1}{x}$ سالبة." }
+      - "$-4$" { why: "مقلوب." }
+      ! "$y = \frac{1}{x}$، فـ $\frac{dy}{dx} = -\frac{1}{x^2} = -\frac{1}{4}$. لا حاجة للبارامتر أصلًا."
+    }
+  }
+
+  slide "اختر: 9 (10)" {
+    id: "c4-e9-10"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > العاشر.
+
+    quiz {
+      ask "مشتقة $(x^2 + 3)$ بالنسبة إلى $\sqrt{x^2 + 16}$ عند $x = 3$ تساوي"
+      skill: "diff-parametric"
+      - "$6$" { why: "هذا $2x$، مشتقة الأولى وحدها. اقسم على مشتقة الثانية." }
+      - "$8$" { why: "راجع الجذر: $\sqrt{9 + 16} = 5$." }
+      * "$10$"
+      - "$15$" { why: "مشتقة الثانية عند $3$ هي $\frac{3}{5}$، و $6 \div \frac{3}{5} = 10$." }
+      ! "$\frac{2x}{\frac{x}{\sqrt{x^2 + 16}}} = 2\sqrt{x^2 + 16} = 10$."
+    }
+  }
+
+  slide "اختر: 9 (11)" {
+    id: "c4-e9-11"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الحادي عشر.
+
+    quiz {
+      ask "إذا كان $x = 2t^2 + 3$ و $y = \sqrt{t^3}$، فإن $\dfrac{dy}{dx}$ عند $t = 1$ تساوي"
+      skill: "diff-parametric"
+      - "$\dfrac{1}{8}$" { why: "$\sqrt{t^3} = t^{\frac{3}{2}}$، ومشتقتها $\frac{3}{2}t^{\frac{1}{2}}$. أين الـ $3$؟" }
+      - "$\dfrac{1}{4}$" { why: "مشتقة $2t^2 + 3$ هي $4t$، والـ $\frac{3}{2}$ من الأس تبقى في البسط." }
+      * "$\dfrac{3}{8}$"
+      - "$\dfrac{8}{3}$" { why: "مقلوب.", onwrong: "c4-d-flip", retry }
+      ! "$\frac{\frac{3}{2}t^{\frac{1}{2}}}{4t} = \frac{3}{8}$ عند $t = 1$."
+    }
+  }
+
+  slide "اختر: 9 (12)" {
+    id: "c4-e9-12"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثاني عشر. الأس هنا على الزاوية.
+
+    quiz {
+      ask "معدل تغير $\sin x^3$ بالنسبة إلى $\cos x^3$ يساوي"
+      skill: "diff-parametric"
+      * "$-\cot x^3$"
+      - "$\cot x^3$" { why: "مشتقة $\cos x^3$ سالبة: $-3x^2\sin x^3$." }
+      - "$\tan x^3$" { why: "مقلوب وبإشارة خاطئة." }
+      - "$-\tan x^3$" { why: "مقلوب: مشتقة $\sin x^3$ في البسط." }
+      ! "$\frac{3x^2\cos x^3}{-3x^2\sin x^3} = -\cot x^3$."
+    }
+  }
+
+  slide "اختر: 9 (13)" {
+    id: "c4-e9-13"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثالث عشر.
+
+    quiz {
+      ask "تتحرك نقطة $(x, y)$ على منحنى بحيث $\dfrac{dx}{dt} = t^2$ و $\dfrac{dy}{dt} = 2t$. ميل المماس عند $t = 1$ يساوي"
+      skill: "diff-parametric"
+      - "$\dfrac{1}{2}$" { why: "مقلوب.", onwrong: "c4-d-flip", retry }
+      * "$2$"
+      - "$4$" { why: "عند $t = 1$: $\frac{dy}{dt} = 2$ و $\frac{dx}{dt} = 1$." }
+      - "$\dfrac{1}{4}$" { why: "راجع الأرقام: $\frac{2}{1}$." }
+      ! "$\frac{2t}{t^2} = \frac{2}{t} = 2$ عند $t = 1$."
+    }
+  }
+
+  slide "اختر: 9 (14)" {
+    id: "c4-e9-14"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الرابع عشر.
+
+    quiz {
+      ask "ميل المماس للمنحنى $y = t^2 + 2t$ و $x = t^2 - 2t$ عند $t = 2$ يساوي"
+      skill: "diff-parametric"
+      - "$\dfrac{1}{2}$" { why: "راجع: $\frac{dy}{dt} = 6$ و $\frac{dx}{dt} = 2$." }
+      - "$-\dfrac{1}{2}$" { why: "كلا المعدلين موجب عند $t = 2$." }
+      - "$2$" { why: "هذا $\frac{dx}{dt}$ وحده." }
+      * "$3$"
+      ! "$\frac{2t + 2}{2t - 2} = \frac{6}{2} = 3$."
+    }
+  }
+
+  slide "اختر: 9 (15)" {
+    id: "c4-e9-15"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الخامس عشر: «يوازي محور $x$» يعني أفقيًا.
+
+    quiz {
+      ask "المماس للمنحنى $x = t^2 - 1$ و $y = t^3 - t$ يوازي محور $x$ عند $t =$"
+      skill: "diff-parametric"
+      - "صفر" { why: "عند $0$ يصير $\frac{dx}{dt} = 0$: المماس رأسي، لا أفقي.", onwrong: "c4-d-hv", retry }
+      * "$\dfrac{1}{\sqrt{3}}$"
+      - "$\dfrac{1}{2}$" { why: "$3t^2 - 1 = 0$ يعطي $t^2 = \frac{1}{3}$، لا $\frac{1}{4}$." }
+      - "$-\dfrac{1}{\sqrt{2}}$" { why: "$3\left(\frac{1}{2}\right) - 1 \neq 0$." }
+      ! "أفقي يعني $\frac{dy}{dt} = 3t^2 - 1 = 0$، فـ $t = \pm\frac{1}{\sqrt{3}}$، و $\frac{dx}{dt} = 2t \neq 0$ هناك."
+    }
+  }
+
+  slide "اختر: 9 (16)" {
+    id: "c4-e9-16"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السادس عشر.
+
+    quiz {
+      ask "العمودي على الدائرة $x^2 + y^2 = 12$ عند أي نقطة عليها يمر بالنقطة"
+      skill: "diff-implicit"
+      - "$(2, 2)$" { why: "هذه لا تقع على الدائرة حتى، و $4 + 4 \neq 12$. العمودي يمر بنقطة ثابتة لكل النقاط." }
+      - "$(1, 1)$" { why: "العمودي ميله $\frac{y}{x}$، خط من الأصل إلى النقطة، لا يمر بـ $(1, 1)$ دائمًا." }
+      * "$(0, 0)$"
+      - "$(-2, -2)$" { why: "العمودي عند نقطة مثل $(\sqrt{12}, 0)$ هو محور $x$، ولا يمر بـ $(-2, -2)$." }
+      ! "ميل المماس $-\frac{x}{y}$، فميل العمودي $\frac{y}{x}$: خط من الأصل إلى النقطة. العمودي على الدائرة يمر دائمًا بمركزها."
+    }
+  }
+
+  slide "اختر: 9 (17)" {
+    id: "c4-e9-17"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السابع عشر.
+
+    quiz {
+      ask "إذا كان المستقيم $y = mx - a$ مماسًا للمنحنى $x^3 + y^2 = 5$ عند $(1, 2)$، فإن $m =$"
+      skill: "diff-implicit"
+      * "$-\dfrac{3}{4}$"
+      - "$\dfrac{3}{4}$" { why: "$3x^2 + 2y\frac{dy}{dx} = 0$: الإشارة سالبة." }
+      - "$\dfrac{4}{3}$" { why: "مقلوب وبإشارة خاطئة: هذا ميل العمودي." }
+      - "$-\dfrac{4}{3}$" { why: "مقلوب." }
+      ! "$\frac{dy}{dx} = -\frac{3x^2}{2y} = -\frac{3}{4}$، وهو ميل المستقيم $m$."
+    }
+  }
+
+  slide "اختر: 9 (18)" {
+    id: "c4-e9-18"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثامن عشر.
+
+    quiz {
+      ask "المماس للمنحنى $x = 3\cos\theta$ و $y = 3\sin\theta$ حيث $0 \le \theta \le \pi$ يوازي محور $x$ إذا كانت $\theta =$"
+      skill: "diff-parametric"
+      - "صفر" { why: "عند $0$ النقطة $(3, 0)$ على طرف الدائرة، والمماس هناك رأسي." }
+      - "$\dfrac{\pi}{3}$" { why: "$\cos\frac{\pi}{3} \neq 0$، فالميل ليس صفرًا." }
+      * "$\dfrac{\pi}{2}$"
+      - "$\pi$" { why: "عند $\pi$ النقطة $(-3, 0)$، والمماس رأسي." }
+      ! "$\frac{dy}{d\theta} = 3\cos\theta = 0$ عند $\frac{\pi}{2}$: قمة الدائرة."
+    }
+  }
+
+  slide "اختر: 9 (19)" {
+    id: "c4-e9-19"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > التاسع عشر. $\frac{dy}{dx} = \frac{dx}{dy}$ يعني أن الميل يساوي مقلوبه.
+
+    quiz {
+      ask "إذا كانت $y^2 = 8x$ حيث $y > 0$، فإن النقطة على المنحنى التي يكون عندها $\dfrac{dy}{dx} = \dfrac{dx}{dy}$ هي"
+      skill: "diff-implicit"
+      - "$(0, 0)$" { why: "$y > 0$ شرط، والميل عند الأصل غير معرّف أصلًا." }
+      - "$(1, 2\sqrt{2})$" { why: "الميل هناك $\frac{4}{2\sqrt{2}} = \sqrt{2}$، ومقلوبه $\frac{1}{\sqrt{2}}$. غير متساويين." }
+      - "$\left(\dfrac{1}{2}, 2\right)$" { why: "الميل هناك $\frac{4}{2} = 2$، ومقلوبه $\frac{1}{2}$." }
+      * "$(2, 4)$"
+      hint "$2y\frac{dy}{dx} = 8$، فـ $\frac{dy}{dx} = \frac{4}{y}$. عدد يساوي مقلوبه هو $\pm 1$."
+      ! "$\frac{4}{y} = 1$ يعطي $y = 4$، و $x = \frac{16}{8} = 2$."
+    }
+  }
+
+  slide "اختر: 9 (20)" {
+    id: "c4-e9-20"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > العشرون. $y$ بدلالة $t$، و $x$ في علاقة ضمنية مع $t$. طريقتا الدرس معًا.
+
+    quiz {
+      ask "إذا كانت $y = \sqrt[3]{t^2 + 7}$ و $6t^2x + t = 1$، فإن العمودي على المنحنى عند نقطته التي إحداثيها السيني صفر يوازي"
+      skill: "diff-parametric"
+      - "محور $x$" { why: "العمودي أفقي فقط إذا كان المماس رأسيًا." }
+      - "محور $y$" { why: "العمودي رأسي فقط إذا كان المماس أفقيًا، والميل هنا $-1$." }
+      * "المستقيم $y = x$"
+      - "المستقيم $y = -x$" { why: "هذا اتجاه المماس نفسه، ميله $-1$. العمودي ميله $+1$." }
+      hint "عند $x = 0$: $t = 1$. اشتق $6t^2x + t = 1$ بالنسبة إلى $t$ لتجد $\frac{dx}{dt}$."
+      ! "$\frac{dy}{dt} = \frac{2t}{3(t^2 + 7)^{\frac{2}{3}}} = \frac{1}{6}$، و $12tx + 6t^2\frac{dx}{dt} + 1 = 0$ تعطي $\frac{dx}{dt} = -\frac{1}{6}$. الميل $-1$، فالعمودي ميله $1$."
+    }
+  }
+
+  slide "اختر: 9 (21)" {
+    id: "c4-e9-21"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الحادي والعشرون.
+
+    quiz {
+      ask "معادلة العمودي على المنحنى $x = t^2$ و $y = 6t - 5$ عند $t = 1$ هي"
+      skill: "diff-parametric"
+      - "$4y + x - 5 = 0$" { why: "النقطة $(1, 1)$ على هذا الخط، لكن ميله $-\frac{1}{4}$. ميل المماس $3$، فميل العمودي $-\frac{1}{3}$." }
+      - "$3x + y - 4 = 0$" { why: "ميله $-3$: عكست الإشارة ولم تقلب الكسر.", onwrong: "c4-d-perp", retry }
+      * "$3y + x - 4 = 0$"
+      - "$4x + y - 5 = 0$" { why: "ميله $-4$، وليس عموديًا على مماس ميله $3$." }
+      ! "الميل $\frac{6}{2t} = 3$، والنقطة $(1, 1)$. العمودي: $y - 1 = -\frac{1}{3}(x - 1)$، أي $3y + x - 4 = 0$."
+    }
+  }
+
+  slide "اختر: 9 (22)" {
+    id: "c4-e9-22"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثاني والعشرون. الجواب بدلالة $x$ و $y$ لا $t$.
+
+    quiz {
+      ask "إذا كان $x = a\left(t - \dfrac{1}{t}\right)$ و $y = a\left(t + \dfrac{1}{t}\right)$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-parametric"
+      * "$\dfrac{x}{y}$"
+      - "$\dfrac{y}{x}$" { why: "$\frac{dy}{dx} = \frac{1 - \frac{1}{t^2}}{1 + \frac{1}{t^2}} = \frac{t^2 - 1}{t^2 + 1}$، و $\frac{x}{y}$ هي نفس الكسر." }
+      - "$-\dfrac{x}{y}$" { why: "كلا الحدين في $\frac{dy}{dx}$ بإشارة سليمة: $\frac{t^2 - 1}{t^2 + 1}$." }
+      - "$-\dfrac{y}{x}$" { why: "راجع: $\frac{dy}{dt} = a\left(1 - \frac{1}{t^2}\right)$ و $\frac{dx}{dt} = a\left(1 + \frac{1}{t^2}\right)$." }
+      ! "$\frac{t^2 - 1}{t^2 + 1}$، و $\frac{x}{y} = \frac{t - \frac{1}{t}}{t + \frac{1}{t}} = \frac{t^2 - 1}{t^2 + 1}$."
+    }
+  }
+
+  slide "اختر: 9 (23)" {
+    id: "c4-e9-23"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثالث والعشرون: منحنى الدوارة، الذي ترسمه نقطة على عجلة تتدحرج. ابحث عن الخطأ.
+
+    quiz {
+      ask "إذا كانت $x = a(\theta - \sin\theta)$ و $y = a(1 - \cos\theta)$، فكل مما يلي صحيح **ما عدا**"
+      skill: "diff-parametric"
+      - "$\dfrac{dx}{d\theta} = y$" { why: "صحيحة: $\frac{dx}{d\theta} = a(1 - \cos\theta) = y$." }
+      - "$\dfrac{dy}{dx} = \cot\dfrac{\theta}{2}$" { why: "صحيحة: $\frac{\sin\theta}{1 - \cos\theta} = \frac{2\sin\frac{\theta}{2}\cos\frac{\theta}{2}}{2\sin^2\frac{\theta}{2}}$." }
+      * "$\dfrac{dy}{d\theta} + \dfrac{dx}{d\theta} = 1$"
+      - "$y\dfrac{dy}{dx} = a\sin\theta$" { why: "صحيحة: $a(1 - \cos\theta) \cdot \frac{\sin\theta}{1 - \cos\theta} = a\sin\theta$." }
+      ! "$\frac{dy}{d\theta} + \frac{dx}{d\theta} = a\sin\theta + a - a\cos\theta$، وهذا ليس $1$ دائمًا."
+    }
+  }
+
+  slide "اختر: 9 (24)" {
+    id: "c4-e9-24"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الرابع والعشرون. مثل الخامس: انتبه لما داخل $f$.
+
+    quiz {
+      ask "إذا كانت $y = f(x^2)$ و $\dfrac{dy}{dx} = 2x^3 - 4x$، فإن $f'(4) =$"
+      skill: "diff-chain-rule"
+      - "صفر" { why: "$f'(x^2) = x^2 - 2$، وعند $x^2 = 4$ يساوي $2$." }
+      * "$2$"
+      - "$6$" { why: "راجع الإشارة: $\frac{2x^3 - 4x}{2x} = x^2 - 2$." }
+      - "$14$" { why: "هذا $x^2 - 2$ عند $x = 4$. لكن $f'(4)$ تعني أن ما داخل $f$ يساوي $4$، أي $x^2 = 4$." }
+      ! "$2x f'(x^2) = 2x^3 - 4x$، فـ $f'(x^2) = x^2 - 2$، و $f'(4) = 4 - 2 = 2$."
+    }
+  }
+
+  slide "اختر: 9 (25)" {
+    id: "c4-e9-25"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الخامس والعشرون.
+
+    quiz {
+      ask "إذا كان $y = \sec x$ و $z = \tan x$، فإن $\dfrac{dy}{dz} =$"
+      skill: "diff-parametric"
+      - "$\cos^3 x$" { why: "$\frac{\sec x\tan x}{\sec^2 x} = \frac{\tan x}{\sec x}$، وهذا يبسط إلى شيء أبسط." }
+      * "$\sin x$"
+      - "$\cos x$" { why: "$\frac{\tan x}{\sec x} = \frac{\sin x}{\cos x} \cdot \cos x = \sin x$." }
+      - "$\tan x\sec x$" { why: "هذا $\frac{dy}{dx}$ وحده. اقسم على $\frac{dz}{dx} = \sec^2 x$." }
+      ! "$\frac{\sec x\tan x}{\sec^2 x} = \frac{\tan x}{\sec x} = \sin x$."
+    }
+  }
+
+  slide "اختر: 9 (26)" {
+    id: "c4-e9-26"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السادس والعشرون. $a \neq 0$ ثابت.
+
+    quiz {
+      ask "إذا كانت $x = a\sec^3\theta$ و $y = a\tan^3\theta$، فإن $\dfrac{dy}{dx}$ عندما $\theta = \dfrac{\pi}{4}$ يساوي"
+      skill: "diff-parametric"
+      * "$\dfrac{\sqrt{2}}{2}$"
+      - "$\dfrac{1}{2}$" { why: "$\frac{dy}{dx} = \sin\theta$، و $\sin\frac{\pi}{4} = \frac{\sqrt{2}}{2}$." }
+      - "$\dfrac{\sqrt{3}}{2}$" { why: "هذا $\sin\frac{\pi}{3}$." }
+      - "صفر" { why: "راجع: $\frac{3a\tan^2\theta\sec^2\theta}{3a\sec^3\theta\tan\theta} = \frac{\tan\theta}{\sec\theta} = \sin\theta$." }
+      ! "$\frac{dy}{dx} = \sin\theta = \frac{\sqrt{2}}{2}$ عند $\frac{\pi}{4}$."
+    }
+  }
+
+  slide "اختر: 9 (27)" {
+    id: "c4-e9-27"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السابع والعشرون.
+
+    quiz {
+      ask "إذا كانت $2xy + \pi\sin y = 2\pi$، فإن $\dfrac{dy}{dx}$ عند $\left(1, \dfrac{\pi}{2}\right)$ يساوي"
+      skill: "diff-implicit"
+      * "$-\dfrac{\pi}{2}$"
+      - "$\dfrac{\pi}{2}$" { why: "$2y + 2x\frac{dy}{dx} + \pi\cos y\frac{dy}{dx} = 0$: الإشارة سالبة." }
+      - "$\pi$" { why: "$\cos\frac{\pi}{2} = 0$، فيبقى $\pi + 2\frac{dy}{dx} = 0$." }
+      - "$-\pi$" { why: "المعامل $2x = 2$، فنقسم على $2$." }
+      ! "$\pi + 2\frac{dy}{dx} + 0 = 0$، فـ $\frac{dy}{dx} = -\frac{\pi}{2}$."
+    }
+  }
+
+  slide "اختر: 9 (28)" {
+    id: "c4-e9-28"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثامن والعشرون.
+
+    quiz {
+      ask "إذا كانت $f(x) = \dfrac{2}{x + 1}$ و $g(x) = 3x$، فإن $\dfrac{d}{dx}\left[(f \circ g)(x)\right]$ عند $x = -2$ يساوي"
+      skill: "diff-chain-rule"
+      - "$-\dfrac{2}{25}$" { why: "هذا $f'(g(-2))$ وحده. اضرب في $g' = 3$." }
+      - "$6$" { why: "راجع: $(f \circ g)(x) = \frac{2}{3x + 1}$، والمقام عند $-2$ هو $-5$." }
+      - "$\dfrac{1}{25}$" { why: "مشتقة $\frac{2}{u}$ هي $-\frac{2}{u^2}$، سالبة." }
+      * "$-\dfrac{6}{25}$"
+      ! "$\frac{d}{dx}\frac{2}{3x + 1} = \frac{-6}{(3x + 1)^2} = -\frac{6}{25}$ عند $-2$."
+    }
+  }
+
+  slide "اختر: 9 (29)" {
+    id: "c4-e9-29"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > التاسع والعشرون. رأيتها في الدرس الثالث.
+
+    quiz {
+      ask "إذا كانت $f(x) = x^2$ و $g(x) = \cot x$، و $k(x) = (f \circ g)(x)$، فإن $k'\left(\dfrac{\pi}{4}\right) =$"
+      skill: "diff-trig"
+      * "$-4$"
+      - "$4$" { why: "مشتقة $\cot$ سالبة: $-\csc^2 x$." }
+      - "صفر" { why: "$k = \cot^2 x$، ومشتقتها $-2\cot x\csc^2 x$، ولا تساوي صفرًا عند $\frac{\pi}{4}$." }
+      - "$-1$" { why: "$\csc^2\frac{\pi}{4} = 2$، و $2\cot\frac{\pi}{4} = 2$." }
+      ! "$-2(1)(2) = -4$."
+    }
+  }
+
+  slide "اختر: 9 (30)" {
+    id: "c4-e9-30"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثلاثون. اقرأ المطلوب بدقة: $f'$ عند $h(3)$، لا مشتقة التركيب.
+
+    quiz {
+      ask "إذا كانت $f(x) = 2x^3 + 1$ و $h(x) = x^2$، فإن $f'(h(3)) =$"
+      skill: "diff-chain-rule"
+      - "صفر" { why: "$f'(9) = 6 \times 81$، ليست صفرًا." }
+      - "$9$" { why: "هذا $h(3)$ نفسه. عوّضه في $f'(x) = 6x^2$." }
+      * "$486$"
+      - "$2916$" { why: "هذا $f'(h(3)) \cdot h'(3)$، مشتقة التركيب. المطلوب $f'(h(3))$ فقط." }
+      ! "$h(3) = 9$، و $f'(x) = 6x^2$، فـ $f'(9) = 486$."
+    }
+  }
+
+  slide "اختر: 9 (31)" {
+    id: "c4-e9-31"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الحادي والثلاثون. الخيارات المطبوعة في كتابك لهذا السؤال لا تحوي جوابه كما كُتب، فاكتب العدد بنفسك. اقرأ الترميز بعناية: $f'$ هي الداخل.
+
+    numeric {
+      ask "إذا كانت $f(x) = 3x^2 - 2$، فما $(f \circ f')(-1)$؟"
+      skill: "diff-chain-rule"
+      answer: 106
+      expect: 3 * (6 * (0 - 1))^2 - 2
+      wrong -36 "هذا $(f \circ f)'(-1)$، مشتقة التركيب. المطلوب $f(f'(-1))$."
+      wrong 6 "هذا $f'(f(-1))$، أي $f' \circ f$. الدالة الداخلية هنا $f'$."
+      wrong -6 "هذا $f'(-1)$ وحده. أدخله في $f$."
+      hint "$f'(x) = 6x$، فـ $f'(-1) = -6$. ثم $f(-6)$."
+      ! "$f'(-1) = -6$، ثم $f(-6) = 3(36) - 2 = 106$."
+    }
+  }
+
+  slide "اختر: 9 (32)" {
+    id: "c4-e9-32"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثاني والثلاثون.
+
+    quiz {
+      ask "أي من المنحنيات الآتية يكون ميل المماس عنده ثابتًا؟"
+      skill: "diff-parametric"
+      - "$x = \sin t,\ y = \cos t$" { why: "دائرة، وميلها $-\tan t$ يتغير." }
+      * "$x = t^2,\ y = 3t^2$"
+      - "$x = 2t - 1,\ y = t^2 - 4$" { why: "$\frac{2t}{2} = t$، يتغير مع $t$." }
+      - "$xy = 7$" { why: "$-\frac{y}{x}$ يتغير من نقطة إلى أخرى." }
+      ! "$\frac{6t}{2t} = 3$ دائمًا: المنحنى جزء من الخط $y = 3x$."
+    }
+  }
+
+  slide "اختر: 9 (33)" {
+    id: "c4-e9-33"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثالث والثلاثون. جرّب كل خيار: اجمعه مع مشتقته.
+
+    quiz {
+      ask "إذا كان $f(x) + f'(x) = x^3 + 5x^2 + x + 2$ حيث $f$ كثيرة حدود، فإن $f(x) =$"
+      skill: "diff-power-rule"
+      - "$x^3 + 2x^2 - 3x$" { why: "$f + f' = x^3 + 5x^2 + x - 3$: الحد الثابت $-3$ لا $2$." }
+      - "$3x^2 - 4x - 3$" { why: "هذه من الدرجة الثانية، فلا يظهر $x^3$ في $f + f'$." }
+      - "$x^3 + 2x^2 + 5$" { why: "$f + f' = x^3 + 5x^2 + 4x + 5$." }
+      * "$x^3 + 2x^2 - 3x + 5$"
+      ! "$f' = 3x^2 + 4x - 3$، و $f + f' = x^3 + 5x^2 + x + 2$."
+    }
+  }
+
+  slide "اختر: 9 (34)" {
+    id: "c4-e9-34"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الرابع والثلاثون. اشتق الطرفين، ثم اختر $x$ الذي يجعل الداخل $7$.
+
+    quiz {
+      ask "إذا كانت $f(2x + 1) = x \cdot h(2x - 5)$، وكان $h(1) = 2$ و $h'(1) = 4$، فإن $f'(7) =$"
+      skill: "diff-chain-rule"
+      - "$4$" { why: "هذا $h'(1)$ وحده." }
+      - "$7$" { why: "لم تقسم على $2$؟ راجع: $2f'(7) = h(1) + 6h'(1)$." }
+      - "$11$" { why: "راجع الحد الثاني: $2x \cdot h'(1) = 6 \times 4 = 24$." }
+      * "$13$"
+      ! "$2f'(2x + 1) = h(2x - 5) + 2x\,h'(2x - 5)$. عند $x = 3$: $2f'(7) = 2 + 24 = 26$، فـ $f'(7) = 13$."
+    }
+  }
+
+  slide "اختر: 9 (35)" {
+    id: "c4-e9-35"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الخامس والثلاثون.
+
+    quiz {
+      ask "إذا كانت $f'(x) = \dfrac{1}{1 + x^2}$ و $g(x) = \tan x$، فإن $(f \circ g)'(x) =$"
+      skill: "diff-chain-rule"
+      - "$\sec^2 x$" { why: "هذا $g'(x)$ وحده. اضرب في $f'(g(x)) = \frac{1}{1 + \tan^2 x}$." }
+      - "$\sec^2 x\tan^2 x$" { why: "$f'(\tan x) = \frac{1}{1 + \tan^2 x}$، لا $\tan^2 x$." }
+      - "$\cos^2 x$" { why: "هذا $f'(g(x))$ وحده." }
+      * "$1$"
+      ! "$\frac{1}{1 + \tan^2 x} \cdot \sec^2 x = \frac{\sec^2 x}{\sec^2 x} = 1$."
+    }
+  }
+
+  slide "اختر: 9 (36)" {
+    id: "c4-e9-36"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السادس والثلاثون. بسّط $x$ أولًا.
+
+    quiz {
+      ask "إذا كانت $x = \tan y\csc y$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      - "$\csc y\cot y$" { why: "هذا $\frac{\cos y}{\sin^2 y}$، والمطلوب $\frac{\cos^2 y}{\sin y}$." }
+      - "$\csc y - \cos y$" { why: "قريب. لكن $\frac{\cos^2 y}{\sin y} = \frac{1 - \sin^2 y}{\sin y}$." }
+      * "$\csc y - \sin y$"
+      - "$\sin y + \sec y$" { why: "راجع: $x = \sec y$، فـ $\frac{dx}{dy} = \sec y\tan y$، ومقلوبه $\frac{\cos^2 y}{\sin y}$." }
+      ! "$\tan y\csc y = \frac{\sin y}{\cos y} \cdot \frac{1}{\sin y} = \sec y$. فـ $\frac{dy}{dx} = \frac{1}{\sec y\tan y} = \frac{\cos^2 y}{\sin y} = \csc y - \sin y$."
+    }
+  }
+
+  slide "اختر: 9 (37)" {
+    id: "c4-e9-37"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السابع والثلاثون. $y$ زاوية حادة. اكتب الجواب بدلالة $x$.
+
+    quiz {
+      ask "إذا كانت $x = \tan y$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      - "$x^2 - 1$" { why: "$\frac{dx}{dy} = \sec^2 y = 1 + \tan^2 y$، والإشارة موجبة." }
+      - "$\dfrac{1}{x^2 - 1}$" { why: "$1 + \tan^2 y = \sec^2 y$، لا $\tan^2 y - 1$." }
+      * "$\dfrac{1}{x^2 + 1}$"
+      - "$-\dfrac{1}{x^2 + 1}$" { why: "مشتقة $\tan$ موجبة." }
+      ! "$\frac{dx}{dy} = \sec^2 y = 1 + x^2$، فـ $\frac{dy}{dx} = \frac{1}{1 + x^2}$."
+    }
+  }
+
+  slide "اختر: 9 (38)" {
+    id: "c4-e9-38"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثامن والثلاثون، بنفس الفكرة.
+
+    quiz {
+      ask "إذا كانت $x = \tan(1 + y)$، فإن $\dfrac{dy}{dx}$ عند $x = 2$ يساوي"
+      skill: "diff-implicit"
+      - "$0.5$" { why: "$1 + x^2 = 5$، لا $2$." }
+      * "$0.2$"
+      - "$1$" { why: "$\frac{dx}{dy} = \sec^2(1 + y) = 1 + x^2 = 5$." }
+      - "$5$" { why: "هذا $\frac{dx}{dy}$. اقلبه." }
+      ! "$\frac{dy}{dx} = \frac{1}{1 + x^2} = \frac{1}{5} = 0.2$."
+    }
+  }
+
+  slide "اختر: 9 (39)" {
+    id: "c4-e9-39"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > التاسع والثلاثون.
+
+    quiz {
+      ask "إذا كان $f'(x) = \sqrt{2x^2 - 1}$ و $y = f(x^2)$، فعندما $x = 1$: $\dfrac{dy}{dx} =$"
+      skill: "diff-chain-rule"
+      - "$1$" { why: "هذا $f'(1)$ وحده. اضرب في مشتقة الداخل $2x = 2$." }
+      * "$2$"
+      - "$-2$" { why: "كل الكميات موجبة عند $x = 1$." }
+      - "$-1$" { why: "كل الكميات موجبة عند $x = 1$." }
+      ! "$f'(x^2) \cdot 2x = f'(1) \cdot 2 = \sqrt{1} \cdot 2 = 2$."
+    }
+  }
+
+  slide "اختر: 9 (40)" {
+    id: "c4-e9-40"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الأربعون. رأيت هذا المنحنى في تمرين 3.
+
+    quiz {
+      ask "المماس للمنحنى $x^2 - xy + y^2 = 27$ عند $(6, 3)$ يصنع مع الاتجاه الموجب لمحور $x$ زاوية قياسها"
+      skill: "diff-implicit"
+      * "$90°$"
+      - "صفر°" { why: "الميل صفر حين البسط صفر، والبسط هنا $-9$. المقام هو الصفر." }
+      - "$45°$" { why: "الميل غير معرّف، لا $1$." }
+      - "$60°$" { why: "الميل غير معرّف، لا $\sqrt{3}$." }
+      ! "المقام $2y - x = 0$، فالمماس رأسي، وزاويته $90°$."
+    }
+  }
+
+  slide "اختر: 9 (41)" {
+    id: "c4-e9-41"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الحادي والأربعون. كم نقطة على المنحنى عند $x = 1$؟
+
+    quiz {
+      ask "إذا كانت $y^2 = 2 + xy$، فإن $\dfrac{dy}{dx}$ عند $x = 1$"
+      skill: "diff-implicit"
+      - "لها قيمة وحيدة" { why: "$y^2 - y - 2 = 0$ لها جذران، فعند $x = 1$ نقطتان على المنحنى." }
+      * "لها قيمتان"
+      - "لها عدد لا نهائي من القيم" { why: "النقاط عند $x = 1$ اثنتان فقط." }
+      - "غير معرفة" { why: "المقام $2y - x$ ليس صفرًا عند النقطتين." }
+      ! "$y = 2$ أو $y = -1$. و $\frac{dy}{dx} = \frac{y}{2y - x}$ يعطي $\frac{2}{3}$ و $\frac{1}{3}$: قيمتان."
+    }
+  }
+
+  slide "اختر: 9 (42)" {
+    id: "c4-e9-42"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثاني والأربعون. انتبه للوحدة أيضًا.
+
+    quiz {
+      ask "معدل تغير حجم الكرة بالنسبة لمساحة سطحها عندما يكون طول نصف قطرها $2$ سم يساوي"
+      skill: "diff-parametric"
+      - "$\frac{1}{2}$ سم²" { why: "راجع الحساب والوحدة: سم³ على سم² تعطي سم." }
+      * "$1$ سم"
+      - "$\frac{1}{2}$ سم" { why: "$\frac{4\pi r^2}{8\pi r} = \frac{r}{2} = 1$." }
+      - "$1$ سم²" { why: "العدد صحيح، والوحدة: سم³ ÷ سم² = سم." }
+      ! "$\frac{dV}{dA} = \frac{dV/dr}{dA/dr} = \frac{4\pi r^2}{8\pi r} = \frac{r}{2} = 1$ سم."
+    }
+  }
+
+  slide "اختر: 9 (43)" {
+    id: "c4-e9-43"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الثالث والأربعون.
+
+    quiz {
+      ask "إذا كانت $y = \dfrac{1}{(x + 1)^2}$، فإن معدل تغير $\dfrac{1}{y}$ بالنسبة إلى $x^2$ عند $x = 1$ يساوي"
+      skill: "diff-parametric"
+      - "$\dfrac{1}{2}$" { why: "مقلوب." }
+      - "$4$" { why: "هذا مشتقة $\frac{1}{y} = (x + 1)^2$ بالنسبة إلى $x$ وحدها. اقسم على مشتقة $x^2$." }
+      * "$2$"
+      - "$\dfrac{1}{4}$" { why: "راجع: $\frac{2(x + 1)}{2x} = 2$ عند $1$." }
+      ! "$\frac{1}{y} = (x + 1)^2$، فالمعدل $\frac{2(x + 1)}{2x} = \frac{x + 1}{x} = 2$."
+    }
+  }
+
+  slide "اختر: 9 (44)" {
+    id: "c4-e9-44"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الرابع والأربعون. $x$ و $y$ زاويتان حادتان. أوجد $y$ أولًا.
+
+    quiz {
+      ask "إذا كان $\sin x\cos y = \dfrac{1}{2}$، فإن $\dfrac{dy}{dx}$ عندما $x = \dfrac{\pi}{4}$ يساوي"
+      skill: "diff-implicit"
+      * "$1$"
+      - "$-1$" { why: "$\cos x\cos y - \sin x\sin y\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = +\cot x\cot y$." }
+      - "صفر" { why: "$\cos x\cos y$ ليس صفرًا عند $\frac{\pi}{4}$." }
+      - "$\dfrac{1}{2}$" { why: "$\cot\frac{\pi}{4}\cot\frac{\pi}{4} = 1$." }
+      ! "عند $x = \frac{\pi}{4}$: $\cos y = \frac{1}{\sqrt{2}}$، فـ $y = \frac{\pi}{4}$. و $\frac{dy}{dx} = \cot x\cot y = 1$."
+    }
+  }
+
+  slide "اختر: 9 (45)" {
+    id: "c4-e9-45"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > الخامس والأربعون: الشكلان يوضحان $y = f(t)$ و $x = g(t)$.
+
+    scene plane {
+      alt: "الشكل الأول: محور أفقي t ومحور رأسي y، وخط مستقيم y = f(t) يمر بالأصل بميل موجب."
+      x: [-3, 3]
+      y: [-3, 3]
+      aspect: equal
+      grid
+      axes
+      line yf = (-2.5, -2) -> (2.5, 2) { color: ypart, width: 3 }
+      label at (2.3, -0.5) = "t" { color: neutral }
+      label at (0.2, 2.6) = "y" { color: ypart }
+      label at (-2.8, 2.3) = "y = f(t)" { color: ypart }
+    }
+
+    scene plane {
+      alt: "الشكل الثاني: محور أفقي t ومحور رأسي x، وخط مستقيم x = g(t) بميل سالب يقطع المحورين."
+      x: [-3, 3]
+      y: [-3, 3]
+      aspect: equal
+      grid
+      axes
+      line xg = (-1.5, 2.8) -> (2.8, -1.5) { color: xpart, width: 3 }
+      label at (2.3, -0.5) = "t" { color: neutral }
+      label at (0.2, 2.6) = "x" { color: xpart }
+      label at (0.6, 2.3) = "x = g(t)" { color: xpart }
+    }
+
+    quiz {
+      ask "$\dfrac{dy}{dx}$ يمكن أن يساوي"
+      skill: "diff-parametric"
+      - "صفرًا" { why: "$\frac{dy}{dt}$ ميل الخط الأول، وهو موجب لا صفر." }
+      - "عددًا موجبًا" { why: "انظر إلى الشكل الثاني: $x$ تنقص مع $t$، فـ $\frac{dx}{dt}$ سالب." }
+      * "عددًا سالبًا"
+      - "عددًا غير سالب" { why: "موجب على سالب لا يكون موجبًا ولا صفرًا." }
+      ! "$\frac{dy}{dt} > 0$ و $\frac{dx}{dt} < 0$، وموجب على سالب سالب: $\frac{dy}{dx} < 0$."
+    }
+  }
+
+  slide "اختر: 9 (46)" {
+    id: "c4-e9-46"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السادس والأربعون. $\overline{AB}$ مماسة للدائرة عند $B$، والقاطع من $A$ يقطعها في $C$ ثم $D$. $AB = x$ و $AC = y$ و $CD = x + 2$. تذكّر: مربع طول المماس = الجزء الخارجي × القاطع كله.
+
+    scene plane {
+      alt: "دائرة، ونقطة A خارجها على اليسار. من A قطعة مماسة AB تمس الدائرة عند B في أعلاها الأيسر، وقاطع أفقي من A يقطع الدائرة في C ثم في D."
+      x: [-3.6, 3.6]
+      y: [-1.4, 2.2]
+      aspect: equal
+      axes: false
+      circle c = (1.5, 0) { r: 1.5, color: neutral, width: 3 }
+      line tangentAB = (-3, 0) -> (1, 1.4142) { color: ypart, width: 3 }
+      line secant = (-3, 0) -> (3, 0) { color: xpart, width: 3 }
+      point a = (-3, 0) { label: "A" }
+      point b = (1, 1.4142) { label: "B" }
+      point cc = (0, 0) { label: "C" }
+      point d = (3, 0) { label: "D" }
+      label at (-1.4, 1.0) = "x" { color: ypart }
+      label at (-1.6, -0.45) = "y" { color: xpart }
+      label at (1.2, -0.45) = "x + 2" { color: xpart }
+    }
+
+    quiz {
+      ask "$\dfrac{dy}{dx}$ عندما $x = 4$ يساوي"
+      skill: "diff-implicit"
+      - "$0.4$" { why: "راجع المقام: $\frac{dy}{dx} = \frac{2x - y}{2y + x + 2}$، وعند $(4, 2)$ المقام $10$." }
+      * "$0.6$"
+      - "$0.8$" { why: "البسط $2x - y = 8 - 2 = 6$." }
+      - "$0.9$" { why: "عند $x = 4$: $16 = y(y + 6)$، فـ $y = 2$ لا غير." }
+      hint "$x^2 = y(y + x + 2)$. عند $x = 4$ أوجد $y$، ثم اشتق ضمنيًا."
+      ! "$y^2 + 6y - 16 = 0$ يعطي $y = 2$. و $2x = \frac{dy}{dx}(2y + x + 2) + y$، فـ $\frac{dy}{dx} = \frac{8 - 2}{4 + 4 + 2} = 0.6$."
+    }
+  }
+
+  slide "اختر: 9 (47)" {
+    id: "c4-e9-47"
+    beat: example
+    cat: "تمارين: اختر الإجابة"
+    > السابع والأربعون. $\overrightarrow{AD}$ ينصف الزاوية $A$ في المثلث $ABC$. $AC = \frac{1}{2}y$ و $AB = \sec x$ و $CD = \csc x$ و $DB = 4$. تذكّر: المنصف يقسم القاعدة بنسبة الضلعين.
+
+    scene plane {
+      alt: "مثلث ABC، رأسه A في الأعلى، و C أسفل اليسار، و B أسفل اليمين. منصف الزاوية A ينزل إلى النقطة D على القاعدة. الأطوال مكتوبة: AC = نصف y، AB = قاطع x، CD = قاطع تمام x، DB = 4."
+      x: [-3, 4]
+      y: [-0.8, 3.4]
+      aspect: equal
+      axes: false
+      polygon tri = [(-2, 0), (3, 0), (0, 3)] { color: neutral, opacity: 0.08 }
+      line bis = (0, 3) -> (0.3, 0) { color: tpart, width: 3, style: dashed }
+      point pa = (0, 3) { label: "A" }
+      point pc = (-2, 0) { label: "C" }
+      point pb = (3, 0) { label: "B" }
+      point pd = (0.3, 0) { label: "D" }
+      label at (-1.9, 1.7) = "y/2" { color: ypart }
+      label at (1.7, 1.7) = "sec x" { color: xpart }
+      label at (-1.3, -0.5) = "csc x" { color: neutral }
+      label at (1.5, -0.5) = "4" { color: neutral }
+    }
+
+    quiz {
+      ask "$\dfrac{dy}{dx} =$"
+      skill: "diff-trig"
+      - "$-\csc 2x\cot 2x$" { why: "مشتقة $\csc 2x$ فيها $2$ من مشتقة الداخل." }
+      - "$-2\csc x\cot x$" { why: "$y = \frac{\sec x\csc x}{2} = \frac{1}{2\sin x\cos x} = \frac{1}{\sin 2x}$، فالزاوية $2x$." }
+      - "$-2\csc 2x$" { why: "مشتقة $\csc u$ هي $-\csc u\cot u \cdot u'$: ضاع $\cot 2x$." }
+      * "$-2\csc 2x\cot 2x$"
+      hint "$\frac{AC}{AB} = \frac{CD}{DB}$، فـ $\frac{y/2}{\sec x} = \frac{\csc x}{4}$."
+      ! "$y = \frac{\sec x\csc x}{2} = \csc 2x$، فـ $\frac{dy}{dx} = -2\csc 2x\cot 2x$."
+    }
+  }
+
+  slide "تمرين 17: المماس الأفقي" {
+    id: "c4-e17-a"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 17. البارامتر هنا يكتبه كتابك «ع»، ونكتبه $t$: $x = 2t^3 - 5t^2 - 4t + 12$ و $y = 2t^2 + t - 4$. مثل مثال 8: البسط للأفقي، والمقام للرأسي.
+
+    numeric {
+      ask "عند أي قيمة لـ $t$ يكون للمنحنى مماس أفقي؟"
+      skill: "diff-parametric"
+      answer: -0.25
+      expect: -1 / 4
+      tolerance: 0.001
+      wrong 2 "عند $2$ يصير $\frac{dx}{dt} = 0$: هذا مماس رأسي." -> "c4-d-hv" retry
+      wrong 0.25 "$4t + 1 = 0$ يعطي $t = -\frac{1}{4}$."
+      hint "أفقي: $\frac{dy}{dt} = 4t + 1 = 0$."
+      ! "$t = -\frac{1}{4}$، و $\frac{dx}{dt}$ هناك $-1.125 \neq 0$، فالمماس أفقي فعلًا."
+    }
+  }
+
+  slide "تمرين 17: المماس الرأسي" {
+    id: "c4-e17-b"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > والمماس الرأسي، لنفس المنحنى.
+
+    quiz {
+      ask "عند أي قيم لـ $t$ يكون للمنحنى مماس رأسي؟"
+      skill: "diff-parametric"
+      * "$t = -\dfrac{1}{3}$ أو $t = 2$"
+      - "$t = -\dfrac{1}{4}$" { why: "هذا الأفقي، حيث البسط صفر.", onwrong: "c4-d-hv", retry }
+      - "$t = \dfrac{1}{3}$ أو $t = -2$" { why: "راجع التحليل: $3t^2 - 5t - 2 = (3t + 1)(t - 2)$." }
+      - "$t = 2$ فقط" { why: "المعادلة التربيعية لها جذران، وكلاهما لا يجعل البسط صفرًا." }
+      hint "$\frac{dx}{dt} = 6t^2 - 10t - 4 = 2(3t^2 - 5t - 2) = 0$."
+      ! "$(3t + 1)(t - 2) = 0$، فـ $t = -\frac{1}{3}$ أو $t = 2$."
+    }
+  }
+
+  slide "تمرين 19" {
+    id: "c4-e19"
+    beat: breaker
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 19. $x$ و $y$ بين $0$ و $2\pi$. قبل أن تشتق، هل تعرف متطابقة تختصر الطرف الأيسر؟
+
+    numeric {
+      ask "إذا كان $\sin x\cos y - \sin y\cos x = 1$، فأوجد $\dfrac{dy}{dx}$."
+      skill: "diff-implicit"
+      answer: 1
+      expect: 1
+      wrong -1 "الطرف الأيسر $\sin(x - y)$، ومشتقة $x - y$ هي $1 - \frac{dy}{dx}$."
+      wrong 0 "$\sin(x - y) = 1$ يعني أن $x - y$ ثابت، فـ $x$ و $y$ يتغيران معًا بنفس المعدل."
+      hint "$\sin x\cos y - \cos x\sin y = \sin(x - y)$."
+      ! "$\sin(x - y) = 1$، فـ $x - y = \frac{\pi}{2}$ ثابت، و $1 - \frac{dy}{dx} = 0$، أي $\frac{dy}{dx} = 1$."
+    }
+  }
+
+  slide "تمرين 23" {
+    id: "c4-e23"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 23. «يوازي محور $y$» يعني رأسيًا: المقام صفر.
+
+    quiz {
+      ask "النقط على المنحنى $x^2 + xy + y^2 = 3$ التي يكون عندها المماس موازيًا لمحور $y$ هي"
+      skill: "diff-implicit"
+      * "$(2, -1)$ و $(-2, 1)$"
+      - "$(1, -2)$ و $(-1, 2)$" { why: "هنا البسط $2x + y = 0$: المماس أفقي، يوازي محور $x$.", onwrong: "c4-d-hv", retry }
+      - "$(\sqrt{3}, 0)$ و $(-\sqrt{3}, 0)$" { why: "على محور $x$ الميل $-\frac{2x}{x} = -2$، ليس رأسيًا." }
+      - "$(0, \sqrt{3})$ و $(0, -\sqrt{3})$" { why: "عند $x = 0$ الميل $-\frac{y}{2y} = -\frac{1}{2}$." }
+      hint "$\frac{dy}{dx} = -\frac{2x + y}{x + 2y}$. اجعل المقام صفرًا: $x = -2y$، ثم عوّض في المعادلة."
+      ! "$x = -2y$ يعطي $4y^2 - 2y^2 + y^2 = 3$، فـ $y = \pm 1$. النقطتان $(-2, 1)$ و $(2, -1)$."
+    }
+  }
+
+  slide "تمرين 24" {
+    id: "c4-e24"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 24.
+
+    quiz {
+      ask "معادلة المماس للمنحنى $x^2 + 2\sqrt{xy} + y^2 - 21 = 0$ عند $(1, 4)$ هي"
+      skill: "diff-implicit"
+      * "$8x + 17y - 76 = 0$"
+      - "$17x - 8y + 15 = 0$" { why: "هذا العمودي، ميله $\frac{17}{8}$.", onwrong: "c4-d-perp", retry }
+      - "$8x - 17y + 60 = 0$" { why: "الميل $-\frac{8}{17}$، سالب." }
+      - "$x + 2y - 9 = 0$" { why: "مشتقة $\sqrt{xy}$ هي $\frac{x\frac{dy}{dx} + y}{2\sqrt{xy}}$. نسيت جزء $x\frac{dy}{dx}$.", onwrong: "c4-d-xy", retry }
+      hint "$2x + \frac{x\frac{dy}{dx} + y}{\sqrt{xy}} + 2y\frac{dy}{dx} = 0$، و $\sqrt{xy} = 2$ عند النقطة."
+      ! "$2 + \frac{\frac{dy}{dx} + 4}{2} + 8\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{8}{17}$، والمماس $17(y - 4) = -8(x - 1)$."
+    }
+  }
+
+  slide "تمرين 25" {
+    id: "c4-e25"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 25.
+
+    quiz {
+      ask "معادلة العمودي على المنحنى $x^3 + y^3 = 6xy$ عند $(3, 3)$ هي"
+      skill: "diff-implicit"
+      * "$x - y = 0$"
+      - "$x + y - 6 = 0$" { why: "هذا المماس، ميله $-1$. العمودي ميله $+1$.", onwrong: "c4-d-perp", retry }
+      - "$x = 3$" { why: "الميل عند النقطة $-1$، لا غير معرّف." }
+      - "$y = 3$" { why: "هذا خط أفقي، والعمودي ميله $1$." }
+      hint "$3x^2 + 3y^2\frac{dy}{dx} = 6\left(x\frac{dy}{dx} + y\right)$."
+      ! "$\frac{dy}{dx} = \frac{6y - 3x^2}{3y^2 - 6x} = \frac{18 - 27}{27 - 18} = -1$، فالعمودي ميله $1$: $y - 3 = x - 3$."
+    }
+  }
+
+  slide "تمرين 26" {
+    id: "c4-e26"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 26: $x = \sec\theta$ و $y = \tan\theta$ عند $\theta = \frac{\pi}{6}$. المماس $2x - y - \sqrt{3} = 0$. والعمودي؟
+
+    quiz {
+      ask "معادلة العمودي عند $\theta = \dfrac{\pi}{6}$ هي"
+      skill: "diff-parametric"
+      * "$3x + 6y - 4\sqrt{3} = 0$"
+      - "$2x - y - \sqrt{3} = 0$" { why: "هذا المماس نفسه." }
+      - "$x + 2y - \sqrt{3} = 0$" { why: "الميل صحيح، $-\frac{1}{2}$، لكن النقطة $\left(\frac{2}{\sqrt{3}}, \frac{1}{\sqrt{3}}\right)$ لا تقع عليه." }
+      - "$3x - 6y - 4\sqrt{3} = 0$" { why: "ميل هذا $+\frac{1}{2}$. العمودي على ميل $2$ ميله $-\frac{1}{2}$.", onwrong: "c4-d-perp", retry }
+      hint "$\frac{dy}{dx} = \frac{\sec^2\theta}{\sec\theta\tan\theta} = \csc\theta = 2$، والنقطة $\left(\frac{2}{\sqrt{3}}, \frac{1}{\sqrt{3}}\right)$."
+      ! "$y - \frac{1}{\sqrt{3}} = -\frac{1}{2}\left(x - \frac{2}{\sqrt{3}}\right)$، واضرب في $6$: $3x + 6y - 4\sqrt{3} = 0$."
+    }
+  }
+
+  slide "تمرين 27" {
+    id: "c4-e27"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 27: الميل معروف، والنقطة مجهولة. $0 \le x \le 2\pi$، والجواب بدلالة $\pi$.
+
+    quiz {
+      ask "معادلة المماس للمنحنى $y = \cos(x + y)$ الذي ميله $-\dfrac{1}{2}$ هي"
+      skill: "diff-implicit"
+      * "$2x + 4y - \pi = 0$"
+      - "$x + 2y - \pi = 0$" { why: "الميل صحيح، لكن هذا يمر بـ $(\pi, 0)$. النقطة $\left(\frac{\pi}{2}, 0\right)$." }
+      - "$4x + 2y - 2\pi = 0$" { why: "ميل هذا $-2$، لا $-\frac{1}{2}$." }
+      - "$2x - 4y - \pi = 0$" { why: "ميل هذا $+\frac{1}{2}$." }
+      hint "$\frac{dy}{dx} = \frac{-\sin(x + y)}{1 + \sin(x + y)} = -\frac{1}{2}$ يعطي $\sin(x + y) = 1$. ماذا يعني هذا لـ $y = \cos(x + y)$؟"
+      ! "$\sin(x + y) = 1$ فـ $\cos(x + y) = 0$، أي $y = 0$، ثم $\sin x = 1$ فـ $x = \frac{\pi}{2}$. المماس $y = -\frac{1}{2}\left(x - \frac{\pi}{2}\right)$."
+    }
+  }
+
+  slide "تمرين 28" {
+    id: "c4-e28"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 28: مماسان يوازيان خطًا معلومًا، أي لهما ميله.
+
+    quiz {
+      ask "معادلتا المماسين للمنحنى $xy = 8$ اللذين يوازيان المستقيم $y + 2x = 9$ هما"
+      skill: "diff-implicit"
+      * "$y + 2x - 8 = 0$ و $y + 2x + 8 = 0$"
+      - "$y + 2x - 8 = 0$ فقط" { why: "$x^2 = 4$ يعطي $x = 2$ و $x = -2$: نقطتان ومماسان." }
+      - "$2y + x - 8 = 0$ و $2y + x + 8 = 0$" { why: "ميل هذين $-\frac{1}{2}$، والمستقيم المعطى ميله $-2$." }
+      - "$y + 2x - 9 = 0$" { why: "هذا المستقيم المعطى نفسه، وهو لا يمس المنحنى." }
+      hint "$\frac{dy}{dx} = -\frac{y}{x} = -\frac{8}{x^2}$. اجعله $-2$."
+      ! "$x = \pm 2$، والنقطتان $(2, 4)$ و $(-2, -4)$. المماسان $y - 4 = -2(x - 2)$ و $y + 4 = -2(x + 2)$."
+    }
+  }
+
+  slide "تمرين 29" {
+    id: "c4-e29"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 29: أين يقطع المنحنى محور $x$؟ ضع $y = 0$ أولًا.
+
+    quiz {
+      ask "معادلتا العمودين على المنحنى $x^2 + y^2 - x + 2y - 2 = 0$ عند نقطتي تقاطعه مع محور $x$ هما"
+      skill: "diff-implicit"
+      * "$3y = 2x - 4$ و $3y = -2x - 2$"
+      - "$2y = -3x + 6$ و $2y = 3x + 3$" { why: "هذان المماسان. العمودي ميله $-\frac{1}{m}$.", onwrong: "c4-d-perp", retry }
+      - "$3y = 2x - 4$ فقط" { why: "$x^2 - x - 2 = 0$ له جذران، $2$ و $-1$." }
+      - "$3y = -2x + 4$ و $3y = 2x + 2$" { why: "الإشارات معكوسة: عند $(2, 0)$ ميل المماس $-\frac{3}{2}$، فالعمودي $+\frac{2}{3}$." }
+      hint "$\frac{dy}{dx} = \frac{1 - 2x}{2y + 2}$. النقطتان $(2, 0)$ و $(-1, 0)$."
+      ! "عند $(2, 0)$ الميل $-\frac{3}{2}$ والعمودي $\frac{2}{3}$. عند $(-1, 0)$ الميل $\frac{3}{2}$ والعمودي $-\frac{2}{3}$. والعمودان يمران بمركز الدائرة $\left(\frac{1}{2}, -1\right)$."
+    }
+  }
+
+  slide "تمرين 30" {
+    id: "c4-e30"
+    beat: example
+    cat: "تمارين: مسائل متنوعة"
+    > تمرين 30. مماس يصنع مع المحورين مثلثًا متساوي الساقين في الربع الأول: يقطع المحورين على بعدين متساويين، فميله $-1$.
+
+    quiz {
+      ask "معادلة المماس للمنحنى $x^2 + y^2 = 50$ الذي يصنع مع المحورين مثلثًا متساوي الساقين في الربع الأول هي"
+      skill: "diff-implicit"
+      * "$x + y - 10 = 0$"
+      - "$x + y + 10 = 0$" { why: "هذا يمس الدائرة في الربع الثالث، عند $(-5, -5)$." }
+      - "$x - y = 0$" { why: "هذا خط من المركز، العمودي عند $(5, 5)$، لا المماس." }
+      - "$x + y - 5 = 0$" { why: "هذا لا يمر بنقطة التماس $(5, 5)$: $5 + 5 \neq 5$." }
+      hint "$-\frac{x}{y} = -1$ يعطي $x = y$. عوّض في الدائرة."
+      ! "$x = y = 5$، والمماس $y - 5 = -(x - 5)$، أي $x + y - 10 = 0$."
+    }
+  }
+
+  slide "مهارات التفكير (1)" {
+    id: "c4-e31-1"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > تمرين 31: أسئلة تقيس مهارات التفكير. ثمانية، كل واحد فيه حيلة صغيرة.
+
+    quiz {
+      ask "إذا كان $f(x) = g(x^2)$، فإن $\dfrac{f'(2)}{g'(4)} =$"
+      skill: "diff-chain-rule"
+      - "$1$" { why: "$f'(x) = g'(x^2) \cdot 2x$: مشتقة الداخل $2x$ لا تختفي." }
+      - "$2$" { why: "$2x$ عند $x = 2$ يساوي $4$." }
+      - "$3$" { why: "راجع: $f'(2) = g'(4) \cdot 2(2)$." }
+      * "$4$"
+      ! "$f'(2) = g'(4) \cdot 4$، فالنسبة $4$."
+    }
+  }
+
+  slide "مهارات التفكير (2)" {
+    id: "c4-e31-2"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > الثاني. $g$ الدالة العكسية لـ $f$: إذا أرسلت $f$ العدد $a$ إلى $b$، أرجعته $g$ من $b$ إلى $a$.
+
+    quiz {
+      ask "إذا كان $f'(a) = 2$ و $f(a) = b$، فإن $g'(b) =$"
+      skill: "diff-implicit"
+      * "$\dfrac{1}{2}$"
+      - "$2$" { why: "هذا $f'(a)$. الدالة العكسية تقلب الميل." }
+      - "$\dfrac{3}{2}$" { why: "راجع: $g(f(x)) = x$، فـ $g'(b) \cdot f'(a) = 1$." }
+      - "$1$" { why: "$g'(b) \cdot 2 = 1$." }
+      ! "$g(f(x)) = x$، فبالاشتقاق $g'(f(x)) \cdot f'(x) = 1$، و $g'(b) = \frac{1}{2}$. مثل $\frac{dy}{dx} = 1 \div \frac{dx}{dy}$."
+    }
+  }
+
+  slide "مهارات التفكير (3)" {
+    id: "c4-e31-3"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > الثالث.
+
+    quiz {
+      ask "إذا كانت $y = f(\tan x)$ و $z = g(\sec x)$، و $f'(1) = 2$ و $g'(\sqrt{2}) = 4$، فإن معدل تغير $y$ بالنسبة إلى $z$ عندما $x = \dfrac{\pi}{4}$ يساوي"
+      skill: "diff-parametric"
+      * "$\dfrac{1}{\sqrt{2}}$"
+      - "$\sqrt{2}$" { why: "مقلوب." }
+      - "$1$" { why: "$\frac{dz}{dx} = g'(\sqrt{2})\sec x\tan x = 4\sqrt{2}$، لا $4$." }
+      - "صفر" { why: "كلا المعدلين غير صفري." }
+      ! "$\frac{dy}{dx} = f'(1)\sec^2\frac{\pi}{4} = 2 \times 2 = 4$، و $\frac{dz}{dx} = 4\sqrt{2}$، فالنسبة $\frac{1}{\sqrt{2}}$."
+    }
+  }
+
+  slide "مهارات التفكير (4)" {
+    id: "c4-e31-4"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > الرابع: جذر لا ينتهي. الجذر داخل الجذر هو $x$ نفسها.
+
+    quiz {
+      ask "إذا كانت $x = \sqrt{\tan y + \sqrt{\tan y + \sqrt{\tan y + \cdots}}}$، فإن $\dfrac{dy}{dx} =$"
+      skill: "diff-implicit"
+      * "$(2x - 1)\cos^2 y$"
+      - "$\cos^2 y$" { why: "$x^2 = \tan y + x$، و $x$ في الطرف الأيمن تتغير أيضًا." }
+      - "$(2x - 1)\sec^2 y$" { why: "هذا مقلوب ما تحتاجه: $\frac{dx}{dy} = \frac{\sec^2 y}{2x - 1}$." }
+      - "$(x^2 - x)\sec^2 y$" { why: "$x^2 - x = \tan y$، والمطلوب مشتقة لا قيمة." }
+      hint "ربّع: $x^2 = \tan y + x$. ثم اشتق بالنسبة إلى $y$."
+      ! "$2x\frac{dx}{dy} = \sec^2 y + \frac{dx}{dy}$، فـ $\frac{dx}{dy} = \frac{\sec^2 y}{2x - 1}$، ومقلوبه $(2x - 1)\cos^2 y$."
+    }
+  }
+
+  slide "مهارات التفكير (5)" {
+    id: "c4-e31-5"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > الخامس. اقرأ: $f'$ الداخل، و $f$ الخارج.
+
+    quiz {
+      ask "إذا كانت $f(x) = x^2$، فإن $(f \circ f')(1) =$"
+      skill: "diff-chain-rule"
+      - "$2$" { why: "هذا $f'(1)$. أدخله في $f$." }
+      * "$4$"
+      - "$8$" { why: "$f(2) = 2^2 = 4$." }
+      - "$9$" { why: "$f'(1) = 2$، ثم $f(2) = 4$." }
+      ! "$f'(x) = 2x$، فـ $f'(1) = 2$، ثم $f(2) = 4$."
+    }
+  }
+
+  slide "مهارات التفكير (6)" {
+    id: "c4-e31-6"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > السادس: مشتقة بالنسبة إلى $x^2$، أي مشتقة دالة بالنسبة إلى دالة.
+
+    quiz {
+      ask "إذا كانت $y = x^2 + 5x + 3$، فإن $\dfrac{dy}{d(x^2)}$ عند $x = 1$ يساوي"
+      skill: "diff-parametric"
+      * "$\dfrac{7}{2}$"
+      - "$\dfrac{5}{7}$" { why: "راجع البسط: $2x + 5 = 7$." }
+      - "$7$" { why: "هذا $\frac{dy}{dx}$. اقسم على مشتقة $x^2$، وهي $2x = 2$." }
+      - "$\dfrac{7}{5}$" { why: "المقام مشتقة $x^2$، أي $2$، لا $5$." }
+      ! "$\frac{2x + 5}{2x} = \frac{7}{2}$ عند $1$."
+    }
+  }
+
+  slide "مهارات التفكير (7)" {
+    id: "c4-e31-7"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > السابع. $y$ في الربع الثاني، فانتبه لإشارة $\tan y$.
+
+    quiz {
+      ask "إذا كان $x = \sec y$ حيث $y \in \left]\dfrac{\pi}{2}, \pi\right]$، فإن $\dfrac{dx}{dy} =$"
+      skill: "diff-trig"
+      - "$x\sqrt{x^2 + 1}$" { why: "$\tan^2 y = \sec^2 y - 1 = x^2 - 1$." }
+      - "$-x\sqrt{x^2 + 1}$" { why: "$\tan^2 y = x^2 - 1$، لا $x^2 + 1$." }
+      * "$-x\sqrt{x^2 - 1}$"
+      - "$x\sqrt{x^2 - 1}$" { why: "في الربع الثاني $\tan y \le 0$، فـ $\tan y = -\sqrt{x^2 - 1}$." }
+      ! "$\frac{dx}{dy} = \sec y\tan y = x \cdot \left(-\sqrt{x^2 - 1}\right)$."
+    }
+  }
+
+  slide "مهارات التفكير (8)" {
+    id: "c4-e31-8"
+    beat: example
+    cat: "تمارين: مهارات التفكير"
+    > الثامن: سلسلة من ثلاث حلقات، كلها $f$.
+
+    quiz {
+      ask "إذا كان $y = f(f(f(x)))$، و $f(1) = 1$ و $f'(1) = 3$، فإن $y'$ عند $x = 1$ يساوي"
+      skill: "diff-chain-rule"
+      - "$3$" { why: "هذه حلقة واحدة. عندك ثلاث." }
+      - "$9$" { why: "حلقتان. عندك ثلاث." }
+      * "$27$"
+      - "$81$" { why: "ثلاث حلقات لا أربع." }
+      ! "$f'(f(f(1))) \cdot f'(f(1)) \cdot f'(1) = 3 \times 3 \times 3 = 27$، لأن $f(1) = 1$ في كل مرة."
+    }
+  }
+
+  slide "السلم المنزلق" {
+    id: "c4-transfer"
+    beat: transfer
+    cat: "جرّب في مكان جديد"
+    > واحدة أخيرة، في مكان جديد.
+
+    numeric {
+      ask "سلم طوله $5$ م يستند إلى حائط. بُعد قاعدته عن الحائط $x$، وارتفاع رأسه $y$، فـ $x^2 + y^2 = 25$. حين تكون القاعدة على بعد $3$ م من الحائط، كم مترًا يتغير ارتفاع الرأس لكل متر تبتعد فيه القاعدة؟ أي ما $\dfrac{dy}{dx}$؟"
+      skill: "diff-implicit"
+      answer: -0.75
+      expect: -3 / sqrt(25 - 9)
+      tolerance: 0.005
+      wrong 0.75 "الرأس ينزل حين تبتعد القاعدة، فالمعدل سالب."
+      wrong -4/3 "مقلوب: $\frac{dy}{dx} = -\frac{x}{y}$."
+      wrong -3/5 "$y$ عند $x = 3$ هي $4$، لا $5$."
+      ! "$y = \sqrt{25 - 9} = 4$، و $\frac{dy}{dx} = -\frac{x}{y} = -\frac{3}{4}$: ينزل الرأس $0.75$ م لكل متر. الاشتقاق الضمني يعود في التمارين خلال الأيام القادمة."
+    }
+  }
+
+  slide "سالب على سالب" {
+    id: "c4-d-sign"
+    beat: detour
+    hidden: true
+    cat: "الاشتقاق الضمني"
+    > في الربع الرابع $x$ موجبة و $y$ سالبة. $-\frac{x}{y}$ فيها سالبان: الإشارة التي أمام الكسر، وإشارة $y$ نفسها. يلغيان بعضهما. والرسم يؤكد: أسفل يمين الدائرة يصعد المماس وأنت تتحرك يمينًا.
+
+    numeric {
+      ask "على الدائرة $x^2 + y^2 = 25$، كم ميل المماس عند $(3, -4)$؟"
+      skill: "diff-implicit"
+      answer: 0.75
+      expect: 0 - 3 / (0 - 4)
+      tolerance: 0.005
+      wrong -0.75 "$-\frac{3}{-4}$: سالب على سالب موجب."
+      ! "$-\frac{3}{-4} = \frac{3}{4}$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "كل حد فيه y" {
+    id: "c4-d-dydx"
+    beat: detour
+    hidden: true
+    cat: "الاشتقاق الضمني"
+    > تذكّر أن [$y$]{ypart} دالة في $x$ تتغير معها. لذلك كل مرة تشتق حدًا فيه $y$ بالنسبة إلى $x$، تضرب في [$\frac{dy}{dx}$]{ypart}: $\frac{d}{dx}y^3 = 3y^2\frac{dy}{dx}$، و $\frac{d}{dx}\sin y = \cos y\,\frac{dy}{dx}$، و $\frac{d}{dx}(5y) = 5\frac{dy}{dx}$. أما حد فيه $x$ وحدها فيُشتق عاديًا.
+
+    numeric {
+      ask "إذا كان $x^2 + y^3 = 9$، فما $\dfrac{dy}{dx}$ عند $(1, 2)$؟"
+      skill: "diff-implicit"
+      answer: -1/6
+      expect: -2 * 1 / (3 * 2^2)
+      tolerance: 0.005
+      wrong -1/3 "راجع: $\frac{d}{dx}y^3 = 3y^2\frac{dy}{dx}$، وعند $y = 2$ هذا $12\frac{dy}{dx}$."
+      wrong -1 "هذا $-\frac{2x}{y}$. من أين جاء؟ اشتق $y^3$ بالسلسلة: $3y^2$."
+      ! "$2x + 3y^2\frac{dy}{dx} = 0$، فـ $\frac{dy}{dx} = -\frac{2x}{3y^2} = -\frac{2}{12} = -\frac{1}{6}$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "xy حاصل ضرب" {
+    id: "c4-d-xy"
+    beat: detour
+    hidden: true
+    cat: "الاشتقاق الضمني"
+    > $xy$ عاملان يتغيران معًا. [$x$]{xpart} يتغير بمعدل $1$، و [$y$]{ypart} بمعدل $\frac{dy}{dx}$. قاعدة الضرب تعطي جزأين: $\frac{d}{dx}(xy) = x\frac{dy}{dx} + y$. وكذلك $\frac{d}{dx}(x^2y) = x^2\frac{dy}{dx} + 2xy$. كل جزء يشتق عاملًا واحدًا ويترك الآخر.
+
+    numeric {
+      ask "إذا كان $xy = 6$، فما $\dfrac{dy}{dx}$ عند $(2, 3)$؟"
+      skill: "diff-implicit"
+      answer: -1.5
+      expect: -3 / 2
+      tolerance: 0.001
+      wrong 0 "هذا لو كانت $\frac{d}{dx}(xy) = x\frac{dy}{dx}$ وحدها. أين $y$؟"
+      wrong -2/3 "مقلوب. $x\frac{dy}{dx} = -y$، فـ $\frac{dy}{dx} = -\frac{y}{x}$."
+      ! "$x\frac{dy}{dx} + y = 0$، فـ $\frac{dy}{dx} = -\frac{y}{x} = -\frac{3}{2}$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "y على x، لا x على y" {
+    id: "c4-d-flip"
+    beat: detour
+    hidden: true
+    cat: "الاشتقاق البارامتري"
+    > الميل هو كم تصعد $y$ لكل خطوة في $x$. في ثانية واحدة تتغير $y$ بمقدار $\frac{dy}{dt}$ و $x$ بمقدار $\frac{dx}{dt}$، فلكل خطوة في $x$ تتغير $y$ بمقدار $\frac{dy}{dt} \div \frac{dx}{dt}$. الـ $y$ فوق، كما في الاسم $\frac{dy}{dx}$. والقسمة، لا الضرب.
+
+    numeric {
+      ask "$x = t^2$ و $y = 4t$. ما $\dfrac{dy}{dx}$ عند $t = 1$؟"
+      skill: "diff-parametric"
+      answer: 2
+      expect: 4 / (2 * 1)
+      wrong 0.5 "مقلوب: $\frac{2t}{4}$."
+      wrong 8 "هذا حاصل الضرب $4 \times 2t$."
+      ! "$\frac{4}{2t} = 2$ عند $t = 1$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "الزاوية الموجبة" {
+    id: "c4-d-angle"
+    beat: detour
+    hidden: true
+    cat: "أمثلة الكتاب"
+    > الزاوية التي يصنعها المماس مع الاتجاه الموجب لمحور $x$ بين $0°$ و $180°$، وظلها الميل. إذا كان الميل سالبًا فالخط ينزل والزاوية منفرجة: الآلة تعطيك زاوية سالبة، فأضف لها $180°$.
+
+    numeric {
+      ask "ميل مماس $-\sqrt{3}$. ما قياس الزاوية الموجبة التي يصنعها مع الاتجاه الموجب لمحور $x$؟"
+      skill: "diff-implicit"
+      answer: 120
+      expect: 180 + deg(atan(0 - sqrt(3)))
+      tolerance: 0.1
+      unit: "°"
+      wrong -60 "أضف $180°$."
+      wrong 60 "الميل سالب، فالزاوية منفرجة."
+      ! "$-60° + 180° = 120°$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "البسط أفقي، المقام رأسي" {
+    id: "c4-d-hv"
+    beat: detour
+    hidden: true
+    cat: "أمثلة الكتاب"
+    > الميل كسر. إذا صار **البسط** صفرًا صار الميل صفرًا: المماس أفقي. وإذا صار **المقام** صفرًا صار الميل غير معرّف: المماس رأسي. في الاشتقاق البارامتري البسط $\frac{dy}{dt}$ والمقام $\frac{dx}{dt}$.
+
+    numeric {
+      ask "$x = t^2 - 4t$ و $y = t^3$. عند أي $t$ موجبة يكون المماس رأسيًا؟"
+      skill: "diff-parametric"
+      answer: 2
+      expect: 4 / 2
+      wrong 0 "عند $0$ يصير البسط $3t^2$ صفرًا أيضًا، فلا نحكم بشيء. والمطلوب قيمة موجبة."
+      ! "$\frac{dx}{dt} = 2t - 4 = 0$ عند $t = 2$، و $\frac{dy}{dt} = 12 \neq 0$ هناك، فالمماس رأسي. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "اقلب واعكس" {
+    id: "c4-d-perp"
+    beat: detour
+    hidden: true
+    cat: "تمارين: مسائل متنوعة"
+    > العمودي على المماس ميله $-\frac{1}{m}$: اقلب الكسر واعكس الإشارة، لأن ميلي خطين متعامدين حاصل ضربهما $-1$. والعمودي يمر بنفس النقطة التي يمر بها المماس.
+
+    numeric {
+      ask "ميل المماس عند نقطة $\frac{3}{2}$. ما ميل العمودي؟"
+      skill: "diff-implicit"
+      answer: -2/3
+      expect: -1 / 1.5
+      tolerance: 0.005
+      wrong 2/3 "قلبت ولم تعكس الإشارة."
+      wrong -1.5 "عكست الإشارة ولم تقلب."
+      ! "$\frac{3}{2} \times \left(-\frac{2}{3}\right) = -1$. ارجع الآن إلى السؤال."
+    }
+  }
+}
