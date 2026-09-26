@@ -1,0 +1,759 @@
+lesson "مشتقات الدوال المثلثية" {
+  course: "calculus-ar"
+  unit: "مدخل إلى التفاضل"
+  difficulty: "Intermediate"
+  icon: "Waves"
+  summary: "ارسم ميل منحنى الجيب بيدك فتجده جيب التمام. ومن هذه الفكرة وحدها، مع قاعدتي القسمة والسلسلة، تخرج مشتقات الدوال المثلثية الست."
+  skills: ["diff-trig"]
+  requires: ["diff-chain-rule", "trig-unit-circle"]
+
+  role fn = primary
+  role slp = success
+  role warn = warning
+
+  slide "إحماء: سلسلة" {
+    id: "c3-check-chain"
+    beat: check
+    cat: "إحماء"
+    > إحماء سريع قبل أن نبدأ.
+
+    numeric {
+      ask "إذا كانت $f(x) = (x^2 + 1)^3$، فما $f'(1)$؟"
+      skill: "diff-chain-rule"
+      answer: 24
+      expect: 3 * (1^2 + 1)^2 * 2 * 1
+      wrong 12 "هذا $3(x^2 + 1)^2$ وحده. مشتقة الداخل $2x$." -> "c3-bridge-chain" retry
+      wrong 8 "هذا $f(1)$، قيمة الدالة." -> "c3-bridge-chain" retry
+      hint "قوة لدالة: $n u^{n-1} \cdot u'$."
+      ! "$3(2)^2 \cdot 2 = 24$. قاعدة السلسلة ستكون معنا في كل شريحة تقريبًا."
+    }
+  }
+
+  slide "الخارج ثم الداخل" {
+    id: "c3-bridge-chain"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > قاعدة السلسلة: اشتق الخارج وأبقِ الداخل كما هو، ثم اضرب في مشتقة الداخل. الشرح كاملًا في [الدرس الثاني](lesson:ar-calc-2).
+
+    numeric {
+      ask "إذا كانت $f(x) = \sqrt{3x + 1}$، فما $f'(1)$؟"
+      skill: "diff-chain-rule"
+      answer: 0.75
+      expect: 3 / (2 * sqrt(3 * 1 + 1))
+      tolerance: 0.001
+      wrong 0.25 "هذا $\frac{1}{2\sqrt{4}}$ وحده. مشتقة الداخل $3$."
+      ! "$\frac{3}{2\sqrt{4}} = \frac{3}{4}$. ارجع الآن إلى الإحماء."
+    }
+  }
+
+  slide "إحماء: قيمة خاصة" {
+    id: "c3-check-trig"
+    beat: check
+    cat: "إحماء"
+    > وسؤال ثانٍ. الزاوية بالراديان، و $\pi$ راديان $= 180°$.
+
+    quiz {
+      ask "ما $\cos\dfrac{\pi}{3}$؟"
+      skill: "trig-unit-circle"
+      * "$\dfrac{1}{2}$"
+      - "$\dfrac{\sqrt{3}}{2}$" { why: "هذا $\sin\frac{\pi}{3}$. عند $60°$ يكون جيب التمام الأصغر.", onwrong: "c3-bridge-trig", retry }
+      - "$\dfrac{\sqrt{2}}{2}$" { why: "هذا عند $\frac{\pi}{4} = 45°$. و $\frac{\pi}{3} = 60°$.", onwrong: "c3-bridge-trig", retry }
+      - "$1$" { why: "$\cos 0 = 1$. عند $60°$ يكون أصغر بكثير.", onwrong: "c3-bridge-trig", retry }
+      ! "$\frac{\pi}{3} = 60°$، و $\cos 60° = \frac{1}{2}$. ستحتاج هذه القيم في كل سؤال عددي."
+    }
+  }
+
+  slide "جدول القيم الخاصة" {
+    id: "c3-bridge-trig"
+    beat: bridge
+    hidden: true
+    cat: "إحماء"
+    > القيم الخاصة تأتي من مثلثين: نصف مربع ($45°$) ونصف مثلث متساوي الأضلاع ($30°$ و $60°$). والجيب يكبر من $0$ إلى $1$ بين $0°$ و $90°$، وجيب التمام يصغر من $1$ إلى $0$. املأ الجدول.
+
+    table {
+      ask "أكمل الجدول (الزاوية بالدرجات، والقيم عشرية لأقرب جزء من مئة)."
+      skill: "trig-unit-circle"
+      header: ["الزاوية", "sin", "cos"]
+      row: 0, blank(0), blank(1)
+      row: 30, blank(0.5), blank(sqrt(3)/2)
+      row: 45, blank(sqrt(2)/2), blank(sqrt(2)/2)
+      row: 60, blank(sqrt(3)/2), blank(0.5)
+      row: 90, blank(1), blank(0)
+      tolerance: 0.01
+      hint "$\sin 30° = \frac{1}{2}$ و $\sin 45° = \frac{\sqrt{2}}{2} \approx 0.71$ و $\sin 60° = \frac{\sqrt{3}}{2} \approx 0.87$."
+      ! "عمود جيب التمام هو عمود الجيب مقلوبًا. وبالراديان: $30° = \frac{\pi}{6}$ و $45° = \frac{\pi}{4}$ و $60° = \frac{\pi}{3}$ و $90° = \frac{\pi}{2}$."
+    }
+  }
+
+  slide "أسماء كتابك" {
+    id: "c3-names"
+    beat: example
+    cat: "مراجعة"
+    > نكتب في Mathly الرموز اللاتينية، وكتابك يكتبها بالعربية: $\sin$ «جا» و $\cos$ «جتا» و $\tan$ «ظا» و $\sec$ «قا» و $\csc$ «قتا» و $\cot$ «ظتا». الثلاثة الأخيرة مقلوبات الثلاثة الأولى.
+
+    match {
+      ask "طابق كل دالة بما تساويه."
+      skill: "diff-trig"
+      pair "$\tan x$" -> "$\dfrac{\sin x}{\cos x}$"
+      pair "$\sec x$" -> "$\dfrac{1}{\cos x}$"
+      pair "$\csc x$" -> "$\dfrac{1}{\sin x}$"
+      pair "$\cot x$" -> "$\dfrac{\cos x}{\sin x}$"
+      decoy "$\dfrac{1}{\tan x \cos x}$"
+      decoy "$\dfrac{\cos x}{1}$"
+      miss "$\sec x$" -> "$\dfrac{1}{\sin x}$" "القاطع «قا» مقلوب جيب التمام، لا الجيب. قاعدة سهلة: كل زوج فيه «تمام» واحد فقط."
+      miss "$\csc x$" -> "$\dfrac{1}{\cos x}$" "قاطع التمام «قتا» مقلوب الجيب. زوج «التمام» يذهب مع ما لا «تمام» فيه."
+      hint "$\sec$ و $\cos$ زوج، و $\csc$ و $\sin$ زوج."
+      ! "$\sec = \frac{1}{\cos}$ و $\csc = \frac{1}{\sin}$ و $\cot = \frac{1}{\tan} = \frac{\cos}{\sin}$. سنشتق الأربعة الأخيرة من هذه الصور."
+    }
+  }
+
+  slide "المتطابقات التي ستحتاجها" {
+    id: "c3-identities"
+    beat: example
+    cat: "مراجعة"
+    > أهم متطابقة: $\sin^2 x + \cos^2 x = 1$، وتأتي من فيثاغورس في دائرة الوحدة. اقسمها على $\cos^2 x$ أو على $\sin^2 x$ فتحصل على أختيها. وضعف الزاوية يظهر كثيرًا بعد الاشتقاق.
+
+    match {
+      ask "طابق كل عبارة بما تساويه."
+      skill: "diff-trig"
+      pair "$1 + \tan^2 x$" -> "$\sec^2 x$"
+      pair "$1 + \cot^2 x$" -> "$\csc^2 x$"
+      pair "$2\sin x\cos x$" -> "$\sin 2x$"
+      pair "$\cos^2 x - \sin^2 x$" -> "$\cos 2x$"
+      decoy "$\tan^2 x$"
+      decoy "$2\sin x$"
+      miss "$1 + \tan^2 x$" -> "$\csc^2 x$" "اقسم $\sin^2 + \cos^2 = 1$ على $\cos^2$: يظهر $\tan^2 + 1 = \sec^2$. الـ $\tan$ تذهب مع $\sec$."
+      miss "$2\sin x\cos x$" -> "$2\sin x$" "$2\sin x\cos x$ ليست $2\sin x$. هي جيب ضعف الزاوية: $\sin 2x$."
+      hint "اقسم $\sin^2 x + \cos^2 x = 1$ على $\cos^2 x$ وانظر ماذا يخرج."
+      ! "$\tan$ مع $\sec$، و $\cot$ مع $\csc$. وستحتاج $\sin 2x = 2\sin x\cos x$ لتبسيط المشتقات كثيرًا."
+    }
+  }
+
+  slide "كم ينحدر الجيب؟" {
+    id: "c3-hook"
+    beat: hook
+    cat: "مشتقة الجيب"
+    > هذا منحنى $y = \sin x$، والزاوية $x$ بالراديان. عند $x = 0$ يمر بنقطة الأصل وهو يصعد.
+
+    scene plane {
+      alt: "منحنى الجيب من x = -1 إلى x = 7 مرسوم على شبكة، ونقطة عند الأصل حيث يبدأ صاعدًا."
+      x: [-1, 7]
+      y: [-1.6, 1.6]
+      grid
+      axes
+      curve s = sin(x) { color: fn, width: 3 }
+      point o = (0, 0) { color: fn }
+    }
+
+    quiz {
+      ask "كم ميل $y = \sin x$ عند $x = 0$؟"
+      skill: "diff-trig"
+      - "$0$، لأن $\sin 0 = 0$" { why: "هذا الارتفاع لا الميل. المنحنى عند الأصل ارتفاعه صفر، لكنه يصعد." }
+      * "$1$"
+      - "$\frac{1}{2}$" { why: "رهان معقول، والمنحنى يبدو هادئًا. لكن قرب الصفر $\sin x \approx x$ تقريبًا. جرّب $\sin 0.01$ على الآلة." }
+      - "$\frac{\pi}{2}$" { why: "$\frac{\pi}{2}$ هو المكان الذي يصل فيه إلى القمة، لا الميل عند البداية." }
+      ! "رهانك الآن. الشريحة التالية تقيس الميل عند كل نقطة."
+    }
+  }
+
+  slide "تتبّع الميل" {
+    id: "c3-trace"
+    beat: explore
+    cat: "مشتقة الجيب"
+    > على اليسار [$\sin x$]{fn} ومماسه عند النقطة التي تسحبها. على اليمين نقطة ارتفاعها [ميل ذلك المماس]{slp}، مقيسًا بفجوة صغيرة جدًا. اسحب وراقب الأثر الذي تتركه.
+
+    scene plane {
+      alt: "على اليسار منحنى الجيب ونقطة تسحبها عليه بين 0 و 2 باي، ومماسها عندها. قراءة تعرض الميل المقيس."
+      x: [-0.3, 6.6]
+      y: [-1.6, 1.6]
+      grid
+      axes
+      param a = 0.3 { range: [0, 6.28], step: 0.01 }
+      curve s = sin(x) { color: fn, width: 3 }
+      point p = (a, sin(a)) { drag: x -> a, color: fn }
+      line tan { through: p, slope: (sin(a + 0.0001) - sin(a))/0.0001, color: slp, width: 2, style: dashed }
+      label at (0, 1.4) = "الميل = ${fixed((sin(a + 0.0001) - sin(a))/0.0001, 2)}" { color: slp }
+    }
+
+    scene plane {
+      alt: "على اليمين محوران فقط، ونقطة خضراء ارتفاعها ميل الجيب عند x نفسه، تترك أثرًا كلما تحركت."
+      x: [-0.3, 6.6]
+      y: [-1.6, 1.6]
+      grid
+      axes
+      point q = (a, (sin(a + 0.0001) - sin(a))/0.0001) { color: slp, trace }
+    }
+
+    goal "جد أول مكان يصير فيه المماس أفقيًا" {
+      when: abs(a - PI/2) < 0.03
+      hints: ["أفقي يعني أن الميل صفر: قمة المنحنى.", "القمة الأولى للجيب عند $\frac{\pi}{2} \approx 1.57$."]
+      showme: { a: 1.5708 }
+    }
+
+    goal "الآن اسحب حتى آخر المنحنى، وانظر إلى الأثر" {
+      when: a > 6.2
+      hints: ["اسحب النقطة يمينًا حتى $2\pi \approx 6.28$."]
+      showme: { a: 6.28 }
+      dur: 4000
+    }
+
+    numeric {
+      ask "ما ميل $y = \sin x$ عند $x = \pi$؟"
+      skill: "diff-trig"
+      answer: -1
+      expect: cos(PI)
+      tolerance: 0.02
+      wrong 0 "هذا $\sin\pi$، الارتفاع. المنحنى هناك يقطع المحور نازلًا."
+      wrong 1 "الحجم صحيح. هل المنحنى يصعد أم ينزل عند $\pi$؟"
+      after: goals
+      ! "عند $\pi$ يقطع الجيب المحور نازلًا بأشد انحدار: الميل $-1$."
+    }
+  }
+
+  slide "ارسم منحنى الميل" {
+    id: "c3-sketch"
+    beat: explore
+    cat: "مشتقة الجيب"
+    > من ذاكرتك الآن: ارسم منحنى [الميل]{slp} كاملًا من $0$ إلى $2\pi$. عندك ثلاث نقاط تعرفها: الميل $1$ عند البداية، و $0$ عند القمة، و $-1$ عند $\pi$.
+
+    scene plane {
+      alt: "محوران على شبكة من 0 إلى 2 باي، ومنحنى الجيب باهتًا للمقارنة. ترسم فوقهما منحنى الميل بإصبعك."
+      x: [-0.3, 6.6]
+      y: [-1.6, 1.6]
+      grid
+      axes
+      curve s = sin(x) { color: fn, width: 1, style: dashed }
+    }
+
+    sketch curve {
+      ask "ارسم منحنى ميل $\sin x$."
+      skill: "diff-trig"
+      follows: cos(x)
+      over: [0, 6.28]
+      overlay
+      near (0, 1)
+      near (1.5708, 0)
+      near (3.1416, -1)
+      near (4.7124, 0)
+      near (6.2832, 1)
+      tol: 0.4
+      hint "الميل صفر عند القمة والقاع، و $\pm 1$ عند نقاط القطع مع المحور."
+      ! "منحنى الميل هو منحنى جيب التمام تمامًا."
+    }
+  }
+
+  slide "مشتقة الجيب" {
+    id: "c3-name"
+    beat: name
+    cat: "مشتقة الجيب"
+    > راهنت على «${answer("c3-hook", "تخمينك")}». الأثر الذي رسمته هو $\cos x$: يبدأ عند $1$، ويصير صفرًا عند القمة، و $-1$ عند $\pi$. إذن $\dfrac{d}{dx}\sin x = \cos x$.
+
+    numeric {
+      ask "ما ميل $y = \sin x$ عند $x = \dfrac{2\pi}{3}$؟"
+      skill: "diff-trig"
+      answer: -0.5
+      expect: cos(2 * PI / 3)
+      tolerance: 0.001
+      wrong 0.5 "$\frac{2\pi}{3} = 120°$، في الربع الثاني، وجيب التمام سالب هناك."
+      wrong sqrt(3)/2 "هذا $\sin\frac{2\pi}{3}$، الارتفاع. الميل $\cos$."
+      hint "$\frac{2\pi}{3} = 120°$. المنحنى بعد القمة ينزل."
+      ! "$\cos 120° = -\frac{1}{2}$: بعد القمة ينزل الجيب، فالميل سالب."
+    }
+  }
+
+  slide "وجيب التمام: الجيب مزاحًا؟" {
+    id: "c3-trap"
+    beat: trap
+    cat: "مشتقة الجيب"
+    > $\cos x$ هو نفس منحنى $\sin x$ مزاحًا. ومشتقة $\sin$ هي $\cos$، إذن مشتقة $\cos$ هي $\sin$، صح؟ اختبرها: اسحب النقطة إلى $x = \frac{\pi}{2}$، حيث $\sin\frac{\pi}{2} = 1$.
+
+    scene plane {
+      alt: "منحنى جيب التمام ونقطة تسحبها عليه ومماسها عندها، بين 0 و 2 باي."
+      x: [-0.3, 6.6]
+      y: [-1.6, 1.6]
+      grid
+      axes
+      param a = 0.4 { range: [0, 6.28], step: 0.01 }
+      curve c = cos(x) { color: fn, width: 3 }
+      point p = (a, cos(a)) { drag: x -> a, color: fn }
+      line tan { through: p, slope: 0 - sin(a), color: slp, width: 2, style: dashed }
+    }
+
+    goal "اسحب النقطة إلى $x = \frac{\pi}{2}$ وانظر إلى المماس" {
+      when: abs(a - PI/2) < 0.03
+      hints: ["$\frac{\pi}{2} \approx 1.57$، حيث يقطع جيب التمام المحور."]
+      showme: { a: 1.5708 }
+    }
+
+    quiz {
+      ask "المماس هناك ينزل بميل $-1$. إذن $\dfrac{d}{dx}\cos x =$"
+      skill: "diff-trig"
+      * "$-\sin x$"
+      - "$\sin x$" { why: "عند $\frac{\pi}{2}$ تعطي $+1$، والمماس ينزل. الإزاحة تنقل المنحنى، لكنها لا تحفظ إشارة الميل.", onwrong: "c3-d-cos", retry }
+      - "$-\cos x$" { why: "عند $\frac{\pi}{2}$ تعطي صفرًا، والمماس هناك مائل بوضوح." }
+      - "$\cos x$" { why: "جيب التمام يبدأ من قمته، فميله عند $0$ صفر، و $\cos 0 = 1$." }
+      after: goals
+      ! "$\frac{d}{dx}\cos x = -\sin x$. جيب التمام يبدأ من القمة وينزل، فمشتقته تبدأ سالبة. هذه الإشارة أكثر ما يُنسى في الامتحان."
+    }
+  }
+
+  slide "لماذا الراديان؟" {
+    id: "c3-radians"
+    beat: breaker
+    cat: "مشتقة الجيب"
+    > كل هذا بالراديان. بالدرجات يصعد الجيب أبطأ بكثير لكل «وحدة»: من $0°$ إلى $1°$ يرتفع $\sin 1° \approx 0.0175$ فقط. ولهذا يعمل كتابك دائمًا بالراديان في التفاضل.
+
+    quiz {
+      ask "لو كانت $x$ بالدرجات، فميل $\sin x$ عند $0$ لكل درجة يساوي تقريبًا"
+      skill: "diff-trig"
+      * "$\dfrac{\pi}{180} \approx 0.0175$"
+      - "$1$" { why: "هذا بالراديان. الدرجة أصغر بكثير من الراديان، فالصعود لكل درجة أصغر." }
+      - "$\dfrac{180}{\pi} \approx 57.3$" { why: "الكسر مقلوب. درجة واحدة تساوي $\frac{\pi}{180}$ راديان، فالصعود يصغر لا يكبر." }
+      ! "درجة واحدة $= \frac{\pi}{180}$ راديان، فالميل لكل درجة $\frac{\pi}{180}$. القاعدة $\frac{d}{dx}\sin x = \cos x$ صحيحة بالراديان فقط."
+    }
+  }
+
+  slide "مشتقة الظل" {
+    id: "c3-tan"
+    beat: example
+    cat: "الأربع الباقية"
+    > الأربع الباقية تخرج من $\sin$ و $\cos$. $\tan x = \dfrac{\sin x}{\cos x}$ كسر، فقاعدة القسمة: المقام في مشتقة البسط، ناقص البسط في مشتقة المقام، على مربع المقام.
+
+    moves {
+      ask "اشتق $\tan x$."
+      skill: "diff-trig"
+      from "$\dfrac{d}{dx}\left[\dfrac{\sin x}{\cos x}\right]$"
+      move "$\dfrac{\cos x \cdot \cos x - \sin x \cdot (-\sin x)}{\cos^2 x}$" {
+        * "قاعدة القسمة"
+        - "$\dfrac{\cos x}{-\sin x}$" { why: "مشتقة البسط على مشتقة المقام ليست مشتقة الكسر." }
+        - "$\dfrac{\cos x \cdot \cos x - \sin x \cdot \sin x}{\cos^2 x}$" { why: "مشتقة $\cos x$ هي $-\sin x$، والإشارة تنقلب مع الطرح." }
+      }
+      move "$\dfrac{\cos^2 x + \sin^2 x}{\cos^2 x}$" {
+        * "بسّط البسط"
+        - "$\dfrac{\cos^2 x - \sin^2 x}{\cos^2 x}$" { why: "ناقص في سالب يعطي موجبًا: $-\sin x \cdot (-\sin x) = +\sin^2 x$." }
+      }
+      move "$\dfrac{1}{\cos^2 x} = \sec^2 x$" {
+        * "استخدم $\sin^2 x + \cos^2 x = 1$"
+        - "$\tan^2 x$" { why: "البسط $\cos^2 + \sin^2 = 1$، لا $\sin^2$ وحده." }
+      }
+      ! "$\frac{d}{dx}\tan x = \sec^2 x$. المتطابقة التي راجعتها أنهت الحساب."
+    }
+  }
+
+  slide "مشتقة القاطع" {
+    id: "c3-sec"
+    beat: example
+    cat: "الأربع الباقية"
+    > $\sec x = \dfrac{1}{\cos x} = (\cos x)^{-1}$، أي قوة لدالة. قاعدة السلسلة مباشرة.
+
+    moves {
+      ask "اشتق $\sec x$."
+      skill: "diff-trig"
+      from "$\dfrac{d}{dx}\left[(\cos x)^{-1}\right]$"
+      move "$-(\cos x)^{-2} \cdot (-\sin x)$" {
+        * "قوة لدالة: $n u^{n-1} \cdot u'$"
+        - "$-(\cos x)^{-2}$" { why: "نسيت مشتقة الداخل $(\cos x)' = -\sin x$." }
+        - "$\dfrac{1}{-\sin x}$" { why: "هذا فخ المقام: لا نشتق المقام ونتركه تحت." }
+      }
+      move "$\dfrac{\sin x}{\cos^2 x}$" {
+        * "السالبان يلغيان بعضهما"
+        - "$-\dfrac{\sin x}{\cos^2 x}$" { why: "سالب في سالب موجب." }
+      }
+      move "$\dfrac{1}{\cos x} \cdot \dfrac{\sin x}{\cos x} = \sec x \tan x$" {
+        * "افصل الكسر إلى كسرين تعرفهما"
+        - "$\sec^2 x$" { why: "بقي $\sin x$ في البسط. $\frac{\sin x}{\cos^2 x} = \frac{1}{\cos x} \cdot \frac{\sin x}{\cos x}$." }
+      }
+      ! "$\frac{d}{dx}\sec x = \sec x\tan x$."
+    }
+  }
+
+  slide "مشتقة ظل التمام" {
+    id: "c3-cot"
+    beat: example
+    cat: "الأربع الباقية"
+    > $\cot x = \dfrac{\cos x}{\sin x}$. نفس خطوات الظل، والمقام الآن $\sin x$. جرّبها في ورقتك قبل أن تختار.
+
+    quiz {
+      ask "ما $\dfrac{d}{dx}\cot x$؟"
+      skill: "diff-trig"
+      * "$-\csc^2 x$"
+      - "$\csc^2 x$" { why: "البسط يخرج $-\sin^2 x - \cos^2 x = -1$، فالإشارة سالبة.", onwrong: "c3-d-cos", retry }
+      - "$-\sec^2 x$" { why: "المقام هنا $\sin^2 x$، فيخرج $\csc^2$، لا $\sec^2$." }
+      - "$\sec^2 x$" { why: "هذه مشتقة $\tan$، أخت $\cot$. والإشارة ليست نفسها." }
+      hint "$\frac{\sin x \cdot (-\sin x) - \cos x \cdot \cos x}{\sin^2 x}$."
+      ! "$\frac{-\sin^2 x - \cos^2 x}{\sin^2 x} = \frac{-1}{\sin^2 x} = -\csc^2 x$. وبنفس الطريقة: $\frac{d}{dx}\csc x = -\csc x\cot x$."
+    }
+  }
+
+  slide "الست معًا" {
+    id: "c3-six"
+    beat: example
+    cat: "الأربع الباقية"
+    > هذه كل المشتقات الست. احفظها أزواجًا: كل دالة وأختها «التمام».
+
+    match {
+      ask "طابق كل دالة بمشتقتها."
+      skill: "diff-trig"
+      pair "$\sin x$" -> "$\cos x$"
+      pair "$\cos x$" -> "$-\sin x$"
+      pair "$\tan x$" -> "$\sec^2 x$"
+      pair "$\cot x$" -> "$-\csc^2 x$"
+      pair "$\sec x$" -> "$\sec x\tan x$"
+      pair "$\csc x$" -> "$-\csc x\cot x$"
+      decoy "$\sin x$"
+      decoy "$\csc^2 x$"
+      miss "$\cos x$" -> "$\sin x$" "مشتقة $\cos$ سالبة: يبدأ من القمة وينزل."
+      miss "$\cot x$" -> "$\csc^2 x$" "مشتقات «التمام» كلها سالبة."
+      hint "الثلاث التي في اسمها «تمام» ($\cos$ و $\cot$ و $\csc$) مشتقاتها سالبة."
+      ! "قاعدة تحفظ الست: بدّل كل دالة بأختها «التمام» في الصورة، وأضف سالبًا لمشتقات «التمام»."
+    }
+  }
+
+  slide "من يحمل السالب؟" {
+    id: "c3-sort-sign"
+    beat: example
+    cat: "الأربع الباقية"
+    > سؤال سريع يثبّت الإشارات.
+
+    sort {
+      ask "ضع كل دالة حسب إشارة مشتقتها في صيغتها."
+      skill: "diff-trig"
+      bin "المشتقة تبدأ بسالب": ["$\cos x$", "$\cot x$", "$\csc x$"]
+      bin "المشتقة بلا سالب": ["$\sin x$", "$\tan x$", "$\sec x$"]
+      hint "ابحث عن «التمام» في الاسم: جيب **التمام**، ظل **التمام**، قاطع **التمام**."
+      ! "$\cos$ و $\cot$ و $\csc$ تحمل السالب. الثلاث الأخرى لا."
+    }
+  }
+
+  slide "المثلثية مع السلسلة" {
+    id: "c3-chain"
+    beat: example
+    cat: "مع السلسلة"
+    > في الامتحان نادرًا ما ترى $\sin x$ وحدها. غالبًا $\sin 3x$ أو $\cos(x^2)$. القاعدة نفسها: مشتقة الخارج عند الداخل، في مشتقة الداخل. $\dfrac{d}{dx}\sin u = \cos u \cdot u'$.
+
+    moves {
+      ask "اشتق $y = \cos(x^2)$."
+      skill: "diff-trig"
+      from "$y = \cos(x^2)$"
+      move "$y' = -\sin(x^2) \cdot 2x$" {
+        * "مشتقة $\cos$ عند الداخل، في مشتقة الداخل"
+        - "$y' = -\sin(2x)$" { why: "الداخل يبقى كما هو في الخارج: $\sin(x^2)$، ثم نضرب في $2x$." }
+        - "$y' = -\sin(x^2)$" { why: "نسيت مشتقة الداخل $2x$." }
+        - "$y' = \sin(x^2) \cdot 2x$" { why: "مشتقة $\cos$ سالبة." }
+      }
+      move "$y' = -2x\sin(x^2)$" {
+        * "رتّب الحدود"
+        - "$y' = -\sin(2x^3)$" { why: "$2x$ عامل مضروب، لا يدخل إلى داخل الجيب." }
+      }
+      ! "ثلاثة أشياء: الخارج صحيح، والداخل لم يتغير، ومشتقة الداخل مضروبة."
+    }
+  }
+
+  slide "جيب ضعف الزاوية" {
+    id: "c3-chain-1"
+    beat: example
+    cat: "مع السلسلة"
+    > جرّبها بأرقام.
+
+    numeric {
+      ask "إذا كانت $f(x) = \sin 3x$، فما $f'\left(\dfrac{\pi}{9}\right)$؟"
+      skill: "diff-trig"
+      answer: 1.5
+      expect: 3 * cos(3 * PI / 9)
+      tolerance: 0.001
+      wrong 0.5 "هذا $\cos\frac{\pi}{3}$ وحده. مشتقة الداخل $3$." -> "c3-d-inner" retry
+      wrong sqrt(3)/2 "هذا $f(\frac{\pi}{9}) = \sin\frac{\pi}{3}$، الارتفاع."
+      wrong cos(PI/9) "الداخل $3x$ يبقى داخل $\cos$: $\cos 3x$، لا $\cos x$."
+      hint "$f'(x) = 3\cos 3x$، و $3 \cdot \frac{\pi}{9} = \frac{\pi}{3}$."
+      ! "$3\cos\frac{\pi}{3} = 3 \times \frac{1}{2} = 1.5$."
+    }
+  }
+
+  slide "ظل بداخله ضعف" {
+    id: "c3-chain-2"
+    beat: example
+    cat: "مع السلسلة"
+    > والظل كذلك.
+
+    numeric {
+      ask "إذا كانت $f(x) = \tan 2x$، فما $f'\left(\dfrac{\pi}{8}\right)$؟"
+      skill: "diff-trig"
+      answer: 4
+      expect: 2 / cos(2 * PI / 8)^2
+      tolerance: 0.001
+      wrong 2 "هذا $\sec^2\frac{\pi}{4}$ وحده. مشتقة الداخل $2$." -> "c3-d-inner" retry
+      wrong 1 "هذا $\tan\frac{\pi}{4}$، قيمة الدالة."
+      wrong 2 * sqrt(2) "$\sec\frac{\pi}{4} = \sqrt{2}$، لكن مشتقة $\tan$ هي $\sec^2$."
+      hint "$\sec\frac{\pi}{4} = \sqrt{2}$، فـ $\sec^2\frac{\pi}{4} = 2$."
+      ! "$2\sec^2\frac{\pi}{4} = 2 \times 2 = 4$."
+    }
+  }
+
+  slide "قاطع بداخله ضعف" {
+    id: "c3-chain-3"
+    beat: example
+    cat: "مع السلسلة"
+    > والقاطع، الذي مشتقته فيها دالتان.
+
+    numeric {
+      ask "إذا كانت $f(x) = \sec 2x$، فما $f'\left(\dfrac{\pi}{8}\right)$؟ لأقرب جزء من مئة."
+      skill: "diff-trig"
+      answer: 2 * sqrt(2)
+      expect: 2 * (1/cos(PI/4)) * tan(PI/4)
+      tolerance: 0.01
+      wrong sqrt(2) "هذا $\sec\frac{\pi}{4}\tan\frac{\pi}{4}$ وحده. مشتقة الداخل $2$." -> "c3-d-inner" retry
+      wrong 4 "مشتقة $\sec$ هي $\sec\tan$، لا $\sec^2$."
+      hint "$f'(x) = 2\sec 2x\tan 2x$."
+      ! "$2 \cdot \sqrt{2} \cdot 1 = 2\sqrt{2} \approx 2.83$."
+    }
+  }
+
+  slide "مشتقة الجيب تكعيب هي جيب التمام تكعيب؟" {
+    id: "c3-power-trap"
+    beat: trap
+    cat: "القوى"
+    > $\sin^3 x$ تعني $(\sin x)^3$. مشتقة $\sin$ هي $\cos$، إذن مشتقة $\sin^3 x$ هي $\cos^3 x$، صح؟ هذا أشهر فخ في الوحدة. احسب عند $\frac{\pi}{4}$ وانظر.
+
+    numeric {
+      ask "إذا كانت $f(x) = \sin^3 x$، فما $f'\left(\dfrac{\pi}{4}\right)$؟ لأقرب جزء من مئة."
+      skill: "diff-trig"
+      answer: 3 * sqrt(2) / 4
+      expect: 3 * sin(PI/4)^2 * cos(PI/4)
+      tolerance: 0.01
+      wrong cos(PI/4)^3 "هذا $\cos^3 x$. $\sin^3 x$ قوة لدالة: الأس ينزل أولًا، ثم نضرب في مشتقة الداخل $\sin x$." -> "c3-d-power" retry
+      wrong 1.5 "هذا $3\sin^2 x$ وحده. مشتقة الداخل $\cos x$." -> "c3-d-power" retry
+      hint "الخارج «التكعيب» والداخل $\sin x$: $3(\sin x)^2 \cdot \cos x$."
+      ! "$3\sin^2 x\cos x$، وعند $\frac{\pi}{4}$: $3 \cdot \frac{1}{2} \cdot \frac{\sqrt{2}}{2} = \frac{3\sqrt{2}}{4} \approx 1.06$. و $\cos^3\frac{\pi}{4} \approx 0.35$، بعيد جدًا."
+    }
+  }
+
+  slide "الأس على الدالة أم على الزاوية؟" {
+    id: "c3-power-sort"
+    beat: example
+    cat: "القوى"
+    > انتبه أين يقع الأس. $\sin^3 x$ أس على **الدالة**. $\sin x^3$ أو $\sin(x^3)$ أس على **الزاوية**. كتابك يكتبهما «جا³ س» و «جا س³»، والفرق بينهما سطر صغير.
+
+    sort {
+      ask "ضع كل دالة مع مشتقتها."
+      skill: "diff-trig"
+      bin "$3\sin^2 x\cos x$": ["$\sin^3 x$", "$(\sin x)^3$"]
+      bin "$3x^2\cos(x^3)$": ["$\sin(x^3)$", "$\sin x^3$"]
+      bin "$3\cos 3x$": ["$\sin 3x$"]
+      hint "اسأل: ما آخر عملية؟ التكعيب، أم أخذ الجيب؟"
+      ! "في $\sin^3 x$ آخر عملية التكعيب، وفي $\sin x^3$ آخر عملية الجيب. آخر عملية هي الخارج دائمًا."
+    }
+  }
+
+  slide "مربع ظل التمام" {
+    id: "c3-cot2"
+    beat: example
+    cat: "القوى"
+    > قوة لدالة، والدالة مشتقتها سالبة. خطوة خطوة.
+
+    numeric {
+      ask "إذا كانت $k(x) = \cot^2 x$، فما $k'\left(\dfrac{\pi}{4}\right)$؟"
+      skill: "diff-trig"
+      answer: -4
+      expect: 2 * (cos(PI/4)/sin(PI/4)) * (0 - 1/sin(PI/4)^2)
+      tolerance: 0.001
+      wrong 4 "مشتقة $\cot$ سالبة: $-\csc^2 x$." -> "c3-d-cos" retry
+      wrong -2 "$\csc^2\frac{\pi}{4} = 2$، لا $1$. $\csc\frac{\pi}{4} = \sqrt{2}$."
+      wrong 2 "هذا $2\cot x$ وحده. اضرب في مشتقة الداخل." -> "c3-d-power" retry
+      hint "$k' = 2\cot x \cdot (-\csc^2 x)$."
+      ! "$2(1)(-2) = -4$."
+    }
+  }
+
+  slide "مربع قاطع ثلاثة أضعاف" {
+    id: "c3-sec2"
+    beat: example
+    cat: "القوى"
+    > ثلاث حلقات: مربع، ثم قاطع، ثم $3\theta$. ستقابل هذه في الدرس الرابع.
+
+    moves {
+      ask "اشتق $x = \sec^2 3\theta$ بالنسبة إلى $\theta$."
+      skill: "diff-trig"
+      from "$x = (\sec 3\theta)^2$"
+      move "$\dfrac{dx}{d\theta} = 2\sec 3\theta \cdot \dfrac{d}{d\theta}\left[\sec 3\theta\right]$" {
+        * "الحلقة الخارجية: التربيع"
+        - "$\dfrac{dx}{d\theta} = 2\sec 3\theta$" { why: "بقي داخل التربيع، $\sec 3\theta$، ويتغير أيضًا." }
+      }
+      move "$\dfrac{dx}{d\theta} = 2\sec 3\theta \cdot \sec 3\theta\tan 3\theta \cdot 3$" {
+        * "الحلقة الوسطى القاطع، ثم الداخلية $3\theta$"
+        - "$\dfrac{dx}{d\theta} = 2\sec 3\theta \cdot \sec 3\theta\tan 3\theta$" { why: "بقيت الحلقة الأخيرة: مشتقة $3\theta$ هي $3$." }
+        - "$\dfrac{dx}{d\theta} = 2\sec 3\theta \cdot \tan^2 3\theta \cdot 3$" { why: "مشتقة $\sec$ هي $\sec\tan$، لا $\tan^2$." }
+      }
+      move "$\dfrac{dx}{d\theta} = 6\sec^2 3\theta\tan 3\theta$" {
+        * "اجمع العوامل"
+        - "$\dfrac{dx}{d\theta} = 6\sec 3\theta\tan 3\theta$" { why: "$\sec 3\theta$ ظهر مرتين، فهو $\sec^2 3\theta$." }
+      }
+      ! "من الخارج إلى الداخل، حلقة حلقة، ولكل حلقة مشتقتها."
+    }
+  }
+
+  slide "ضرب فيه جيب" {
+    id: "c3-product"
+    beat: example
+    cat: "ضرب وقسمة"
+    > المثلثية تدخل في قواعد الضرب والقسمة كأي دالة أخرى.
+
+    numeric {
+      ask "إذا كانت $y = x^2\sin x$، فما $y'\left(\dfrac{\pi}{2}\right)$؟"
+      skill: "diff-trig"
+      answer: PI
+      expect: 2 * (PI/2) * sin(PI/2) + (PI/2)^2 * cos(PI/2)
+      tolerance: 0.01
+      wrong 0 "هذا $2x\cos x$، حاصل ضرب المشتقتين."
+      wrong PI^2 / 4 "هذا $y(\frac{\pi}{2})$، القيمة."
+      hint "$y' = 2x\sin x + x^2\cos x$، و $\cos\frac{\pi}{2} = 0$."
+      ! "$2 \cdot \frac{\pi}{2} \cdot 1 + \frac{\pi^2}{4} \cdot 0 = \pi \approx 3.14$."
+    }
+  }
+
+  slide "قسمة فيها جيب" {
+    id: "c3-quotient"
+    beat: example
+    cat: "ضرب وقسمة"
+    > والقسمة.
+
+    numeric {
+      ask "إذا كانت $y = \dfrac{\sin x}{x}$، فما $y'(\pi)$؟ لأقرب جزء من ألف."
+      skill: "diff-trig"
+      answer: -1 / PI
+      expect: (PI * cos(PI) - sin(PI)) / PI^2
+      tolerance: 0.002
+      wrong 1 / PI "الترتيب معكوس في البسط، أو نسيت أن $\cos\pi = -1$."
+      wrong -1 "هذا $\frac{\cos x}{1}$، مشتقة البسط على مشتقة المقام."
+      hint "$y' = \frac{x\cos x - \sin x}{x^2}$."
+      ! "$\frac{\pi(-1) - 0}{\pi^2} = -\frac{1}{\pi} \approx -0.318$."
+    }
+  }
+
+  slide "جيب في جيب تمام" {
+    id: "c3-sincos"
+    beat: example
+    cat: "ضرب وقسمة"
+    > $y = \sin x\cos x$. طريقان: قاعدة الضرب، أو اكتبها $\frac{1}{2}\sin 2x$ أولًا. كلاهما يجب أن يعطي الشيء نفسه.
+
+    quiz {
+      ask "ما $y'$؟"
+      skill: "diff-trig"
+      * "$\cos 2x$"
+      - "$-\sin^2 x$" { why: "هذا $\cos x \cdot (-\sin x)$، حاصل ضرب المشتقتين." }
+      - "$\cos^2 x + \sin^2 x = 1$" { why: "مشتقة $\cos x$ هي $-\sin x$، فيصير $\cos^2 x - \sin^2 x$." }
+      - "$2\cos 2x$" { why: "$\sin x\cos x = \frac{1}{2}\sin 2x$، والنصف يلغي الـ $2$." }
+      hint "بالضرب: $\cos x \cdot \cos x + \sin x \cdot (-\sin x)$."
+      ! "$\cos^2 x - \sin^2 x = \cos 2x$. وبالطريق الآخر: $\frac{1}{2} \cdot 2\cos 2x = \cos 2x$."
+    }
+  }
+
+  slide "مشتقة الواحد" {
+    id: "c3-identity"
+    beat: breaker
+    cat: "ضرب وقسمة"
+    > سؤال يبدو صعبًا وليس كذلك.
+
+    quiz {
+      ask "ما مشتقة $\sin^2 x + \cos^2 x$؟"
+      skill: "diff-trig"
+      * "$0$"
+      - "$2\sin x\cos x$" { why: "هذا الحد الأول وحده. الثاني يعطي $-2\cos x\sin x$، فيلغيان بعضهما." }
+      - "$2\sin x - 2\cos x$" { why: "نسيت مشتقة الداخل في كل حد." }
+      - "$4\sin x\cos x$" { why: "مشتقة $\cos^2 x$ سالبة: $2\cos x \cdot (-\sin x)$." }
+      ! "$2\sin x\cos x - 2\cos x\sin x = 0$. طبيعي: العبارة تساوي $1$ دائمًا، والثابت لا يتغير."
+    }
+  }
+
+  slide "حين تكون الزاوية y" {
+    id: "c3-y-trig"
+    beat: example
+    cat: "تمهيد للدرس الرابع"
+    > إذا كانت $y$ دالة في $x$، فـ $\sin y$ جيب لدالة، ومشتقته بالنسبة إلى $x$ بالسلسلة: $\dfrac{d}{dx}\sin y = \cos y \cdot \dfrac{dy}{dx}$. نفس فكرة $y^2$ في الدرس الثاني.
+
+    quiz {
+      ask "إذا كانت $y$ دالة في $x$، فما $\dfrac{d}{dx}\left[\cos 2y\right]$؟"
+      skill: "diff-trig"
+      * "$-2\sin 2y \cdot \dfrac{dy}{dx}$"
+      - "$-2\sin 2y$" { why: "هذا بالنسبة إلى $y$. بالنسبة إلى $x$ نضرب في $\frac{dy}{dx}$ أيضًا.", onwrong: "c3-d-inner", retry }
+      - "$-\sin 2y \cdot \dfrac{dy}{dx}$" { why: "نسيت الـ $2$ من مشتقة $2y$." }
+      - "$2\sin 2y \cdot \dfrac{dy}{dx}$" { why: "مشتقة $\cos$ سالبة." }
+      ! "ثلاث حلقات: $\cos$، ثم $2y$، ثم $y$ نفسها التي تتغير مع $x$. هذا كل ما يحتاجه الاشتقاق الضمني."
+    }
+  }
+
+  slide "الساقية" {
+    id: "c3-transfer"
+    beat: transfer
+    cat: "جرّب في مكان جديد"
+    > واحد أخير، في مكان جديد.
+
+    numeric {
+      ask "ساقية تدور على ترعة. ارتفاع أحد قواديسها فوق الماء بعد $t$ ثانية هو $h = 2 - 2\cos\dfrac{\pi t}{6}$ مترًا. ما معدل ارتفاعه عند $t = 2$؟ لأقرب جزء من مئة."
+      skill: "diff-trig"
+      answer: PI * sqrt(3) / 6
+      expect: 2 * (PI/6) * sin(PI * 2 / 6)
+      tolerance: 0.01
+      unit: "م/ث"
+      wrong sqrt(3) "هذا $2\sin\frac{\pi}{3}$ وحده. مشتقة الداخل $\frac{\pi}{6}$." -> "c3-d-inner" retry
+      wrong 1 "هذا الارتفاع نفسه عند $t = 2$."
+      wrong 0 - PI * sqrt(3) / 6 "الإشارة: $-2 \cdot (-\sin) = +2\sin$. القادوس يصعد في هذه اللحظة."
+      ! "$h' = 2 \cdot \frac{\pi}{6}\sin\frac{\pi t}{6}$، وعند $2$: $\frac{\pi}{3} \cdot \frac{\sqrt{3}}{2} \approx 0.91$ م/ث. المشتقات المثلثية تعود في التمارين خلال الأيام القادمة."
+    }
+  }
+
+  slide "جيب التمام يبدأ من القمة" {
+    id: "c3-d-cos"
+    beat: detour
+    hidden: true
+    cat: "مشتقة الجيب"
+    > $\cos x$ يبدأ من قمته عند $0$ ثم ينزل، فميله بعد الصفر سالب. و $\sin x$ موجب هناك، فالمشتقة يجب أن تكون $-\sin x$. والأمر نفسه لكل دالة فيها «تمام»: $\cot$ و $\csc$ مشتقاتها سالبة.
+
+    numeric {
+      ask "إذا كانت $f(x) = \cos x$، فما $f'\left(\dfrac{\pi}{6}\right)$؟"
+      skill: "diff-trig"
+      answer: -0.5
+      expect: 0 - sin(PI/6)
+      tolerance: 0.001
+      wrong 0.5 "الحجم صحيح، والإشارة لا. جيب التمام ينزل هناك."
+      ! "$-\sin\frac{\pi}{6} = -\frac{1}{2}$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "الداخل يُشتق أيضًا" {
+    id: "c3-d-inner"
+    beat: detour
+    hidden: true
+    cat: "مع السلسلة"
+    > $\sin 3x$ يلف أسرع من $\sin x$ بثلاث مرات، فينحدر أشد بثلاث مرات. لذلك نضرب في مشتقة الداخل: $\dfrac{d}{dx}\sin 3x = 3\cos 3x$، لا $\cos 3x$.
+
+    numeric {
+      ask "إذا كانت $f(x) = \cos 4x$، فما $f'\left(\dfrac{\pi}{8}\right)$؟"
+      skill: "diff-trig"
+      answer: -4
+      expect: 0 - 4 * sin(4 * PI / 8)
+      tolerance: 0.001
+      wrong -1 "هذا $-\sin\frac{\pi}{2}$ وحده. مشتقة الداخل $4$."
+      ! "$-4\sin\frac{\pi}{2} = -4$. ارجع الآن إلى السؤال."
+    }
+  }
+
+  slide "قوة لدالة مثلثية" {
+    id: "c3-d-power"
+    beat: detour
+    hidden: true
+    cat: "القوى"
+    > $\sin^3 x$ قوة، والداخل هو $\sin x$. مثل $u^3$: الأس ينزل ويبقى الداخل كما هو، $3(\sin x)^2$، ثم نضرب في مشتقة الداخل $\cos x$.
+
+    numeric {
+      ask "إذا كانت $f(x) = \cos^2 x$، فما $f'\left(\dfrac{\pi}{4}\right)$؟"
+      skill: "diff-trig"
+      answer: -1
+      expect: 2 * cos(PI/4) * (0 - sin(PI/4))
+      tolerance: 0.001
+      wrong 0.5 "هذا $\sin^2\frac{\pi}{4}$. الخارج التربيع: $2\cos x \cdot (-\sin x)$."
+      wrong 1 "الإشارة: مشتقة $\cos$ سالبة."
+      ! "$2 \cdot \frac{\sqrt{2}}{2} \cdot \left(-\frac{\sqrt{2}}{2}\right) = -1$. ارجع الآن إلى السؤال."
+    }
+  }
+}
