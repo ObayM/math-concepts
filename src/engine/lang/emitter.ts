@@ -1607,6 +1607,20 @@ function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
     slots = templateSlots;
   }
 
+  const misses = s.misses.map((m) => {
+    if (!s.bank.includes(m.token))
+      throw new CompileError(
+        `miss "${m.token}": that token isn't in the bank${suggest(m.token, s.bank)}`,
+        m.ln
+      );
+    if (s.answers.some((a) => a.includes(m.token)))
+      throw new CompileError(
+        `miss "${m.token}": that token is part of an accepted answer, so placing it isn't a mistake`,
+        m.ln
+      );
+    return { token: m.token, why: m.why };
+  });
+
   return {
     kind: 'build' as const,
     prompt: s.common.ask,
@@ -1615,6 +1629,7 @@ function emitBuild(s: Extract<Stmt, { k: 'build' }>) {
     slots,
     ...(template && { template }),
     ...(s.reusable && { reusable: true }),
+    ...(misses.length && { misses }),
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),
@@ -1779,11 +1794,32 @@ function emitMatch(s: Extract<Stmt, { k: 'match' }>) {
     if (r.k !== 'str') throw new CompileError('pair right side must be a string', s.ln);
     return { left: l.v, right: r.v };
   });
+  const lefts = pairs.map((p) => p.left);
+  const rights = [...pairs.map((p) => p.right), ...s.decoys];
+  const misses = s.misses.map((m) => {
+    if (!lefts.includes(m.left))
+      throw new CompileError(
+        `miss "${m.left}": no pair has that left side${suggest(m.left, lefts)}`,
+        m.ln
+      );
+    if (!rights.includes(m.right))
+      throw new CompileError(
+        `miss -> "${m.right}": that isn't one of the right-hand options${suggest(m.right, rights)}`,
+        m.ln
+      );
+    if (pairs.some((p) => p.left === m.left && p.right === m.right))
+      throw new CompileError(
+        `miss "${m.left}" -> "${m.right}" is the correct pairing, not a mistake`,
+        m.ln
+      );
+    return { left: m.left, right: m.right, why: m.why };
+  });
   return {
     kind: 'match' as const,
     prompt: s.common.ask,
     pairs,
     ...(s.decoys.length && { decoys: s.decoys }),
+    ...(misses.length && { misses }),
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),
     ...(s.common.skill && { skill: s.common.skill }),

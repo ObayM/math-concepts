@@ -63,9 +63,9 @@ export const exercisesSection: DocSection = {
     {
       keyword: 'build',
       syntax:
-        'build {\n  ask "..."\n  bank: ["tok", "tok", ...]\n  answer: ["tok", ...]\n  [answer: ["...alt ordering..."]]\n  [template: "text with ___ blanks"]\n  [slots: <n>]\n  [reusable]\n}',
+        'build {\n  ask "..."\n  bank: ["tok", "tok", ...]\n  answer: ["tok", ...]\n  [answer: ["...alt ordering..."]]\n  [template: "text with ___ blanks"]\n  [slots: <n>]\n  [reusable]\n  [miss "tok" "why"]\n}',
       description:
-        'Tap tokens from the bank into slots to assemble an answer. List multiple `answer:` lines to accept equivalent orderings (e.g. commutative forms). Add `reusable` when a token can be placed more than once. Bank tokens and slots render as rich text, so `"$f(a)$"` is a perfectly good token.\n\nWithout `template`, the slots are a bare row and `slots` defaults to the length of the first answer. With `template`, the slots sit inline in the text you write, which turns the same exercise into an expression builder or a fill-in-the-blank sentence. Mark each blank with `___` (three or more underscores). Underscores **inside** a `$...$` span are left alone, so `$x_1$` is safe — which also means a blank cannot go inside a math group like `x^{...}`; make the whole group a bank token instead. When a template is present it decides the slot count, so leave `slots` off.',
+        'Tap tokens from the bank into slots to assemble an answer. List multiple `answer:` lines to accept equivalent orderings (e.g. commutative forms). Add `reusable` when a token can be placed more than once. Bank tokens and slots render as rich text, so `"$f(a)$"` is a perfectly good token.\n\nWithout `template`, the slots are a bare row and `slots` defaults to the length of the first answer. With `template`, the slots sit inline in the text you write, which turns the same exercise into an expression builder or a fill-in-the-blank sentence. Mark each blank with `___` (three or more underscores). Underscores **inside** a `$...$` span are left alone, so `$x_1$` is safe — which also means a blank cannot go inside a math group like `x^{...}`; make the whole group a bank token instead. When a template is present it decides the slot count, so leave `slots` off.\n\n`miss "tok" "why"` gives a decoy its own feedback: after a wrong check, the why of every decoy the student placed is shown, so each tempting wrong token names its own mistake.',
       props: [
         { name: 'bank', type: 'string[]', description: 'the tokens the learner can place' },
         { name: 'answer', type: 'string[]', description: 'an accepted sequence (repeatable)' },
@@ -80,9 +80,14 @@ export const exercisesSection: DocSection = {
           description: 'number of slots (defaults to first answer length; unused with a template)',
         },
         { name: 'reusable', type: 'flag', description: 'allow a token to be used more than once' },
+        {
+          name: 'miss',
+          type: '"tok" "why"',
+          description: 'feedback shown when this decoy was placed (repeatable)',
+        },
       ],
       example:
-        'build {\n  ask "Complete the power rule."\n  template: "$\\frac{d}{dx}\\left[x^{3}\\right] =$ ___ $\\cdot$ ___"\n  bank: ["3", "2", "$x^{2}$", "$x^{3}$"]\n  answer: ["3", "$x^{2}$"]\n  hint "Bring the exponent down, then drop it by one."\n  ! "$3x^{2}$ — the 3 comes down and the power drops to 2."\n}',
+        'build {\n  ask "Complete the power rule."\n  template: "$\\frac{d}{dx}\\left[x^{3}\\right] =$ ___ $\\cdot$ ___"\n  bank: ["3", "2", "$x^{2}$", "$x^{3}$"]\n  answer: ["3", "$x^{2}$"]\n  miss "$x^{3}$" "The power drops by one, so it cannot stay $x^{3}$."\n  hint "Bring the exponent down, then drop it by one."\n  ! "$3x^{2}$ — the 3 comes down and the power drops to 2."\n}',
     },
     {
       keyword: 'hotspot',
@@ -162,9 +167,9 @@ export const exercisesSection: DocSection = {
     {
       keyword: 'match',
       syntax:
-        'match {\n  ask "..."\n  pair "left" -> "right"\n  [pair "left2" -> "right2" ...]\n  [decoy "extra wrong right"]\n  [hint "..."]\n  [! "explanation"]\n}',
+        'match {\n  ask "..."\n  pair "left" -> "right"\n  [pair "left2" -> "right2" ...]\n  [decoy "extra wrong right"]\n  [miss "left" -> "wrong right" "why"]\n  [hint "..."]\n  [! "explanation"]\n}',
       description:
-        'Tap-left-then-tap-right pairing. Tap a left item, then tap the right item it belongs with — at least two `pair` lines are required. `decoy` adds extra right-side entries that never pair with anything, making the match harder to guess. The right column is shuffled (seeded off the left texts, so it stays put across re-renders of the same exercise).',
+        'Tap-left-then-tap-right pairing. Tap a left item, then tap the right item it belongs with — at least two `pair` lines are required. `decoy` adds extra right-side entries that never pair with anything, making the match harder to guess. The right column is shuffled (seeded off the left texts, so it stays put across re-renders of the same exercise). `miss "left" -> "right" "why"` names one tempting wrong pairing and explains the mistake; it shows after a check that made that pairing.',
       props: [
         {
           name: 'pair',
@@ -176,9 +181,14 @@ export const exercisesSection: DocSection = {
           type: 'string',
           description: 'an extra unpaired right-side option (repeatable)',
         },
+        {
+          name: 'miss',
+          type: '"left" -> "right" "why"',
+          description: 'feedback for one wrong pairing (repeatable)',
+        },
       ],
       example:
-        'match {\n  ask "Match each derivative rule to its result."\n  pair "d/dx(x^n)" -> "n·x^(n-1)"\n  pair "d/dx(sin x)" -> "cos x"\n  pair "d/dx(cos x)" -> "-sin x"\n  decoy "n·x^n"\n  ! "Power rule brings the exponent down and drops it by one."\n}',
+        'match {\n  ask "Match each derivative rule to its result."\n  pair "d/dx(x^n)" -> "n·x^(n-1)"\n  pair "d/dx(sin x)" -> "cos x"\n  pair "d/dx(cos x)" -> "-sin x"\n  decoy "n·x^n"\n  miss "d/dx(cos x)" -> "cos x" "That is the derivative of sin. Cos slopes down first, so it is negative."\n  ! "Power rule brings the exponent down and drops it by one."\n}',
     },
     {
       keyword: 'order',

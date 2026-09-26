@@ -41,9 +41,19 @@ const PAIR = [
 
 const hueOf = (i) => PAIR[i % PAIR.length];
 
-export default function MatchExercise({ slide, value, checked, onChange, revealAnswer = true }) {
+export default function MatchExercise({
+  slide,
+  value,
+  checked,
+  correct,
+  onChange,
+  revealAnswer = true,
+}) {
   const ex = slide.exercise;
   const matches = Array.isArray(value) ? value : new Array(ex.pairs.length).fill(null);
+  const misses = (ex.misses ?? []).filter((m) =>
+    ex.pairs.some((p, i) => p.left === m.left && sameAnswer(matches[i], m.right))
+  );
   const [armed, setArmed] = useState(null);
 
   const rightItems = useMemo(
@@ -181,6 +191,16 @@ export default function MatchExercise({ slide, value, checked, onChange, revealA
             <RichText>{drag.id}</RichText>
           </span>
         </DragGhost>
+      )}
+
+      {checked && !correct && misses.length > 0 && (
+        <div className="mt-6 flex flex-col gap-1">
+          {misses.map((m) => (
+            <RichText key={`${m.left}>${m.right}`} className="block text-sm text-danger-600">
+              {m.why}
+            </RichText>
+          ))}
+        </div>
       )}
 
       {checked && revealAnswer && ex.explanation && (

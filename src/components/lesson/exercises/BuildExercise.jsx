@@ -17,6 +17,7 @@ export default function BuildExercise({
   const t = useT();
   const ex = slide.exercise;
   const placed = Array.isArray(value) ? value : [];
+  const misses = (ex.misses ?? []).filter((m) => placed.includes(m.token));
   const bank = useMemo(
     () =>
       shuffledOrder(ex.bank.length, hashStr(ex.bank.map((tok) => tok.id).join('|'))).map(
@@ -184,6 +185,16 @@ export default function BuildExercise({
             <RichText>{dragLabel}</RichText>
           </span>
         </DragGhost>
+      )}
+
+      {checked && !correct && misses.length > 0 && (
+        <div className="flex max-w-md flex-col gap-1 text-center">
+          {misses.map((m) => (
+            <RichText key={m.token} className="block text-sm text-danger-600">
+              {m.why}
+            </RichText>
+          ))}
+        </div>
       )}
 
       {checked && revealAnswer && ex.explanation && (

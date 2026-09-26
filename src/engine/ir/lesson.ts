@@ -67,6 +67,7 @@ const buildExercise = z.object({
   slots: z.number().int().positive(),
   template: z.array(templateSeg).optional(),
   reusable: z.boolean().optional(),
+  misses: z.array(z.object({ token: z.string(), why: z.string() })).optional(),
   ...exerciseBase,
 });
 
@@ -99,6 +100,7 @@ const matchExercise = z.object({
   kind: z.literal('match'),
   pairs: z.array(z.object({ left: z.string(), right: z.string() })).min(2),
   decoys: z.array(z.string()).optional(),
+  misses: z.array(z.object({ left: z.string(), right: z.string(), why: z.string() })).optional(),
   ...exerciseBase,
 });
 

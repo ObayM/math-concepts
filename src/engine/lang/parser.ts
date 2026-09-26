@@ -780,10 +780,17 @@ function makeParser(tokens: Token[]) {
     let slots: number | null = null;
     let template: string | null = null;
     let reusable = false;
+    const misses: { token: string; why: string; ln: number }[] = [];
     const common: ExerciseCommon = { ask: '', hints: [] };
     while (!check('RC') && !check('EOF')) {
       if (parseCommonLine(common)) continue;
-      if (at('bank')) {
+      if (at('miss')) {
+        const line = peek().line;
+        pos++;
+        const token = eatStr();
+        misses.push({ token, why: eatStr(), ln: line });
+        endStmt();
+      } else if (at('bank')) {
         pos++;
         eat('COLON');
         bank.push(...parseStrList());
@@ -811,14 +818,14 @@ function makeParser(tokens: Token[]) {
         const t = peek();
         const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
         throw new CompileError(
-          `unexpected ${what} in build — use ask/bank/answer/slots/template/reusable/hint/!`,
+          `unexpected ${what} in build — use ask/bank/answer/slots/template/reusable/miss/hint/!`,
           t.line,
           t.col
         );
       }
     }
     eat('RC');
-    return { k: 'build', bank, answers, slots, template, reusable, common, ln };
+    return { k: 'build', bank, answers, slots, template, reusable, misses, common, ln };
   }
 
   function parseHotspot(ln: number): Stmt {
@@ -932,10 +939,19 @@ function makeParser(tokens: Token[]) {
     skipNL();
     const pairs: [Expr, Expr][] = [];
     const decoys: string[] = [];
+    const misses: { left: string; right: string; why: string; ln: number }[] = [];
     const common: ExerciseCommon = { ask: '', hints: [] };
     while (!check('RC') && !check('EOF')) {
       if (parseCommonLine(common)) continue;
-      if (at('pair')) {
+      if (at('miss')) {
+        const line = peek().line;
+        pos++;
+        const e = parseExpr();
+        if (e.k !== 'arrow' || e.from.k !== 'str' || e.to.k !== 'str')
+          throw new CompileError('miss must be "left" -> "right" "why"', line);
+        misses.push({ left: e.from.v, right: e.to.v, why: eatStr(), ln: line });
+        endStmt();
+      } else if (at('pair')) {
         pos++;
         const e = parseExpr();
         if (e.k !== 'arrow') throw new CompileError('pair must be "left" -> "right"', ln);
@@ -949,14 +965,14 @@ function makeParser(tokens: Token[]) {
         const t = peek();
         const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
         throw new CompileError(
-          `unexpected ${what} in match — use ask/pair/decoy/hint/!`,
+          `unexpected ${what} in match — use ask/pair/decoy/miss/hint/!`,
           t.line,
           t.col
         );
       }
     }
     eat('RC');
-    return { k: 'match', pairs, decoys, common, ln };
+    return { k: 'match', pairs, decoys, misses, common, ln };
   }
 
   function parseOrder(ln: number): Stmt {

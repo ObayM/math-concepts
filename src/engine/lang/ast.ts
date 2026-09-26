@@ -80,6 +80,7 @@ export type Stmt =
       slots: number | null;
       template: string | null;
       reusable: boolean;
+      misses: { token: string; why: string; ln: number }[];
       common: ExerciseCommon;
       ln: number;
     }
@@ -107,6 +108,7 @@ export type Stmt =
       k: 'match';
       pairs: [Expr, Expr][];
       decoys: string[];
+      misses: { left: string; right: string; why: string; ln: number }[];
       common: ExerciseCommon;
       ln: number;
     }
