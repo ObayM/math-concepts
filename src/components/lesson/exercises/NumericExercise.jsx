@@ -2,7 +2,7 @@
 import { CheckCircle2, XCircle } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
-import { parseNumber } from './answers';
+import { parseNumber, formatAnswer } from './answers';
 
 export default function NumericExercise({
   slide,
@@ -63,7 +63,7 @@ export default function NumericExercise({
             <>
               {t('exercise.answerIs')}{' '}
               <span dir="ltr">
-                {ex.answers[0]}
+                {formatAnswer(ex.answers[0], ex.tolerance)}
                 {ex.unit ? ` ${ex.unit}` : ''}
               </span>
               .

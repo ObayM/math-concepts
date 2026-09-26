@@ -10,3 +10,8 @@ export function parseNumber(v: unknown): number {
 }
 
 export const isNumberAnswer = (v: unknown) => !Number.isNaN(parseNumber(v));
+
+export function formatAnswer(value: number, tolerance = 0): string {
+  const places = tolerance > 1e-9 ? Math.max(2, Math.ceil(-Math.log10(tolerance))) : 4;
+  return String(Number(value.toFixed(Math.min(places, 6))));
+}

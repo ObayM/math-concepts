@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseNumber } from '@/components/lesson/exercises/answers';
+import { parseNumber, formatAnswer } from '@/components/lesson/exercises/answers';
 import { exercises } from '@/components/lesson/exercises';
 import { compileLesson } from '@/engine/lang';
 import { lessonSchema } from '@/engine/ir/lesson';
@@ -53,5 +53,17 @@ describe('numeric registry', () => {
 
   it('refuses a hex literal', () => {
     expect(exercises.numeric.isComplete(slide, '0x10')).toBe(false);
+  });
+});
+
+describe('formatAnswer', () => {
+  it.each([
+    [25 / 60, 0.005, '0.417'],
+    [36.87, 0.6, '36.87'],
+    [6, 0.01, '6'],
+    [1 / 3, 0, '0.3333'],
+    [2 * Math.PI, 1e-12, '6.2832'],
+  ])('shows %d with tolerance %d as %s', (value, tol, shown) => {
+    expect(formatAnswer(value, tol)).toBe(shown);
   });
 });
