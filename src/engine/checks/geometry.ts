@@ -104,6 +104,83 @@ export function curveMatchesExpr(
   return total > 0 && hit / total >= coverage;
 }
 
+export interface GapBand {
+  off: boolean;
+  pts: Pt[];
+}
+
+export interface SketchGap {
+  truth: Pt[][];
+  bands: GapBand[];
+  within: number;
+}
+
+export function sketchGap(
+  line: Pt[] | null,
+  expr: ExprIR | number,
+  domain: [number, number],
+  tol: number,
+  samples = 120
+): SketchGap {
+  const [a, b] = domain;
+  const truth: Pt[][] = [];
+  const bands: GapBand[] = [];
+  let run: Pt[] = [];
+  let drawn: Pt[] = [];
+  let want: Pt[] = [];
+  let off = false;
+  let hit = 0;
+  let finite = 0;
+
+  const closeBand = () => {
+    if (drawn.length > 1) bands.push({ off, pts: [...drawn, ...want.reverse()] });
+    drawn = [];
+    want = [];
+  };
+
+  for (let i = 0; i <= samples; i++) {
+    const x = a + ((b - a) * i) / samples;
+    const y = safeEval(expr, x);
+    if (!Number.isFinite(y)) {
+      if (run.length > 1) truth.push(run);
+      run = [];
+      closeBand();
+      continue;
+    }
+    finite++;
+    run.push([x, y]);
+
+    const d = line && line.length > 1 ? interpY(line, x) : null;
+    if (d == null) {
+      closeBand();
+      continue;
+    }
+    const miss = Math.abs(d - y) > tol;
+    if (!miss) hit++;
+    if (drawn.length && miss !== off) {
+      const joinD = drawn[drawn.length - 1];
+      const joinW = want[want.length - 1];
+      closeBand();
+      drawn = [joinD];
+      want = [joinW];
+    }
+    off = miss;
+    drawn.push([x, d]);
+    want.push([x, y]);
+  }
+  closeBand();
+  if (run.length > 1) truth.push(run);
+  return { truth, bands, within: finite ? hit / finite : 0 };
+}
+
+function safeEval(expr: ExprIR | number, x: number): number {
+  try {
+    return evalNum(expr, { x });
+  } catch {
+    return NaN;
+  }
+}
+
 // y of the polyline at a given x (assumes roughly monotonic-x sketch input)
 function interpY(line: Pt[], x: number): number | null {
   for (let i = 0; i < line.length - 1; i++) {

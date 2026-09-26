@@ -1782,6 +1782,10 @@ function emitFollows(
 
 function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
   if (!s.common.ask) throw new CompileError('sketch needs an ask "..."', s.ln);
+  if (s.overlay && s.mode !== 'curve')
+    throw new CompileError('overlay only works on sketch curve', s.ln);
+  if (s.overlay && !s.follows)
+    throw new CompileError('overlay needs a follows: so it knows which curve to draw', s.ln);
 
   if (s.mode === 'line') {
     if (!s.through) throw new CompileError('sketch line needs a through (x, y) point', s.ln);
@@ -1826,6 +1830,7 @@ function emitSketch(s: Extract<Stmt, { k: 'sketch' }>) {
     prompt: s.common.ask,
     targets,
     ...(follows && { follows: follows.expr, over: follows.over }),
+    ...(s.overlay && { overlay: true }),
     tol,
     hints: s.common.hints,
     ...(s.common.explanation && { explanation: s.common.explanation }),

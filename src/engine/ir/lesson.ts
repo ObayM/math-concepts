@@ -93,6 +93,7 @@ const sketchExercise = z.object({
   slopeTol: z.number().nonnegative().optional(),
   follows: exprIRSchema.optional(),
   over: z.tuple([z.number(), z.number()]).optional(),
+  overlay: z.boolean().optional(),
   tol: z.number().nonnegative(),
   ...exerciseBase,
 });

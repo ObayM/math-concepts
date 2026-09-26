@@ -13,9 +13,9 @@ export const PRISM_COOKBOOK: CookbookEntry[] = [
     id: 'predict-then-reveal',
     title: 'Predict, then reveal',
     description:
-      'The learner sketches a guess before the real curve is shown. `reveal { ... }` hides the answer until the exercise is checked — pairs naturally with `sketch`.',
+      'The learner commits to a sketch before seeing the real curve. `follows:` grades the whole stroke, `overlay` then draws the true curve over it and shades the gap, and `reveal { ... }` holds back anything else until the check.',
     source:
-      'lesson "Predict then Reveal" {\n  slide "Guess the curve" {\n    > Sketch what $y = (x-1)^2 - 3$ looks like before we draw it.\n    scene plane {\n      x: [-5, 6]\n      y: [-5, 6]\n      grid\n      axes\n      reveal {\n        curve f = (x-1)^2 - 3 { color: primary, width: 3 }\n      }\n    }\n    sketch curve {\n      ask "Draw the parabola — vertex and both crossings roughly right."\n      near (1, -3)\n      near (1-sqrt(3), 0)\n      near (1+sqrt(3), 0)\n      tol: 0.6\n      hint "Vertex form puts the vertex at (h, k)."\n    }\n  }\n}',
+      'lesson "Predict then Reveal" {\n  slide "Guess the curve" {\n    > Sketch what $y = (x-1)^2 - 3$ looks like before we draw it.\n    scene plane {\n      x: [-5, 6]\n      y: [-5, 6]\n      grid\n      axes\n      reveal {\n        point v = (1, -3) { color: accent }\n        label at (1, -3.8) = "vertex"\n      }\n    }\n    sketch curve {\n      ask "Draw the parabola, vertex and both crossings roughly right."\n      follows: (x-1)^2 - 3\n      over: [-1.5, 3.5]\n      overlay\n      tol: 0.6\n      hint "Vertex form puts the vertex at (h, k)."\n    }\n  }\n}',
   },
   {
     id: 'build-the-thing',

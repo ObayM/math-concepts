@@ -97,6 +97,7 @@ export const KEYWORDS = new Set([
   'wrong',
   'follows',
   'over',
+  'overlay',
   'beat',
   'then',
   'after',

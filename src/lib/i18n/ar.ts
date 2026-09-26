@@ -88,6 +88,9 @@ const ar: Dictionary = {
   'exercise.sketchCurve': 'ارسم على الرسم بالأعلى، أو انتقل إليه بمفتاح Tab واستخدم الأسهم.',
   'exercise.sketchPoints':
     'اضغط على الرسم بالأعلى لتضع النقاط، أو انتقل إليه بمفتاح Tab واستخدم الأسهم.',
+  'exercise.sketchWithin':
+    'رسمتك كانت قريبة من المنحنى الحقيقي في {pct}% منه. الأحمر هو المكان الذي ابتعدت فيه.',
+  'exercise.sketchAllWithin': 'رسمتك بقيت قريبة من المنحنى الحقيقي طوال الطريق.',
   'exercise.sketchLine':
     'اسحب على الرسم بالأعلى لترسم خطًا، أو انتقل إليه بمفتاح Tab واستخدم الأسهم.',
   'exercise.sceneAria':

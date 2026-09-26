@@ -883,10 +883,15 @@ function makeParser(tokens: Token[]) {
     let slopeTol: Expr | null = null;
     let follows: Expr | null = null;
     let over: Expr | null = null;
+    let overlay = false;
     const common: ExerciseCommon = { ask: '', hints: [] };
     while (!check('RC') && !check('EOF')) {
       if (parseCommonLine(common)) continue;
-      if (at('follows')) {
+      if (at('overlay')) {
+        pos++;
+        overlay = true;
+        endStmt();
+      } else if (at('follows')) {
         pos++;
         eat('COLON');
         follows = parseExpr();
@@ -923,14 +928,27 @@ function makeParser(tokens: Token[]) {
         const t = peek();
         const what = t.type === 'IDENT' ? `"${t.raw}"` : t.type;
         throw new CompileError(
-          `unexpected ${what} in sketch - use ask/near/follows/over/through/slope/tol/hint/!`,
+          `unexpected ${what} in sketch - use ask/near/follows/over/overlay/through/slope/tol/hint/!`,
           t.line,
           t.col
         );
       }
     }
     eat('RC');
-    return { k: 'sketch', mode, near, through, slope, tol, slopeTol, follows, over, common, ln };
+    return {
+      k: 'sketch',
+      mode,
+      near,
+      through,
+      slope,
+      tol,
+      slopeTol,
+      follows,
+      over,
+      overlay,
+      common,
+      ln,
+    };
   }
 
   function parseMatch(ln: number): Stmt {

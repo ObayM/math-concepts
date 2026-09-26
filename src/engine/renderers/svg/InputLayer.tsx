@@ -9,6 +9,7 @@ import {
   type Cursor,
 } from '@/engine/runtime/keyboardCursor';
 import KeyboardCrosshair from './KeyboardCrosshair';
+import SketchOverlay, { type SketchOverlayConfig } from './SketchOverlay';
 import { resolveColor } from '@/engine/colors';
 import type { Pt } from '@/engine/checks/geometry';
 import type { CoordSystem } from './types';
@@ -21,6 +22,7 @@ export interface InputLayerConfig {
   onChange: (points: Pt[]) => void;
   disabled?: boolean;
   maxPoints?: number;
+  overlay?: SketchOverlayConfig;
 }
 
 const SAMPLE_PX = 3;
@@ -33,6 +35,7 @@ export default function InputLayer({
   onChange,
   disabled,
   maxPoints = Infinity,
+  overlay,
 }: InputLayerConfig & { cx: CoordSystem; svgRef: React.RefObject<SVGSVGElement | null> }) {
   const draftRef = useRef<Pt[]>([]);
   const lastScreenRef = useRef<{ x: number; y: number } | null>(null);
@@ -129,6 +132,32 @@ export default function InputLayer({
       ? 'Plot points: drag with a pointer, or move the crosshair with the arrow keys and press Enter to drop each point. Backspace removes the last one. Hold shift to move faster.'
       : 'Draw a curve: drag with a pointer, or move the crosshair with the arrow keys and press Enter to drop each point, left to right. Backspace removes the last one. Hold shift to move faster.';
 
+  const stroke =
+    mode === 'points'
+      ? shown.map(([x, y], i) => (
+          <circle
+            key={i}
+            cx={cx.toX(x)}
+            cy={cx.toY(y)}
+            r={7}
+            fill={color}
+            stroke="white"
+            strokeWidth={2.5}
+            pointerEvents="none"
+          />
+        ))
+      : shown.length > 1 && (
+          <polyline
+            points={shown.map(([x, y]) => `${cx.toX(x)},${cx.toY(y)}`).join(' ')}
+            fill="none"
+            stroke={color}
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pointerEvents="none"
+          />
+        );
+
   return (
     <>
       {!disabled && (
@@ -147,30 +176,13 @@ export default function InputLayer({
         />
       )}
       {keyCursor && !disabled && <KeyboardCrosshair cx={cx} x={keyCursor.x} y={keyCursor.y} />}
-      {mode === 'points'
-        ? shown.map(([x, y], i) => (
-            <circle
-              key={i}
-              cx={cx.toX(x)}
-              cy={cx.toY(y)}
-              r={7}
-              fill={color}
-              stroke="white"
-              strokeWidth={2.5}
-              pointerEvents="none"
-            />
-          ))
-        : shown.length > 1 && (
-            <polyline
-              points={shown.map(([x, y]) => `${cx.toX(x)},${cx.toY(y)}`).join(' ')}
-              fill="none"
-              stroke={color}
-              strokeWidth={3}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              pointerEvents="none"
-            />
-          )}
+      {overlay && mode === 'curve' ? (
+        <SketchOverlay cx={cx} line={value} overlay={overlay}>
+          {stroke}
+        </SketchOverlay>
+      ) : (
+        stroke
+      )}
     </>
   );
 }

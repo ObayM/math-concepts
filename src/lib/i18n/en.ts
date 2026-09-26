@@ -87,6 +87,9 @@ const en = {
   'exercise.sketchCurve': 'Draw on the scene above, or tab to it and use the arrow keys.',
   'exercise.sketchPoints':
     'Tap the scene above to place points, or tab to it and use the arrow keys.',
+  'exercise.sketchWithin':
+    'You were within reach of the real curve for {pct}% of it. Red is where you drifted.',
+  'exercise.sketchAllWithin': 'You stayed within reach of the real curve the whole way.',
   'exercise.sketchLine':
     'Drag on the scene above to draw a line, or tab to it and use the arrow keys.',
   'exercise.sceneAria':

@@ -101,6 +101,7 @@ export type Stmt =
       slopeTol: Expr | null;
       follows: Expr | null;
       over: Expr | null;
+      overlay: boolean;
       common: ExerciseCommon;
       ln: number;
     }

@@ -241,6 +241,30 @@
   }
 }
 
+@keyframes sketchTruthDraw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sketchGapIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.sketch-truth {
+  stroke-dasharray: 1 1;
+  animation: sketchTruthDraw 900ms var(--ease-entrance) both;
+}
+
+.sketch-gap {
+  animation: sketchGapIn var(--duration-base) ease 700ms both;
+}
+
 .scene-obj {
   transition: opacity var(--duration-base) ease;
   transform-box: fill-box;

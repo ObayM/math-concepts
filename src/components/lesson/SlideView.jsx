@@ -33,6 +33,11 @@ const exerciseRegistry = {
 
 const NO_MEMORY = emptyMemory();
 
+const overlayOf = (ex, shown) =>
+  shown && ex.overlay && ex.follows !== undefined
+    ? { follows: ex.follows, over: ex.over, tol: ex.tol }
+    : undefined;
+
 export default function SlideView({
   slide: source,
   value,
@@ -76,6 +81,7 @@ export default function SlideView({
         onChange,
         disabled: checked,
         maxPoints: slide.exercise.mode === 'points' ? slide.exercise.targets.length : undefined,
+        overlay: overlayOf(slide.exercise, checked && revealAnswer),
       }
     : undefined;
 

@@ -2,6 +2,7 @@
 import { CheckCircle2, XCircle, Pencil, RotateCcw } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { sketchGap } from '@/engine/checks/geometry';
 
 const PROMPT_KEY_BY_MODE = {
   curve: 'exercise.sketchCurve',
@@ -20,6 +21,10 @@ export default function SketchExercise({
   const t = useT();
   const ex = slide.exercise;
   const hasDrawn = Array.isArray(value) && value.length > 0;
+  const overlaid = checked && revealAnswer && ex.overlay && ex.follows !== undefined;
+  const within = overlaid
+    ? Math.round(sketchGap(value, ex.follows, ex.over, ex.tol).within * 100)
+    : null;
 
   return (
     <div className="flex flex-col">
@@ -54,6 +59,14 @@ export default function SketchExercise({
             <XCircle className="w-5 h-5 shrink-0" /> {t('exercise.notQuite')}
           </div>
         ))}
+
+      {within !== null && (
+        <p className="mt-2 text-sm text-neutral-500 font-medium">
+          {within === 100
+            ? t('exercise.sketchAllWithin')
+            : t('exercise.sketchWithin', { pct: within })}
+        </p>
+      )}
 
       {checked && revealAnswer && ex.explanation && (
         <RichText className="mt-4 text-sm text-neutral-500 bg-neutral-50 rounded-xl p-4 leading-relaxed block">
