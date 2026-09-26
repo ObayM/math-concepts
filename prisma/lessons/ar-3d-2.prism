@@ -1,5 +1,5 @@
 lesson "المتجهات في الفراغ" {
-  course: "solid-geometry-g12-ar"
+  course: "solid-geometry-ar"
   unit: "الهندسة والقياس في ثلاثة أبعاد"
   difficulty: "Intermediate"
   icon: "Move"

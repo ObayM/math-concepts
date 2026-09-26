@@ -24,6 +24,7 @@ const COURSES = [
       'limits-3',
       'limits-4',
       'limits-5',
+      'derivative-meaning',
       'differentiation-1',
       'differentiation-2',
       'differentiation-3',
@@ -80,6 +81,7 @@ const COURSES = [
       'vec-4',
       'vec-5',
       'vec-6',
+      'vec-cross',
       'calcess-1',
       'calcess-2',
       'calcess-3',
@@ -100,6 +102,7 @@ const COURSES = [
       'fric-1',
       'fric-2',
       'fric-3',
+      'fric-angle',
       'fric-4',
       'newton-1',
       'newton-2',
@@ -114,10 +117,11 @@ const COURSES = [
   {
     name: 'الهندسة الفراغية',
     slug: 'solid-geometry-ar',
-    description: 'الهندسة الفراغية للثانوية العامة: الفراغ والمتجهات والمستقيمات والمستويات.',
+    description:
+      'الهندسة الفراغية للثانوية العامة: الإحداثيات في الفراغ، المتجهات، والضرب القياسي والاتجاهي.',
     lang: 'ar',
     sortOrder: 4,
-    lessons: ['ar-sg-1'],
+    lessons: ['ar-3d-1', 'ar-3d-2', 'ar-3d-3', 'ar-3d-4'],
   },
   {
     name: 'الأساسيات',

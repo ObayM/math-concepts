@@ -1,5 +1,5 @@
 lesson "الضرب الاتجاهي والضرب الثلاثي القياسي" {
-  course: "solid-geometry-g12-ar"
+  course: "solid-geometry-ar"
   unit: "الهندسة والقياس في ثلاثة أبعاد"
   difficulty: "Advanced"
   icon: "Move"
