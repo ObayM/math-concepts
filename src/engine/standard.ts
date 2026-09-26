@@ -289,6 +289,37 @@ function checkBeats(lesson: LessonIR, out: Finding[]) {
   }
 }
 
+function checkRequires(lesson: LessonIR, out: Finding[]) {
+  const requires = lesson.requires ?? [];
+  const checks = lesson.slides.filter((s) => s.beat === 'check' && !s.hidden);
+  const tested = new Set<string>();
+  for (const s of checks) {
+    const skill = s.exercise?.skill ?? s.skill;
+    if (skill) tested.add(skill);
+    if (!skill || !requires.includes(skill))
+      out.push(
+        warn(
+          s.id,
+          'V_CHECK_NOT_REQUIRED',
+          skill
+            ? `this check tests "${skill}", which isn't in the lesson's requires:, so it can never be skipped for a student who has it`
+            : 'this check has no skill:, so it can never be skipped for a student who already has the prerequisite'
+        )
+      );
+  }
+  const first = lesson.slides.find((s) => !s.hidden)?.id ?? '';
+  for (const skill of requires) {
+    if (!tested.has(skill))
+      out.push(
+        warn(
+          first,
+          'V_REQUIRES_UNCHECKED',
+          `requires "${skill}" but no check beat tests it, so a student without it gets no warm up and no bridge`
+        )
+      );
+  }
+}
+
 function checkAlt(slide: SlideIR, out: Finding[]) {
   if (!slide.scene || slide.hidden || slide.scene.space.alt) return;
   out.push(
@@ -311,5 +342,6 @@ export function checkStandard(lesson: LessonIR): Finding[] {
     checkVoice(slide, out);
   }
   checkBeats(lesson, out);
+  checkRequires(lesson, out);
   return out;
 }

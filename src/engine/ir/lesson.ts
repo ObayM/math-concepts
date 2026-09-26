@@ -188,6 +188,7 @@ export const lessonSchema = z.object({
   title: z.string(),
   course: z.string().optional(),
   skills: z.array(z.string()).optional(),
+  requires: z.array(z.string()).optional(),
   unit: z.string().optional(),
   difficulty: z.enum(LESSON_DIFFICULTIES).optional(),
   icon: z.enum(LESSON_ICONS).optional(),

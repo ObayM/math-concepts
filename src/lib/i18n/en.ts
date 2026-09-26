@@ -41,6 +41,8 @@ const en = {
   'lesson.askTutor': 'Ask AI Tutor',
   'lesson.stuck': 'Stuck? Ask about this slide',
   'lesson.followUp': 'Ask a follow up',
+  'lesson.skippedCheck':
+    "You've got the warm up covered lately, so we skipped it. Back takes you there.",
   'lesson.restart': 'Restart this lesson from the beginning? Your progress will be cleared.',
   'lesson.notes': 'Notes',
   'lesson.prev': 'Back',

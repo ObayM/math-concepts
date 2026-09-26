@@ -10,9 +10,9 @@ export const lessonSection: DocSection = {
     {
       keyword: 'lesson',
       syntax:
-        'lesson "Title" {\n  [course: "..."]\n  [unit: "..."]\n  [difficulty: "Beginner"|"Intermediate"|"Advanced"]\n  [icon: "..."]\n  [summary: "..."]\n  [skills: ["...", "..."]]\n  slide "..." { ... }\n  ...\n}',
+        'lesson "Title" {\n  [course: "..."]\n  [unit: "..."]\n  [difficulty: "Beginner"|"Intermediate"|"Advanced"]\n  [icon: "..."]\n  [summary: "..."]\n  [skills: ["...", "..."]]\n  [requires: ["..."]]\n  slide "..." { ... }\n  ...\n}',
       description:
-        'The top-level container. Holds lesson metadata and an ordered list of slides. These properties are the source of truth for how the lesson appears in the catalog: `unit` groups it under a heading on the course page, `difficulty` and `icon` render on its card, and `summary` is the one-line description. `course` tags which track it belongs to; `skills` lists the skill ids it teaches. An unknown property here is a compile error, so a typo cannot silently drop your metadata.',
+        'The top-level container. Holds lesson metadata and an ordered list of slides. These properties are the source of truth for how the lesson appears in the catalog: `unit` groups it under a heading on the course page, `difficulty` and `icon` render on its card, and `summary` is the one-line description. `course` tags which track it belongs to; `skills` lists the skill ids it teaches. `requires` lists the hard prerequisite skills: a `beat: check` slide whose exercise tests one of them is skipped for a student who got that skill right recently, so nobody re-proves what they just showed. An unknown property here is a compile error, so a typo cannot silently drop your metadata.',
       props: [
         { name: 'course', type: 'string', description: 'track id, e.g. "calculus"' },
         { name: 'unit', type: 'string', description: 'unit heading on the course page' },
@@ -28,6 +28,11 @@ export const lessonSection: DocSection = {
         },
         { name: 'summary', type: 'string', description: 'one line describing the lesson' },
         { name: 'skills', type: 'string[]', description: 'skill ids this lesson teaches' },
+        {
+          name: 'requires',
+          type: 'string[]',
+          description: 'hard prerequisite skills; recently mastered ones skip their check slides',
+        },
       ],
       example:
         'lesson "Quadratics" {\n  course: "algebra"\n  unit: "Polynomials"\n  difficulty: "Beginner"\n  icon: "FunctionSquare"\n  summary: "Meet the parabola and its vertex."\n  skills: ["quad-vertex"]\n\n  slide "Meet the parabola" {\n    > A quadratic graphs as a **parabola**.\n  }\n}',
@@ -69,7 +74,7 @@ export const lessonSection: DocSection = {
       keyword: '>',
       syntax: '> markdown text with $latex$',
       description:
-        'A prose line. Everything after `> ` is raw text — **markdown** (`**bold**`, `*italic*`) and `$inline$` / `$$display$$` LaTeX all work. Consecutive prose lines join into one paragraph.',
+        'A prose line. Everything after `> ` is raw text — **markdown** (`**bold**`, `*italic*`) and `$inline$` / `$$display$$` LaTeX all work. Consecutive prose lines join into one paragraph. `[words](lesson:key)` links to another lesson, the way to point a student at a missing prerequisite.',
       example: '> The **discriminant** $D = b^2 - 4ac$ tells you how many roots exist.',
     },
     {

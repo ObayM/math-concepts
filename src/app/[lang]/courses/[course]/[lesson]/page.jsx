@@ -8,6 +8,8 @@ import { courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 import * as Sentry from '@sentry/nextjs';
 import { getT } from '@/lib/i18n/server';
+import { getMasteryFor } from '@/lib/db/progressService';
+import { skippableChecks } from '@/lib/prerequisites';
 
 export async function generateMetadata({ params }) {
   const { course, lesson: lessonSlug, lang } = await params;
@@ -47,11 +49,8 @@ export default async function LessonPage({ params, searchParams }) {
     redirect(`/courses/${canonicalCourse}/${lessonSlug}${query}`);
   }
 
-  let wantsDraft = preview === 'draft';
-  if (wantsDraft) {
-    const session = await getFullSession();
-    wantsDraft = isAdmin(session?.user ?? null);
-  }
+  const session = await getFullSession();
+  const wantsDraft = preview === 'draft' && isAdmin(session?.user ?? null);
 
   if (!wantsDraft && lessonRow.status !== 'published') notFound();
 
@@ -69,7 +68,11 @@ export default async function LessonPage({ params, searchParams }) {
     return <BrokenLesson course={course} t={t} />;
   }
 
-  const nextLessonId = await getNextLessonKey(lessonRow.courseId, lessonRow.sortOrder);
+  const [nextLessonId, mastery] = await Promise.all([
+    getNextLessonKey(lessonRow.courseId, lessonRow.sortOrder),
+    getMasteryFor(session?.user?.id, parsed.data.requires),
+  ]);
+  const skipTo = skippableChecks(parsed.data.slides, parsed.data.requires, mastery);
 
   return (
     <LessonPlayer
@@ -77,6 +80,7 @@ export default async function LessonPage({ params, searchParams }) {
       lessonId={lessonSlug}
       coursePath={course}
       nextLessonId={nextLessonId}
+      skipTo={skipTo}
     />
   );
 }

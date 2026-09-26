@@ -130,6 +130,14 @@ export async function getTakenLessonIds(userId) {
   return [...new Set([...progress, ...attempts].map((r) => r.lessonId))];
 }
 
+export async function getMasteryFor(userId, skills) {
+  if (!userId || !skills?.length) return [];
+  return prisma.userSkillMastery.findMany({
+    where: { userId, skill: { in: skills } },
+    select: { skill: true, score: true, updatedAt: true },
+  });
+}
+
 export async function getMyMastery(userId) {
   const rows = await prisma.userSkillMastery.findMany({
     where: { userId },

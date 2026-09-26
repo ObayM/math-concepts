@@ -5,6 +5,7 @@ lesson "What a derivative is" {
   icon: "TrendingUp"
   summary: "A speedometer shows a speed at one instant, when no time passes. Shrink the gap, watch the average settle, and find out what that number really is."
   skills: ["derivative-meaning", "derivative-from-definition"]
+  requires: ["slope-of-line"]
 
   role gap = primary
   role distance = accent

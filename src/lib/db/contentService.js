@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { compileLesson, CompileError, formatCompileError } from '@/engine/lang';
 import { verifyLesson, isBlocking } from '@/engine/verify';
+import { lessonLinks } from '@/engine/links';
 
 function slugify(name) {
   return name
@@ -113,7 +114,29 @@ export async function updateLessonSource(id, source, expectedUpdatedAt) {
   }
 
   const lesson = await prisma.lesson.findUnique({ where: { id } });
-  return { lesson, findings: compiled.findings, error: null };
+  return {
+    lesson,
+    findings: [...compiled.findings, ...(await brokenLinks(compiled.data))],
+    error: null,
+  };
+}
+
+async function brokenLinks(data) {
+  const links = lessonLinks(data);
+  if (!links.length) return [];
+  const found = await prisma.lesson.findMany({
+    where: { lessonKey: { in: [...new Set(links.map((l) => l.key))] } },
+    select: { lessonKey: true },
+  });
+  const known = new Set(found.map((l) => l.lessonKey));
+  return links
+    .filter((l) => !known.has(l.key))
+    .map((l) => ({
+      slideId: l.slideId,
+      code: 'V_LESSON_LINK_MISSING',
+      message: `links to lesson "${l.key}", which doesn't exist`,
+      severity: 'warning',
+    }));
 }
 
 export async function moveLessonToCourse(id, courseId) {

@@ -5,6 +5,7 @@ lesson "The angle of friction" {
   icon: "Triangle"
   summary: "A surface gives one push, and friction can only tilt it so far. Find that furthest tilt with your hands, then watch it decide when things slide off a ramp."
   skills: ["fric-limiting", "fric-resultant-reaction", "fric-angle-of-friction"]
+  requires: ["fric-limiting"]
 
   role up = success
   role friction = warning

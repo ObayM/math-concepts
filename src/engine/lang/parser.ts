@@ -438,7 +438,15 @@ function makeParser(tokens: Token[]) {
     return { k: 'lesson', title, props, slides, defs, roles, ln };
   }
 
-  const LESSON_PROPS = new Set(['course', 'skills', 'unit', 'difficulty', 'icon', 'summary']);
+  const LESSON_PROPS = new Set([
+    'course',
+    'skills',
+    'requires',
+    'unit',
+    'difficulty',
+    'icon',
+    'summary',
+  ]);
 
   const SLIDE_PROPS = new Set(['cat', 'id', 'skill', 'hidden', 'beat', 'then']);
 

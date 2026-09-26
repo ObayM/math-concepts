@@ -15,7 +15,7 @@ const DISPLAY_ONLY = /^\$\$([^$]+)\$\$$/;
 
 function renderInline(text) {
   const re =
-    /\$\$([^$]+)\$\$|\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]\n]+)\]\{(primary|accent|success|danger|warning|neutral)(?::([\w-]+))?\}/g;
+    /\$\$([^$]+)\$\$|\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]\n]+)\]\{(primary|accent|success|danger|warning|neutral)(?::([\w-]+))?\}|\[([^\]\n]+)\]\(lesson:([a-z0-9-]+)\)/g;
   const parts = [];
   let last = 0;
   let key = 0;
@@ -56,6 +56,16 @@ function renderInline(text) {
         >
           {renderInline(m[5])}
         </span>
+      );
+    } else if (m[8] != null) {
+      parts.push(
+        <a
+          key={key++}
+          href={`/l/${m[9]}`}
+          className="font-semibold text-primary-600 underline decoration-2 underline-offset-4"
+        >
+          {renderInline(m[8])}
+        </a>
       );
     }
     last = re.lastIndex;

@@ -39,6 +39,7 @@ export default function LessonPlayer({
   lessonId,
   coursePath = 'algebra',
   nextLessonId,
+  skipTo = 0,
 }) {
   const router = useRouter();
   const t = useT();
@@ -57,6 +58,7 @@ export default function LessonPlayer({
   const [streak, setStreak] = useState(null);
   const [saveError, setSaveError] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [skippedTo, setSkippedTo] = useState(0);
 
   const [padOpen, setPadOpen] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -143,6 +145,10 @@ export default function LessonPlayer({
       .then((r) => r.json())
       .then((d) => {
         if (d.currentStep > 0 && d.currentStep < path.length) setFlow(initialFlow(d.currentStep));
+        else if (!d.completed && skipTo > 0 && skipTo < path.length) {
+          setFlow(initialFlow(skipTo));
+          setSkippedTo(skipTo);
+        }
         if (Array.isArray(d.quizHistory)) setMemory(memoryFromHistory(slides, d.quizHistory));
         if (d.completed) {
           setIsComplete(true);
@@ -151,7 +157,7 @@ export default function LessonPlayer({
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
-  }, [lessonId, path.length, slides]);
+  }, [lessonId, path.length, slides, skipTo]);
 
   const skipNextSaveRef = useRef(true);
   useEffect(() => {
@@ -377,6 +383,7 @@ export default function LessonPlayer({
     if (!confirm(t('lesson.restart'))) return;
     fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
     setFlow(initialFlow(0));
+    setSkippedTo(0);
     setResetForKey(null);
     setQuizHistory([]);
     setMemory(emptyMemory());
@@ -560,6 +567,11 @@ export default function LessonPlayer({
                 >
                   {slide?.title}
                 </h1>
+                {skippedTo > 0 && !inDetour && pathIndex === skippedTo && (
+                  <p className="mt-3 text-sm font-medium text-neutral-500">
+                    {t('lesson.skippedCheck')}
+                  </p>
+                )}
               </div>
 
               <div className="flex-1 w-full">

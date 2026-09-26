@@ -43,6 +43,7 @@ const ar: Dictionary = {
   'lesson.askTutor': 'اسأل المدرّس',
   'lesson.stuck': 'واقف؟ اسأل عن هذه الشريحة',
   'lesson.followUp': 'اسأل سؤالًا آخر',
+  'lesson.skippedCheck': 'أتقنت الإحماء مؤخرًا، فتخطيناه. زر الرجوع يعيدك إليه.',
   'lesson.restart': 'تبدأ الدرس من أوله؟ سيُمسح تقدمك فيه.',
   'lesson.notes': 'ملاحظات',
   'lesson.prev': 'رجوع',

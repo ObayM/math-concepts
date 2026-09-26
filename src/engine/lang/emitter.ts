@@ -2272,6 +2272,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
 
   const course = pStr(root.props, 'course');
   const skills = pStrList(root.props, 'skills');
+  const requires = pStrList(root.props, 'requires');
   const unit = pStr(root.props, 'unit');
   const summary = pStr(root.props, 'summary');
   const difficulty = pEnum(root.props, 'difficulty', LESSON_DIFFICULTIES, root.ln);
@@ -2296,6 +2297,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
     title: root.title,
     ...(course && { course }),
     ...(skills && { skills }),
+    ...(requires && { requires }),
     ...(unit && { unit }),
     ...(difficulty && { difficulty }),
     ...(icon && { icon }),

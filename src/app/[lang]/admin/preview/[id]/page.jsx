@@ -4,12 +4,14 @@ import { lessonSchema } from '@/engine/ir/lesson';
 import LessonPlayer from '@/components/lesson/LessonPlayer';
 import { getLessonById } from '@/lib/db/lessonService';
 import { requireAdmin } from '@/lib/authz';
+import { getMasteryFor } from '@/lib/db/progressService';
+import { skippableChecks } from '@/lib/prerequisites';
 import { DEFAULT_LOCALE, dirFor, isLocale } from '@/lib/locale';
 
 // preview resolves by id, not by key plus language. the cms always runs on the
 // english host, so a key lookup would refuse every arabic draft.
 export default async function LessonPreviewPage({ params, searchParams }) {
-  await requireAdmin();
+  const admin = await requireAdmin();
   const { id } = await params;
   const { published } = await searchParams;
 
@@ -25,6 +27,8 @@ export default async function LessonPreviewPage({ params, searchParams }) {
 
   const course = lesson.courseId ? await courseLang(lesson.courseId) : null;
   const lang = isLocale(course) ? course : DEFAULT_LOCALE;
+  const mastery = await getMasteryFor(admin?.id, parsed.data.requires);
+  const skipTo = skippableChecks(parsed.data.slides, parsed.data.requires, mastery);
 
   return (
     <div lang={lang} dir={dirFor(lang)}>
@@ -33,6 +37,7 @@ export default async function LessonPreviewPage({ params, searchParams }) {
         lessonId={lesson.lessonKey}
         coursePath={`admin/content`}
         nextLessonId={null}
+        skipTo={skipTo}
       />
     </div>
   );
