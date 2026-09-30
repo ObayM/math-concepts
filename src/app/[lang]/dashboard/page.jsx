@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { PlayCircle, ArrowRight, Flame, Lock, CheckCircle, Target, Zap } from 'lucide-react';
 
 import { requireUser } from '@/lib/session';
+import { isAdmin } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { getStreak, getActivityHeatmap, getTodayXp } from '@/lib/db/activityService';
 import { getUserTimeZone } from '@/lib/db/userService';
@@ -20,7 +21,7 @@ import BetaBanner from '@/components/i18n/BetaBanner';
 
 const eyebrow = 'text-xs font-bold uppercase tracking-[0.12em] text-neutral-400';
 
-function withLessonStatus(lessons, progressByLessonKey) {
+function withLessonStatus(lessons, progressByLessonKey, unlockAll) {
   return lessons.map((lesson, index) => {
     const progress = progressByLessonKey.get(lesson.lessonKey);
     const isCompleted = progress?.completed ?? false;
@@ -34,7 +35,7 @@ function withLessonStatus(lessons, progressByLessonKey) {
     } else if (progressByLessonKey.get(lessons[index - 1].lessonKey)?.completed) {
       status = 'unlocked';
     }
-    if (status === 'locked' && isStarted) status = 'unlocked';
+    if (status === 'locked' && (isStarted || unlockAll)) status = 'unlocked';
 
     return {
       id: lesson.lessonKey,
@@ -88,7 +89,11 @@ const DashboardPage = async ({ params }) => {
 
   const coursesWithLessons = courses.map((course) => ({
     ...course,
-    lessons: withLessonStatus(lessonsByCourse.get(course.id) ?? [], progressByLessonKey),
+    lessons: withLessonStatus(
+      lessonsByCourse.get(course.id) ?? [],
+      progressByLessonKey,
+      isAdmin(user)
+    ),
   }));
 
   let currentCourse = coursesWithLessons[0] ?? null;

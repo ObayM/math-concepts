@@ -107,7 +107,7 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
   if (isLocked) return inner;
 
   return (
-    <Link href={`/courses/${courseSlug}/${id}`} className="block">
+    <Link href={`/courses/${courseSlug}/${id}${isDraft ? '?preview=draft' : ''}`} className="block">
       {inner}
     </Link>
   );

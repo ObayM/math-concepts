@@ -55,7 +55,7 @@ export default async function CoursePage({ params }) {
       const prevKey = lessons[index - 1].lessonKey;
       if (progressMap.get(prevKey)?.is_completed) status = 'unlocked';
     }
-    if (status === 'locked' && isStarted) status = 'unlocked';
+    if (status === 'locked' && (isStarted || viewerIsAdmin)) status = 'unlocked';
 
     return { ...lesson, id: lesson.lessonKey, status, isDraft: lesson.status !== 'published' };
   });
