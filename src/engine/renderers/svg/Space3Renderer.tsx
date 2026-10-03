@@ -103,7 +103,7 @@ export default function Space3Renderer({ ir, revealed }: { ir: SceneIR; revealed
   return (
     <div
       ref={wrapRef}
-      className="w-full bg-white rounded-2xl border border-neutral-100 card-soft overflow-hidden"
+      className="w-full bg-card rounded-2xl border border-neutral-100 card-soft overflow-hidden"
     >
       <svg
         viewBox={`0 0 ${W} ${H}`}

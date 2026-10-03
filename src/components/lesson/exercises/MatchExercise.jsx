@@ -123,7 +123,7 @@ export default function MatchExercise({
             const matched = matches[i] != null;
             const isCorrect = checked && sameAnswer(matches[i], p.right);
             const isWrong = checked && matched && !isCorrect;
-            let cls = 'border-2 border-neutral-200 bg-white hover:border-neutral-300';
+            let cls = 'border-2 border-neutral-200 bg-card hover:border-neutral-300';
             if (matched) cls = `border-2 ${hue.box}`;
             if (armed === i) cls = `border-2 ${hue.armed}`;
             if (isCorrect) cls = 'border-2 border-success-500 bg-success-50';
@@ -161,7 +161,7 @@ export default function MatchExercise({
             const hue = used ? hueOf(owner) : null;
             const isCorrect = checked && used && sameAnswer(text, ex.pairs[owner].right);
             const isWrong = checked && used && !isCorrect;
-            let cls = 'border-2 border-neutral-200 bg-white hover:border-neutral-300';
+            let cls = 'border-2 border-neutral-200 bg-card hover:border-neutral-300';
             if (used) cls = `border-2 ${hue.box}`;
             if (isCorrect) cls = 'border-2 border-success-500 bg-success-50';
             if (isWrong) cls = 'border-2 border-danger-500 bg-danger-50';
@@ -187,7 +187,7 @@ export default function MatchExercise({
 
       {drag && (
         <DragGhost x={drag.x} y={drag.y}>
-          <span className="inline-flex items-center p-4 rounded-2xl border-2 border-neutral-300 bg-white font-bold text-neutral-800">
+          <span className="inline-flex items-center p-4 rounded-2xl border-2 border-neutral-300 bg-card font-bold text-neutral-800">
             <RichText>{drag.id}</RichText>
           </span>
         </DragGhost>

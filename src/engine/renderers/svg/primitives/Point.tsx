@@ -56,7 +56,7 @@ export default function Point({ obj, scope, cx, startDrag, keyDrag }: PrimProps)
         cx={px}
         cy={py}
         r={r}
-        fill={obj.open ? 'white' : color}
+        fill={obj.open ? LABEL_HALO : color}
         stroke={obj.open ? color : LABEL_HALO}
         strokeWidth={2.5}
         onPointerDown={onPointerDown}

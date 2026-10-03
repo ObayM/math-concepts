@@ -96,7 +96,7 @@ export default function OnboardingForm() {
       <form
         method="post"
         onSubmit={handleSubmit}
-        className="bg-white border border-neutral-200 rounded-2xl p-8 space-y-6"
+        className="bg-card border border-neutral-200 rounded-2xl p-8 space-y-6"
       >
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-1">

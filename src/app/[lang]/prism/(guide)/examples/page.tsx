@@ -88,7 +88,7 @@ function ExampleCard({ example }: { example: (typeof EXAMPLES)[number] }) {
 
 export default function ExamplesPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <div className="ex-page">
         <header className="ex-header">
           <h1 className="ex-page-title">Examples</h1>

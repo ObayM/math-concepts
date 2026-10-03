@@ -71,7 +71,7 @@ export default function BuildExercise({
     const filled = placed[i] != null;
     if (checked && filled)
       return correct ? 'border-success-500 bg-success-50' : 'border-danger-500 bg-danger-50';
-    if (filled) return 'border-primary-300 bg-white';
+    if (filled) return 'border-primary-300 bg-card';
     return 'border-dashed border-neutral-300';
   };
 
@@ -162,7 +162,7 @@ export default function BuildExercise({
               className={`flex items-center justify-center text-lg font-bold transition-all active:scale-90 disabled:opacity-30 ${
                 isOp
                   ? 'min-w-12 h-12 px-2 rounded-full border-2 border-neutral-300 text-neutral-600 hover:border-primary-400'
-                  : 'min-w-12 h-12 px-3 rounded-xl border-2 border-neutral-300 bg-white text-neutral-800 hover:border-primary-400'
+                  : 'min-w-12 h-12 px-3 rounded-xl border-2 border-neutral-300 bg-card text-neutral-800 hover:border-primary-400'
               }`}
             >
               <RichText>{tok.label}</RichText>
@@ -181,7 +181,7 @@ export default function BuildExercise({
 
       {drag && (
         <DragGhost x={drag.x} y={drag.y}>
-          <span className="inline-flex items-center justify-center min-w-12 h-12 px-3 rounded-xl border-2 border-primary-400 bg-white text-lg font-bold text-neutral-800">
+          <span className="inline-flex items-center justify-center min-w-12 h-12 px-3 rounded-xl border-2 border-primary-400 bg-card text-lg font-bold text-neutral-800">
             <RichText>{dragLabel}</RichText>
           </span>
         </DragGhost>

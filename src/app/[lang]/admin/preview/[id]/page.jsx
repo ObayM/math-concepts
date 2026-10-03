@@ -57,7 +57,7 @@ async function courseLang(courseId) {
 
 function PreviewProblem({ lesson }) {
   return (
-    <div className="border border-neutral-300 bg-white p-6">
+    <div className="border border-neutral-300 bg-card p-6">
       <h1 className="text-lg font-bold text-neutral-900">This draft will not render</h1>
       <p className="mt-2 text-sm text-neutral-600">
         {lesson.lessonKey} compiled, but the stored IR does not match the schema, or every slide in

@@ -13,7 +13,7 @@ export default function Card({
   return (
     <Comp
       className={clsx(
-        'rounded-2xl border border-neutral-200 bg-white',
+        'rounded-2xl border border-neutral-200 bg-card',
         isPressable && pressable,
         className
       )}

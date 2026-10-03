@@ -1,5 +1,5 @@
 import katex from 'katex';
-import { texColors } from '@/engine/colors';
+import { texColors, themeTex } from '@/engine/colors';
 import { newReport, toMathML, type PNode, type Report } from './emit';
 
 type Parse = (src: string, settings: Record<string, unknown>) => PNode[];
@@ -19,13 +19,17 @@ export function arabicMath(src: string, display: boolean): ArabicMath {
   try {
     const body = toMathML(parseTex(src), report);
     const mode = display ? ' display="block"' : '';
-    return { html: `<math dir="rtl" class="artex"${mode}>${body}</math>`, fallback: false, report };
+    return {
+      html: themeTex(`<math dir="rtl" class="artex"${mode}>${body}</math>`),
+      fallback: false,
+      report,
+    };
   } catch {
     const html = katex.renderToString(texColors(src), {
       throwOnError: false,
       displayMode: display,
     });
-    return { html: `<span dir="ltr">${html}</span>`, fallback: true, report };
+    return { html: `<span dir="ltr">${themeTex(html)}</span>`, fallback: true, report };
   }
 }
 

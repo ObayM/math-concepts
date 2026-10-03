@@ -22,7 +22,7 @@ export default function ImpersonationBanner() {
 
   if (confirming) {
     return (
-      <div className="animate-fade-in-up fixed bottom-5 right-5 z-[60] flex w-48 flex-col gap-2 border border-neutral-900 bg-neutral-900 p-3 text-xs font-bold text-white">
+      <div className="animate-fade-in-up fixed bottom-5 right-5 z-[60] flex w-48 flex-col gap-2 border border-neutral-900 bg-neutral-900 p-3 text-xs font-bold text-card">
         <span>Exit and go back to you?</span>
         <Button type="button" variant="danger" size="sm" onClick={handleExit} fullWidth>
           Yes, exit
@@ -44,7 +44,7 @@ export default function ImpersonationBanner() {
     <button
       onClick={() => setConfirming(true)}
       title="Exit impersonation"
-      className="animate-fade-in-up fixed bottom-5 right-5 z-[60] flex items-center gap-2 border border-neutral-900 bg-neutral-900 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-800"
+      className="animate-fade-in-up fixed bottom-5 right-5 z-[60] flex items-center gap-2 border border-neutral-900 bg-neutral-900 px-3 py-2 text-xs font-bold text-card transition-colors hover:bg-neutral-800"
     >
       <Eye size={16} />
       <span>Viewing as {user?.username ?? user?.email ?? 'user'}</span>

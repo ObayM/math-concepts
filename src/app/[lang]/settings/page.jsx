@@ -3,6 +3,7 @@ import { requireUser } from '@/lib/session';
 import { getUserSettings } from '@/lib/db/userService';
 import SettingsForm from './SettingsForm';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
+import ThemeSwitcher from '@/components/settings/ThemeSwitcher';
 import { getT } from '@/lib/i18n/server';
 import { LOCALES } from '@/lib/locale';
 import { originForLocale } from '@/lib/origin';
@@ -34,6 +35,9 @@ export default async function SettingsPage() {
             heading={t('settings.language')}
             blurb={t('settings.languageBlurb')}
           />
+        </div>
+        <div className="mt-8">
+          <ThemeSwitcher />
         </div>
         <SettingsForm
           reminderEmails={settings.reminderEmails}

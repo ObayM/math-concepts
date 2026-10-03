@@ -56,8 +56,8 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
       <div
         className={`card-soft flex-1 mb-3 ms-3 rounded-xl border p-4 transition-colors ${
           isLocked
-            ? 'border-neutral-200 bg-white opacity-60'
-            : 'border-neutral-200 bg-white group-hover:border-primary-200 group-hover:bg-primary-50'
+            ? 'border-neutral-200 bg-card opacity-60'
+            : 'border-neutral-200 bg-card group-hover:border-primary-200 group-hover:bg-primary-50'
         }`}
       >
         <div className="flex items-start justify-between gap-3">

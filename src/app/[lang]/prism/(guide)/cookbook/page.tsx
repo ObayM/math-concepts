@@ -5,7 +5,7 @@ import './cookbook.css';
 
 export default function CookbookPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <div className="cb-page">
         <header className="cb-header">
           <h1 className="cb-page-title">Cookbook</h1>

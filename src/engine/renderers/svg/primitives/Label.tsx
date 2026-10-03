@@ -1,6 +1,6 @@
 import katex from 'katex';
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
-import { resolveColor, LABEL_HALO, texColors } from '@/engine/colors';
+import { resolveColor, LABEL_HALO, texColors, themeTex } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
 import { arabicMath } from '@/engine/artex';
 import { useMathNotation, useSceneText } from '@/engine/artex/context';
@@ -17,7 +17,7 @@ export default function Label({ obj, scope, cx }: PrimProps) {
     const raw = interpolate(obj.text, scope);
     const html = arabic
       ? arabicMath(raw, false).html
-      : katex.renderToString(texColors(raw), { throwOnError: false });
+      : themeTex(katex.renderToString(texColors(raw), { throwOnError: false }));
 
     const narrow = cx.W < 420;
     const estW = raw.replace(/\\[a-zA-Z]+|[{}\s]/g, '').length * fontSize * 0.62 + 12;
@@ -42,7 +42,7 @@ export default function Label({ obj, scope, cx }: PrimProps) {
             unicodeBidi: 'isolate',
             lineHeight: 1.35,
             display: 'inline-block',
-            background: 'rgba(255, 255, 255, 0.82)',
+            background: 'color-mix(in srgb, var(--color-card) 82%, transparent)',
             padding: '1px 5px',
             borderRadius: 4,
           }}

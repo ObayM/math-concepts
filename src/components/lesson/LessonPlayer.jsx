@@ -452,7 +452,7 @@ export default function LessonPlayer({
   const restartButton = (
     <button
       onClick={handleReset}
-      className="tap-target bg-white p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors flex items-center justify-center"
+      className="tap-target bg-card p-2.5 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 transition-colors flex items-center justify-center"
       title={t('lesson.restartAction')}
       aria-label={t('lesson.restartAction')}
     >
@@ -463,7 +463,7 @@ export default function LessonPlayer({
   const lessonChrome = (
     <>
       {streak !== null && (
-        <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 card-soft">
+        <div className="bg-card px-4 py-2 rounded-full border border-neutral-200 font-bold text-orange-500 flex items-center gap-2 card-soft">
           🔥 {t('lesson.dayStreak', { count: streak })}
         </div>
       )}
@@ -489,7 +489,7 @@ export default function LessonPlayer({
   const mobileChrome = (
     <div className={`flex shrink-0 items-center gap-2 ${showPad ? '' : 'md:hidden'}`}>
       {streak !== null && (
-        <div className="flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-sm font-bold text-orange-500">
+        <div className="flex items-center rounded-full border border-neutral-200 bg-card px-2.5 py-1 text-sm font-bold text-orange-500">
           🔥 {streak}
         </div>
       )}
@@ -514,7 +514,7 @@ export default function LessonPlayer({
       )}
 
       <div
-        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-5xl'} transition-[max-width] duration-300 bg-white rounded-3xl overflow-hidden border border-neutral-200/80 flex relative md:max-h-[calc(100dvh-var(--nav-h)-1.5rem)] max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
+        className={`card-hero animate-fade-in-up w-full ${showPad ? 'max-w-[80rem]' : 'max-w-5xl'} transition-[max-width] duration-300 bg-card rounded-3xl overflow-hidden border border-neutral-200/80 flex relative md:max-h-[calc(100dvh-var(--nav-h)-1.5rem)] max-md:rounded-none max-md:border-0 max-md:h-[calc(100dvh-var(--nav-h))]`}
       >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
@@ -668,7 +668,7 @@ export default function LessonPlayer({
                       ) : (
                         <div
                           key={i}
-                          className="w-fit max-w-[92%] rounded-2xl rounded-es-sm border border-primary-100 bg-white px-4 py-3 text-sm leading-relaxed text-neutral-700"
+                          className="w-fit max-w-[92%] rounded-2xl rounded-es-sm border border-primary-100 bg-card px-4 py-3 text-sm leading-relaxed text-neutral-700"
                         >
                           {turn.content ? (
                             <RichText>{turn.content}</RichText>
@@ -699,7 +699,7 @@ export default function LessonPlayer({
                     disabled={tutorStreaming}
                     placeholder={tutorTurns.length ? t('lesson.followUp') : t('lesson.stuck')}
                     aria-label={t('lesson.askTutor')}
-                    className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
+                    className="flex-1 rounded-xl border border-neutral-200 bg-card px-4 py-3 text-base sm:text-sm outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
                   />
                   <Button
                     onClick={handleTutorAsk}

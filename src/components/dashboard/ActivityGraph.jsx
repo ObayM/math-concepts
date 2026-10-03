@@ -127,7 +127,7 @@ const StreakView = ({ weekDays, activityMap, streak, hasActivityToday, showCapti
                   active
                     ? 'bg-success-500 text-white'
                     : day.isToday
-                      ? 'ring-2 ring-primary-300 bg-white text-primary-500'
+                      ? 'ring-2 ring-primary-300 bg-card text-primary-500'
                       : 'bg-neutral-100 text-neutral-300',
                 ].join(' ')}
               >

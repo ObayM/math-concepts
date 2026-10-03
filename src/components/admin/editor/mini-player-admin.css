@@ -7,7 +7,7 @@
 
 .mini-player-tab {
   border: 1px solid var(--color-neutral-300);
-  background: white;
+  background: var(--color-card);
   color: var(--color-neutral-600);
   font-size: 12px;
   font-weight: 700;

@@ -38,7 +38,7 @@ export default function Scratchpad({
       aria-pressed={tab === id}
       className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
         tab === id
-          ? 'bg-white text-neutral-800 shadow-sm'
+          ? 'bg-card text-neutral-800 shadow-sm'
           : 'text-neutral-500 hover:text-neutral-700'
       }`}
     >

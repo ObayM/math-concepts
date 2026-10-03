@@ -61,7 +61,7 @@ export default function LiveDemo({ lesson }) {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div dir="ltr" className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white">
+    <div dir="ltr" className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-card">
       {playing ? (
         <div className="p-4 sm:p-6">
           <MiniPlayer lesson={lesson} />

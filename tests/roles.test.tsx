@@ -43,7 +43,7 @@ describe('colour roles', () => {
     const html = renderToStaticMarkup(<RichText>{slide.prose}</RichText>);
     expect(html).toContain('data-role="distance"');
     expect(html).toContain('var(--color-accent-600)');
-    expect(html).toContain('#a855f7');
+    expect(html).toContain('var(--scene-accent)');
   });
 
   it('refuses a span with a role nobody declared', () => {

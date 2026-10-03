@@ -14,6 +14,7 @@ const en = {
   'nav.primary': 'Primary',
   'nav.global': 'Global',
   'nav.you': 'You',
+  'nav.theme': 'Theme',
   'nav.account': 'Account menu',
   'nav.learn': 'Learn',
 
@@ -435,6 +436,11 @@ const en = {
   'settings.language': 'Language',
   'settings.languageBlurb':
     'Arabic and English are separate courses, not translations of each other. Switching takes you to the other site.',
+  'settings.theme': 'Appearance',
+  'settings.themeBlurb': 'Light, dark, or whatever your device is set to.',
+  'settings.themeLight': 'Light',
+  'settings.themeDark': 'Dark',
+  'settings.themeSystem': 'System',
 
   'difficulty.Beginner': 'Beginner',
   'difficulty.Intermediate': 'Intermediate',

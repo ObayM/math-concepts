@@ -6,7 +6,7 @@
 
 .cb-header {
   padding-bottom: 32px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--doc-line-soft);
   margin-bottom: 40px;
 }
 
@@ -14,14 +14,14 @@
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #0f0f0f;
+  color: var(--doc-ink);
   margin: 0 0 10px;
 }
 
 .cb-page-sub {
   font-size: 15px;
   line-height: 1.7;
-  color: #6b7280;
+  color: var(--doc-muted);
   max-width: 620px;
   margin: 0;
 }
@@ -39,14 +39,14 @@
 .cb-entry-title {
   font-size: 20px;
   font-weight: 700;
-  color: #0f0f0f;
+  color: var(--doc-ink);
   margin: 0 0 8px;
 }
 
 .cb-entry-desc {
   font-size: 14px;
   line-height: 1.7;
-  color: #374151;
+  color: var(--doc-body);
   margin: 0 0 16px;
   max-width: 640px;
 }

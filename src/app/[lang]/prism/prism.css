@@ -1,8 +1,56 @@
+:root {
+  --doc-ink: #0f0f0f;
+  --doc-body: #374151;
+  --doc-muted: #6b7280;
+  --doc-faint: #9ca3af;
+  --doc-line: #e5e7eb;
+  --doc-line-soft: #f0f0f0;
+  --doc-chip: #f3f4f6;
+  --doc-wash: #f9fafb;
+  --doc-wash-2: #fafafa;
+  --doc-canvas: #fdfdfd;
+  --doc-dot: #e2e8f0;
+  --doc-indigo: #4f46e5;
+  --doc-indigo-2: #6366f1;
+  --doc-indigo-soft: #eef2ff;
+  --doc-indigo-line: #e0e7ff;
+  --doc-violet-soft: #f5f3ff;
+  --doc-violet: #9333ea;
+  --doc-green: #16a34a;
+  --doc-green-soft: #f0fdf4;
+  --doc-green-line: #bbf7d0;
+  --doc-red: #ef4444;
+}
+
+:root[data-theme='dark'] {
+  --doc-ink: #eef2f7;
+  --doc-body: #c4ccd8;
+  --doc-muted: #8d99ab;
+  --doc-faint: #6c7a90;
+  --doc-line: #273041;
+  --doc-line-soft: #1c2431;
+  --doc-chip: #1c2431;
+  --doc-wash: #171e2a;
+  --doc-wash-2: #171e2a;
+  --doc-canvas: #10151e;
+  --doc-dot: #1f2836;
+  --doc-indigo: #818cf8;
+  --doc-indigo-2: #818cf8;
+  --doc-indigo-soft: #161a3a;
+  --doc-indigo-line: #252b5c;
+  --doc-violet-soft: #1d1430;
+  --doc-violet: #c084fc;
+  --doc-green: #4ade80;
+  --doc-green-soft: #0f2416;
+  --doc-green-line: #1f5132;
+  --doc-red: #f87171;
+}
+
 .prism-shell {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #fff;
+  background: var(--color-card);
   color: var(--color-neutral-900);
 }
 
@@ -13,7 +61,7 @@
   height: 56px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--color-neutral-100);
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, var(--color-card) 92%, transparent);
   backdrop-filter: blur(8px);
 }
 
@@ -98,7 +146,7 @@
   padding: 0 10px;
   border-radius: 8px;
   border: 1px solid var(--color-neutral-200);
-  background: #fff;
+  background: var(--color-card);
   color: var(--color-neutral-400);
   font-size: 13px;
   cursor: pointer;
@@ -416,7 +464,7 @@
   gap: 6px;
   padding: 10px 20px;
   border-radius: 10px;
-  background: #fff;
+  background: var(--color-card);
   color: var(--color-neutral-700);
   font-size: 14.5px;
   font-weight: 700;
@@ -525,7 +573,7 @@
   display: inline-block;
   padding: 3px 9px;
   border-radius: 6px;
-  background: #fff;
+  background: var(--color-card);
   color: var(--color-neutral-700);
   border: 1px solid var(--color-neutral-200);
   font-size: 12px;
@@ -740,7 +788,7 @@
 
 .code-preview-scene {
   padding: 16px;
-  background: #fff;
+  background: var(--color-card);
 }
 
 .prism-pre {
@@ -883,7 +931,7 @@
   height: 26px;
   border-radius: 6px;
   border: 1px solid var(--color-neutral-200);
-  background: #fff;
+  background: var(--color-card);
   color: var(--color-neutral-500);
   font-size: 12px;
   font-weight: 600;
@@ -977,7 +1025,7 @@
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--color-card);
   border: 1px solid var(--color-neutral-200);
   border-radius: 12px;
   overflow: hidden;

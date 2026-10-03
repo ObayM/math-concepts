@@ -284,7 +284,7 @@ export default function SvgRenderer({
   return (
     <div
       ref={wrapRef}
-      className="w-full bg-white rounded-2xl border border-neutral-100 card-soft overflow-hidden"
+      className="w-full bg-card rounded-2xl border border-neutral-100 card-soft overflow-hidden"
     >
       <svg
         ref={svgRef}

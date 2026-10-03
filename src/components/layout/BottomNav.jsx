@@ -34,7 +34,7 @@ export default function BottomNav() {
       <div className="h-[calc(var(--tab-h)+var(--safe-b))] md:hidden" aria-hidden />
       <nav
         aria-label={t('nav.primary')}
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white pb-safe md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-card pb-safe md:hidden"
       >
         <ul className="flex">
           {tabs.map((tab) => {

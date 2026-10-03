@@ -132,7 +132,7 @@ export default function AiPanel({ source, onApply, onInsertScene }) {
               className={`border px-2 py-1 text-xs font-semibold ${
                 mode === value
                   ? 'border-primary-600 bg-primary-600 text-white'
-                  : 'border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50'
+                  : 'border-neutral-300 bg-card text-neutral-600 hover:bg-neutral-50'
               }`}
             >
               {label}

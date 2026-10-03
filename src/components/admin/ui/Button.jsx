@@ -11,8 +11,8 @@ const sizes = {
 
 const variants = {
   primary: 'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600',
-  secondary: 'bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-300',
-  outline: 'bg-white hover:bg-neutral-50 text-neutral-600 border border-neutral-200',
+  secondary: 'bg-card hover:bg-neutral-50 text-neutral-700 border border-neutral-300',
+  outline: 'bg-card hover:bg-neutral-50 text-neutral-600 border border-neutral-200',
   ghost: 'text-neutral-500 hover:bg-neutral-100 border border-transparent',
   danger: 'bg-danger-600 hover:bg-danger-700 text-white border border-danger-600',
 };

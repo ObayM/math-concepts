@@ -16,7 +16,7 @@ export default async function Footer() {
   ];
 
   return (
-    <footer className="border-t border-neutral-200/70 bg-white/60">
+    <footer className="border-t border-neutral-200/70 bg-card/60">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <p className="text-sm text-neutral-400">{t('footer.tagline')}</p>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">

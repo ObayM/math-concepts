@@ -201,7 +201,7 @@ const HeroContinue = ({ t, course, nextLesson, completed }) => {
   const started = completed > 0;
 
   return (
-    <div className="card-hero mt-8 rounded-3xl border border-neutral-200/80 bg-white p-7 animate-fade-in-up [animation-delay:80ms] opacity-0 sm:p-9">
+    <div className="card-hero mt-8 rounded-3xl border border-neutral-200/80 bg-card p-7 animate-fade-in-up [animation-delay:80ms] opacity-0 sm:p-9">
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-2xl">
           <p className={eyebrow}>

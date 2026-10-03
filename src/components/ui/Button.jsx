@@ -16,10 +16,10 @@ const variants = {
   primary: `bg-primary-600 hover:bg-primary-500 text-white border-primary-800 ${press}`,
   success: `bg-success-500 hover:bg-success-600 text-white border-success-600 ${press}`,
   accent: `bg-accent-600 hover:bg-accent-700 text-white border-accent-800 ${press}`,
-  secondary: `bg-white hover:bg-primary-50 text-primary-700 border-primary-100 ${press}`,
+  secondary: `bg-card hover:bg-primary-50 text-primary-700 border-primary-100 ${press}`,
   neutral: `bg-neutral-200 hover:bg-neutral-300 text-neutral-700 border-neutral-400 ${press}`,
   outline:
-    'bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 hover:border-neutral-300',
+    'bg-card hover:bg-neutral-50 text-neutral-700 border border-neutral-200 hover:border-neutral-300',
   ghost: 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700',
 };
 

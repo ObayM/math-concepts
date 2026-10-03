@@ -10,7 +10,7 @@ export default function GlobalError({ error, reset }) {
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: 'light dark' }}>
       <body
         style={{
           minHeight: '100dvh',

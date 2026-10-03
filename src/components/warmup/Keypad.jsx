@@ -6,7 +6,7 @@ import { useT } from '@/components/i18n/LocaleProvider';
 const KEYS = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '-', '0'];
 
 const keyClass =
-  'tap-target flex h-12 items-center justify-center rounded-xl border border-neutral-200 border-b-[3px] border-b-neutral-300 bg-white text-2xl font-extrabold text-neutral-800 transition-all duration-100 active:translate-y-[2px] active:border-b active:border-b-neutral-200 sm:h-14';
+  'tap-target flex h-12 items-center justify-center rounded-xl border border-neutral-200 border-b-[3px] border-b-neutral-300 bg-card text-2xl font-extrabold text-neutral-800 transition-all duration-100 active:translate-y-[2px] active:border-b active:border-b-neutral-200 sm:h-14';
 
 export default function Keypad({ onPress, submitLabel, className = '' }) {
   const t = useT();

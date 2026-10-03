@@ -72,7 +72,7 @@ export default function OrderExercise({
           const filled = idx != null;
           const isCorrect = filled && bank[idx] === ex.items[i];
           let cls = 'border-dashed border-neutral-300';
-          if (filled) cls = 'border-primary-300 bg-white';
+          if (filled) cls = 'border-primary-300 bg-card';
           if (checked && filled) {
             cls = isCorrect ? 'border-success-500 bg-success-50' : 'border-danger-500 bg-danger-50';
           }
@@ -109,7 +109,7 @@ export default function OrderExercise({
               {...(disabled ? {} : sourceProps(`bank:${idx}`))}
               onClick={() => place(idx)}
               disabled={disabled}
-              className="px-4 h-12 rounded-xl border-2 border-neutral-300 bg-white text-neutral-800 font-bold transition-all active:scale-90 hover:border-primary-400 disabled:opacity-30"
+              className="px-4 h-12 rounded-xl border-2 border-neutral-300 bg-card text-neutral-800 font-bold transition-all active:scale-90 hover:border-primary-400 disabled:opacity-30"
             >
               <RichText>{label}</RichText>
             </button>
@@ -127,7 +127,7 @@ export default function OrderExercise({
 
       {drag && (
         <DragGhost x={drag.x} y={drag.y}>
-          <span className="inline-flex items-center min-h-12 px-4 rounded-xl border-2 border-primary-400 bg-white font-bold text-neutral-800">
+          <span className="inline-flex items-center min-h-12 px-4 rounded-xl border-2 border-primary-400 bg-card font-bold text-neutral-800">
             <RichText>{dragLabel}</RichText>
           </span>
         </DragGhost>

@@ -132,7 +132,7 @@
   width: 100%;
   max-width: 760px;
   padding: 16px;
-  background: #fff;
+  background: var(--color-card);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -193,4 +193,12 @@
   color: #7f1d1d;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+}
+
+:global(:root[data-theme='dark']) .sceneWrap {
+  background: var(--grid-bg);
+}
+
+:global(:root[data-theme='dark']) .emptyLoading {
+  color: var(--color-neutral-700);
 }

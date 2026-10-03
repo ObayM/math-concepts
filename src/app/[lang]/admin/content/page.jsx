@@ -79,7 +79,7 @@ function LessonRow({ lesson, courses }) {
               <button
                 type="submit"
                 aria-label={`Move ${direction}`}
-                className="border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-50"
+                className="border border-neutral-200 bg-card px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-50"
               >
                 {direction === 'up' ? '▲' : '▼'}
               </button>
@@ -94,7 +94,7 @@ function LessonRow({ lesson, courses }) {
               name="courseId"
               defaultValue=""
               aria-label="Move to course"
-              className="border border-neutral-300 bg-white px-2 py-1 text-xs"
+              className="border border-neutral-300 bg-card px-2 py-1 text-xs"
             >
               <option value="" disabled>
                 Move to…

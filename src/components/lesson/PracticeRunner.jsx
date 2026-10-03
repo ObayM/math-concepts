@@ -246,7 +246,7 @@ export default function PracticeRunner({
                 />
               ))}
             </div>
-            <div className="bg-white px-4 py-2 rounded-full border border-neutral-200 font-bold text-sm text-neutral-500">
+            <div className="bg-card px-4 py-2 rounded-full border border-neutral-200 font-bold text-sm text-neutral-500">
               {t('practice.scoreLine', { correct: stats.correct, total: stats.attempted })}
             </div>
           </div>

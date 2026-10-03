@@ -77,7 +77,7 @@ export default function NotesPad({ value, onChange }) {
 
   return (
     <div
-      className="min-h-0 flex-1 cursor-text overflow-y-auto rounded-xl border border-neutral-200 bg-white p-3"
+      className="min-h-0 flex-1 cursor-text overflow-y-auto rounded-xl border border-neutral-200 bg-card p-3"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) {
           e.preventDefault();

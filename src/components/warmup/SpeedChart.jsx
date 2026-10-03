@@ -54,7 +54,7 @@ export default function SpeedChart({ trend }) {
       <div className="relative">
         {hovered && (
           <div
-            className="pointer-events-none absolute -top-1 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xl border border-neutral-200 bg-white px-3 py-2 text-left text-xs shadow-[0_4px_12px_-4px_rgba(15,23,42,0.15)]"
+            className="pointer-events-none absolute -top-1 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xl border border-neutral-200 bg-card px-3 py-2 text-left text-xs shadow-[0_4px_12px_-4px_rgb(var(--shadow-rgb)/0.15)]"
             style={{
               left: `${Math.min(88, Math.max(12, ((left + (active + 0.5) * band) / W) * 100))}%`,
             }}

@@ -15,7 +15,7 @@ function Reorder({ id, action }) {
           <button
             type="submit"
             aria-label={`Move ${direction}`}
-            className="border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-50"
+            className="border border-neutral-200 bg-card px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-50"
           >
             {direction === 'up' ? '▲' : '▼'}
           </button>

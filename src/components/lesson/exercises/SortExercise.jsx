@@ -60,7 +60,7 @@ export default function SortExercise({ slide, value, checked, onChange, revealAn
         : 'border-danger-500 bg-danger-50 text-danger-700';
     }
     if (armed === i) return 'border-primary-500 bg-primary-50';
-    return 'border-neutral-300 bg-white hover:border-primary-400';
+    return 'border-neutral-300 bg-card hover:border-primary-400';
   };
 
   return (
@@ -160,7 +160,7 @@ export default function SortExercise({ slide, value, checked, onChange, revealAn
 
       {drag && (
         <DragGhost x={drag.x} y={drag.y}>
-          <span className="inline-flex items-center min-h-12 px-4 rounded-xl border-2 border-primary-400 bg-white font-bold text-neutral-800">
+          <span className="inline-flex items-center min-h-12 px-4 rounded-xl border-2 border-primary-400 bg-card font-bold text-neutral-800">
             <RichText>{items[Number(drag.id)].text}</RichText>
           </span>
         </DragGhost>

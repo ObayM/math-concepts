@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 @theme {
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
@@ -66,6 +68,25 @@
   --color-surface: #f5f5f7;
   --color-snow: #fafbfd;
   --color-snow-grid: #e9eef5;
+  --color-card: #ffffff;
+
+  --text-color-primary-500: var(--color-primary-500);
+  --text-color-primary-600: var(--color-primary-600);
+  --text-color-primary-700: var(--color-primary-700);
+  --text-color-primary-800: var(--color-primary-800);
+  --text-color-primary-900: var(--color-primary-900);
+  --text-color-success-500: var(--color-success-500);
+  --text-color-success-600: var(--color-success-600);
+  --text-color-success-700: var(--color-success-700);
+  --text-color-success-800: var(--color-success-800);
+  --text-color-danger-500: var(--color-danger-500);
+  --text-color-danger-600: var(--color-danger-600);
+  --text-color-warning-500: var(--color-warning-500);
+  --text-color-warning-600: var(--color-warning-600);
+  --text-color-accent-500: var(--color-accent-500);
+  --text-color-accent-600: var(--color-accent-600);
+  --text-color-accent-700: var(--color-accent-700);
+  --text-color-accent-800: var(--color-accent-800);
 
   --duration-fast: 150ms;
   --duration-base: 300ms;
@@ -131,14 +152,102 @@
 }
 
 :root {
+  color-scheme: light;
   --dir: 1;
   --grid-bg: #ffffff;
   --grid-line: #e6ebf3;
+  --shadow-rgb: 15 23 42;
+  --scene-primary: #3b82f6;
+  --scene-accent: #a855f7;
+  --scene-success: #58cc02;
+  --scene-danger: #ef4444;
+  --scene-warning: #f59e0b;
+  --scene-neutral: #94a3b8;
   --grid-size: 34px;
   --nav-h: 73px;
   --tab-h: 58px;
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
+}
+
+/* dark keeps the hue fills (500 and up) as they are, so pressable buttons keep
+   their darker bottom edge. text in those hues goes through --text-color-*
+   instead, which is the only way it can lighten without the fill following. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --grid-bg: #0b0f17;
+  --grid-line: #161d29;
+  --shadow-rgb: 0 0 0;
+  --scene-primary: #60a5fa;
+  --scene-accent: #c084fc;
+  --scene-success: #6bd61a;
+  --scene-danger: #f87171;
+  --scene-warning: #fbbf24;
+  --scene-neutral: #9aa6b8;
+
+  --color-card: #121822;
+  --color-surface: #0f141c;
+  --color-snow: #10151e;
+  --color-snow-grid: #1a2130;
+
+  --color-neutral-50: #171e2a;
+  --color-neutral-100: #1c2431;
+  --color-neutral-200: #273041;
+  --color-neutral-300: #364053;
+  --color-neutral-400: #6c7a90;
+  --color-neutral-500: #8d99ab;
+  --color-neutral-600: #a9b3c2;
+  --color-neutral-700: #c4ccd8;
+  --color-neutral-800: #dce2ea;
+  --color-neutral-900: #eef2f7;
+
+  --color-primary-50: #0f1b31;
+  --color-primary-100: #132542;
+  --color-primary-200: #1b3358;
+  --color-primary-300: #29497d;
+  --color-primary-900: #dbeafe;
+
+  --color-success-50: #11210b;
+  --color-success-100: #172d0e;
+  --color-success-200: #1f4012;
+  --color-success-300: #2f6418;
+
+  --color-danger-50: #2a1316;
+  --color-danger-100: #3b181c;
+
+  --color-warning-50: #261c09;
+  --color-warning-100: #35270c;
+
+  --color-accent-50: #1d1430;
+  --color-accent-100: #291a45;
+
+  --color-pair-1-soft: #0f1b31;
+  --color-pair-2-soft: #261c09;
+  --color-pair-3-soft: #1d1430;
+  --color-pair-4-soft: #0b2422;
+  --color-pair-5-soft: #2a1220;
+  --color-pair-6-soft: #161a3a;
+
+  --text-color-primary-500: #60a5fa;
+  --text-color-primary-600: #6aa8fb;
+  --text-color-primary-700: #8dbdfc;
+  --text-color-primary-800: #b3d3fd;
+  --text-color-primary-900: #dbeafe;
+  --text-color-success-600: #6fd629;
+  --text-color-success-700: #8be04f;
+  --text-color-success-800: #a8e97a;
+  --text-color-danger-500: #f26b6b;
+  --text-color-danger-600: #f87171;
+  --text-color-warning-500: #f5a524;
+  --text-color-warning-600: #fbbf24;
+  --text-color-accent-500: #b97cf9;
+  --text-color-accent-600: #c084fc;
+  --text-color-accent-700: #d0a4fd;
+  --text-color-accent-800: #e0c4fe;
+}
+
+html {
+  background-color: var(--grid-bg);
 }
 
 @media (max-width: 1023px) {
@@ -416,8 +525,8 @@ html[dir='rtl'] * {
       to bottom,
       transparent 0,
       transparent 230px,
-      rgba(255, 255, 255, 0.4) 560px,
-      rgba(255, 255, 255, 0.78) 860px,
+      color-mix(in srgb, var(--grid-bg) 40%, transparent) 560px,
+      color-mix(in srgb, var(--grid-bg) 78%, transparent) 860px,
       var(--grid-bg) 1200px
     ),
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
@@ -452,14 +561,14 @@ math.artex {
 
 .card-soft {
   box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 4px 10px -4px rgba(15, 23, 42, 0.05);
+    0 1px 2px rgb(var(--shadow-rgb) / 0.04),
+    0 4px 10px -4px rgb(var(--shadow-rgb) / 0.05);
 }
 
 .card-hero {
   box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 6px 16px -8px rgba(15, 23, 42, 0.07);
+    0 1px 2px rgb(var(--shadow-rgb) / 0.04),
+    0 6px 16px -8px rgb(var(--shadow-rgb) / 0.07);
 }
 
 .bg-grid-pad {

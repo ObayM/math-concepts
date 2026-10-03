@@ -10,7 +10,7 @@ import {
 } from '@/engine/runtime/keyboardCursor';
 import KeyboardCrosshair from './KeyboardCrosshair';
 import SketchOverlay, { type SketchOverlayConfig } from './SketchOverlay';
-import { resolveColor } from '@/engine/colors';
+import { resolveColor, LABEL_HALO } from '@/engine/colors';
 import type { Pt } from '@/engine/checks/geometry';
 import type { CoordSystem } from './types';
 
@@ -141,7 +141,7 @@ export default function InputLayer({
             cy={cx.toY(y)}
             r={7}
             fill={color}
-            stroke="white"
+            stroke={LABEL_HALO}
             strokeWidth={2.5}
             pointerEvents="none"
           />

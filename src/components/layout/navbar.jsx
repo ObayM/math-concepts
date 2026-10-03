@@ -10,6 +10,7 @@ import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { Avatar } from '@/components/profile/ProfileHeaderCard';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:pt-4">
         <nav
-          className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-neutral-200/80 bg-white px-4 py-2.5 shadow-[0_4px_16px_-6px_rgba(15,23,42,0.12)] lg:px-5"
+          className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-neutral-200/80 bg-card px-4 py-2.5 shadow-[0_4px_16px_-6px_rgb(var(--shadow-rgb)/0.12)] lg:px-5"
           aria-label={t('nav.global')}
         >
           <div className="flex lg:flex-1">
@@ -158,7 +159,7 @@ export default function Navbar() {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute end-0 mt-2 w-56 origin-top-end rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
+                  <div className="absolute end-0 mt-2 w-56 origin-top-end rounded-xl bg-card shadow-lg ring-1 ring-neutral-900/5 focus:outline-none dark:ring-neutral-200 overflow-hidden">
                     <div className="py-1">
                       <div className="px-4 py-3 border-b border-neutral-100">
                         <p className="text-sm font-semibold text-neutral-900 truncate">
@@ -186,6 +187,7 @@ export default function Navbar() {
                       >
                         {t('nav.settings')}
                       </Link>
+                      <ThemeToggle className="px-4 py-1.5" />
                       <button
                         onClick={handleLogout}
                         className="text-danger-600 block w-full px-4 py-2 text-start text-sm hover:bg-neutral-50"
@@ -220,10 +222,10 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="lg:hidden" role="dialog" aria-modal="true" ref={drawerRef}>
           <div
-            className="fixed inset-0 z-50 bg-black/30"
+            className="fixed inset-0 z-50 bg-black/30 dark:bg-black/60"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 end-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-black/5">
+          <div className="fixed inset-y-0 end-0 z-50 w-full overflow-y-auto bg-card px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-black/5 sm:dark:ring-neutral-200">
             <div className="flex items-center justify-between">
               <Link href="/" className="-m-1.5 p-1.5" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="font-display text-2xl font-bold tracking-tight text-neutral-900">
@@ -258,6 +260,10 @@ export default function Navbar() {
                       {link.name}
                     </Link>
                   ))}
+                </div>
+
+                <div className="py-4">
+                  <ThemeToggle />
                 </div>
 
                 <div className="py-6">

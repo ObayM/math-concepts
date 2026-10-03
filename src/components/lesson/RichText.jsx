@@ -1,6 +1,6 @@
 'use client';
 import katex from 'katex';
-import { texColors } from '@/engine/colors';
+import { texColors, themeTex } from '@/engine/colors';
 import { ROLE_EVENT } from '@/engine/runtime/roleEvent';
 import { arabicMath } from '@/engine/artex';
 import { useMathNotation } from '@/engine/artex/context';
@@ -10,7 +10,7 @@ export const proseClass = 'block max-w-[42rem] text-xl leading-[1.75] font-norma
 const LATIN = {
   dir: 'ltr',
   html: (src, displayMode) =>
-    katex.renderToString(texColors(src), { throwOnError: false, displayMode }),
+    themeTex(katex.renderToString(texColors(src), { throwOnError: false, displayMode })),
 };
 
 const ARABIC = { dir: undefined, html: (src, displayMode) => arabicMath(src, displayMode).html };
@@ -65,7 +65,7 @@ function renderInline(text, math) {
           key={key++}
           data-role={role}
           className="font-semibold"
-          style={{ color: `var(--color-${m[6]}-600)` }}
+          style={{ color: `var(--text-color-${m[6]}-600, var(--color-${m[6]}-600))` }}
           onPointerEnter={role ? () => announceRole(role) : undefined}
           onPointerLeave={role ? () => announceRole(null) : undefined}
         >

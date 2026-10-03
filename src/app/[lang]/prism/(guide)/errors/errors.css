@@ -6,7 +6,7 @@
 
 .err-header {
   padding-bottom: 32px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--doc-line-soft);
   margin-bottom: 32px;
 }
 
@@ -14,14 +14,14 @@
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #0f0f0f;
+  color: var(--doc-ink);
   margin: 0 0 10px;
 }
 
 .err-page-sub {
   font-size: 15px;
   line-height: 1.7;
-  color: #6b7280;
+  color: var(--doc-muted);
   max-width: 620px;
   margin: 0;
 }
@@ -33,7 +33,7 @@
 }
 
 .err-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--doc-line);
   border-radius: 14px;
   padding: 22px 24px;
   scroll-margin-top: 24px;
@@ -51,8 +51,8 @@
   font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
   font-size: 11px;
   font-weight: 700;
-  color: #9333ea;
-  background: #f5f3ff;
+  color: var(--doc-violet);
+  background: var(--doc-violet-soft);
   padding: 2px 8px;
   border-radius: 6px;
 }
@@ -60,14 +60,14 @@
 .err-title {
   font-size: 17px;
   font-weight: 700;
-  color: #0f0f0f;
+  color: var(--doc-ink);
   margin: 0;
 }
 
 .err-explanation {
   font-size: 14px;
   line-height: 1.7;
-  color: #374151;
+  color: var(--doc-body);
   margin: 0 0 16px;
 }
 
@@ -96,9 +96,9 @@
 }
 
 .err-pair-label-bad {
-  color: #ef4444;
+  color: var(--doc-red);
 }
 
 .err-pair-label-good {
-  color: #16a34a;
+  color: var(--doc-green);
 }

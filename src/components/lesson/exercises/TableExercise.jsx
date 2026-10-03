@@ -30,7 +30,7 @@ export default function TableExercise({ slide, value, checked, onChange, revealA
       </RichText>
 
       <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 end-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden" />
+        <div className="pointer-events-none absolute inset-y-0 end-0 w-8 bg-gradient-to-l from-card to-transparent md:hidden" />
         <div className="overflow-x-auto">
           <table className="border-collapse">
             {ex.header && (

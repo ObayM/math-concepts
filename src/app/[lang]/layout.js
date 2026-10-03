@@ -8,17 +8,22 @@ import ImpersonationBanner from '@/components/admin/ImpersonationBanner';
 import Footer from '@/components/layout/Footer';
 import BottomNav from '@/components/layout/BottomNav';
 import ServiceWorker from '@/components/layout/ServiceWorker';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect, notFound } from 'next/navigation';
 import { LOCALES, DEFAULT_LOCALE, dirFor, isLocale } from '@/lib/locale';
 import { getOrigin, originForLocale, hasLocaleOrigins } from '@/lib/origin';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import { THEME_COLOR, THEME_COOKIE, SYSTEM_THEME_SCRIPT, parseTheme } from '@/lib/theme';
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#ffffff',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: THEME_COLOR.light },
+    { media: '(prefers-color-scheme: dark)', color: THEME_COLOR.dark },
+  ],
 };
 
 const TITLE = {
@@ -80,7 +85,10 @@ export default async function RootLayout({ children, params }) {
   if (!isLocale(lang)) notFound();
 
   const userInfo = await getUserInfo();
-  const pathname = (await headers()).get('x-pathname') ?? '';
+  const requestHeaders = await headers();
+  const pathname = requestHeaders.get('x-pathname') ?? '';
+  const nonce = requestHeaders.get('content-security-policy')?.match(/'nonce-([^']+)'/)?.[1];
+  const themePref = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
   const chromeless = pathname.startsWith('/dsl-preview') || pathname.startsWith('/prism');
 
   if (
@@ -93,24 +101,39 @@ export default async function RootLayout({ children, params }) {
   }
 
   return (
-    <html lang={lang} dir={dirFor(lang)} suppressHydrationWarning>
+    <html
+      lang={lang}
+      dir={dirFor(lang)}
+      data-theme={themePref === 'system' ? undefined : themePref}
+      suppressHydrationWarning
+    >
+      <head>
+        {themePref === 'system' && (
+          <script nonce={nonce} dangerouslySetInnerHTML={{ __html: SYSTEM_THEME_SCRIPT }} />
+        )}
+      </head>
       <body className={`${fontVars} antialiased`}>
-        <LocaleProvider lang={lang}>
-          <AuthProvider initialUser={userInfo}>
-            <ServiceWorker />
-            <ImpersonationBanner />
-            {chromeless ? (
-              children
-            ) : (
-              <div className="bg-app flex min-h-dvh flex-col">
-                <Navbar />
-                <div className="flex-1">{children}</div>
-                {!pathname.startsWith('/admin') && <Footer />}
-                {!pathname.startsWith('/admin') && <BottomNav />}
-              </div>
-            )}
-          </AuthProvider>
-        </LocaleProvider>
+        <ThemeProvider
+          initialPref={themePref}
+          cookieDomain={process.env.COOKIE_DOMAIN?.trim() ?? ''}
+        >
+          <LocaleProvider lang={lang}>
+            <AuthProvider initialUser={userInfo}>
+              <ServiceWorker />
+              <ImpersonationBanner />
+              {chromeless ? (
+                children
+              ) : (
+                <div className="bg-app flex min-h-dvh flex-col">
+                  <Navbar />
+                  <div className="flex-1">{children}</div>
+                  {!pathname.startsWith('/admin') && <Footer />}
+                  {!pathname.startsWith('/admin') && <BottomNav />}
+                </div>
+              )}
+            </AuthProvider>
+          </LocaleProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

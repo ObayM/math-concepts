@@ -16,6 +16,7 @@ const ar: Dictionary = {
   'nav.primary': 'التنقل',
   'nav.global': 'التنقل',
   'nav.you': 'أنت',
+  'nav.theme': 'المظهر',
   'nav.account': 'قائمة الحساب',
   'nav.learn': 'تعلّم',
 
@@ -457,6 +458,11 @@ const ar: Dictionary = {
   'settings.language': 'اللغة',
   'settings.languageBlurb':
     'العربية والإنجليزية دورات منفصلة، وليست ترجمة لبعضها. التبديل ينقلك إلى الموقع الآخر.',
+  'settings.theme': 'المظهر',
+  'settings.themeBlurb': 'فاتح أو داكن أو زي ما جهازك متظبط.',
+  'settings.themeLight': 'فاتح',
+  'settings.themeDark': 'داكن',
+  'settings.themeSystem': 'زي الجهاز',
 
   'difficulty.Beginner': 'مبتدئ',
   'difficulty.Intermediate': 'متوسط',

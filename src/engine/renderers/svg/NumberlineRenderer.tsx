@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { evalNumber, evalBool, interpolate, alphaOf } from '@/engine/runtime/eval';
 import { expandObjects } from '@/engine/runtime/expand';
-import { resolveColor, AXIS_LINE, AXIS_LABEL } from '@/engine/colors';
+import { resolveColor, AXIS_LINE, AXIS_LABEL, LABEL_HALO } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 import type { InputLayerConfig } from './InputLayer';
@@ -78,7 +78,7 @@ export default function NumberlineRenderer({
           textAnchor="middle"
           fontSize={11}
           fill={AXIS_LABEL}
-          stroke="white"
+          stroke={LABEL_HALO}
           strokeWidth={3}
           paintOrder="stroke"
         >
@@ -110,7 +110,7 @@ export default function NumberlineRenderer({
   return (
     <div
       ref={wrapRef}
-      className="w-full bg-white rounded-2xl border border-neutral-100 overflow-hidden"
+      className="w-full bg-card rounded-2xl border border-neutral-100 overflow-hidden"
     >
       <svg
         ref={svgRef}
@@ -159,7 +159,7 @@ export default function NumberlineRenderer({
                   cy={Y_MID}
                   r={6}
                   fill={color}
-                  stroke="white"
+                  stroke={LABEL_HALO}
                   strokeWidth={2}
                   onPointerDown={onPointerDown}
                 />
@@ -171,7 +171,7 @@ export default function NumberlineRenderer({
                     fontSize={12}
                     fontWeight={700}
                     fill={color}
-                    stroke="white"
+                    stroke={LABEL_HALO}
                     strokeWidth={3}
                     paintOrder="stroke"
                   >
@@ -193,7 +193,7 @@ export default function NumberlineRenderer({
                 textAnchor="middle"
                 fontSize={obj.fontSize ?? 12}
                 fill={resolveColor(obj.color)}
-                stroke="white"
+                stroke={LABEL_HALO}
                 strokeWidth={2}
                 paintOrder="stroke"
               >

@@ -116,7 +116,7 @@ export default async function AdminUsersPage({ searchParams }) {
           {pageNum > 1 && (
             <Link
               href={`/admin/users?${new URLSearchParams({ ...(q && { q }), page: String(pageNum - 1) })}`}
-              className="border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+              className="border border-neutral-300 bg-card px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
             >
               Previous
             </Link>
@@ -124,7 +124,7 @@ export default async function AdminUsersPage({ searchParams }) {
           {pageNum * PER_PAGE < total && (
             <Link
               href={`/admin/users?${new URLSearchParams({ ...(q && { q }), page: String(pageNum + 1) })}`}
-              className="border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+              className="border border-neutral-300 bg-card px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
             >
               Next
             </Link>

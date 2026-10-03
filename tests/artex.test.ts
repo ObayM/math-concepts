@@ -127,8 +127,10 @@ describe('arabic notation', () => {
     expect(body('x \\neq 1')).toContain('<mo>≠</mo>');
   });
 
-  it('carries colors through as mathcolor', () => {
-    expect(body('\\textcolor{primary}{x}')).toBe('<mstyle mathcolor="#3b82f6"><mi>س</mi></mstyle>');
+  it('carries colors through as the theme variable', () => {
+    expect(body('\\textcolor{primary}{x}')).toBe(
+      '<mstyle style="color:var(--scene-primary)"><mi>س</mi></mstyle>'
+    );
   });
 
   it('marks display math as a block, both rtl', () => {

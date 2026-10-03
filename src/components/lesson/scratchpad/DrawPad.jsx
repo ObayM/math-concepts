@@ -4,15 +4,18 @@ import { Eraser, Pen, Trash2, Undo2 } from 'lucide-react';
 
 import { drawStrokes, eraseAt, fromGrid, toGrid } from './strokes';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { useResolvedTheme } from '@/components/theme/ThemeProvider';
 
 const SAMPLE_PX = 3;
 const PEN_WIDTH = 2.5;
 const ERASER_RADIUS = 12;
 const MAX_UNDO = 30;
-const INK = '#1e293b';
+const ink = (el) =>
+  getComputedStyle(el).getPropertyValue('--color-neutral-800').trim() || '#1e293b';
 
 export default function DrawPad({ strokes, onChange }) {
   const t = useT();
+  const theme = useResolvedTheme();
   const [tool, setTool] = useState('pen');
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
@@ -28,7 +31,7 @@ export default function DrawPad({ strokes, onChange }) {
     if (!ctx) return;
     const w = widthRef.current;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawStrokes(ctx, strokesRef.current, w, { color: INK, lineWidth: PEN_WIDTH });
+    drawStrokes(ctx, strokesRef.current, w, { color: ink(canvas), lineWidth: PEN_WIDTH });
   }, []);
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export default function DrawPad({ strokes, onChange }) {
   useEffect(() => {
     strokesRef.current = strokes;
     repaint();
-  }, [strokes, repaint]);
+  }, [strokes, theme, repaint]);
 
   const pushUndo = () => {
     undoRef.current = [...undoRef.current, strokesRef.current].slice(-MAX_UNDO);
@@ -117,7 +120,7 @@ export default function DrawPad({ strokes, onChange }) {
 
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.strokeStyle = INK;
+    ctx.strokeStyle = ink(canvasRef.current);
     ctx.lineWidth = PEN_WIDTH;
 
     const move = (ev) => {

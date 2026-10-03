@@ -35,8 +35,8 @@ function FilterChips({ levels, active, t }) {
   const chip = (isActive) =>
     `tap-target-halo tap-target-h inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold transition-colors ${
       isActive
-        ? 'bg-neutral-900 text-white'
-        : 'bg-white text-neutral-500 border border-neutral-200 hover:text-neutral-800'
+        ? 'bg-neutral-900 text-card'
+        : 'bg-card text-neutral-500 border border-neutral-200 hover:text-neutral-800'
     }`;
 
   return (
@@ -168,7 +168,7 @@ export default async function HistoryView({ level, levels, totals, trend, weakSp
               <a
                 href="/api/warmup/export?scope=sessions"
                 download
-                className="tap-target-h inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-bold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+                className="tap-target-h inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-card px-4 py-2.5 text-sm font-bold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
               >
                 <Download className="h-4 w-4" aria-hidden />
                 Sessions CSV
@@ -176,7 +176,7 @@ export default async function HistoryView({ level, levels, totals, trend, weakSp
               <a
                 href="/api/warmup/export?scope=answers"
                 download
-                className="tap-target-h inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-bold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+                className="tap-target-h inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-card px-4 py-2.5 text-sm font-bold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
               >
                 <Download className="h-4 w-4" aria-hidden />
                 Every answer CSV

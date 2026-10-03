@@ -13,7 +13,7 @@ function summarize(diagnostics) {
 
 export default function ProblemsPanel({ diagnostics, onJump }) {
   return (
-    <div className="flex h-full flex-col overflow-hidden border border-neutral-200 bg-white">
+    <div className="flex h-full flex-col overflow-hidden border border-neutral-200 bg-card">
       <p className="border-b border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-neutral-500">
         Problems{summarize(diagnostics)}
       </p>

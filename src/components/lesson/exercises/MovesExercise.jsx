@@ -70,7 +70,7 @@ export default function MovesExercise({ slide, value, checked, onChange, revealA
                   className={`w-full rounded-2xl border-2 p-4 text-start font-bold transition-all active:scale-95 disabled:cursor-default ${
                     tried
                       ? 'border-danger-500 bg-danger-50 text-danger-600'
-                      : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300 hover:bg-primary-50'
+                      : 'border-neutral-200 bg-card text-neutral-700 hover:border-primary-300 hover:bg-primary-50'
                   }`}
                 >
                   <RichText>{step.options[i].text}</RichText>

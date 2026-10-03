@@ -31,7 +31,7 @@ export default function QuizExercise({ slide, value, checked, onChange, revealAn
           const isCorrect = revealAnswer && idx === ex.correct;
 
           let cls =
-            'border-2 border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50';
+            'border-2 border-neutral-200 bg-card hover:border-primary-300 hover:bg-primary-50';
           if (isSelected && !checked) cls = 'border-primary-500 bg-primary-50';
           if (checked) {
             if (isCorrect) cls = 'border-success-500 bg-success-50';

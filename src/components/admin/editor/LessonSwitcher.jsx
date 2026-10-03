@@ -60,11 +60,11 @@ export default function LessonSwitcher({ currentLessonId, confirmLeave }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 pt-24"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 pt-24 dark:bg-black/60"
       onClick={() => setOpen(false)}
     >
       <div
-        className="w-full max-w-lg border border-neutral-300 bg-white"
+        className="w-full max-w-lg border border-neutral-300 bg-card"
         onClick={(e) => e.stopPropagation()}
       >
         <input
