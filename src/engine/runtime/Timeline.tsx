@@ -4,6 +4,7 @@ import { Play, RotateCcw, ChevronLeft, Lightbulb } from 'lucide-react';
 import { useScene } from './SceneProvider';
 import { evalBool } from './eval';
 import { useT } from '@/components/i18n/LocaleProvider';
+import RichText from '@/components/lesson/RichText';
 import type { SceneIR } from '@/engine/ir/types';
 
 function baseState(ir: SceneIR): Record<string, number | boolean> {
@@ -36,7 +37,8 @@ function safeBool(e: unknown, scope: Record<string, unknown>): boolean {
 function StepHint({ hint }: { hint: string }) {
   const t = useT();
   const [shown, setShown] = useState(false);
-  if (shown) return <p className="text-neutral-400 text-xs leading-relaxed">{hint}</p>;
+  if (shown)
+    return <RichText className="block text-neutral-400 text-xs leading-relaxed">{hint}</RichText>;
   return (
     <button
       type="button"
@@ -110,12 +112,12 @@ export default function Timeline({
   return (
     <div className="bg-neutral-100 rounded-2xl p-4 flex flex-col gap-3">
       {current?.narrate && (
-        <p
+        <RichText
           key={idx}
-          className="animate-fade-in-up text-neutral-600 text-sm font-medium leading-relaxed"
+          className="block animate-fade-in-up text-neutral-600 text-sm font-medium leading-relaxed"
         >
           {current.narrate}
-        </p>
+        </RichText>
       )}
 
       {current?.hint && <StepHint key={idx} hint={current.hint} />}
