@@ -395,3 +395,24 @@ describe('slideLines', () => {
     expect(slideLines(scene)).toEqual(new Map());
   });
 });
+
+describe('latin letters in arabic text', () => {
+  const ar = (body: string) => `lesson "L" {\n  slide "ش" {\n    id: "s1"\n${body}\n  }\n}`;
+
+  it('flags a point name left outside math in arabic prose', () => {
+    expect(codes(ar('    > الظل يقع خلف B تمامًا.'))).toContain('V_AR_LATIN');
+  });
+
+  it('flags an axis letter in an arabic title', () => {
+    expect(
+      codes('lesson "L" {\n  slide "على محور y" {\n    id: "s1"\n    > نص.\n  }\n}')
+    ).toContain('V_AR_LATIN');
+  });
+
+  it('is fine with math, interpolation, roles, an escaped latin letter and english lessons', () => {
+    expect(
+      codes(ar('    > الظل يقع خلف $B$ و [الظل]{accent:shadow} مع $\\text{V}$.'))
+    ).not.toContain('V_AR_LATIN');
+    expect(codes(wrap('    > the shadow falls behind B.'))).not.toContain('V_AR_LATIN');
+  });
+});

@@ -3,6 +3,7 @@ import type { SceneIR } from '@/engine/ir/types';
 import { evalNum } from '@/engine/expr';
 import { checkStandard } from './standard';
 import { exerciseBranches } from './lang/emitter';
+import { LETTERS } from './artex/notation';
 
 export interface Finding {
   slideId: string;
@@ -336,6 +337,48 @@ function checkDetourReachable(lesson: LessonIR, out: Finding[]) {
   }
 }
 
+const NOT_TEXT = new Set([
+  'scene',
+  'scenes',
+  'pane',
+  'id',
+  'skill',
+  'skills',
+  'kind',
+  'beat',
+  'bind',
+  'then',
+  'role',
+  'color',
+  'icon',
+  'type',
+]);
+
+function latinInArabic(v: unknown, found: Set<string>) {
+  if (typeof v === 'string') {
+    if (!/\p{Script=Arabic}/u.test(v)) return;
+    const bare = v
+      .replace(/\$\{[^}]*\}/g, ' ')
+      .replace(/\$\$[^$]*\$\$|\$[^$]*\$/g, ' ')
+      .replace(/\]\{[a-z]+(?::[\w-]+)?\}|\]\(lesson:[a-z0-9-]+\)/g, ']');
+    for (const [w] of bare.matchAll(/(?<![A-Za-z\\])(?:[A-Z]+|[a-z])(?![A-Za-z])/g))
+      if (w.length === 1 || [...w].some((c) => c in LETTERS)) found.add(w);
+  } else if (Array.isArray(v)) v.forEach((x) => latinInArabic(x, found));
+  else if (v && typeof v === 'object')
+    for (const [k, x] of Object.entries(v)) if (!NOT_TEXT.has(k)) latinInArabic(x, found);
+}
+
+function checkArabicLatin(slideId: string, v: unknown, out: Finding[]) {
+  const found = new Set<string>();
+  latinInArabic(v, found);
+  if (found.size === 0) return;
+  out.push({
+    slideId,
+    code: 'V_AR_LATIN',
+    message: `${[...found].join(', ')} sits in arabic text outside $...$, so it stays latin while the math around it is in book notation. wrap it in $...$, write the arabic letter in a title, or use $\\text{...}$ to keep it latin on purpose`,
+  });
+}
+
 export function verifyLesson(lesson: LessonIR): Finding[] {
   const out: Finding[] = [];
   for (const slide of lesson.slides) {
@@ -347,7 +390,9 @@ export function verifyLesson(lesson: LessonIR): Finding[] {
     checkBuild(slide, out);
     checkAlongDragRange(slide, out);
     checkFreeDragAnchor(slide, out);
+    checkArabicLatin(slide.id, [slide, slideScenes(slide).map((sc) => sc.timeline ?? [])], out);
   }
+  checkArabicLatin('(lesson)', { title: lesson.title, summary: lesson.summary }, out);
   checkDetourReachable(lesson, out);
   return [...out.map((f) => ({ ...f, severity: 'error' as const })), ...checkStandard(lesson)];
 }
