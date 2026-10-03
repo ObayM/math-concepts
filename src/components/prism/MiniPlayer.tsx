@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import SlideView from '@/components/lesson/SlideView';
 import { exercises } from '@/components/lesson/exercises';
 import { instantiate, randomSeed } from '@/engine/runtime/variant';
@@ -23,11 +23,13 @@ export default function MiniPlayer({ lesson }: { lesson: LessonIR }) {
     met: [],
   });
 
-  useEffect(() => {
+  const valueKey = `${idx}:${slide.id}:${slide.exercise?.kind ?? ''}`;
+  const [valueFor, setValueFor] = useState(valueKey);
+  if (valueFor !== valueKey) {
+    setValueFor(valueKey);
     setValue(checker ? checker.initial(slide) : null);
     setChecked(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx]);
+  }
 
   const correct = checked && checker ? checker.check(slide, value) : null;
   const goalsMet =
