@@ -51,7 +51,7 @@ export type Report = {
 
 export const newReport = (): Report => ({ latin: new Set(), mapped: new Map() });
 
-const THIN = '<mspace width="0.1667em"></mspace>';
+const FN_SPACE = '<mspace width="0.2222em"></mspace>';
 const DELIM_SIZES = [1.2, 1.8, 2.4, 3];
 const OPERATOR_CHAR = /^(?![∞∂∇∅])[\p{Sm}\p{P}]$/u;
 const ALIGN: Record<string, string> = { l: 'start', c: 'center', r: 'end' };
@@ -87,6 +87,12 @@ function unaryAfter(nodes: PNode[], i: number): boolean {
   if (prev.type === 'atom') return ['bin', 'rel', 'open', 'punct'].includes(prev.family ?? '');
   if (prev.type === 'mclass') return prev.mclass === 'mrel' || prev.mclass === 'mbin';
   return prev.type === 'op' || prev.type === 'htmlmathml';
+}
+
+function followsTerm(prev: PNode | undefined): boolean {
+  if (!prev || prev.type === 'kern' || prev.type === 'spacing') return false;
+  if (prev.type === 'atom') return prev.family === 'close';
+  return !appliesFunction(prev);
 }
 
 function appliesFunction(n: PNode): boolean {
@@ -328,8 +334,9 @@ export function toMathML(nodes: PNode[], report: Report): string {
         out += `<mo form="prefix">${esc(symbol(n.text ?? ''))}</mo>`;
         continue;
       }
+      if (appliesFunction(n) && followsTerm(nodes[i - 1])) out += FN_SPACE;
       out += emit(n);
-      if (appliesFunction(n) && !opensFence(nodes[i + 1])) out += THIN;
+      if (appliesFunction(n) && !opensFence(nodes[i + 1])) out += FN_SPACE;
     }
     return out;
   }

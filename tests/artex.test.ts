@@ -57,9 +57,9 @@ describe('arabic notation', () => {
   });
 
   it('uses the six arabic trig names with a thin space before the argument', () => {
-    expect(body('\\sin x')).toBe('<mi>جا</mi><mspace width="0.1667em"></mspace><mi>س</mi>');
+    expect(body('\\sin x')).toBe('<mi>جا</mi><mspace width="0.2222em"></mspace><mi>س</mi>');
     expect(body('\\cos^2 x')).toBe(
-      '<msup><mi>جتا</mi><mn>٢</mn></msup><mspace width="0.1667em"></mspace><mi>س</mi>'
+      '<msup><mi>جتا</mi><mn>٢</mn></msup><mspace width="0.2222em"></mspace><mi>س</mi>'
     );
     for (const [cmd, ar] of [
       ['tan', 'ظا'],
@@ -68,6 +68,12 @@ describe('arabic notation', () => {
       ['csc', 'قتا'],
     ])
       expect(body(`\\${cmd} x`)).toContain(`<mi>${ar}</mi>`);
+  });
+
+  it('spaces a function off from a coefficient in front of it', () => {
+    expect(body('2\\sec 2x')).toBe(
+      '<mn>٢</mn><mspace width="0.2222em"></mspace><mi>قا</mi><mspace width="0.2222em"></mspace><mn>٢</mn><mi>س</mi>'
+    );
   });
 
   it('puts no space between a function and its bracket', () => {
@@ -113,7 +119,7 @@ describe('arabic notation', () => {
     expect(body('\\sqrt{x}')).toBe('<msqrt><mi>س</mi></msqrt>');
     expect(body('\\sqrt[3]{x}')).toBe('<mroot><mi>س</mi><mn>٣</mn></mroot>');
     expect(body('\\lim\\limits_{x \\to 0} x')).toBe(
-      '<munder><mi>نها</mi><mrow><mi>س</mi><mo>←</mo><mn>٠</mn></mrow></munder><mspace width="0.1667em"></mspace><mi>س</mi>'
+      '<munder><mi>نها</mi><mrow><mi>س</mi><mo>←</mo><mn>٠</mn></mrow></munder><mspace width="0.2222em"></mspace><mi>س</mi>'
     );
     expect(body('\\left(x\\right)')).toBe(
       '<mrow><mo fence="true" stretchy="true">(</mo><mi>س</mi><mo fence="true" stretchy="true">)</mo></mrow>'
