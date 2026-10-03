@@ -21,10 +21,11 @@ export function authoringDirective(lang: Locale, register: Register = 'msa-simpl
   return `
 Write all learner-facing prose in Arabic: slide titles, the \`>\` lines, exercise prompts, choices, hints and explanations.
 Register: ${REGISTER_NOTE[register]}
-Keep ALL mathematics latin and left-to-right: latin variable names, western numerals 0-9, standard LaTeX inside $...$. Never use Arabic-Indic numerals and never put Arabic inside \\text{} (the math font has no Arabic glyphs).
+Keep ALL mathematics latin in the source: latin variable names, western numerals 0-9, standard LaTeX inside $...$. The page converts it to the book's notation (y becomes ص, sin becomes جا, digits become ٠-٩, right to left), so never write Arabic-Indic numerals, never put Arabic inside \\text{}, and never explain the notation ("your book writes y as ص"): the student already sees ص.
+Every variable, point or axis letter in Arabic prose goes inside $...$, even a lone one ("على محور $y$"), or it stays latin on the page. Slide titles cannot hold math, so a title uses the Arabic letter itself ("على محور ص").
 Every slide MUST carry an explicit ascii \`id:\`, because ids cannot be derived from an Arabic title and the compiler will reject the lesson without one.
 Keep \`skill:\` values as the existing ascii english identifiers so mastery is shared across languages.
-Scene labels stay latin: the diagram is a left-to-right island even on a right-to-left page.`;
+Scene labels stay latin too (the diagram converts them): it is a left-to-right island even on a right-to-left page.`;
 }
 
 export function isRegister(value: unknown): value is Register {
