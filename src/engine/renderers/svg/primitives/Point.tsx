@@ -2,8 +2,10 @@ import { evalNumber, interpolate } from '@/engine/runtime/eval';
 import { resolveColor, LABEL_HALO } from '@/engine/colors';
 import { shortNum } from '@/engine/format';
 import type { PrimProps } from '@/engine/renderers/svg/types';
+import { useSceneText } from '@/engine/artex/context';
 
 export default function Point({ obj, scope, cx, startDrag, keyDrag }: PrimProps) {
+  const sceneText = useSceneText();
   const px = cx.toX(evalNumber(obj.x, scope));
   const py = cx.toY(evalNumber(obj.y, scope));
   if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
@@ -70,7 +72,7 @@ export default function Point({ obj, scope, cx, startDrag, keyDrag }: PrimProps)
           strokeWidth={3}
           paintOrder="stroke"
         >
-          {interpolate(obj.label, scope)}
+          {sceneText(interpolate(obj.label, scope))}
         </text>
       )}
     </g>

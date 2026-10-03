@@ -26,6 +26,7 @@ import InputLayer, { type InputLayerConfig } from './InputLayer';
 import KeyboardCrosshair from './KeyboardCrosshair';
 import type { SceneIR, Scope } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
+import { useSceneText } from '@/engine/artex/context';
 
 const DEFAULT_W = 640;
 const ASPECT = 0.6;
@@ -54,6 +55,7 @@ export default function SvgRenderer({
   tapLabel?: string;
 }) {
   const { scope, set, attention, traces } = useScene();
+  const sceneText = useSceneText();
   const [hoveredRole, setHoveredRole] = useState<string | null>(null);
   useEffect(() => {
     const onRole = (e: Event) => setHoveredRole((e as CustomEvent<string | null>).detail);
@@ -218,7 +220,7 @@ export default function SvgRenderer({
             paintOrder="stroke"
             style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-nunito)' }}
           >
-            {fmt(t, sx)}
+            {sceneText(fmt(t, sx))}
           </text>
         );
     }
@@ -243,7 +245,7 @@ export default function SvgRenderer({
             paintOrder="stroke"
             style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-nunito)' }}
           >
-            {fmt(t, sy)}
+            {sceneText(fmt(t, sy))}
           </text>
         );
     }

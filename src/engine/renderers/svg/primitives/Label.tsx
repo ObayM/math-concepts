@@ -2,8 +2,12 @@ import katex from 'katex';
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
 import { resolveColor, LABEL_HALO, texColors } from '@/engine/colors';
 import type { PrimProps } from '@/engine/renderers/svg/types';
+import { arabicMath } from '@/engine/artex';
+import { useMathNotation, useSceneText } from '@/engine/artex/context';
 
 export default function Label({ obj, scope, cx }: PrimProps) {
+  const arabic = useMathNotation() === 'ar';
+  const sceneText = useSceneText();
   const px = cx.toX(evalNumber(obj.x, scope));
   const py = cx.toY(evalNumber(obj.y, scope));
   if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
@@ -11,7 +15,9 @@ export default function Label({ obj, scope, cx }: PrimProps) {
   if (obj.tex) {
     const fontSize = obj.fontSize ?? 18;
     const raw = interpolate(obj.text, scope);
-    const html = katex.renderToString(texColors(raw), { throwOnError: false });
+    const html = arabic
+      ? arabicMath(raw, false).html
+      : katex.renderToString(texColors(raw), { throwOnError: false });
 
     const narrow = cx.W < 420;
     const estW = raw.replace(/\\[a-zA-Z]+|[{}\s]/g, '').length * fontSize * 0.62 + 12;
@@ -28,7 +34,7 @@ export default function Label({ obj, scope, cx }: PrimProps) {
         overflow="visible"
       >
         <div
-          dir="ltr"
+          dir={arabic ? 'rtl' : 'ltr'}
           style={{
             fontSize,
             color: resolveColor(obj.color ?? 'neutral'),
@@ -62,7 +68,7 @@ export default function Label({ obj, scope, cx }: PrimProps) {
       strokeWidth={3}
       paintOrder="stroke"
     >
-      {interpolate(obj.text, scope)}
+      {sceneText(interpolate(obj.text, scope))}
     </text>
   );
 }

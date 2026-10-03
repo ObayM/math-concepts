@@ -1,8 +1,10 @@
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
 import { resolveColor, dash, LABEL_HALO, STROKE } from '@/engine/colors';
 import type { Prim3Props } from '@/engine/renderers/svg/types';
+import { useSceneText } from '@/engine/artex/context';
 
 export default function Segment3({ obj, scope, cx }: Prim3Props) {
+  const sceneText = useSceneText();
   const a = ['x1', 'y1', 'z1'].map((k) => evalNumber(obj[k], scope));
   const b = ['x2', 'y2', 'z2'].map((k) => evalNumber(obj[k], scope));
   if (![...a, ...b].every(Number.isFinite)) return null;
@@ -54,7 +56,7 @@ export default function Segment3({ obj, scope, cx }: Prim3Props) {
           strokeWidth={3}
           paintOrder="stroke"
         >
-          {interpolate(obj.label, scope)}
+          {sceneText(interpolate(obj.label, scope))}
         </text>
       )}
     </g>

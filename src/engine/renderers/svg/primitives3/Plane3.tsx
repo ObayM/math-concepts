@@ -1,6 +1,7 @@
 import { evalNumber, interpolate } from '@/engine/runtime/eval';
 import { resolveColor, dash, LABEL_HALO, SHAPE_STROKE_WIDTH } from '@/engine/colors';
 import type { Prim3Props } from '@/engine/renderers/svg/types';
+import { useSceneText } from '@/engine/artex/context';
 
 type V3 = [number, number, number];
 
@@ -26,6 +27,7 @@ export function spanOf(n: V3): [V3, V3] | null {
 }
 
 export default function Plane3({ obj, scope, cx }: Prim3Props) {
+  const sceneText = useSceneText();
   const n: V3 = [evalNumber(obj.nx, scope), evalNumber(obj.ny, scope), evalNumber(obj.nz, scope)];
   const c: V3 = [
     evalNumber(obj.through[0], scope),
@@ -81,7 +83,7 @@ export default function Plane3({ obj, scope, cx }: Prim3Props) {
           strokeWidth={3}
           paintOrder="stroke"
         >
-          {interpolate(obj.label, scope)}
+          {sceneText(interpolate(obj.label, scope))}
         </text>
       )}
     </g>

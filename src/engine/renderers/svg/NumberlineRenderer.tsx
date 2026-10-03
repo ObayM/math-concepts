@@ -7,6 +7,7 @@ import { resolveColor, AXIS_LINE, AXIS_LABEL } from '@/engine/colors';
 import type { SceneIR } from '@/engine/ir/types';
 import type { CoordSystem } from './types';
 import type { InputLayerConfig } from './InputLayer';
+import { useSceneText } from '@/engine/artex/context';
 
 const DEFAULT_W = 640;
 const H = 120;
@@ -23,6 +24,7 @@ export default function NumberlineRenderer({
   inputLayer?: InputLayerConfig;
 }) {
   const { scope, set } = useScene();
+  const sceneText = useSceneText();
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +82,7 @@ export default function NumberlineRenderer({
           strokeWidth={3}
           paintOrder="stroke"
         >
-          {fmt(t)}
+          {sceneText(fmt(t))}
         </text>
       </g>
     );
@@ -173,7 +175,7 @@ export default function NumberlineRenderer({
                     strokeWidth={3}
                     paintOrder="stroke"
                   >
-                    {interpolate(obj.label, scope)}
+                    {sceneText(interpolate(obj.label, scope))}
                   </text>
                 )}
               </g>
@@ -195,7 +197,7 @@ export default function NumberlineRenderer({
                 strokeWidth={2}
                 paintOrder="stroke"
               >
-                {interpolate(obj.text, scope)}
+                {sceneText(interpolate(obj.text, scope))}
               </text>
             );
           }

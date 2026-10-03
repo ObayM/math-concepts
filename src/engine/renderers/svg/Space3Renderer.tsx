@@ -8,6 +8,8 @@ import { AXIS_LINE, AXIS_LABEL, LABEL_HALO, AXIS_LABEL_SIZE } from '@/engine/col
 import { spaceCoords3 } from './coords3';
 import type { SceneIR } from '@/engine/ir/types';
 import type { Coord3 } from './types';
+import { useMathNotation } from '@/engine/artex/context';
+import { AXIS_NAMES } from '@/engine/artex/sceneText';
 
 const DEFAULT_W = 640;
 const ASPECT = 0.72;
@@ -131,6 +133,7 @@ export default function Space3Renderer({ ir, revealed }: { ir: SceneIR; revealed
 }
 
 function Axes3({ cx }: { cx: Coord3 }) {
+  const arabic = useMathNotation() === 'ar';
   const axes: { to: [number, number, number]; from: [number, number, number]; name: string }[] = [
     { from: [cx.xDomain[0], 0, 0], to: [cx.xDomain[1], 0, 0], name: 'x' },
     { from: [0, cx.yDomain[0], 0], to: [0, cx.yDomain[1], 0], name: 'y' },
@@ -169,7 +172,7 @@ function Axes3({ cx }: { cx: Coord3 }) {
               strokeWidth={3}
               paintOrder="stroke"
             >
-              {name}
+              {arabic ? AXIS_NAMES[name] : name}
             </text>
             <Ticks cx={cx} axis={name} />
           </g>
