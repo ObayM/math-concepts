@@ -1,4 +1,5 @@
 import { Nunito, Fraunces, IBM_Plex_Sans_Arabic, Rubik } from 'next/font/google';
+import localFont from 'next/font/local';
 
 export const nunito = Nunito({
   variable: '--font-nunito',
@@ -32,4 +33,13 @@ export const rubik = Rubik({
   preload: false,
 });
 
-export const fontVars = [nunito, fraunces, plexArabic, rubik].map((f) => f.variable).join(' ');
+export const mathFont = localFont({
+  src: '../assets/fonts/noto-sans-math.woff2',
+  variable: '--font-math',
+  display: 'swap',
+  preload: false,
+});
+
+export const fontVars = [nunito, fraunces, plexArabic, rubik, mathFont]
+  .map((f) => f.variable)
+  .join(' ');

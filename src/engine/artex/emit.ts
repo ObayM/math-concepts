@@ -79,6 +79,16 @@ function opensFence(n: PNode | undefined): boolean {
   return n.type === 'delimsizing' && n.mclass === 'mopen';
 }
 
+function unaryAfter(nodes: PNode[], i: number): boolean {
+  let j = i - 1;
+  while (j >= 0 && (nodes[j].type === 'kern' || nodes[j].type === 'spacing')) j--;
+  const prev = nodes[j];
+  if (!prev) return true;
+  if (prev.type === 'atom') return ['bin', 'rel', 'open', 'punct'].includes(prev.family ?? '');
+  if (prev.type === 'mclass') return prev.mclass === 'mrel' || prev.mclass === 'mbin';
+  return prev.type === 'op' || prev.type === 'htmlmathml';
+}
+
 function appliesFunction(n: PNode): boolean {
   if (n.type === 'op') return !n.symbol;
   return n.type === 'supsub' && n.base?.type === 'op' && !n.base.symbol;
@@ -312,6 +322,10 @@ export function toMathML(nodes: PNode[], report: Report): string {
       if (n.type === 'textord' && /^\p{M}$/u.test(n.text ?? '') && nodes[i + 1]) {
         const next = nodes[++i];
         out += `<mo>${esc((symbol(next.text ?? '') + n.text).normalize('NFC'))}</mo>`;
+        continue;
+      }
+      if (n.type === 'atom' && n.family === 'bin' && unaryAfter(nodes, i)) {
+        out += `<mo form="prefix">${esc(symbol(n.text ?? ''))}</mo>`;
         continue;
       }
       out += emit(n);

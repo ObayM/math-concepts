@@ -3,9 +3,11 @@ import { useMemo } from 'react';
 import { ArrowDown, CheckCircle2 } from 'lucide-react';
 import RichText from '../RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
+import { useMathNotation } from '@/engine/artex/context';
 import { hashStr, shuffledOrder } from './shuffle';
 
 export default function MovesExercise({ slide, value, checked, onChange, revealAnswer = true }) {
+  const flow = useMathNotation() === 'ar' ? undefined : 'ltr';
   const t = useT();
   const ex = slide.exercise;
   const picks = Array.isArray(value) ? value : ex.steps.map(() => []);
@@ -39,7 +41,7 @@ export default function MovesExercise({ slide, value, checked, onChange, revealA
         {ex.prompt}
       </RichText>
 
-      <div className="flex flex-col items-start gap-2" dir="ltr">
+      <div className="flex flex-col items-start gap-2" dir={flow}>
         <RichText className="rounded-xl bg-neutral-50 px-4 py-2 text-lg">{ex.start}</RichText>
         {ex.steps.slice(0, current).map((st, i) => (
           <div key={i} className="animate-fade-in-up flex flex-col items-start gap-2">

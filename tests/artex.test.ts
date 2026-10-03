@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import katex from 'katex';
 import { arabicMath, collisions, parseTex } from '@/engine/artex';
+import { arabicSceneText } from '@/engine/artex/sceneText';
 
 const body = (tex: string) => {
   const r = arabicMath(tex, false);
@@ -151,5 +152,38 @@ describe('what artex cannot do', () => {
     expect([...arabicMath('P + q', false).report.latin]).toEqual(['P', 'q']);
     expect(collisions(arabicMath('C(0, c, 0)', false).report)).toEqual([['جـ', ['C', 'c']]]);
     expect(collisions(arabicMath('x\\hat i + y\\hat j', false).report)).toEqual([]);
+  });
+});
+
+describe('scene labels in arabic', () => {
+  const LRI = '⁦';
+  const RLI = '⁧';
+  const PDI = '⁩';
+
+  it('maps point names and coordinates, each number its own ltr run', () => {
+    expect(arabicSceneText('O')).toBe(`${RLI}و${PDI}`);
+    expect(arabicSceneText('P(3, -4, 12)')).toBe(
+      `${RLI}P(${LRI}٣${PDI}، ${LRI}−٤${PDI}، ${LRI}١٢${PDI})${PDI}`
+    );
+    expect(arabicSceneText('-2.5')).toBe(`${RLI}${LRI}−٢٫٥${PDI}${PDI}`);
+  });
+
+  it('leaves words and arabic text alone', () => {
+    expect(arabicSceneText('max')).toBe('max');
+    expect(arabicSceneText('لفّ المشهد')).toBe('لفّ المشهد');
+    expect(arabicSceneText('')).toBe('');
+  });
+});
+
+describe('unary signs', () => {
+  it('marks a minus as prefix after a comma, a bracket, a relation or nothing', () => {
+    expect(body('(0, -3)')).toContain('<mo>،</mo><mo form="prefix">−</mo><mn>٣</mn>');
+    expect(body('-x')).toBe('<mo form="prefix">−</mo><mi>س</mi>');
+    expect(body('x = -2')).toContain('<mo>=</mo><mo form="prefix">−</mo>');
+    expect(body('\\left(-1\\right)')).toContain('<mo form="prefix">−</mo>');
+  });
+
+  it('keeps a minus between two terms binary', () => {
+    expect(body('x - 1')).toBe('<mi>س</mi><mo>−</mo><mn>١</mn>');
   });
 });

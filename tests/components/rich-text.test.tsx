@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import RichText from '@/components/lesson/RichText';
+import { MathNotationProvider } from '@/engine/artex/context';
 
 const html = (src: string) => render(<RichText className="">{src}</RichText>).container.innerHTML;
 
@@ -67,5 +68,35 @@ describe('math inside right-to-left prose', () => {
     );
     expect(container.textContent).toContain('المشتقة تقيس معدل التغير');
     expect(container.querySelector('span[dir="ltr"]')).toBeNull();
+  });
+});
+
+describe('math in arabic notation', () => {
+  const ar = (src: string) =>
+    render(
+      <MathNotationProvider notation="ar">
+        <div dir="rtl">
+          <RichText>{src}</RichText>
+        </div>
+      </MathNotationProvider>
+    ).container;
+
+  it('renders rtl mathml in book notation instead of katex', () => {
+    const c = ar('الدالة $y = f(x)$ معرفة');
+    const math = c.querySelector('math.artex');
+    expect(math?.getAttribute('dir')).toBe('rtl');
+    expect(math?.textContent).toBe('ص=د(س)');
+    expect(c.querySelector('.katex')).toBeNull();
+    expect(c.querySelector('span[dir="ltr"]')).toBeNull();
+  });
+
+  it('renders a display paragraph as a block', () => {
+    const c = ar('قبلها\n\n$$x^2$$');
+    expect(c.querySelector('math[display="block"]')?.textContent).toBe('س٢');
+  });
+
+  it('leaves latin courses on katex', () => {
+    expect(html('$y = f(x)$')).toContain('katex');
+    expect(html('$y = f(x)$')).not.toContain('<math dir="rtl"');
   });
 });
