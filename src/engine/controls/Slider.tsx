@@ -1,6 +1,7 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
 import { shortNum } from '@/engine/format';
+import { useSceneText } from '@/engine/artex/context';
 import { useT } from '@/components/i18n/LocaleProvider';
 
 type SliderControl = {
@@ -25,6 +26,7 @@ export default function Slider({ control }: { control: SliderControl }) {
   const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
 
   const name = control.label || control.bind;
+  const sceneText = useSceneText();
   const shown = shortNum(val);
 
   return (
@@ -32,7 +34,7 @@ export default function Slider({ control }: { control: SliderControl }) {
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">{name}</span>
         <span className="font-mono text-lg font-bold tabular-nums leading-none text-primary-600">
-          {shown}
+          {sceneText(shown)}
         </span>
       </div>
       <div className="group relative h-6">
@@ -58,8 +60,8 @@ export default function Slider({ control }: { control: SliderControl }) {
         />
       </div>
       <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-neutral-400">
-        <span>{shortNum(min)}</span>
-        <span>{shortNum(max)}</span>
+        <span>{sceneText(shortNum(min))}</span>
+        <span>{sceneText(shortNum(max))}</span>
       </div>
     </div>
   );

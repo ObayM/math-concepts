@@ -162,21 +162,27 @@ describe('what artex cannot do', () => {
 });
 
 describe('scene labels in arabic', () => {
-  const LRI = '⁦';
-  const RLI = '⁧';
-  const PDI = '⁩';
+  const RLI = '\u2067';
+  const PDI = '\u2069';
+  const n = (s: string) => `${RLI}${s}${PDI}`;
 
-  it('maps point names and coordinates, each number its own ltr run', () => {
-    expect(arabicSceneText('O')).toBe(`${RLI}و${PDI}`);
-    expect(arabicSceneText('P(3, -4, 12)')).toBe(
-      `${RLI}P(${LRI}٣${PDI}، ${LRI}−٤${PDI}، ${LRI}١٢${PDI})${PDI}`
-    );
-    expect(arabicSceneText('-2.5')).toBe(`${RLI}${LRI}−٢٫٥${PDI}${PDI}`);
+  it('maps point names and coordinates, each number its own rtl run', () => {
+    expect(arabicSceneText('O')).toBe(n('و'));
+    expect(arabicSceneText('P(3, -4, 12)')).toBe(n(`P(${n('٣')}، ${n('−٤')}، ${n('١٢')})`));
+    expect(arabicSceneText('-2.5')).toBe(n(n('−٢٫٥')));
   });
 
-  it('leaves words and arabic text alone', () => {
-    expect(arabicSceneText('max')).toBe('max');
+  it('reads greek and degrees as math', () => {
+    expect(arabicSceneText('θx = 54.74°')).toBe(n(`θس = ${n('٥٤٫٧٤')}°`));
+  });
+
+  it('turns the numbers in an arabic label into arabic digits and nothing else', () => {
+    expect(arabicSceneText('الميل = -1.00')).toBe(n(`الميل = ${n('−١٫٠٠')}`));
     expect(arabicSceneText('لفّ المشهد')).toBe('لفّ المشهد');
+  });
+
+  it('leaves words alone', () => {
+    expect(arabicSceneText('max')).toBe('max');
     expect(arabicSceneText('')).toBe('');
   });
 });
@@ -191,5 +197,17 @@ describe('unary signs', () => {
 
   it('keeps a minus between two terms binary', () => {
     expect(body('x - 1')).toBe('<mi>س</mi><mo>−</mo><mn>١</mn>');
+  });
+});
+
+describe('axis lines', () => {
+  it("writes the negative half of an axis as the book does, سَ for x'", () => {
+    expect(body("\\overleftrightarrow{xx'}")).toBe(
+      '<mover accent="true"><mrow><mi>س</mi><mi>سَ</mi></mrow><mo stretchy="true">↔</mo></mover>'
+    );
+  });
+
+  it("keeps y' a derivative everywhere else", () => {
+    expect(body("y'")).toBe('<msup><mi>ص</mi><mo>′</mo></msup>');
   });
 });
