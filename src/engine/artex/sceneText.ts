@@ -3,7 +3,8 @@ import { LETTERS, indicDigits } from './notation';
 const RLI = '\u2067';
 const PDI = '\u2069';
 
-const MATHISH = /^[A-Za-z0-9\s().,+\-=′'/[\]|°\u0370-\u03ff]+$/;
+const MATHISH = /^[A-Za-z0-9\s().,+\-=′'/[\]|°×·\u0370-\u03ff]+$/;
+const TOKEN = /(?<![A-Za-z])(?:[A-Z]+|[a-z])(?![A-Za-z])/g;
 const ARABIC = /\p{Script=Arabic}/u;
 const NUMBER = /-?\d+(?:\.\d+)?/g;
 
@@ -12,9 +13,14 @@ const NUMBER = /-?\d+(?:\.\d+)?/g;
 // number is its own run so a minus lands on its reading side, as in the math
 const number = (n: string) => RLI + indicDigits(n.replace('-', '−')) + PDI;
 
+const pointName = (w: string) => w.replace(/[A-Za-z]/g, (l) => LETTERS[l] ?? l);
+
 export function arabicSceneText(s: string): string {
   if (!/[0-9]/.test(s) && !/[A-Za-z]/.test(s)) return s;
-  if (ARABIC.test(s)) return /[0-9]/.test(s) ? RLI + s.replace(NUMBER, number) + PDI : s;
+  if (ARABIC.test(s)) {
+    const out = s.replace(TOKEN, pointName).replace(NUMBER, number);
+    return out === s ? s : RLI + out + PDI;
+  }
   if (!MATHISH.test(s)) return s;
   const words = s.match(/[A-Za-z]+/g) ?? [];
   if (words.some((w) => w.length > 1 && w !== w.toUpperCase())) return s;

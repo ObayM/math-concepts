@@ -11,7 +11,9 @@ const files = readdirSync(dir).filter((f) => /^ar-.*\.prism$/.test(f));
 
 function formulas(v: unknown, out: string[]): string[] {
   if (typeof v === 'string') {
-    const text = v.replace(MEMORY_REF, (_, _fn, _name, fallback?: string) => fallback ?? '');
+    const text = v
+      .replace(MEMORY_REF, (_, _fn, _name, fallback?: string) => fallback ?? '')
+      .replace(/\$\{[^}]*\}/g, '7');
     for (const m of text.matchAll(/\$\$([^$]+)\$\$|\$([^$]+)\$/g)) out.push(m[1] ?? m[2]);
   } else if (Array.isArray(v)) v.forEach((x) => formulas(x, out));
   else if (v && typeof v === 'object') {

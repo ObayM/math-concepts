@@ -23,7 +23,9 @@ export default function Stepper({ control }: { control: StepperControl }) {
 
   return (
     <div className="flex w-full items-center justify-between rounded-2xl bg-neutral-100 p-4">
-      <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">{name}</span>
+      <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+        {sceneText(name)}
+      </span>
       <div className="flex items-center gap-3">
         <button
           type="button"

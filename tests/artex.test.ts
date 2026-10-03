@@ -181,6 +181,11 @@ describe('scene labels in arabic', () => {
     expect(arabicSceneText('لفّ المشهد')).toBe('لفّ المشهد');
   });
 
+  it('names points inside arabic labels too, and reads × as math', () => {
+    expect(arabicSceneText('موضع Q على محور x')).toBe(n('موضع Q على محور س'));
+    expect(arabicSceneText('B × A')).toBe(n('ب × أ'));
+  });
+
   it('leaves words alone', () => {
     expect(arabicSceneText('max')).toBe('max');
     expect(arabicSceneText('')).toBe('');

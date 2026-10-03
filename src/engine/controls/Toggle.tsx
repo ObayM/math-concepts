@@ -1,9 +1,11 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
+import { useSceneText } from '@/engine/artex/context';
 
 type ToggleControl = { as: 'toggle'; bind: string; label?: string };
 
 export default function Toggle({ control }: { control: ToggleControl }) {
+  const sceneText = useSceneText();
   const { scope, set } = useScene();
   const on = !!scope[control.bind];
 
@@ -17,7 +19,7 @@ export default function Toggle({ control }: { control: ToggleControl }) {
       className="w-full flex items-center justify-between bg-neutral-100 rounded-2xl p-4 text-left transition-colors hover:bg-neutral-200/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
     >
       <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
-        {control.label || control.bind}
+        {sceneText(control.label || control.bind)}
       </span>
       <span
         className={`relative w-11 h-6 rounded-full transition-colors ${on ? 'bg-primary-500' : 'bg-neutral-300'}`}

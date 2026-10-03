@@ -1,5 +1,6 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
+import { useSceneText } from '@/engine/artex/context';
 
 type ButtonControl = {
   as: 'button';
@@ -13,6 +14,7 @@ type ButtonControl = {
 };
 
 export default function Button({ control }: { control: ButtonControl }) {
+  const sceneText = useSceneText();
   const { scope, set, setMany, animate } = useScene();
 
   const onClick = () => {
@@ -34,7 +36,7 @@ export default function Button({ control }: { control: ButtonControl }) {
       onClick={onClick}
       className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm px-5 py-3 rounded-2xl border-b-4 border-primary-700 active:border-b-0 active:translate-y-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
     >
-      {control.label}
+      {sceneText(control.label)}
     </button>
   );
 }

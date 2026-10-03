@@ -32,7 +32,9 @@ export default function Slider({ control }: { control: SliderControl }) {
   return (
     <div className="w-full bg-neutral-100 rounded-2xl px-4 py-3">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">{name}</span>
+        <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+          {sceneText(name)}
+        </span>
         <span className="font-mono text-lg font-bold tabular-nums leading-none text-primary-600">
           {sceneText(shown)}
         </span>

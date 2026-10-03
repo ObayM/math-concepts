@@ -1,9 +1,11 @@
 'use client';
 import { useScene } from '@/engine/runtime/SceneProvider';
+import { useSceneText } from '@/engine/artex/context';
 
 type PickerControl = { as: 'picker'; bind: string; label?: string };
 
 export default function Picker({ control }: { control: PickerControl }) {
+  const sceneText = useSceneText();
   const { scope, set, ir } = useScene();
   const def = ir.state[control.bind];
   const options = def?.type === 'enum' ? def.options : [];
@@ -12,7 +14,9 @@ export default function Picker({ control }: { control: PickerControl }) {
 
   return (
     <div className="w-full rounded-2xl bg-neutral-100 p-4">
-      <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">{name}</span>
+      <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+        {sceneText(name)}
+      </span>
       <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label={name}>
         {options.map((opt) => (
           <button
@@ -27,7 +31,7 @@ export default function Picker({ control }: { control: PickerControl }) {
                 : 'bg-white text-neutral-600 border border-neutral-200 hover:border-primary-400'
             }`}
           >
-            {opt}
+            {sceneText(opt)}
           </button>
         ))}
       </div>
