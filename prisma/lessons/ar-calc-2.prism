@@ -720,7 +720,7 @@ lesson "قواعد الضرب والقسمة والسلسلة" {
     }
   }
 
-  slide "حين يكون الداخل y" {
+  slide "حين يكون الداخل ص" {
     id: "c2-y-inner"
     beat: example
     cat: "كل شيء معًا"
@@ -738,7 +738,7 @@ lesson "قواعد الضرب والقسمة والسلسلة" {
     }
   }
 
-  slide "مشتقة y تربيع" {
+  slide "مشتقة ص تربيع" {
     id: "c2-y-inner-2"
     beat: example
     cat: "كل شيء معًا"
@@ -843,7 +843,7 @@ lesson "قواعد الضرب والقسمة والسلسلة" {
     }
   }
 
-  slide "عند الداخل لا عند x" {
+  slide "عند الداخل لا عند س" {
     id: "c2-d-at-inner"
     beat: detour
     hidden: true

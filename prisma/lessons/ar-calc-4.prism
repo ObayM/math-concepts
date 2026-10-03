@@ -3,7 +3,7 @@ lesson "الاشتقاق الضمني والبارامتري" {
   unit: "الاشتقاق وتطبيقاته"
   difficulty: "Advanced"
   icon: "FunctionSquare"
-  summary: "كيف تشتق منحنى لا تستطيع أن تكتب فيه y وحدها، أو منحنى ترسمه نقطة تتحرك مع الزمن. الدرس الأول من كتابك، بكل أمثلته وتمارينه."
+  summary: "كيف تشتق منحنى لا تستطيع أن تكتب فيه ص وحدها، أو منحنى ترسمه نقطة تتحرك مع الزمن. الدرس الأول من كتابك، بكل أمثلته وتمارينه."
   skills: ["diff-implicit", "diff-parametric"]
   requires: ["diff-chain-rule", "diff-product-rule", "diff-trig"]
 
@@ -263,7 +263,7 @@ lesson "الاشتقاق الضمني والبارامتري" {
     }
   }
 
-  slide "مشتقة y تربيع هي 2y؟" {
+  slide "مشتقة ص تربيع هي ٢ص؟" {
     id: "c4-trap"
     beat: trap
     cat: "الاشتقاق الضمني"
@@ -294,7 +294,7 @@ lesson "الاشتقاق الضمني والبارامتري" {
     }
   }
 
-  slide "و x في y؟" {
+  slide "و س في ص؟" {
     id: "c4-trap-xy"
     beat: trap
     cat: "الاشتقاق الضمني"
@@ -509,7 +509,7 @@ lesson "الاشتقاق الضمني والبارامتري" {
     }
   }
 
-  slide "مثال 4: اشتق بالنسبة إلى y ثم اقلب" {
+  slide "مثال 4: اشتق بالنسبة إلى ص ثم اقلب" {
     id: "c4-ex4"
     beat: example
     cat: "أمثلة الكتاب"
@@ -3148,7 +3148,7 @@ lesson "الاشتقاق الضمني والبارامتري" {
     }
   }
 
-  slide "كل حد فيه y" {
+  slide "كل حد فيه ص" {
     id: "c4-d-dydx"
     beat: detour
     hidden: true
@@ -3186,7 +3186,7 @@ lesson "الاشتقاق الضمني والبارامتري" {
     }
   }
 
-  slide "y على x، لا x على y" {
+  slide "ص على س، لا س على ص" {
     id: "c4-d-flip"
     beat: detour
     hidden: true
