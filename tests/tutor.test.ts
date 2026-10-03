@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { compileLesson } from '@/engine/lang';
 import {
-  MAX_HISTORY_TURNS,
   MAX_QUESTION_CHARS,
   MAX_TURN_CHARS,
   TUTOR_SYSTEM_PROMPT,
@@ -191,13 +190,13 @@ describe('what the tutor can see', () => {
 });
 
 describe('history', () => {
-  it('keeps only the most recent turns', () => {
+  it('keeps the whole conversation', () => {
     const many = Array.from({ length: 20 }, (_, i) => ({
       role: 'user' as const,
       content: `q${i}`,
     }));
     const kept = trimHistory(many);
-    expect(kept).toHaveLength(MAX_HISTORY_TURNS);
+    expect(kept).toHaveLength(20);
     expect(kept.at(-1)!.content).toBe('q19');
   });
 

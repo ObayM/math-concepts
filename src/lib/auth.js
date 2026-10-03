@@ -25,9 +25,6 @@ const trustedOrigins = (process.env.TRUSTED_ORIGINS ?? '')
 
 const allowedHosts = hostsForDomain(appDomain);
 
-// this decides both which origins are trusted and whether the session cookie
-// gets the __Secure- prefix, so it follows the scheme the app is actually
-// served over rather than NODE_ENV
 const protocol = (process.env.APP_PROTOCOL ?? 'auto').trim();
 
 export const auth = betterAuth({
@@ -51,10 +48,6 @@ export const auth = betterAuth({
     },
   },
 
-  // better-auth rate limits by default in production only, and its defaults are
-  // strict (3 per 10s on sign-in/sign-up). pin them here so the behaviour is a
-  // decision rather than an inherited surprise. the store is per-process, same
-  // caveat as src/lib/rate-limit.ts.
   rateLimit: {
     enabled: true,
     window: 60,

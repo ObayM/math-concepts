@@ -11,7 +11,6 @@ import { lessonSchema } from '@/engine/ir/lesson';
 import { DEFAULT_LOCALE, isLocale } from '@/lib/locale';
 import {
   MAX_QUESTION_CHARS,
-  MAX_HISTORY_TURNS,
   MAX_TURN_CHARS,
   buildTutorContext,
   buildTutorRequest,
@@ -32,7 +31,6 @@ const bodySchema = z.object({
         content: z.string().max(MAX_TURN_CHARS),
       })
     )
-    .max(MAX_HISTORY_TURNS * 2)
     .optional(),
 });
 

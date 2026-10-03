@@ -2,7 +2,6 @@ import type { LessonIR, SlideIR } from '@/engine/ir/lesson';
 import { DEFAULT_LOCALE, type Locale } from './locale';
 
 export const MAX_QUESTION_CHARS = 500;
-export const MAX_HISTORY_TURNS = 4;
 export const MAX_TURN_CHARS = 800;
 
 export type TutorRole = 'user' | 'assistant';
@@ -55,8 +54,6 @@ How to answer:
 - If they ask about something outside this slide's math, answer in one sentence and bring them back.
 - You cannot see their screen, run code, or change the lesson. Don't pretend otherwise.`;
 
-// arabic says the same thing in fewer words, so the english budget would let the
-// model ramble. the maths itself stays latin, matching how the lessons are written.
 const LOCALE_DIRECTIVE: Record<Locale, string> = {
   en: '',
   ar: `
@@ -102,7 +99,6 @@ export function trimHistory(history: unknown): TutorTurn[] {
         ((t as TutorTurn).role === 'user' || (t as TutorTurn).role === 'assistant') &&
         typeof (t as TutorTurn).content === 'string'
     )
-    .slice(-MAX_HISTORY_TURNS)
     .map((t) => ({ role: t.role, content: t.content.slice(0, MAX_TURN_CHARS) }));
 }
 

@@ -1,5 +1,3 @@
-// a reminder should land in the evening where the reader actually is, so the
-// cron runs hourly and each user only qualifies during their own local hour
 export const REMINDER_HOUR = 19;
 const RESEND_GUARD_MS = 20 * 60 * 60 * 1000;
 
