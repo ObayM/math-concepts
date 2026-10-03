@@ -138,6 +138,24 @@ export function toMathML(nodes: PNode[], report: Report): string {
     return UNIT_VECTORS[t] ?? UNIT_VECTOR_OTHER;
   };
 
+  let onLine = 0;
+  const line = (x: PNode['body']): string => {
+    onLine++;
+    try {
+      return group(x);
+    } finally {
+      onLine--;
+    }
+  };
+
+  const negativeAxis = (n: PNode): string | null => {
+    if (!onLine || n.sub || n.base?.type !== 'mathord' || !/^[xyz]$/.test(n.base.text ?? ''))
+      return null;
+    const sup = flat(n.sup);
+    if (sup.length !== 1 || sup[0].text !== '\\prime') return null;
+    return `<mi>${LETTERS[n.base.text ?? '']}\u064E</mi>`;
+  };
+
   const over = (base: string, mark: string, stretchy: boolean) =>
     `<mover accent="true">${base}<mo stretchy="${stretchy}">${mark}</mo></mover>`;
 
@@ -152,11 +170,11 @@ export function toMathML(nodes: PNode[], report: Report): string {
       case '\\vec':
         return over(group(n.base), '←', false);
       case '\\overrightarrow':
-        return over(group(n.base), '←', true);
+        return over(line(n.base), '←', true);
       case '\\overleftarrow':
-        return over(group(n.base), '→', true);
+        return over(line(n.base), '→', true);
       case '\\overleftrightarrow':
-        return over(group(n.base), '↔', true);
+        return over(line(n.base), '↔', true);
       case '\\bar':
         return over(group(n.base), '¯', false);
       case '\\tilde':
@@ -202,6 +220,8 @@ export function toMathML(nodes: PNode[], report: Report): string {
       case 'ordgroup':
         return `<mrow>${seq(list(n.body))}</mrow>`;
       case 'supsub': {
+        const axis = negativeAxis(n);
+        if (axis) return axis;
         const base = n.base ? group(n.base) : '<mrow></mrow>';
         const limits = n.base?.type === 'op' && n.base.limits;
         const [subTag, supTag, bothTag] = limits
@@ -233,7 +253,7 @@ export function toMathML(nodes: PNode[], report: Report): string {
       case 'accent':
         return accent(n);
       case 'overline':
-        return over(group(n.body), '‾', true);
+        return over(line(n.body), '‾', true);
       case 'underline':
         return `<munder accentunder="true">${group(n.body)}<mo stretchy="true">‾</mo></munder>`;
       case 'op': {
