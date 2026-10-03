@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { lessonSchema } from '@/engine/ir/lesson';
 import LessonPlayer from '@/components/lesson/LessonPlayer';
+import { MathNotationProvider } from '@/engine/artex/context';
 import { getLessonById } from '@/lib/db/lessonService';
 import { requireAdmin } from '@/lib/authz';
 import { getMasteryFor } from '@/lib/db/progressService';
@@ -32,13 +33,15 @@ export default async function LessonPreviewPage({ params, searchParams }) {
 
   return (
     <div lang={lang} dir={dirFor(lang)}>
-      <LessonPlayer
-        slides={parsed.data.slides}
-        lessonId={lesson.lessonKey}
-        coursePath={`admin/content`}
-        nextLessonId={null}
-        skipTo={skipTo}
-      />
+      <MathNotationProvider notation={lang === 'ar' ? 'ar' : 'latin'}>
+        <LessonPlayer
+          slides={parsed.data.slides}
+          lessonId={lesson.lessonKey}
+          coursePath={`admin/content`}
+          nextLessonId={null}
+          skipTo={skipTo}
+        />
+      </MathNotationProvider>
     </div>
   );
 }

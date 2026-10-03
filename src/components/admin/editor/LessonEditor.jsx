@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { compileAny } from '@/components/prism/compileAny';
 import MiniPlayer from '@/components/prism/MiniPlayer';
+import { MathNotationProvider } from '@/engine/artex/context';
 import Button from '@/components/admin/ui/Button';
 import ProblemsPanel from './ProblemsPanel';
 import AiPanel from './AiPanel';
@@ -24,7 +25,7 @@ const vSeparator =
 const hSeparator =
   'h-1.5 shrink-0 cursor-row-resize bg-neutral-200 transition-colors hover:bg-primary-300 active:bg-primary-400';
 
-export default function LessonEditor({ lessonId, title, initialSource, initialUpdatedAt }) {
+export default function LessonEditor({ lessonId, title, initialSource, initialUpdatedAt, lang }) {
   const [source, setSource] = useState(initialSource);
   const [savedSource, setSavedSource] = useState(initialSource);
   const [serverUpdatedAt, setServerUpdatedAt] = useState(initialUpdatedAt ?? null);
@@ -211,11 +212,16 @@ export default function LessonEditor({ lessonId, title, initialSource, initialUp
           </Panel>
           <Separator className={vSeparator} />
           <Panel defaultSize={showAi ? 25 : 35} minSize={15} collapsible collapsedSize={0}>
-            <div className="h-full min-w-0 overflow-auto border border-neutral-200 p-4">
+            <div
+              dir={lang === 'ar' ? 'rtl' : undefined}
+              className="h-full min-w-0 overflow-auto border border-neutral-200 p-4"
+            >
               {previewError ? (
                 <pre className="whitespace-pre-wrap text-xs text-danger-600">{previewError}</pre>
               ) : lesson ? (
-                <MiniPlayer lesson={lesson} />
+                <MathNotationProvider notation={lang === 'ar' ? 'ar' : 'latin'}>
+                  <MiniPlayer lesson={lesson} />
+                </MathNotationProvider>
               ) : null}
             </div>
           </Panel>

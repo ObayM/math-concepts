@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getLessonById } from '@/lib/db/lessonService';
+import { getCourseById } from '@/lib/db/courseService';
 import LessonEditor from '@/components/admin/editor/LessonEditor';
 import { requireAdmin } from '@/lib/authz';
 
@@ -8,6 +9,7 @@ export default async function LessonEditPage({ params }) {
   const { id } = await params;
   const lesson = await getLessonById(id);
   if (!lesson) notFound();
+  const course = lesson.courseId ? await getCourseById(lesson.courseId) : null;
 
   return (
     <div>
@@ -18,6 +20,7 @@ export default async function LessonEditPage({ params }) {
         title={lesson.title ?? lesson.lessonKey}
         initialSource={lesson.source}
         initialUpdatedAt={lesson.updatedAt.toISOString()}
+        lang={course?.lang}
       />
     </div>
   );
