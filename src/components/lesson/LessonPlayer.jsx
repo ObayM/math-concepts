@@ -186,13 +186,14 @@ export default function LessonPlayer({
   }, [pathIndex, quizHistory, lessonId, progressLoaded]);
 
   useEffect(() => {
+    if (topic) return;
     fetch('/api/activity')
       .then((r) => r.json())
       .then((d) => {
         if (d.streak !== undefined) setStreak(d.streak);
       })
       .catch(console.error);
-  }, []);
+  }, [topic]);
 
   const [resetForKey, setResetForKey] = useState(null);
   if (resetForKey !== currentKey) {
@@ -207,19 +208,21 @@ export default function LessonPlayer({
   }
 
   const markComplete = () => {
-    fetch('/api/activity', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
-    })
-      .then(() =>
-        fetch('/api/activity')
-          .then((r) => r.json())
-          .then((d) => {
-            if (d.streak !== undefined) setStreak(d.streak);
-          })
-      )
-      .catch(console.error);
+    if (!topic) {
+      fetch('/api/activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+      })
+        .then(() =>
+          fetch('/api/activity')
+            .then((r) => r.json())
+            .then((d) => {
+              if (d.streak !== undefined) setStreak(d.streak);
+            })
+        )
+        .catch(console.error);
+    }
 
     fetch('/api/progress', {
       method: 'POST',
