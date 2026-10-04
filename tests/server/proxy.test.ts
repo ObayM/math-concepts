@@ -46,6 +46,7 @@ describe('the page gate', () => {
       '/api/auth/callback/x',
       '/api/check-username',
       '/api/cron/reminders',
+      '/api/content/topics',
       '/api/health',
       '/privacy',
       '/terms',
@@ -147,6 +148,27 @@ describe('the cross origin gate', () => {
       })
     );
     expect(res.status).not.toBe(403);
+  });
+
+  it('exempts the content api, which authenticates with a bearer token', () => {
+    const res = proxy(
+      new NextRequest(`${BASE}/api/content/topics`, {
+        method: 'POST',
+        headers: { host: 'localhost:3000', authorization: 'Bearer x' },
+      })
+    );
+    expect(res.status).not.toBe(403);
+  });
+
+  it('still guards the cookie-authed topic route', () => {
+    const res = proxy(
+      request('/api/admin/topics', {
+        method: 'POST',
+        cookie: SESSION,
+        headers: { origin: 'https://evil.test' },
+      })
+    );
+    expect(res.status).toBe(403);
   });
 
   it('never blocks a read', () => {

@@ -30,10 +30,10 @@ export const AUDIT_ACTIONS = Object.values(AUDIT);
 // best effort by design: a failed audit write must never roll back the action
 // it describes, or a full disk would stop all admin work. a missing row shows
 // up as a visible gap in the timeline instead.
-export async function recordAudit({ action, target, meta }) {
+export async function recordAudit({ action, target, meta, actor: given }) {
   try {
-    const [session, h] = await Promise.all([getFullSession(), headers()]);
-    const actor = session?.user ?? null;
+    const [session, h] = await Promise.all([given ? null : getFullSession(), headers()]);
+    const actor = given ?? session?.user ?? null;
 
     await prisma.auditLog.create({
       data: {

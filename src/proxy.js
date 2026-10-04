@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   '/api/auth',
   '/api/check-username',
   '/api/cron/',
+  '/api/content/',
   '/api/health',
   '/error',
   '/privacy',
@@ -30,7 +31,7 @@ const PUBLIC_PATHS = [
   '/offline',
 ];
 
-const CROSS_ORIGIN_EXEMPT = ['/api/auth', '/api/cron/'];
+const CROSS_ORIGIN_EXEMPT = ['/api/auth', '/api/cron/', '/api/content/'];
 
 // internal tooling and the language reference stay english whichever host they
 // are reached from

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getLessonByKey, listTopics } from '@/lib/db/lessonService';
-import { createTopic, moveLessonToCourse, publishLesson } from '@/lib/db/contentService';
+import { createTopic, moveLessonToCourse, publishLesson, saveTopic } from '@/lib/db/contentService';
 import { upsertLessonProgress, recordPracticeAttempt } from '@/lib/db/progressService';
 import { prisma } from '@/lib/prisma';
 import { makeCourse, makePublishedLesson, makeUser, NUMERIC_LESSON } from '../helpers/factories';
@@ -126,5 +126,36 @@ describe('topics stay out of the game loop', () => {
     const user = await makeUser();
     const topic = await makePublishedLesson(NUMERIC_LESSON, { courseId: null, lang: 'en' });
     expect(await recordPracticeAttempt(user.id, topic.lessonKey, 'power', 12)).toBeNull();
+  });
+});
+
+describe('saveTopic', () => {
+  it('will not edit a course lesson through its key', async () => {
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+    const result = await saveTopic({ source: topicSource('Hijack', 'X'), key: lesson.lessonKey });
+    expect(result.notFound).toBe(true);
+  });
+
+  it('creates and publishes in one go', async () => {
+    const result = await saveTopic({
+      source: topicSource('One go', 'Calculus'),
+      lang: 'en',
+      publish: true,
+    });
+    expect(result.created).toBe(true);
+    expect(result.published).toBe(true);
+    expect(result.lesson!.status).toBe('published');
+  });
+
+  it('updates an existing topic by key', async () => {
+    const first = await saveTopic({ source: topicSource('Before', 'Calculus'), lang: 'en' });
+    const second = await saveTopic({
+      source: topicSource('After', 'Calculus'),
+      key: first.lesson!.lessonKey,
+      publish: true,
+    });
+    expect(second.created).toBe(false);
+    expect(second.lesson!.title).toBe('After');
+    expect(second.lesson!.lessonKey).toBe(first.lesson!.lessonKey);
   });
 });

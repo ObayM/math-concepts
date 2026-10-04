@@ -113,6 +113,38 @@ export async function getTopicByKey(lessonKey) {
   return prisma.lesson.findFirst({ where: { lessonKey, courseId: null } });
 }
 
+// the one write path for topics, behind both the admin form and the token api.
+// a publish that verify blocks leaves a saved draft rather than failing the save.
+/** @param {{ source: string, lang?: string, key?: string, publish?: boolean, authorId?: string | null }} input */
+export async function saveTopic({ source, lang, key, publish = false, authorId = null }) {
+  let lesson;
+  let findings;
+  let created = false;
+  if (key) {
+    const existing = await getTopicByKey(key);
+    if (!existing) return { notFound: true };
+    const saved = await updateLessonSource(existing.id, source);
+    if (saved.error) return { error: saved.error };
+    ({ lesson, findings } = saved);
+  } else {
+    const made = await createTopic({ source, lang, authorId });
+    if (made.error) return { error: made.error };
+    ({ lesson, findings } = made);
+    created = true;
+  }
+
+  if (!publish) return { lesson, findings, created, published: false };
+  try {
+    lesson = await publishLesson(lesson.id);
+    return { lesson, findings, created, published: true };
+  } catch (err) {
+    if (err instanceof VerifyError) {
+      return { lesson, findings, created, published: false, blocking: err.findings };
+    }
+    throw err;
+  }
+}
+
 export async function listAllTopics() {
   return prisma.lesson.findMany({
     where: { courseId: null },
