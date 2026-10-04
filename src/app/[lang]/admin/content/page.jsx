@@ -7,6 +7,7 @@ import Input from '@/components/admin/ui/Input';
 import CourseHeaderRow from '@/components/admin/CourseHeaderRow';
 import DeleteWithImpact from '@/components/admin/DeleteWithImpact';
 import PublishLessonButton from '@/components/admin/PublishLessonButton';
+import NewTopicForm from '@/components/admin/NewTopicForm';
 import { requireAdmin } from '@/lib/authz';
 import {
   createCourseAction,
@@ -25,6 +26,7 @@ import {
 
 const LESSON_SELECT = {
   id: true,
+  lang: true,
   lessonKey: true,
   title: true,
   status: true,
@@ -41,7 +43,7 @@ function missingMetadata(lesson) {
   return ['unit', 'difficulty', 'iconName', 'description'].filter((k) => !lesson[k]);
 }
 
-function LessonRow({ lesson, courses }) {
+function LessonRow({ lesson, courses, topic = false }) {
   const gaps = missingMetadata(lesson);
 
   return (
@@ -54,6 +56,7 @@ function LessonRow({ lesson, courses }) {
           <Badge variant={lesson.status === 'published' ? 'success' : 'neutral'}>
             {lesson.status}
           </Badge>
+          {topic && <Badge variant="neutral">{lesson.lang ?? 'no lang'}</Badge>}
           {gaps.length > 0 && (
             <span
               title={`Missing in the lesson source: ${gaps.join(', ')}`}
@@ -71,21 +74,23 @@ function LessonRow({ lesson, courses }) {
       </div>
 
       <div className="flex flex-wrap items-start gap-2">
-        <div className="flex">
-          {['up', 'down'].map((direction) => (
-            <form key={direction} action={moveLessonAction}>
-              <input type="hidden" name="id" value={lesson.id} />
-              <input type="hidden" name="direction" value={direction} />
-              <button
-                type="submit"
-                aria-label={`Move ${direction}`}
-                className="border border-neutral-200 bg-card px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-50"
-              >
-                {direction === 'up' ? '▲' : '▼'}
-              </button>
-            </form>
-          ))}
-        </div>
+        {!topic && (
+          <div className="flex">
+            {['up', 'down'].map((direction) => (
+              <form key={direction} action={moveLessonAction}>
+                <input type="hidden" name="id" value={lesson.id} />
+                <input type="hidden" name="direction" value={direction} />
+                <button
+                  type="submit"
+                  aria-label={`Move ${direction}`}
+                  className="border border-neutral-200 bg-card px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-50"
+                >
+                  {direction === 'up' ? '▲' : '▼'}
+                </button>
+              </form>
+            ))}
+          </div>
+        )}
 
         {courses.length > 1 && (
           <form action={moveLessonToCourseAction} className="flex items-center gap-1">
@@ -158,14 +163,14 @@ export default async function AdminContentPage({ searchParams }) {
       }
     : {};
 
-  const [courses, orphans] = await Promise.all([
+  const [courses, topics] = await Promise.all([
     prisma.course.findMany({
       orderBy: { sortOrder: 'asc' },
       include: { lessons: { where, orderBy: { sortOrder: 'asc' }, select: LESSON_SELECT } },
     }),
     prisma.lesson.findMany({
       where: { courseId: null, ...where },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: [{ lang: 'asc' }, { unit: 'asc' }, { title: 'asc' }],
       select: LESSON_SELECT,
     }),
   ]);
@@ -252,20 +257,24 @@ export default async function AdminContentPage({ searchParams }) {
           </Card>
         ))}
 
-        {orphans.length > 0 && (
-          <Card className="border-warning-500 p-5">
-            <h2 className="text-lg font-bold text-neutral-900">Unassigned</h2>
-            <p className="mt-1 text-sm text-neutral-500">
-              These lessons belong to no course, so no student can reach them. Move them somewhere
-              or delete them.
-            </p>
-            <div className="mt-4 divide-y divide-neutral-100">
-              {orphans.map((lesson) => (
-                <LessonRow key={lesson.id} lesson={lesson} courses={courseOptions} />
-              ))}
-            </div>
-          </Card>
-        )}
+        <Card className="p-5">
+          <h2 className="text-lg font-bold text-neutral-900">Topics</h2>
+          <p className="mt-1 text-sm text-neutral-500">
+            Standalone lessons on one idea, outside every course. Published ones show up at /topics
+            on their language&apos;s site.
+          </p>
+          <NewTopicForm />
+          <div className="mt-4 divide-y divide-neutral-100">
+            {topics.map((lesson) => (
+              <LessonRow key={lesson.id} lesson={lesson} courses={courseOptions} topic />
+            ))}
+            {topics.length === 0 && (
+              <p className="py-3 text-sm text-neutral-400">
+                {q ? 'No topics match that search.' : 'No topics yet.'}
+              </p>
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   );

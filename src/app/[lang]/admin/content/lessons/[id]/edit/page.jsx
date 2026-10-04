@@ -20,7 +20,7 @@ export default async function LessonEditPage({ params }) {
         title={lesson.title ?? lesson.lessonKey}
         initialSource={lesson.source}
         initialUpdatedAt={lesson.updatedAt.toISOString()}
-        lang={course?.lang}
+        lang={course?.lang ?? lesson.lang ?? undefined}
       />
     </div>
   );

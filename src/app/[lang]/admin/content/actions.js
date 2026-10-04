@@ -30,6 +30,7 @@ async function requireContentPermission(action) {
 function revalidate() {
   revalidatePath('/admin/content');
   revalidatePath('/courses');
+  revalidatePath('/topics');
   revalidatePath('/dashboard');
 }
 

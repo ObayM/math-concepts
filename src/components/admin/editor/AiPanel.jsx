@@ -5,7 +5,7 @@ import Button from '@/components/admin/ui/Button';
 
 const MAX_RETRIES = 2;
 
-function buildTopic(instruction, priorSource, priorDetail) {
+export function buildTopic(instruction, priorSource, priorDetail) {
   if (!priorSource) return instruction;
   let topic = `Here is the current Prism lesson source:\n${priorSource}\n\nInstruction: ${instruction}\n\nReturn the FULL updated lesson source, not a diff.`;
   if (priorDetail) {
