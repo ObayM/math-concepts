@@ -107,11 +107,12 @@ test.describe('arabic content', () => {
     await expect(page.getByText('ما ميل هذا الخط؟')).toHaveCount(0);
   });
 
-  test('math inside arabic prose stays left to right', async ({ page }) => {
+  test('math inside arabic prose renders right to left in book notation', async ({ page }) => {
     await page.goto(`${host('ar')}/courses/calculus-ar/ar-calc-1`);
-    const math = page.locator('.rich-text span[dir="ltr"] .katex').first();
+    const math = page.locator('.rich-text math.artex').first();
     await expect(math).toBeVisible();
-    await expect(math).toHaveCSS('direction', 'ltr');
+    await expect(math).toHaveCSS('direction', 'rtl');
+    await expect(page.locator('.rich-text .katex')).toHaveCount(0);
   });
 
   test('the arabic catalog shows only arabic courses', async ({ page }) => {

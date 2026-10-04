@@ -30,7 +30,12 @@ test('the document points at the manifest and a touch icon', async ({ page }) =>
     '/manifest.webmanifest'
   );
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#ffffff');
+  await expect(
+    page.locator('meta[name="theme-color"][media="(prefers-color-scheme: light)"]')
+  ).toHaveAttribute('content', '#ffffff');
+  await expect(
+    page.locator('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]')
+  ).toHaveAttribute('content', '#0b0f17');
 });
 
 test('the viewport opts into the safe area', async ({ page }) => {
