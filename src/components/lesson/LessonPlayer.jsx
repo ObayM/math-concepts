@@ -38,6 +38,7 @@ export default function LessonPlayer({
   slides = [],
   lessonId,
   coursePath = 'algebra',
+  topic = false,
   nextLessonId,
   skipTo = 0,
 }) {
@@ -375,9 +376,10 @@ export default function LessonPlayer({
     }
   };
 
+  const backHref = topic ? '/topics' : `/courses/${coursePath}`;
   const handleContinue = () =>
-    router.push(nextLessonId ? `/courses/${coursePath}/${nextLessonId}` : `/courses/${coursePath}`);
-  const handleBackToCourse = () => router.push(`/courses/${coursePath}`);
+    router.push(nextLessonId ? `/courses/${coursePath}/${nextLessonId}` : backHref);
+  const handleBackToCourse = () => router.push(backHref);
 
   const handleReset = () => {
     if (!confirm(t('lesson.restart'))) return;
@@ -402,7 +404,7 @@ export default function LessonPlayer({
           </h2>
           <p className="text-neutral-500 mt-2">{t('lesson.loadingBlurb')}</p>
           <Button onClick={handleBackToCourse} variant="ghost" className="mt-6">
-            {t('lesson.back')}
+            {t(topic ? 'topics.back' : 'lesson.back')}
           </Button>
         </Card>
       </div>
@@ -418,6 +420,7 @@ export default function LessonPlayer({
             onBack={handleBackToCourse}
             onRetake={handleReset}
             nextLessonId={nextLessonId}
+            topic={topic}
             streak={streak}
             xpEarned={xpEarned}
             quizHistory={quizHistory}

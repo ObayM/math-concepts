@@ -26,8 +26,8 @@ export default async function LessonPreviewPage({ params, searchParams }) {
     return <PreviewProblem lesson={lesson} />;
   }
 
-  const course = lesson.courseId ? await courseLang(lesson.courseId) : null;
-  const lang = isLocale(course) ? course : DEFAULT_LOCALE;
+  const own = lesson.courseId ? await courseLang(lesson.courseId) : lesson.lang;
+  const lang = isLocale(own) ? own : DEFAULT_LOCALE;
   const mastery = await getMasteryFor(admin?.id, parsed.data.requires);
   const skipTo = skippableChecks(parsed.data.slides, parsed.data.requires, mastery);
 

@@ -2,6 +2,7 @@ const en = {
   'nav.dashboard': 'Dashboard',
   'nav.courses': 'Courses',
   'nav.warmup': 'Warm up',
+  'nav.topics': 'Topics',
   'nav.sandbox': 'Sandbox',
   'nav.admin': 'Admin',
   'nav.profile': 'Your Profile',
@@ -432,6 +433,20 @@ const en = {
   'courses.unitCount': { one: '1 unit', other: '{count} units' },
   'courses.empty': 'No courses published yet. Check back soon.',
   'courses.more': 'More tracks coming soon.',
+
+  'topics.title': 'Topics',
+  'topics.subtitle': 'Short lessons, one idea each. Pick the thing that keeps tripping you up.',
+  'topics.search': 'Search topics',
+  'topics.noResults': 'Nothing matches that. Try a shorter word.',
+  'topics.empty': 'No topics yet. Check back soon.',
+  'topics.other': 'Other',
+  'topics.back': 'Back to topics',
+  'topics.finish': 'Back to topics',
+  'topics.done': 'Done',
+  'topics.dashTitle': 'Stuck on one thing?',
+  'topics.dashBody':
+    'Topics are short lessons on a single idea. No course, no order, just the fix.',
+  'topics.dashCta': 'Browse topics',
 
   'settings.language': 'Language',
   'settings.languageBlurb':

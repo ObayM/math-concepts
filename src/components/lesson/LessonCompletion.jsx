@@ -10,6 +10,7 @@ export default function LessonCompletion({
   onBack,
   onRetake,
   nextLessonId,
+  topic = false,
   streak,
   xpEarned,
   quizHistory = [],
@@ -39,13 +40,17 @@ export default function LessonCompletion({
         )}
       </div>
 
-      <div className="animate-fade-in-up [animation-delay:500ms] opacity-0 grid grid-cols-2 gap-4 w-full max-w-sm mb-10">
-        <div className="bg-warning-50 border-2 border-warning-100 p-4 rounded-2xl flex flex-col items-center">
-          <span className="text-3xl font-bold text-warning-600 mb-1">{streak ?? 0}</span>
-          <span className="text-xs font-bold text-warning-600 uppercase tracking-wider flex items-center gap-1">
-            <span className="text-lg">🔥</span> {t('complete.dayStreak')}
-          </span>
-        </div>
+      <div
+        className={`animate-fade-in-up [animation-delay:500ms] opacity-0 grid gap-4 w-full mb-10 ${topic ? 'grid-cols-1 max-w-[11rem]' : 'grid-cols-2 max-w-sm'}`}
+      >
+        {!topic && (
+          <div className="bg-warning-50 border-2 border-warning-100 p-4 rounded-2xl flex flex-col items-center">
+            <span className="text-3xl font-bold text-warning-600 mb-1">{streak ?? 0}</span>
+            <span className="text-xs font-bold text-warning-600 uppercase tracking-wider flex items-center gap-1">
+              <span className="text-lg">🔥</span> {t('complete.dayStreak')}
+            </span>
+          </div>
+        )}
 
         <div className="bg-primary-50 border-2 border-primary-100 p-4 rounded-2xl flex flex-col items-center">
           <span className="text-3xl font-bold text-primary-600 mb-1">
@@ -65,13 +70,15 @@ export default function LessonCompletion({
           onClick={onContinue}
           className="rounded-2xl font-extrabold"
         >
-          {nextLessonId ? t('complete.next') : t('complete.finish')}{' '}
+          {topic ? t('topics.finish') : nextLessonId ? t('complete.next') : t('complete.finish')}{' '}
           <ArrowRight className="w-5 h-5" />
         </Button>
 
-        <Button variant="ghost" size="lg" fullWidth onClick={onBack}>
-          <Home className="w-5 h-5" /> {t('complete.backToCourse')}
-        </Button>
+        {!topic && (
+          <Button variant="ghost" size="lg" fullWidth onClick={onBack}>
+            <Home className="w-5 h-5" /> {t('complete.backToCourse')}
+          </Button>
+        )}
 
         {onRetake && (
           <Button variant="ghost" size="sm" fullWidth onClick={onRetake}>

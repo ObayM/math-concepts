@@ -4,6 +4,7 @@ const ar: Dictionary = {
   'nav.dashboard': 'الرئيسية',
   'nav.courses': 'الدورات',
   'nav.warmup': 'إحماء',
+  'nav.topics': 'مواضيع',
   'nav.sandbox': 'المختبر',
   'nav.admin': 'الإدارة',
   'nav.profile': 'ملفك',
@@ -454,6 +455,19 @@ const ar: Dictionary = {
   },
   'courses.empty': 'لا دورات منشورة بعد. عد قريبًا.',
   'courses.more': 'مسارات أخرى في الطريق.',
+
+  'topics.title': 'مواضيع',
+  'topics.subtitle': 'دروس قصيرة، كل درس فكرة واحدة. اختار الحاجة اللي بتلخبطك.',
+  'topics.search': 'ابحث في المواضيع',
+  'topics.noResults': 'مفيش حاجة بالاسم ده. جرّب كلمة أقصر.',
+  'topics.empty': 'لا مواضيع بعد. عد قريبًا.',
+  'topics.other': 'أخرى',
+  'topics.back': 'رجوع إلى المواضيع',
+  'topics.finish': 'رجوع إلى المواضيع',
+  'topics.done': 'تم',
+  'topics.dashTitle': 'واقف عند حاجة واحدة؟',
+  'topics.dashBody': 'المواضيع دروس قصيرة عن فكرة واحدة. من غير دورة ولا ترتيب، الحل على طول.',
+  'topics.dashCta': 'تصفّح المواضيع',
 
   'settings.language': 'اللغة',
   'settings.languageBlurb':
