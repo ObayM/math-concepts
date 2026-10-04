@@ -50,3 +50,6 @@ prisma/lessons/*.json
 /test-results/
 /playwright-report/
 /blob-report/
+
+# topic sources written by the mini-lesson skill. the db is the source of truth
+/content/topics/

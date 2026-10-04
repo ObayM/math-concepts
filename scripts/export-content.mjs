@@ -14,11 +14,25 @@ async function main() {
     orderBy: { sortOrder: 'asc' },
     include: { lessons: { orderBy: { sortOrder: 'asc' } } },
   });
+  const topics = await prisma.lesson.findMany({
+    where: { courseId: null },
+    orderBy: [{ lang: 'asc' }, { lessonKey: 'asc' }],
+  });
 
   fs.mkdirSync(out, { recursive: true });
 
   const manifest = [];
   let written = 0;
+
+  function writeLesson(dir, lesson) {
+    const source = lesson.publishedSource ?? lesson.source;
+    if (!source) return;
+    fs.writeFileSync(path.join(dir, `${lesson.lessonKey}.prism`), source);
+    written += 1;
+    if (lesson.source && lesson.source !== lesson.publishedSource) {
+      fs.writeFileSync(path.join(dir, `${lesson.lessonKey}.draft.prism`), lesson.source);
+    }
+  }
 
   for (const course of courses) {
     const dir = path.join(out, `${safe(course.slug ?? course.name)}-${course.lang}`);
@@ -40,19 +54,30 @@ async function main() {
       })),
     });
 
-    for (const lesson of course.lessons) {
-      const source = lesson.publishedSource ?? lesson.source;
-      if (!source) continue;
-      fs.writeFileSync(path.join(dir, `${lesson.lessonKey}.prism`), source);
-      written += 1;
-      if (lesson.source && lesson.source !== lesson.publishedSource) {
-        fs.writeFileSync(path.join(dir, `${lesson.lessonKey}.draft.prism`), lesson.source);
-      }
-    }
+    for (const lesson of course.lessons) writeLesson(dir, lesson);
+  }
+
+  if (topics.length) {
+    const dir = path.join(out, 'topics');
+    fs.mkdirSync(dir, { recursive: true });
+    for (const lesson of topics) writeLesson(dir, lesson);
+    const topicManifest = topics.map((l) => ({
+      lessonKey: l.lessonKey,
+      title: l.title,
+      unit: l.unit,
+      lang: l.lang,
+      status: l.status,
+    }));
+    fs.writeFileSync(
+      path.join(dir, 'manifest.json'),
+      `${JSON.stringify(topicManifest, null, 2)}\n`
+    );
   }
 
   fs.writeFileSync(path.join(out, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  console.log(`exported ${written} lessons across ${courses.length} courses to ${out}/`);
+  console.log(
+    `exported ${written} lessons across ${courses.length} courses and ${topics.length} topics to ${out}/`
+  );
 }
 
 main()

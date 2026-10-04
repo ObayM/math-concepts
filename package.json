@@ -20,6 +20,7 @@
     "db:seed": "npm run build:lessons && node prisma/seed.js",
     "prepare": "husky",
     "dsl": "tsx scripts/dsl.ts",
+    "topic": "tsx --env-file-if-exists=.env scripts/topic.ts",
     "test": "vitest run",
     "test:fast": "vitest run --project engine --project dom --project server",
     "test:db:setup": "node --env-file-if-exists=.env scripts/test-db.mjs",
