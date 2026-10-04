@@ -115,6 +115,7 @@ model Course {
 model Lesson {
   id              String        @id @default(uuid())
   courseId        String?       @map("course_id")
+  lang            String?
   lessonKey       String        @unique @map("lesson_key")
   source          String        @default("")
   data            Json
@@ -140,6 +141,7 @@ model Lesson {
 
   @@index([courseId])
   @@index([status])
+  @@index([lang])
   @@map("lessons")
 }
 
