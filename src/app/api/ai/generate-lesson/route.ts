@@ -15,12 +15,22 @@ import { LOCALES } from '@/lib/locale';
 const INSTRUCTIONS = toAIContext();
 
 const bodySchema = z.object({
-  topic: z.string().min(1).max(300),
+  // a revision or a fix-up retry carries the whole lesson source inside topic
+  topic: z.string().min(1).max(72_000),
   course: z.string().max(100).optional().default(''),
   difficulty: z.string().max(50).optional().default('intermediate'),
   lang: z.enum(LOCALES).optional().default('en'),
   register: z.enum(REGISTERS).optional().default('msa-simple'),
+  standalone: z.boolean().optional().default(false),
 });
+
+const STANDALONE = `
+
+This is a standalone topic, not part of a course. Teach exactly one idea and
+assume no earlier lesson: whatever it leans on gets a one-line reminder, not a
+detour. Size it to the idea, short when the idea is small. Set \`unit:\` to the
+broad subject it belongs under (e.g. "Calculus", "Algebra", "Trigonometry",
+"Mechanics"), since the topics library groups by it.`;
 
 export async function POST(req: Request) {
   if (!isAiConfigured()) return aiNotConfigured();
@@ -38,7 +48,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const { topic, course, difficulty, lang, register } = parsed.data;
+  const { topic, course, difficulty, lang, register, standalone } = parsed.data;
 
   let prism: string;
   try {
@@ -53,7 +63,7 @@ that build understanding step by step, the way the cookbook patterns do. Every
 slide with a scene should be genuinely interactive — the learner manipulates
 something and sees math respond, not a static picture.
 
-Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markdown, no explanation.${authoringDirective(lang, register)}`,
+Return ONLY the Prism source, starting with \`lesson "Title" { ... }\`. No markdown, no explanation.${standalone ? STANDALONE : ''}${authoringDirective(lang, register)}`,
       maxOutputTokens: 4096,
       abortSignal: AbortSignal.timeout(60_000),
     });
