@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { getLessonByKey, listTopics } from '@/lib/db/lessonService';
 import { createTopic, moveLessonToCourse, publishLesson } from '@/lib/db/contentService';
-import { makeCourse, makePublishedLesson, NUMERIC_LESSON } from '../helpers/factories';
+import { upsertLessonProgress, recordPracticeAttempt } from '@/lib/db/progressService';
+import { prisma } from '@/lib/prisma';
+import { makeCourse, makePublishedLesson, makeUser, NUMERIC_LESSON } from '../helpers/factories';
 
 const topicSource = (title: string, unit: string) => `lesson "${title}" {
   unit: "${unit}"
@@ -86,5 +88,43 @@ describe('listTopics', () => {
 
     const group = (await listTopics('en')).find((g) => g.unit === unit);
     expect(group!.lessons.map((l: { title: string }) => l.title)).toEqual(['Alpha', 'Beta']);
+  });
+});
+
+describe('topics stay out of the game loop', () => {
+  const attempt = {
+    title: 'Power rule',
+    question: 'q',
+    slideId: 'power',
+    kind: 'numeric',
+    correct: true,
+    answer: '12',
+  };
+
+  it('saves the checkmark but pays no xp and moves no mastery', async () => {
+    const user = await makeUser();
+    const topic = await makePublishedLesson(NUMERIC_LESSON, { courseId: null, lang: 'en' });
+
+    const result = await upsertLessonProgress(user.id, topic.lessonKey, {
+      currentStep: 2,
+      isCompleted: true,
+      quizHistory: [attempt],
+    });
+
+    expect(result!.xp).toBe(0);
+    const progress = await prisma.userLessonProgress.findFirst({ where: { userId: user.id } });
+    expect(progress!.completed).toBe(true);
+    expect(await prisma.userDailyActivity.count({ where: { userId: user.id } })).toBe(0);
+    expect(await prisma.userSkillMastery.count({ where: { userId: user.id } })).toBe(0);
+    const [row] = await prisma.lessonAttempt.findMany({ where: { userId: user.id } });
+    expect(row.correct).toBe(true);
+    expect(row.skill).toBeNull();
+    expect(row.lang).toBe('en');
+  });
+
+  it('refuses practice attempts against a topic', async () => {
+    const user = await makeUser();
+    const topic = await makePublishedLesson(NUMERIC_LESSON, { courseId: null, lang: 'en' });
+    expect(await recordPracticeAttempt(user.id, topic.lessonKey, 'power', 12)).toBeNull();
   });
 });

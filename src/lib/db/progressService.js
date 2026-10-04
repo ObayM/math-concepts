@@ -154,7 +154,7 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer, 
     }),
     getUserTimeZone(userId),
   ]);
-  if (!lesson || lesson.status !== 'published') return null;
+  if (!lesson?.course || lesson.status !== 'published') return null;
 
   const slide = buildSlideMap(lesson.publishedData).get(slideId);
   if (!slide?.exercise) return null;
@@ -208,12 +208,15 @@ export async function upsertLessonProgress(
   const [lesson, timezone] = await Promise.all([
     prisma.lesson.findUnique({
       where: { lessonKey },
-      select: { id: true, publishedData: true, course: { select: { lang: true } } },
+      select: { id: true, publishedData: true, lang: true, course: { select: { lang: true } } },
     }),
     getUserTimeZone(userId),
   ]);
   if (!lesson) return null;
 
+  // topics sit outside the game loop: no xp, no streak, no mastery. their
+  // attempts still get recorded, skill-less, so a mastery rebuild can't pick them up.
+  const topic = !lesson.course;
   const now = new Date();
 
   let earnedXp = 0;
@@ -240,14 +243,14 @@ export async function upsertLessonProgress(
             lessonId: lesson.id,
             slideId: v.slideId,
             exerciseKind: v.kind,
-            skill: v.skill,
-            lang: lesson.course?.lang ?? null,
+            skill: topic ? null : v.skill,
+            lang: lesson.course?.lang ?? lesson.lang,
             question: v.question,
             correct: v.correct,
           })),
         });
         for (const v of verified) {
-          if (v.skill) await recordSkillMastery(tx, userId, v.skill, v.correct);
+          if (v.skill && !topic) await recordSkillMastery(tx, userId, v.skill, v.correct);
         }
         earnedXp += xpForAttempts(verified);
 
@@ -268,7 +271,7 @@ export async function upsertLessonProgress(
 
     const alreadyAwarded = existing?.xpAwarded ?? 0;
     const cap = lessonXpCap(countExercises(lesson.publishedData));
-    earnedXp = xpStillOwed(earnedXp, alreadyAwarded, cap);
+    earnedXp = topic ? 0 : xpStillOwed(earnedXp, alreadyAwarded, cap);
 
     await tx.userLessonProgress.upsert({
       where: { userId_lessonId: { userId, lessonId: lesson.id } },
