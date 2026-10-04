@@ -41,8 +41,31 @@ export async function getLessonByKey(lessonKey, lang) {
     include: { course: { select: { lang: true, slug: true, name: true } } },
   });
   if (!lesson) return null;
-  if (lang && lesson.course && lesson.course.lang !== lang) return null;
+  if (lang && (lesson.course?.lang ?? lesson.lang) !== lang) return null;
   return refreshLessonIr(lesson);
+}
+
+export async function listTopics(lang) {
+  const rows = await prisma.lesson.findMany({
+    where: { courseId: null, lang, status: 'published' },
+    orderBy: [{ unit: 'asc' }, { title: 'asc' }],
+    select: {
+      id: true,
+      lessonKey: true,
+      title: true,
+      description: true,
+      unit: true,
+      difficulty: true,
+      iconName: true,
+    },
+  });
+  const groups = new Map();
+  for (const row of rows) {
+    const unit = row.unit ?? '';
+    if (!groups.has(unit)) groups.set(unit, []);
+    groups.get(unit).push(row);
+  }
+  return [...groups].map(([unit, lessons]) => ({ unit: unit || null, lessons }));
 }
 
 export async function getLessonById(id) {

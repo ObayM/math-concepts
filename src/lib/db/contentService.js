@@ -50,8 +50,8 @@ export function compileAndValidate(source) {
   }
 }
 
-async function generateUniqueLessonKey(title) {
-  const base = slugify(title) || 'lesson';
+async function generateUniqueLessonKey(title, prefix = '') {
+  const base = prefix + (slugify(title) || 'lesson');
   for (let i = 0; i < 5; i++) {
     const suffix = Math.random().toString(36).slice(2, 7);
     const key = `${base}-${suffix}`;
@@ -83,6 +83,40 @@ export async function createLesson({ courseId, title, source, authorId }) {
       authorId,
       sortOrder: (agg._max.sortOrder ?? 0) + 1,
     },
+  });
+}
+
+export async function createTopic({ source, lang, authorId }) {
+  const compiled = compileAndValidate(source);
+  if (compiled.error) return { lesson: null, findings: [], error: compiled.error };
+
+  const lessonKey = await generateUniqueLessonKey(
+    compiled.data.title,
+    lang === 'en' ? 'topic-' : `${lang}-topic-`
+  );
+  const lesson = await prisma.lesson.create({
+    data: {
+      courseId: null,
+      lang,
+      lessonKey,
+      source,
+      data: compiled.data,
+      ...derivedMetadata(compiled.data),
+      status: 'draft',
+      authorId,
+    },
+  });
+  return { lesson, findings: compiled.findings, error: null };
+}
+
+export async function getTopicByKey(lessonKey) {
+  return prisma.lesson.findFirst({ where: { lessonKey, courseId: null } });
+}
+
+export async function listAllTopics() {
+  return prisma.lesson.findMany({
+    where: { courseId: null },
+    orderBy: [{ lang: 'asc' }, { unit: 'asc' }, { title: 'asc' }],
   });
 }
 
@@ -143,7 +177,7 @@ export async function moveLessonToCourse(id, courseId) {
   const agg = await prisma.lesson.aggregate({ where: { courseId }, _max: { sortOrder: true } });
   return prisma.lesson.update({
     where: { id },
-    data: { courseId, sortOrder: (agg._max.sortOrder ?? 0) + 1 },
+    data: { courseId, lang: null, sortOrder: (agg._max.sortOrder ?? 0) + 1 },
   });
 }
 

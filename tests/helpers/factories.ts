@@ -30,11 +30,11 @@ export async function makeCourse(overrides: Record<string, unknown> = {}) {
 // and published columns, so read paths that only look at publishedData work.
 export async function makePublishedLesson(source: string, overrides: Record<string, unknown> = {}) {
   const data = compileLesson(source);
-  const course = (overrides.courseId as string) ?? (await makeCourse()).id;
+  const course = 'courseId' in overrides ? overrides.courseId : (await makeCourse()).id;
 
   return prisma.lesson.create({
     data: {
-      courseId: course,
+      courseId: course as string | null,
       lessonKey: uid('lesson'),
       source,
       data: data as never,
