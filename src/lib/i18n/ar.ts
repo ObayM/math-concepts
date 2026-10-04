@@ -467,7 +467,6 @@ const ar: Dictionary = {
   'topics.done': 'تم',
   'topics.dashTitle': 'واقف عند حاجة واحدة؟',
   'topics.dashBody': 'المواضيع دروس قصيرة عن فكرة واحدة. من غير دورة ولا ترتيب، الحل على طول.',
-  'topics.dashCta': 'تصفّح المواضيع',
 
   'settings.language': 'اللغة',
   'settings.languageBlurb':

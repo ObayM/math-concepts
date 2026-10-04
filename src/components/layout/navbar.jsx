@@ -89,6 +89,7 @@ export default function Navbar() {
     { name: t('nav.dashboard'), href: '/dashboard' },
     { name: t('nav.courses'), href: '/courses' },
     { name: t('nav.warmup'), href: '/warmup' },
+    { name: t('nav.topics'), href: '/topics' },
     { name: t('nav.sandbox'), href: '/prism/play' },
     ...(isAdmin ? [{ name: t('nav.admin'), href: '/admin' }] : []),
   ];

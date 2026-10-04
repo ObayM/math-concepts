@@ -446,7 +446,6 @@ const en = {
   'topics.dashTitle': 'Stuck on one thing?',
   'topics.dashBody':
     'Topics are short lessons on a single idea. No course, no order, just the fix.',
-  'topics.dashCta': 'Browse topics',
 
   'settings.language': 'Language',
   'settings.languageBlurb':

@@ -81,7 +81,7 @@ export default function TopicList({ groups, completed }) {
                       ) : (
                         <ChevronRight
                           size={16}
-                          className="mt-1 shrink-0 text-neutral-300 transition-all group-hover:text-primary-500 rtl:rotate-180"
+                          className="mt-1 shrink-0 text-neutral-300 transition-all group-hover:text-primary-500"
                         />
                       )}
                     </Card>
