@@ -1,0 +1,335 @@
+lesson "المشتقة الثانية للمعادلات البارامترية" {
+  course: "calculus-ar"
+  unit: "الاشتقاق وتطبيقاته"
+  difficulty: "Advanced"
+  icon: "Move"
+  summary: "لما س و ص الاتنين بيتحركوا مع الزمن، المشتقة الثانية محتاجة قسمة زيادة. هتعرف ليه."
+  skills: ["diff-higher-parametric"]
+  requires: ["diff-parametric"]
+
+  role ypart = primary
+  role slope = success
+  role tpart = accent
+  role xpart = warning
+  role accel = accent
+  role wrong = danger
+
+  slide "تسخين: بارامتري" {
+    id: "c10-check-param"
+    beat: check
+    cat: "تسخين"
+    > سؤال سريع قبل ما نبدأ. النقطة دي بترسم المنحنى وهي ماشية: مكانها في اللحظة $t$ هو $(2t,\ t^3)$.
+
+    scene plane {
+      alt: "منحنى ترسمه نقطة x = 2t و y = t تكعيب، والنقطة عند t = 2 وهي (4, 8). بعد الإجابة يظهر المماس عندها."
+      x: [-1.5, 7]
+      y: [-1.5, 10.5]
+      grid
+      axes
+      curve path = (2*t, t^3) { t: [-0.6, 2.15], color: ypart, width: 3 }
+      point p = (4, 8) { color: tpart }
+      reveal {
+        line tan = (3, 2) -> (4.5, 11) { color: slope, width: 2 }
+      }
+    }
+
+    numeric {
+      ask "لو $x = 2t$ و $y = t^3$، $\dfrac{dy}{dx}$ عند $t = 2$ تطلع كام؟"
+      skill: "diff-parametric"
+      answer: 6
+      expect: (3 * 2^2) / 2
+      wrong 12 "ده $\frac{dy}{dt}$ لوحده. لازم تقسم على $\frac{dx}{dt}$." -> "c10-bridge-param" retry
+      wrong 1/6 "مقلوبة: $\frac{dy}{dt}$ فوق." -> "c10-bridge-param" retry
+      hint "$\dfrac{dy}{dx} = \dfrac{dy}{dt} \div \dfrac{dx}{dt}$."
+      ! "$\frac{3t^2}{2}$، وعند $t = 2$: $6$."
+    }
+  }
+
+  slide "البارامتري باختصار" {
+    id: "c10-bridge-param"
+    beat: bridge
+    hidden: true
+    cat: "تسخين"
+    > لما $x$ و $y$ الاتنين دوال في $t$: الميل هو تغير $y$ على تغير $x$، الاتنين بالنسبة لـ $t$. يعني $\dfrac{dy}{dx} = \dfrac{dy}{dt} \div \dfrac{dx}{dt}$. الشرح كامل في [الدرس الرابع](lesson:ar-calc-4).
+
+    numeric {
+      ask "لو $x = 3t$ و $y = t^2$، $\dfrac{dy}{dx}$ عند $t = 3$ تطلع كام؟"
+      skill: "diff-parametric"
+      answer: 2
+      expect: (2 * 3) / 3
+      wrong 6 "ده $\frac{dy}{dt}$ لوحده."
+      wrong 1/2 "مقلوبة."
+      ! "$\frac{2t}{3}$ عند $t = 3$ تبقى $2$. ارجع لسؤال التسخين."
+    }
+  }
+
+  slide "الطيارة الورق" {
+    id: "c10-hook"
+    beat: hook
+    cat: "بالنسبة لمتغير تاني"
+    > طيارة ورق طايرة، ومكانها بعد $t$ ثانية: $x = 2t$ و $y = t^2$. ميل المسار $\dfrac{dy}{dx} = t$، يعني في الثانية الأولى الميل $1$ وفي التانية $2$. الميل بيزيد $1$ كل ثانية.
+    >
+    > طب بيزيد قد إيه مع كل متر الطيارة بتقطعه [أفقي]{xpart}؟
+
+    scene plane {
+      alt: "مسار طيارة ورق x = 2t و y = t تربيع، متقطع. شريط الزمن يحرك الطيارة على المسار، وفوق قراءة لقيمة t وقراءة لقيمة x."
+      x: [-0.5, 6]
+      y: [-0.5, 6.5]
+      aspect: equal
+      grid
+      axes
+      param s = 1 { range: [0, 2.5], step: 0.25 }
+      curve path = (2*t, t^2) { t: [0, 2.5], color: neutral, width: 2, style: dashed }
+      point k = (2*s, s^2) { color: tpart, trace }
+      label at (0, 6.1) = "t = ${s}" { color: tpart }
+      label at (2.6, 6.1) = "x = ${2*s}" { color: xpart }
+      slider s { label: "t" }
+    }
+
+    goal "حرّك الطيارة من $t = 1$ لـ $t = 2$" {
+      when: abs(s - 2) < 0.01
+      hints: ["اسحب شريط الزمن لحد $t = 2$.", "وبص على $x$ وهو بيتغير."]
+      showme: { s: 2 }
+    }
+
+    quiz {
+      ask "الميل بيزيد قد إيه مع كل متر أفقي؟"
+      skill: "diff-higher-parametric"
+      * "$\frac{1}{2}$"
+      - "$1$" { why: "ده اللي بيزيده في ثانية. وفي الثانية دي الطيارة مشيت مترين." }
+      - "$2$" { why: "بالعكس: المترين بياخدوا ثانية، فالمتر الواحد بياخد نص ثانية، ويزيد فيه نص الزيادة." }
+      after: goals
+      ! "نص. خلي الرقم ده في دماغك."
+    }
+  }
+
+  slide "لكل ثانية ولا لكل خطوة؟" {
+    id: "c6-param"
+    beat: explore
+    cat: "بالنسبة لمتغير تاني"
+    > خد المنحنى ده: $x = 3t^2 - 1$ و $y = t^3 + 2$. من [الدرس الرابع](lesson:ar-calc-4): $\dfrac{dy}{dx} = \dfrac{3t^2}{6t} = \dfrac{t}{2}$.
+    >
+    > يبقى الميل $\dfrac{t}{2}$. وبالتالي $y''$ هي مشتقة $\dfrac{t}{2}$، يعني $\dfrac{1}{2}$؟ استنى، تعالى نبص الأول.
+    >
+    > حرّك [$t$]{tpart}، وبص على الرقمين: [$x$]{xpart} بيتحرك قد إيه، و[الميل]{slope} بيتغير قد إيه.
+
+    scene plane {
+      alt: "منحنى ترسمه نقطة: x = 3t تربيع ناقص 1 و y = t تكعيب زائد 2. شريط يغير t من 1 إلى 4، والمماس عند النقطة، وقراءات لقيمة t و x والميل."
+      x: [-2, 50]
+      y: [-3, 70]
+      grid
+      axes
+      param s = 1 { range: [1, 4], step: 0.25 }
+      curve path = (3*t^2 - 1, t^3 + 2) { t: [1, 4], color: neutral, width: 2, style: dashed }
+      point p0 = (2, 3) { color: neutral, open }
+      point p = (3*s^2 - 1, s^3 + 2) { color: tpart, trace }
+      line tan { through: p, slope: s / 2, color: slope, width: 2 }
+      label at (3, 66) = "t = ${s}" { color: tpart }
+      label at (3, 60) = "x = ${3*s^2 - 1}" { color: xpart }
+      label at (3, 54) = "الميل = ${fixed(s / 2, 2)}" { color: slope }
+      slider s { label: "t" }
+    }
+
+    goal "حرّك $t$ من $1$ لـ $2$" {
+      when: abs(s - 2) < 0.01
+      hints: ["اسحب الشريط لحد ما $t$ تبقى $2$.", "وبص على $x$ والميل وهم بيتغيروا."]
+      showme: { s: 2 }
+    }
+
+    numeric {
+      ask "من $t = 1$ لـ $t = 2$، [الميل]{slope} زاد قد إيه لكل خطوة واحدة في [$x$]{xpart}، في المتوسط؟"
+      skill: "diff-higher-parametric"
+      answer: 1/18
+      expect: 0.5 / 9
+      tolerance: 0.002
+      wrong 0.5 "ده الزيادة لكل ثانية من $t$. السؤال لكل خطوة في $x$، و $x$ اتحرك $9$ مش $1$." -> "c6-d-per-x" retry
+      wrong 9 "ده قد إيه $x$ اتحرك. قسّم زيادة الميل على زيادة $x$."
+      wrong 18 "مقلوبة: الميل فوق و $x$ تحت."
+      hint "زيادة الميل ÷ زيادة $x$."
+      after: goals
+      ! "$\frac{0.5}{9} = \frac{1}{18}$، يعني حوالي $0.06$، بعيد خالص عن $0.5$. الميل بيتغير $0.5$ لكل ثانية من $t$، بس $y''$ بتسأل **لكل خطوة في $x$**، و $x$ جري $9$ خطوات في الثانية دي. فلازم نقسم على سرعة $x$، يعني $\frac{dx}{dt}$، مرة تانية."
+    }
+  }
+
+  slide "القاعدة" {
+    id: "c6-param-rule"
+    beat: name
+    cat: "بالنسبة لمتغير تاني"
+    > قاعدة [الدرس الرابع](lesson:ar-calc-4) شغالة مع أي حاجة، مش مع $y$ بس: مشتقة أي حاجة ■ بالنسبة لـ $x$ هي (مشتقتها بالنسبة لـ $t$) ÷ $\dfrac{dx}{dt}$.
+    >
+    > حط مكان ■ الميل نفسه، $\dfrac{dy}{dx}$.
+    >
+    > الرسمة بتوريك ليه. ده الميل مرسوم قدام $t$ من $t = 1$ لـ $t = 2$: زاد $0.5$ في خطوة أفقية واحدة. شغّل الخطوة التانية: نفس النقط بالظبط، بس مرسومة قدام $x$. و $x$ جري $9$، فالخط اتمط $9$ مرات واتفرد. الطلعة زي ما هي، والمسافة الأفقية بس هي اللي كبرت، وعشان كده بنقسم.
+
+
+    scene plane {
+      alt: "الميل في المنحنى ده مرسوم قدام t من 1 إلى 2 كخط يطلع 0.5 في خطوة أفقية واحدة. الخطوة الثانية تنقل نفس النقط لتكون قدام x، فيتمدد الخط أفقيًا من 2 إلى 11 ويبقى أفرد بكثير."
+      x: [0, 12]
+      y: [0, 1.4]
+      grid
+      axes
+      param u = 0 { range: [0, 1] }
+      curve sl = ((1 - u)*t + u*(3*t^2 - 1), t / 2) { t: [1, 2], color: slope, width: 3 }
+      point a = ((1 - u) + 2*u, 0.5) { color: slope }
+      point b = (2*(1 - u) + 11*u, 1) { color: slope }
+      line run = ((1 - u) + 2*u, 0.5) -> (2*(1 - u) + 11*u, 0.5) { color: xpart, style: dashed, width: 2 }
+      line rise = (2*(1 - u) + 11*u, 0.5) -> (2*(1 - u) + 11*u, 1) { color: slope, style: dashed, width: 2 }
+      label at (0.4, 1.3) = "الطلعة 0.5 على مسافة أفقية ${fixed(1 + 8*u, 1)}" { color: slope }
+      label at (11.4, 0.08) = "t" { tex, color: tpart, show: u < 0.5 }
+      label at (11.4, 0.08) = "x" { tex, color: xpart, show: u >= 0.5 }
+      step "الميل قدام الزمن: طلع 0.5 في خطوة واحدة." { set: { u: 0 } }
+      step "نفس النقط قدام المسافة الأفقية: نفس الطلعة على 9 خطوات." { animate: { u: 1 }, dur: 1600, indicate: ["sl"] }
+    }
+
+    build {
+      ask "كمّل القاعدة."
+      skill: "diff-higher-parametric"
+      template: "$\dfrac{d^2y}{dx^2} =$ ___ $\div$ ___"
+      bank: ["$\dfrac{d}{dt}\left(\dfrac{dy}{dx}\right)$", "$\dfrac{dx}{dt}$", "$\dfrac{d^2y}{dt^2}$", "$\dfrac{d^2x}{dt^2}$", "$\dfrac{dt}{dx}$"]
+      answer: ["$\dfrac{d}{dt}\left(\dfrac{dy}{dx}\right)$", "$\dfrac{dx}{dt}$"]
+      miss "$\dfrac{d^2y}{dt^2}$" "ده مشتقة $y$ التانية بالنسبة لـ $t$، مش مشتقة الميل. الشريحة الجاية هتوريك ليه دي فخ."
+      miss "$\dfrac{d^2x}{dt^2}$" "بنقسم على سرعة $x$، يعني $\frac{dx}{dt}$، مش على مشتقتها التانية."
+      miss "$\dfrac{dt}{dx}$" "القسمة على $\frac{dt}{dx}$ تبقى ضرب في $\frac{dx}{dt}$. إحنا عايزين نقسم على $\frac{dx}{dt}$ نفسها."
+      hint "نفس قاعدة $\dfrac{dy}{dx} = \dfrac{dy}{dt} \div \dfrac{dx}{dt}$، بس مكان $y$ حط الميل."
+      ! "$\frac{d^2y}{dx^2} = \frac{d}{dt}\left(\frac{dy}{dx}\right) \div \frac{dx}{dt}$. والقسمة الأخيرة دي هي اللي الناس بتنساها. في المنحنى ده: مشتقة $\frac{t}{2}$ بالنسبة لـ $t$ هي $\frac{1}{2}$ (اللي كنت هتقول عليها الإجابة)، وبعدين نقسم على $\frac{dx}{dt} = 6t$، فـ $\frac{d^2y}{dx^2} = \frac{1}{12t}$. عند $t = 1$ ده $\frac{1}{12}$، وعند $t = 2$ ده $\frac{1}{24}$، والمتوسط اللي لقيته $\frac{1}{18}$ واقع بينهم."
+    }
+  }
+
+  slide "الاختصار اللي مش موجود" {
+    id: "c6-nochain"
+    beat: trap
+    cat: "بالنسبة لمتغير تاني"
+    > فيه اختصار مغري جدًا: المشتقة الأولى $\dfrac{dy}{dt} \div \dfrac{dx}{dt}$، يبقى أكيد التانية $\dfrac{d^2y}{dt^2} \div \dfrac{d^2x}{dt^2}$، صح؟
+    >
+    > يلا جرّبه على نفس المنحنى عند $t = 2$. الرسمة هي الميل قدام $x$ (نفس الخط المفرود من الشريحة اللي فاتت، بس لحد $t = 4$)، والنقطة هي اللحظة دي. احسب، وبعدين قارن الاختصار بالمماس الحقيقي.
+
+    scene plane {
+      alt: "الميل في المنحنى ده مرسوم قدام x كمنحنى أخضر من (2, 0.5) إلى (47, 2)، والنقطة عند t = 2 وهي (11, 1). بعد الإجابة يظهر المماس الحقيقي بالبنفسجي وخط الاختصار الأحمر المتقطع شبه رأسي."
+      x: [0, 48]
+      y: [0, 2.4]
+      grid
+      axes
+      curve sl = (3*t^2 - 1, t / 2) { t: [1, 4], color: slope, width: 3 }
+      point q = (11, 1) { color: tpart }
+      reveal {
+        line right = (2, 0.625) -> (46, 2.4583) { color: accel, width: 2 }
+        line naive = (10.5, 0) -> (11.7, 2.4) { color: wrong, width: 2, style: dashed }
+        label at (14, 2.2) = "الاختصار" { color: wrong }
+        label at (30, 1.25) = "المماس الحقيقي" { color: accel }
+      }
+    }
+
+    numeric {
+      ask "احسب $\dfrac{d^2y}{dt^2} \div \dfrac{d^2x}{dt^2}$ عند $t = 2$."
+      skill: "diff-higher-parametric"
+      answer: 2
+      expect: (6 * 2) / 6
+      wrong 1/24 "دي الإجابة الصح بالقاعدة. هنا عايزين نجرّب الاختصار: $y_{tt} = 6t$ و $x_{tt} = 6$."
+      wrong 12 "ده $\frac{d^2y}{dt^2}$ لوحده. اقسم على $\frac{d^2x}{dt^2} = 6$."
+      hint "$\dfrac{d^2y}{dt^2} = 6t$ و $\dfrac{d^2x}{dt^2} = 6$."
+      ! "الاختصار بيدي $2$. والإجابة الحقيقية من القاعدة $\frac{1}{12 \times 2} = \frac{1}{24}$. ولا قريب، الاختصار طلع أكبر $48$ مرة. وده معنى الجملة اللي هتسمعها كتير: «لا توجد قاعدة سلسلة في المشتقة الثانية». ونفس السبب إن $\frac{dy}{dx} \times \frac{dx}{dy} = 1$، بس $\frac{d^2y}{dx^2} \times \frac{d^2x}{dy^2} \neq 1$: المشتقات الأولى بتتقلب وتتضرب زي الكسور، التانية لأ."
+    }
+  }
+
+  slide "دورك" {
+    id: "c6-ex36"
+    beat: example
+    cat: "بالنسبة لمتغير تاني"
+    > دورك، ومن غير رسمة المرة دي.
+
+    numeric {
+      ask "إذا كانت: $x = 2t^3 + 3$، $y = t^4$ أوجد: $\dfrac{d^2y}{dx^2}$ عند $t = 1$"
+      skill: "diff-higher-parametric"
+      answer: 1/9
+      expect: (2 / 3) / (6 * 1^2)
+      tolerance: 0.001
+      wrong 1 "ده الاختصار: $\frac{12t^2}{12t} = t$. مفيش قاعدة سلسلة للتانية." -> "c6-d-nochain" retry
+      wrong 2/3 "ده مشتقة الميل بالنسبة لـ $t$. فاضل تقسم على $\frac{dx}{dt}$ مرة كمان." -> "c6-d-per-x" retry
+      wrong 4/9 "ده $\left(\frac{dy}{dx}\right)^2 = \left(\frac{2}{3}\right)^2$. المشتقة التانية مش مربع الأولى."
+      wrong 4 "ضربت في $\frac{dx}{dt} = 6$ بدل ما تقسم عليها." -> "c6-d-per-x" retry
+      hint "الميل الأول: $\dfrac{4t^3}{6t^2} = \dfrac{2t}{3}$."
+      hint "اشتق $\dfrac{2t}{3}$ بالنسبة لـ $t$، واقسم على $\dfrac{dx}{dt} = 6t^2$."
+      ! "$\frac{dy}{dx} = \frac{2t}{3}$، مشتقته $\frac{2}{3}$، وعلى $6t^2$: $\frac{2}{18t^2} = \frac{1}{9t^2}$. وعند $t = 1$: $\frac{1}{9}$."
+    }
+  }
+
+  slide "دالة بالنسبة لدالة" {
+    id: "c6-ex4"
+    beat: breaker
+    cat: "بالنسبة لمتغير تاني"
+    > ده نفس الكلام بالظبط، بس بأسماء مختلفة. $y$ و $z$ الاتنين دوال في $x$، فـ $x$ هنا بتلعب دور $t$. والقاعدة:
+    >
+    > $$\dfrac{d^2y}{dz^2} = \dfrac{d}{dx}\left(\dfrac{dy}{dz}\right) \div \dfrac{dz}{dx}$$
+
+    numeric {
+      ask "إذا كانت: $y = x^2 + 7x - 1$، $z = x^2 - 3x + 15$ أوجد: $\dfrac{d^2y}{dz^2}$ عندما $x = 2$"
+      skill: "diff-higher-parametric"
+      answer: -20
+      expect: 0 - 20 / (2 * 2 - 3)^3
+      wrong 1 "ده الاختصار: $\frac{y''}{z''} = \frac{2}{2}$." -> "c6-d-nochain" retry
+      wrong 11 "ده $\frac{dy}{dz}$ عند $x = 2$، المشتقة الأولى. كمّل."
+      hint "$\dfrac{dy}{dz} = \dfrac{2x + 7}{2x - 3}$. اشتقها بالنسبة لـ $x$ بقاعدة القسمة."
+      hint "وبعدين اقسم على $\dfrac{dz}{dx} = 2x - 3$."
+      ! "$\frac{d}{dx}\left(\frac{2x + 7}{2x - 3}\right) = \frac{2(2x - 3) - 2(2x + 7)}{(2x - 3)^2} = \frac{-20}{(2x - 3)^2}$، وعلى $(2x - 3)$: $\frac{-20}{(2x - 3)^3}$. وعند $x = 2$: $-20$. وخد بالك من حاجة: عند $x = 2$ بالذات $\frac{dz}{dx} = 1$، فالقسمة ماغيرتش حاجة. لو نسيتها هنا هتطلع صح بالصدفة. ماتتعودش تنساها، في المسألة الجاية هتفرق."
+    }
+  }
+
+  slide "المكعب" {
+    id: "c6-transfer"
+    beat: transfer
+    cat: "بالنسبة لمتغير تاني"
+    > آخر سؤال، ومفيش مساعدة.
+
+    quiz {
+      ask "مكعب طول حرفه $= l$ وحدة طول وحجمه $= V$ وحدة مكعبة ومساحته الكلية $= M$ وحدة مربعة فإن: $\dfrac{d^2V}{dM^2} = \ldots$ عندما $l = \dfrac{1}{4}$"
+      skill: "diff-higher-parametric"
+      * "$\dfrac{1}{12}$"
+      - "$\dfrac{1}{4}$" { why: "اشتقيت $\frac{l}{4}$ بالنسبة لـ $l$، بس نسيت تقسم على $\frac{dM}{dl} = 12l$.", onwrong: "c6-d-per-x", retry }
+      - "$\dfrac{1}{16}$" { why: "ده $\frac{dV}{dM} = \frac{l}{4}$ عند $l = \frac{1}{4}$، المشتقة الأولى بس." }
+      - "$\dfrac{1}{48}$" { why: "ده $\frac{1}{48l}$ من غير ما تعوّض بـ $l = \frac{1}{4}$." }
+      ! "هنا $l$ لابسة دور $t$. $\frac{dV}{dM} = \frac{3l^2}{12l} = \frac{l}{4}$، مشتقتها بالنسبة لـ $l$ هي $\frac{1}{4}$، وعلى $\frac{dM}{dl} = 12l$: $\frac{1}{48l}$. وعند $l = \frac{1}{4}$: $\frac{1}{12}$. المشتقات الثانية دي هترجعلك في التدريب الأيام الجاية."
+    }
+  }
+
+  slide "اقسم مرة كمان" {
+    id: "c6-d-per-x"
+    beat: detour
+    hidden: true
+    cat: "بالنسبة لمتغير تاني"
+    > الرقم اللي معاك هو تغير الميل **لكل ثانية من $t$**. بس $y''$ بتسأل عن تغير الميل **لكل خطوة في $x$**. والاتنين مختلفين لأن $x$ مش بيتحرك خطوة واحدة كل ثانية، بيتحرك $\dfrac{dx}{dt}$ خطوة.
+    >
+    > فاقسم على $\dfrac{dx}{dt}$. نفس اللي عملته في المشتقة الأولى بالظبط، بس مرة تانية.
+
+    numeric {
+      ask "$x = t^2$ و $y = t^3$. الميل $\dfrac{dy}{dx} = \dfrac{3t}{2}$. $\dfrac{d^2y}{dx^2}$ عند $t = 1$ تطلع كام؟"
+      skill: "diff-higher-parametric"
+      answer: 3/4
+      expect: (3 / 2) / (2 * 1)
+      tolerance: 0.001
+      wrong 3/2 "ده تغير الميل لكل ثانية. اقسم على $\frac{dx}{dt} = 2t$."
+      wrong 3 "ده الاختصار $\frac{6t}{2}$."
+      ! "$\frac{3}{2} \div 2 = \frac{3}{4}$. ارجع للسؤال."
+    }
+  }
+
+  slide "مفيش سلسلة للتانية" {
+    id: "c6-d-nochain"
+    beat: detour
+    hidden: true
+    cat: "بالنسبة لمتغير تاني"
+    > $\dfrac{d^2y}{dt^2} \div \dfrac{d^2x}{dt^2}$ شكلها شبه قاعدة المشتقة الأولى، بس هي مش قاعدة. المشتقة الثانية مش «تغير $y$ على تغير $x$»، هي «تغير **الميل** على تغير $x$».
+    >
+    > فالطريق الوحيد: هات الميل الأول، اشتقه بالنسبة للبارامتر، واقسم على مشتقة المتغير اللي تحت بالنسبة للبارامتر.
+
+    numeric {
+      ask "$x = t^2$ و $y = t^4$. $\dfrac{d^2y}{dx^2}$ عند $t = 1$ تطلع كام بالطريقة الصح؟"
+      skill: "diff-higher-parametric"
+      answer: 2
+      expect: (4 * 1) / (2 * 1)
+      wrong 6 "ده الاختصار: $\frac{12t^2}{2}$. الميل الأول $\frac{4t^3}{2t} = 2t^2$، ابدأ منه."
+      wrong 4 "ده مشتقة الميل بالنسبة لـ $t$. اقسم على $\frac{dx}{dt} = 2t$."
+      hint "الميل $2t^2$، مشتقته $4t$، وعلى $2t$."
+      ! "$\frac{4t}{2t} = 2$. والاختصار كان هيقول $6$. ارجع للسؤال."
+    }
+  }
+}

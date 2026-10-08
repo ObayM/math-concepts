@@ -129,7 +129,18 @@ const COURSES = [
     description: 'التفاضل للثانوية العامة: معنى المشتقة وقواعدها، ثم الاشتقاق الضمني والبارامتري.',
     lang: 'ar',
     sortOrder: 3,
-    lessons: ['ar-calc-1', 'ar-calc-2', 'ar-calc-3', 'ar-calc-4', 'ar-calc-5', 'ar-calc-6'],
+    lessons: [
+      'ar-calc-1',
+      'ar-calc-2',
+      'ar-calc-3',
+      'ar-calc-4',
+      'ar-calc-5',
+      'ar-calc-7',
+      'ar-calc-9',
+      'ar-calc-8',
+      'ar-calc-6',
+      'ar-calc-10',
+    ],
   },
 ];
 
