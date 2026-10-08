@@ -446,6 +446,7 @@ function makeParser(tokens: Token[]) {
     'difficulty',
     'icon',
     'summary',
+    'kind',
   ]);
 
   const SLIDE_PROPS = new Set(['cat', 'id', 'skill', 'hidden', 'beat', 'then']);

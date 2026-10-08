@@ -10,6 +10,9 @@ import {
   stageBranch,
   next,
   back,
+  rounds,
+  roundAt,
+  jumpTo,
 } from '@/engine/runtime/flow';
 
 const SRC = `lesson "L" {
@@ -201,5 +204,71 @@ describe('slideKey', () => {
     expect(slideKey(inDetour)).toBe('d:help-retry');
     expect(slideKey(returned)).toBe('p:1');
     expect(slideKey(inDetour)).not.toBe(slideKey(returned));
+  });
+});
+
+describe('bank rounds', () => {
+  const bank = lessonSchema.parse(
+    compileLesson(`lesson "B" {
+  kind: "bank"
+  slide "a" {
+    cat: "one"
+    numeric {
+      ask "a?"
+      skill: "s"
+      answer: 1
+    }
+  }
+  slide "b" {
+    cat: "one"
+    numeric {
+      ask "b?"
+      skill: "s"
+      answer: 1
+    }
+  }
+  slide "c" {
+    cat: "two"
+    numeric {
+      ask "c?"
+      skill: "s"
+      answer: 1
+    }
+  }
+  slide "d" {
+    numeric {
+      ask "d?"
+      skill: "s"
+      answer: 1
+    }
+  }
+}`)
+  );
+
+  it('groups runs of the same cat: into rounds', () => {
+    expect(rounds(bank.slides)).toEqual([
+      { label: 'one', start: 0, size: 2 },
+      { label: 'two', start: 2, size: 1 },
+      { label: undefined, start: 3, size: 1 },
+    ]);
+  });
+
+  it('finds the round a question sits in', () => {
+    const list = rounds(bank.slides);
+    expect([0, 1, 2, 3].map((i) => roundAt(list, i))).toEqual([0, 0, 1, 2]);
+    expect(roundAt(list, 9)).toBe(-1);
+  });
+
+  it('jumps anywhere on the path and clamps to it', () => {
+    const from = { ...initialFlow(1), branched: ['x>y'] };
+    expect(jumpTo(bank.slides, from, 3)).toEqual({ ...from, pathIndex: 3 });
+    expect(jumpTo(bank.slides, from, 99).pathIndex).toBe(3);
+    expect(jumpTo(bank.slides, from, -2).pathIndex).toBe(0);
+  });
+
+  it('drops any detour or pending one on a jump', () => {
+    const lesson = lessonSchema.parse(compileLesson(SRC));
+    const inDetour = { ...initialFlow(1), detour: { slideId: 'help-retry', retry: true } };
+    expect(jumpTo(lesson.slides, inDetour, 0)).toMatchObject({ detour: null, pending: null });
   });
 });

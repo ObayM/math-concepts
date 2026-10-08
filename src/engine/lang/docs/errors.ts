@@ -115,4 +115,12 @@ export const PRISM_ERRORS: DocError[] = [
     bad: 'lesson "\u0627\u0644\u0646\u0647\u0627\u064a\u0627\u062a" {\n  slide "\u0627\u0644\u0645\u0634\u062a\u0642\u0629 \u062a\u0642\u064a\u0633 \u0645\u0639\u062f\u0644 \u0627\u0644\u062a\u063a\u064a\u0631" {\n    > \u0646\u0635\n  }\n}',
     good: 'lesson "\u0627\u0644\u0646\u0647\u0627\u064a\u0627\u062a" {\n  slide "\u0627\u0644\u0645\u0634\u062a\u0642\u0629 \u062a\u0642\u064a\u0633 \u0645\u0639\u062f\u0644 \u0627\u0644\u062a\u063a\u064a\u0631" {\n    id: "derivative-intro"\n    > \u0646\u0635\n  }\n}',
   },
+  {
+    code: 'E_BANK_DETOUR',
+    title: 'A bank has no detours',
+    explanation:
+      'A `kind: "bank"` lesson lets the student jump between questions from a grid, so there is no single path for a detour to leave and rejoin. A wrong answer in a bank shows the worked solution instead. Put the fix in the `!` and end it with a link to the lesson that teaches the idea.',
+    bad: 'lesson "Practice" {\n  kind: "bank"\n  slide "Q1" {\n    cat: "Round 1"\n    numeric {\n      ask "2 + 2?"\n      skill: "add"\n      answer: 4\n      onwrong: "help"\n    }\n  }\n  slide "Help" {\n    id: "help"\n    hidden: true\n    > count on your fingers\n  }\n}',
+    good: 'lesson "Practice" {\n  kind: "bank"\n  slide "Q1" {\n    cat: "Round 1"\n    numeric {\n      ask "2 + 2?"\n      skill: "add"\n      answer: 4\n      ! "Two and two make four. [Adding, from the start](lesson:add-1)"\n    }\n  }\n}',
+  },
 ];

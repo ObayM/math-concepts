@@ -100,3 +100,58 @@ describe('the icon registry and the renderer agree', () => {
     }
   });
 });
+
+describe('kind: "bank"', () => {
+  const bank = (slides: string) => `lesson "Practice" {
+  kind: "bank"
+${slides}
+}`;
+  const question = `  slide "Q1" {
+    cat: "Round 1"
+    numeric {
+      ask "2 + 2?"
+      skill: "add"
+      answer: 4
+    }
+  }`;
+
+  it('marks the lesson as a bank', () => {
+    expect(compileLesson(bank(question)).kind).toBe('bank');
+  });
+
+  it('is absent on an ordinary lesson', () => {
+    expect(compileLesson(wrap('')).kind).toBeUndefined();
+  });
+
+  it('only knows banks', () => {
+    expect(() => compileLesson(wrap('  kind: "quiz"'))).toThrow(/must be one of bank/);
+  });
+
+  it('refuses a detour, since a bank has no path to leave and rejoin', () => {
+    const detour = `  slide "Q1" {
+    numeric {
+      ask "2 + 2?"
+      answer: 4
+      onwrong: "help"
+    }
+  }
+  slide "Help" {
+    id: "help"
+    hidden: true
+    > count on your fingers
+  }`;
+    expect(() => compileLesson(bank(detour))).toThrow(/a bank has no detours.*drop onwrong:/);
+    expect(() =>
+      compileLesson(bank(`${question}\n  slide "Aside" {\n    hidden: true\n    > psst\n  }`))
+    ).toThrow(/drop hidden:/);
+  });
+
+  it('wants every slide to be a question with a skill', () => {
+    expect(() => compileLesson(bank(`${question}\n  slide "Note" {\n    > psst\n  }`))).toThrow(
+      /needs an exercise/
+    );
+    expect(() => compileLesson(bank(question.replace('      skill: "add"\n', '')))).toThrow(
+      /needs a skill:/
+    );
+  });
+});

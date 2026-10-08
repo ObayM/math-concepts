@@ -116,6 +116,32 @@ export function back(slides: SlideIR[], state: FlowState): FlowState {
   return state;
 }
 
+export interface Round {
+  label: string | undefined;
+  start: number;
+  size: number;
+}
+
+export function rounds(slides: SlideIR[]): Round[] {
+  const out: Round[] = [];
+  visiblePath(slides).forEach((s, i) => {
+    const last = out[out.length - 1];
+    if (last && last.label === s.category) last.size += 1;
+    else out.push({ label: s.category, start: i, size: 1 });
+  });
+  return out;
+}
+
+export function roundAt(list: Round[], pathIndex: number): number {
+  return list.findIndex((r) => pathIndex >= r.start && pathIndex < r.start + r.size);
+}
+
+export function jumpTo(slides: SlideIR[], state: FlowState, pathIndex: number): FlowState {
+  const last = visiblePath(slides).length - 1;
+  const to = Math.max(0, Math.min(last, Math.floor(pathIndex)));
+  return { ...state, pathIndex: to, detour: null, pending: null };
+}
+
 export function exerciseVisible(
   slide: SlideIR | null | undefined,
   goalsMet: boolean[] = [],

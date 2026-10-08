@@ -26,6 +26,8 @@ export const LESSON_DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as c
 
 export type LessonDifficulty = (typeof LESSON_DIFFICULTIES)[number];
 
+export const LESSON_KINDS = ['bank'] as const;
+
 export const SLIDE_BEATS = [
   'check',
   'bridge',

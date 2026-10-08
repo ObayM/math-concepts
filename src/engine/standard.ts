@@ -307,7 +307,7 @@ export function checkStandard(lesson: LessonIR): Finding[] {
     checkAnswerOnScreen(slide, out);
     checkVoice(slide, out);
   }
-  checkBeats(lesson, out);
+  if (lesson.kind !== 'bank') checkBeats(lesson, out);
   checkRequires(lesson, out);
   return out;
 }

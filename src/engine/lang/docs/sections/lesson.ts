@@ -10,9 +10,9 @@ export const lessonSection: DocSection = {
     {
       keyword: 'lesson',
       syntax:
-        'lesson "Title" {\n  [course: "..."]\n  [unit: "..."]\n  [difficulty: "Beginner"|"Intermediate"|"Advanced"]\n  [icon: "..."]\n  [summary: "..."]\n  [skills: ["...", "..."]]\n  [requires: ["..."]]\n  slide "..." { ... }\n  ...\n}',
+        'lesson "Title" {\n  [course: "..."]\n  [unit: "..."]\n  [difficulty: "Beginner"|"Intermediate"|"Advanced"]\n  [icon: "..."]\n  [summary: "..."]\n  [skills: ["...", "..."]]\n  [requires: ["..."]]\n  [kind: "bank"]\n  slide "..." { ... }\n  ...\n}',
       description:
-        'The top-level container. Holds lesson metadata and an ordered list of slides. These properties are the source of truth for how the lesson appears in the catalog: `unit` groups it under a heading on the course page, `difficulty` and `icon` render on its card, and `summary` is the one-line description. `course` tags which track it belongs to; `skills` lists the skill ids it teaches. `requires` lists the hard prerequisite skills: a `beat: check` slide whose exercise tests one of them is skipped for a student who got that skill right recently, so nobody re-proves what they just showed. An unknown property here is a compile error, so a typo cannot silently drop your metadata.',
+        'The top-level container. Holds lesson metadata and an ordered list of slides. These properties are the source of truth for how the lesson appears in the catalog: `unit` groups it under a heading on the course page, `difficulty` and `icon` render on its card, and `summary` is the one-line description. `course` tags which track it belongs to; `skills` lists the skill ids it teaches. `requires` lists the hard prerequisite skills: a `beat: check` slide whose exercise tests one of them is skipped for a student who got that skill right recently, so nobody re-proves what they just showed. `kind: \"bank\"` makes a practice bank instead of a lesson: many questions the student works through at their own pace across several sittings. Every slide in a bank is a question with a `skill:`, since mastery is what a bank is for. Consecutive slides with the same `cat:` form a round (aim for about 10 questions), the student gets a stop point after each round, and can jump to any question from a grid. A bank has no detours, so a wrong answer shows the `!` worked solution, which should end with a `[link](lesson:key)` back to the lesson that teaches it. Banks are optional on the course page and never block the next lesson, and a bank counts as finished once every question has an answer. An unknown property here is a compile error, so a typo cannot silently drop your metadata.',
       props: [
         { name: 'course', type: 'string', description: 'track id, e.g. "calculus"' },
         { name: 'unit', type: 'string', description: 'unit heading on the course page' },
@@ -32,6 +32,12 @@ export const lessonSection: DocSection = {
           name: 'requires',
           type: 'string[]',
           description: 'hard prerequisite skills; recently mastered ones skip their check slides',
+        },
+        {
+          name: 'kind',
+          type: '"bank"',
+          description:
+            'a practice bank: every slide a skill-tagged question, rounds by cat:, no detours',
         },
       ],
       example:

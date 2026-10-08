@@ -19,7 +19,7 @@ import {
   type Roles,
   type ColorToken,
 } from '@/engine/roles';
-import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from './icons';
+import { LESSON_DIFFICULTIES, LESSON_ICONS, LESSON_KINDS, SLIDE_BEATS } from './icons';
 
 type CompileScope = Record<string, number | boolean>;
 type Macros = Map<string, { params: string[]; body: Stmt[] }>;
@@ -2397,6 +2397,27 @@ function validateSlideFlow(slides: ReturnType<typeof emitSlide>[], stmts: SlideS
     throw new CompileError('a lesson needs at least one slide that is not hidden');
 }
 
+function validateBank(slides: ReturnType<typeof emitSlide>[], stmts: SlideStmt[]) {
+  slides.forEach((s, i) => {
+    const ln = stmts[i].ln;
+    if (s.hidden || exerciseBranches(s.exercise).length)
+      throw new CompileError(
+        `a bank has no detours, a wrong answer shows the worked solution in ! instead, so drop ${s.hidden ? 'hidden:' : 'onwrong:'} here`,
+        ln
+      );
+    if (!s.exercise)
+      throw new CompileError(
+        'every slide in a bank is a question, so this one needs an exercise',
+        ln
+      );
+    if (!(s.exercise.skill ?? s.skill))
+      throw new CompileError(
+        'a bank question needs a skill:, since mastery is what a bank is for',
+        ln
+      );
+  });
+}
+
 export function emitLesson(stmts: Stmt[]): LessonIR {
   const root = stmts[0];
   if (!root || root.k !== 'lesson') throw new CompileError('expected a lesson block');
@@ -2411,6 +2432,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
   const summary = pStr(root.props, 'summary');
   const difficulty = pEnum(root.props, 'difficulty', LESSON_DIFFICULTIES, root.ln);
   const icon = pEnum(root.props, 'icon', LESSON_ICONS, root.ln);
+  const kind = pEnum(root.props, 'kind', LESSON_KINDS, root.ln);
   const roles: Roles = {};
   for (const r of root.roles) {
     if (!isColorToken(r.color))
@@ -2424,6 +2446,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
     roles[r.name] = r.color as ColorToken;
   }
   const slides = root.slides.map((s, i) => emitSlide(s, i, lessonMacros, roles));
+  if (kind === 'bank') validateBank(slides, root.slides);
   validateSlideFlow(slides, root.slides);
   validateMemory(slides, root.slides);
   const ir = {
@@ -2436,6 +2459,7 @@ export function emitLesson(stmts: Stmt[]): LessonIR {
     ...(difficulty && { difficulty }),
     ...(icon && { icon }),
     ...(summary && { summary }),
+    ...(kind && { kind }),
     slides,
   };
 

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { sceneSchema, paneSchema } from './schema';
 import type { SceneIR } from './types';
 import { exprIRSchema } from '@/engine/expr';
-import { LESSON_DIFFICULTIES, LESSON_ICONS, SLIDE_BEATS } from '@/engine/lang/icons';
+import { LESSON_DIFFICULTIES, LESSON_ICONS, LESSON_KINDS, SLIDE_BEATS } from '@/engine/lang/icons';
 
 // the stored IR is a cache of the compiled source, never the record. anything
 // older than this gets recompiled on read rather than migrated. see issue #7.
@@ -198,6 +198,7 @@ export const lessonSchema = z.object({
   difficulty: z.enum(LESSON_DIFFICULTIES).optional(),
   icon: z.enum(LESSON_ICONS).optional(),
   summary: z.string().optional(),
+  kind: z.enum(LESSON_KINDS).optional(),
   slides: z.array(slide).min(1),
 });
 

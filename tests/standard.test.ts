@@ -160,6 +160,17 @@ describe('beats', () => {
   });
 });
 
+describe('banks', () => {
+  const bank = (body: string) =>
+    checkStandard(
+      lessonSchema.parse(compileLesson(`lesson "B" {\n  kind: "bank"\n${body}\n}`))
+    ).map((f) => f.code);
+
+  it('skips the beat checks, a bank is practice and has no story to tell', () => {
+    expect(bank(quizSlide('a', '    beat: name\n    skill: "s"'))).toEqual([]);
+  });
+});
+
 describe('verifyLesson', () => {
   it('keeps the standard as warnings, which never block a publish', () => {
     const found = verifyLesson(lesson(`  slide "s" {\n    > Just words.\n  }`));
