@@ -44,6 +44,7 @@ export async function makePublishedLesson(source: string, overrides: Record<stri
       unit: data.unit ?? null,
       difficulty: data.difficulty ?? null,
       iconName: data.icon ?? null,
+      kind: data.kind ?? null,
       description: data.summary ?? null,
       status: 'published',
       publishedAt: new Date(),
@@ -74,4 +75,20 @@ export const NUMERIC_LESSON = `lesson "Derivatives" {
       skill: "power-rule"
     }
   }
+}`;
+
+export const bankLesson = (questions: number) => `lesson "Practice bank" {
+  kind: "bank"
+${Array.from(
+  { length: questions },
+  (_, i) => `  slide "Q${i + 1}" {
+    id: "q${i + 1}"
+    cat: "Round ${Math.floor(i / 10) + 1}"
+    numeric {
+      ask "What is ${i} + 1?"
+      skill: "counting"
+      answer: ${i + 1}
+    }
+  }`
+).join('\n')}
 }`;

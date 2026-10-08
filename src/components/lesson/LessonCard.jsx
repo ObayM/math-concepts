@@ -34,7 +34,7 @@ const statusConfig = {
 
 export default function LessonCard({ lesson, courseSlug, index, isLast = false }) {
   const t = useT();
-  const { id, title, description, difficulty, status, iconName, isDraft } = lesson;
+  const { id, title, description, difficulty, status, iconName, isDraft, kind } = lesson;
   const Icon = iconMap[iconName] || iconMap['FunctionSquare'];
   const config = statusConfig[status] || statusConfig.locked;
   const isLocked = status === 'locked';
@@ -82,7 +82,11 @@ export default function LessonCard({ lesson, courseSlug, index, isLast = false }
               </Badge>
             )}
             <Badge variant={config.badgeVariant} className="text-xs whitespace-nowrap">
-              {t(config.labelKey)}
+              {t(
+                kind === 'bank' && status === 'unlocked'
+                  ? 'lesson.optionalPractice'
+                  : config.labelKey
+              )}
             </Badge>
             {!isLocked && (
               <ChevronRight

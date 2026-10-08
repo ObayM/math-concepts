@@ -8,8 +8,21 @@ import {
   replayMastery,
   MAX_ANSWER_CHARS,
 } from '@/lib/db/progressService';
-import { XP_ATTEMPT, XP_CORRECT, XP_LESSON_COMPLETE, lessonXpCap } from '@/lib/xp';
-import { makeCourse, makePublishedLesson, makeUser, NUMERIC_LESSON } from '../helpers/factories';
+import {
+  XP_ATTEMPT,
+  XP_CORRECT,
+  XP_LESSON_COMPLETE,
+  XP_BANK_CORRECT,
+  BANK_XP_CAP,
+  lessonXpCap,
+} from '@/lib/xp';
+import {
+  bankLesson,
+  makeCourse,
+  makePublishedLesson,
+  makeUser,
+  NUMERIC_LESSON,
+} from '../helpers/factories';
 
 const attempt = (overrides: Record<string, unknown> = {}) => ({
   title: 'Power rule',
@@ -79,7 +92,6 @@ describe('the answer forgery boundary', () => {
     expect(mastery!.correct).toBe(0);
     expect(mastery!.score).toBe(0);
   });
-
 });
 
 describe('answers kept for going Back', () => {
@@ -438,5 +450,77 @@ describe('resetting a lesson', () => {
 
     expect(after._sum.xp).toBe(before._sum.xp);
     expect(after._sum.xp).toBe(XP_CORRECT);
+  });
+});
+
+describe('bank rewards', () => {
+  const answers = (from: number, to: number) =>
+    Array.from({ length: to - from }, (_, k) => {
+      const i = from + k;
+      return {
+        title: `Q${i + 1}`,
+        question: `What is ${i} + 1?`,
+        slideId: `q${i + 1}`,
+        kind: 'numeric',
+        correct: true,
+        answer: String(i + 1),
+      };
+    });
+
+  it('pays a little per right answer, with no completion bonus', async () => {
+    const user = await makeUser();
+    const bank = await makePublishedLesson(bankLesson(12));
+
+    const first = await upsertLessonProgress(user.id, bank.lessonKey, {
+      currentStep: 3,
+      isCompleted: false,
+      quizHistory: [...answers(0, 2), { ...answers(2, 3)[0], answer: '99' }],
+    });
+    expect(first!.xp).toBe(2 * XP_BANK_CORRECT);
+
+    const done = await upsertLessonProgress(user.id, bank.lessonKey, {
+      currentStep: 3,
+      isCompleted: true,
+      quizHistory: [...answers(0, 2), { ...answers(2, 3)[0], answer: '99' }],
+    });
+    expect(done!.xp).toBe(0);
+  });
+
+  it('caps a big bank flat, while mastery still counts every answer', async () => {
+    const user = await makeUser();
+    const bank = await makePublishedLesson(bankLesson(40));
+
+    const result = await upsertLessonProgress(user.id, bank.lessonKey, {
+      currentStep: 39,
+      isCompleted: true,
+      quizHistory: answers(0, 40),
+    });
+
+    expect(result!.xp).toBe(BANK_XP_CAP);
+    const mastery = await prisma.userSkillMastery.findUnique({
+      where: { userId_skill: { userId: user.id, skill: 'counting' } },
+    });
+    expect(mastery!.attempts).toBe(40);
+  });
+
+  it('is finished once every question has an answer, whatever the client says', async () => {
+    const user = await makeUser();
+    const bank = await makePublishedLesson(bankLesson(3));
+    const row = () =>
+      prisma.userLessonProgress.findFirstOrThrow({ where: { userId: user.id, lessonId: bank.id } });
+
+    await upsertLessonProgress(user.id, bank.lessonKey, {
+      currentStep: 2,
+      isCompleted: true,
+      quizHistory: answers(0, 2),
+    });
+    expect((await row()).completed).toBe(false);
+
+    await upsertLessonProgress(user.id, bank.lessonKey, {
+      currentStep: 2,
+      isCompleted: false,
+      quizHistory: answers(0, 3),
+    });
+    expect((await row()).completed).toBe(true);
   });
 });

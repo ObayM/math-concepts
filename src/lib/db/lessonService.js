@@ -75,7 +75,7 @@ export async function getLessonById(id) {
 export async function getNextLessonKey(courseId, sortOrder) {
   if (!courseId) return null;
   const next = await prisma.lesson.findFirst({
-    where: { courseId, sortOrder: { gt: sortOrder } },
+    where: { courseId, sortOrder: { gt: sortOrder }, status: 'published', kind: null },
     orderBy: { sortOrder: 'asc' },
     select: { lessonKey: true },
   });
@@ -95,7 +95,7 @@ export async function getExercisePoolByCourse(courseId, { lessonIds } = {}) {
   const pool = [];
   for (const lesson of lessons) {
     const parsed = lessonSchema.safeParse(lesson.publishedData);
-    if (!parsed.success) continue;
+    if (!parsed.success || parsed.data.kind === 'bank') continue;
     for (const slide of parsed.data.slides) {
       if (slide.exercise && !slide.hidden) pool.push({ ...slide, lessonKey: lesson.lessonKey });
     }

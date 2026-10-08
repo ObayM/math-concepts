@@ -7,7 +7,7 @@ import {
   xpForAttempts,
   lessonXpCap,
   xpStillOwed,
-  XP_LESSON_COMPLETE,
+  completionXp,
   XP_CORRECT,
   XP_ATTEMPT,
 } from '@/lib/xp';
@@ -20,6 +20,13 @@ export function buildSlideMap(publishedData) {
   if (!parsed.success) return map;
   for (const slide of parsed.data.slides) map.set(slide.id, slide);
   return map;
+}
+
+export function bankFinished(publishedData, history) {
+  const parsed = lessonSchema.safeParse(publishedData);
+  if (!parsed.success) return false;
+  const answered = new Set((Array.isArray(history) ? history : []).map((e) => e.slideId));
+  return parsed.data.slides.every((s) => !s.exercise || answered.has(s.id));
 }
 
 export function countExercises(publishedData) {
@@ -174,6 +181,7 @@ export async function recordPracticeAttempt(userId, lessonKey, slideId, answer, 
     getUserTimeZone(userId),
   ]);
   if (!lesson?.course || lesson.status !== 'published') return null;
+  if (lesson.publishedData?.kind === 'bank') return null;
 
   const slide = buildSlideMap(lesson.publishedData).get(slideId);
   if (!slide?.exercise) return null;
@@ -236,6 +244,7 @@ export async function upsertLessonProgress(
   // topics sit outside the game loop: no xp, no streak, no mastery. their
   // attempts still get recorded, skill-less, so a mastery rebuild can't pick them up.
   const topic = !lesson.course;
+  const kind = lesson.publishedData?.kind ?? null;
   const now = new Date();
 
   let earnedXp = 0;
@@ -272,7 +281,7 @@ export async function upsertLessonProgress(
         for (const v of verified) {
           if (v.skill && !topic) await recordSkillMastery(tx, userId, v.skill, v.correct);
         }
-        earnedXp += xpForAttempts(verified);
+        earnedXp += xpForAttempts(verified, kind);
 
         const seen = new Set(prior.map((e) => e.slideId));
         verifiedQuizHistory = [
@@ -294,10 +303,19 @@ export async function upsertLessonProgress(
       }
     }
 
-    if (isCompleted && !existing?.completed) earnedXp += XP_LESSON_COMPLETE;
+    // a bank has no last slide to finish on, so it is done once every question has an answer
+    const finishing =
+      kind === 'bank'
+        ? !existing?.completed &&
+          bankFinished(
+            lesson.publishedData,
+            quizHistory !== undefined ? verifiedQuizHistory : existing?.quizHistory
+          )
+        : isCompleted;
+    if (finishing && !existing?.completed) earnedXp += completionXp(kind);
 
     const alreadyAwarded = existing?.xpAwarded ?? 0;
-    const cap = lessonXpCap(countExercises(lesson.publishedData));
+    const cap = lessonXpCap(countExercises(lesson.publishedData), kind);
     earnedXp = topic ? 0 : xpStillOwed(earnedXp, alreadyAwarded, cap);
 
     await tx.userLessonProgress.upsert({
@@ -306,7 +324,7 @@ export async function upsertLessonProgress(
         currentStep,
         lastPlayedAt: now,
         xpAwarded: alreadyAwarded + earnedXp,
-        ...(isCompleted && { completed: true, completedAt: now }),
+        ...(finishing && { completed: true, completedAt: now }),
         ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
       },
       create: {
@@ -315,7 +333,7 @@ export async function upsertLessonProgress(
         currentStep,
         lastPlayedAt: now,
         xpAwarded: earnedXp,
-        ...(isCompleted && { completed: true, completedAt: now }),
+        ...(finishing && { completed: true, completedAt: now }),
         ...(quizHistory !== undefined && { quizHistory: verifiedQuizHistory }),
       },
     });

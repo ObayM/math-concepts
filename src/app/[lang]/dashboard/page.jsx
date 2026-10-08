@@ -86,7 +86,7 @@ const DashboardPage = async ({ params }) => {
   const progressByLessonKey = new Map(progressRows.map((p) => [p.lesson.lessonKey, p]));
 
   const allLessons = await prisma.lesson.findMany({
-    where: { courseId: { in: courses.map((c) => c.id) }, status: 'published' },
+    where: { courseId: { in: courses.map((c) => c.id) }, status: 'published', kind: null },
     orderBy: { sortOrder: 'asc' },
   });
   const lessonsByCourse = new Map();

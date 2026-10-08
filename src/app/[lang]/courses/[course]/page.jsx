@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { resolveCourseBySlug, courseUrlSlug } from '@/lib/db/courseService';
 import { getFullSession, isAdmin } from '@/lib/authz';
 import { getT } from '@/lib/i18n/server';
+import { isBank, lessonStatuses } from '@/lib/unlock';
 
 export default async function CoursePage({ params }) {
   const { course: courseSlug, lang } = await params;
@@ -29,10 +30,7 @@ export default async function CoursePage({ params }) {
       },
     });
     progressData.forEach((p) => {
-      progressMap.set(p.lesson.lessonKey, {
-        is_completed: p.completed,
-        current_step: p.currentStep,
-      });
+      progressMap.set(p.lesson.lessonKey, { completed: p.completed, currentStep: p.currentStep });
     });
   }
 
@@ -41,27 +39,17 @@ export default async function CoursePage({ params }) {
     orderBy: { sortOrder: 'asc' },
   });
 
-  const lessonsWithProgress = lessons.map((lesson, index) => {
-    const progress = progressMap.get(lesson.lessonKey);
-    const isCompleted = progress?.is_completed;
-    const isStarted = (progress?.current_step ?? 0) > 0;
+  const statuses = lessonStatuses(lessons, (key) => progressMap.get(key), viewerIsAdmin);
+  const lessonsWithProgress = lessons.map((lesson, index) => ({
+    ...lesson,
+    id: lesson.lessonKey,
+    status: statuses[index],
+    isDraft: lesson.status !== 'published',
+  }));
 
-    let status = 'locked';
-    if (isCompleted) {
-      status = 'completed';
-    } else if (index === 0) {
-      status = 'unlocked';
-    } else {
-      const prevKey = lessons[index - 1].lessonKey;
-      if (progressMap.get(prevKey)?.is_completed) status = 'unlocked';
-    }
-    if (status === 'locked' && (isStarted || viewerIsAdmin)) status = 'unlocked';
-
-    return { ...lesson, id: lesson.lessonKey, status, isDraft: lesson.status !== 'published' };
-  });
-
-  const completedCount = lessonsWithProgress.filter((l) => l.status === 'completed').length;
-  const pct = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0;
+  const core = lessonsWithProgress.filter((l) => !isBank(l));
+  const completedCount = core.filter((l) => l.status === 'completed').length;
+  const pct = core.length ? Math.round((completedCount / core.length) * 100) : 0;
   const slug = courseUrlSlug(course);
 
   const groups = [];
@@ -97,7 +85,7 @@ export default async function CoursePage({ params }) {
             <div className="min-w-0 flex-1">
               <div className="mb-1.5 flex items-center justify-between text-sm">
                 <span className="text-neutral-500">
-                  {t('course.completedOf', { done: completedCount, total: lessons.length })}
+                  {t('course.completedOf', { done: completedCount, total: core.length })}
                 </span>
                 <span className="font-bold text-neutral-700">{pct}%</span>
               </div>
@@ -125,7 +113,8 @@ export default async function CoursePage({ params }) {
 
         <div className="mt-12">
           {groups.map((group, gi) => {
-            const groupCompleted = group.lessons.filter((l) => l.status === 'completed').length;
+            const groupCore = group.lessons.filter((l) => !isBank(l));
+            const groupCompleted = groupCore.filter((l) => l.status === 'completed').length;
             return (
               <div key={group.unit ?? `ungrouped-${gi}`}>
                 {group.unit && (
@@ -140,9 +129,11 @@ export default async function CoursePage({ params }) {
                         {group.unit}
                       </h2>
                     </div>
-                    <p className="shrink-0 text-xs font-bold text-neutral-400">
-                      {groupCompleted} / {group.lessons.length}
-                    </p>
+                    {groupCore.length > 0 && (
+                      <p className="shrink-0 text-xs font-bold text-neutral-400">
+                        {groupCompleted} / {groupCore.length}
+                      </p>
+                    )}
                   </div>
                 )}
                 {group.lessons.map((lesson, i) => (

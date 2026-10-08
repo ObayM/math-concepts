@@ -129,6 +129,7 @@ model Lesson {
   unit            String?
   difficulty      String?
   iconName        String?       @map("icon_name")
+  kind            String?
   sortOrder       Int           @default(0) @map("sort_order")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")

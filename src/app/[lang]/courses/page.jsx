@@ -22,12 +22,12 @@ export default async function CoursesPage({ params }) {
     where: { status: 'published', lang },
     orderBy: { sortOrder: 'asc' },
     include: {
-      _count: { select: { lessons: { where: { status: 'published' } } } },
+      _count: { select: { lessons: { where: { status: 'published', kind: null } } } },
     },
   });
 
   const lessonUnits = await prisma.lesson.findMany({
-    where: { courseId: { in: courses.map((c) => c.id) }, status: 'published' },
+    where: { courseId: { in: courses.map((c) => c.id) }, status: 'published', kind: null },
     select: { courseId: true, unit: true },
   });
   const unitsByCourse = new Map();

@@ -226,6 +226,7 @@ export async function publishLesson(id, { force = false } = {}) {
       publishedSource: lesson.source,
       publishedData: compiled.data,
       ...derivedMetadata(compiled.data),
+      kind: compiled.data.kind ?? null,
       status: 'published',
       publishedAt: new Date(),
     },

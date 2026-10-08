@@ -9,6 +9,10 @@ import {
   DAILY_GOAL_XP,
   XP_WARMUP_CORRECT,
   WARMUP_DAILY_XP_CAP,
+  XP_BANK_CORRECT,
+  BANK_XP_CAP,
+  lessonXpCap,
+  completionXp,
 } from '@/lib/xp';
 
 describe('xpForAttempts', () => {
@@ -109,5 +113,22 @@ describe('goalProgress', () => {
   it('falls back to the default goal if handed a nonsense one', () => {
     expect(goalProgress(10, 0).goal).toBe(DAILY_GOAL_XP);
     expect(goalProgress(10, -5).goal).toBe(DAILY_GOAL_XP);
+  });
+});
+
+describe('banks', () => {
+  it('pays a little for each right answer and nothing for a wrong one', () => {
+    expect(xpForAttempts([{ correct: true }, { correct: false }], 'bank')).toBe(XP_BANK_CORRECT);
+  });
+
+  it('has a flat cap that does not grow with the number of questions', () => {
+    expect(lessonXpCap(10, 'bank')).toBe(BANK_XP_CAP);
+    expect(lessonXpCap(150, 'bank')).toBe(BANK_XP_CAP);
+    expect(lessonXpCap(150)).toBeGreaterThan(BANK_XP_CAP);
+  });
+
+  it('gives no completion bonus', () => {
+    expect(completionXp('bank')).toBe(0);
+    expect(completionXp(null)).toBe(XP_LESSON_COMPLETE);
   });
 });

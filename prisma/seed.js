@@ -171,6 +171,7 @@ async function main() {
           unit: data.unit ?? null,
           difficulty: data.difficulty ?? null,
           iconName: data.icon ?? null,
+          kind: data.kind ?? null,
           sortOrder: i + 1,
           publishedSource: source,
           publishedData: data,
