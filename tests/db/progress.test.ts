@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import {
+  getLessonProgress,
   upsertLessonProgress,
   recordPracticeAttempt,
   resetLessonProgress,
@@ -134,6 +135,74 @@ describe('replays and repeat submissions', () => {
     });
 
     expect(await prisma.lessonAttempt.count({ where: { userId: user.id } })).toBe(2);
+  });
+
+  it('keeps recording after a resume, when the client starts from the stored history', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 1,
+      isCompleted: false,
+      quizHistory: [attempt({ answer: '12' })],
+    });
+    const { quizHistory: stored } = await getLessonProgress(user.id, lesson.lessonKey);
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 2,
+      isCompleted: false,
+      quizHistory: [...(stored as never[]), attempt({ slideId: 'pick', kind: 'quiz', answer: 0 })],
+    });
+
+    expect(await prisma.lessonAttempt.count({ where: { userId: user.id } })).toBe(2);
+    const after = await getLessonProgress(user.id, lesson.lessonKey);
+    expect((after.quizHistory as { slideId: string }[]).map((e) => e.slideId)).toEqual([
+      'power',
+      'pick',
+    ]);
+  });
+
+  it('never lets a shorter history from a stale client wipe what is stored', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 2,
+      isCompleted: false,
+      quizHistory: [
+        attempt({ answer: '12' }),
+        attempt({ slideId: 'pick', kind: 'quiz', answer: 0 }),
+      ],
+    });
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 2,
+      isCompleted: false,
+      quizHistory: [attempt({ answer: '12' })],
+    });
+
+    const after = await getLessonProgress(user.id, lesson.lessonKey);
+    expect(after.quizHistory).toHaveLength(2);
+  });
+
+  it('builds history from its own copy, not from what the client says happened earlier', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 1,
+      isCompleted: false,
+      quizHistory: [attempt({ answer: '5' })],
+    });
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 2,
+      isCompleted: false,
+      quizHistory: [
+        attempt({ answer: '5', correct: true }),
+        attempt({ slideId: 'pick', kind: 'quiz', answer: 0 }),
+      ],
+    });
+
+    const after = await getLessonProgress(user.id, lesson.lessonKey);
+    expect((after.quizHistory as { correct: boolean }[])[0].correct).toBe(false);
   });
 
   it('pays the completion bonus once', async () => {

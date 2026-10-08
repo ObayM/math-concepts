@@ -230,8 +230,9 @@ export async function upsertLessonProgress(
     });
 
     if (quizHistory !== undefined) {
-      const priorLength = Array.isArray(existing?.quizHistory) ? existing.quizHistory.length : 0;
-      const newAttempts = quizHistory.slice(priorLength);
+      const prior = Array.isArray(existing?.quizHistory) ? existing.quizHistory : [];
+      const newAttempts = quizHistory.slice(prior.length);
+      verifiedQuizHistory = prior;
 
       if (newAttempts.length) {
         const slideMap = buildSlideMap(lesson.publishedData);
@@ -255,7 +256,7 @@ export async function upsertLessonProgress(
         earnedXp += xpForAttempts(verified);
 
         verifiedQuizHistory = [
-          ...quizHistory.slice(0, priorLength),
+          ...prior,
           ...verified.map(({ title, question, slideId, kind, correct }) => ({
             title,
             question,

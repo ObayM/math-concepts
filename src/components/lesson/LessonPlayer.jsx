@@ -157,11 +157,11 @@ export default function LessonPlayer({
           setFlow(initialFlow(skipTo));
           setSkippedTo(skipTo);
         }
-        if (Array.isArray(d.quizHistory)) setMemory(memoryFromHistory(slides, d.quizHistory));
-        if (d.completed) {
-          setIsComplete(true);
-          if (Array.isArray(d.quizHistory)) setQuizHistory(d.quizHistory);
+        if (Array.isArray(d.quizHistory)) {
+          setMemory(memoryFromHistory(slides, d.quizHistory));
+          setQuizHistory(d.quizHistory);
         }
+        if (d.completed) setIsComplete(true);
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
