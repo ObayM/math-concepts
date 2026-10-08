@@ -6,6 +6,7 @@ import {
   recordPracticeAttempt,
   resetLessonProgress,
   replayMastery,
+  MAX_ANSWER_CHARS,
 } from '@/lib/db/progressService';
 import { XP_ATTEMPT, XP_CORRECT, XP_LESSON_COMPLETE, lessonXpCap } from '@/lib/xp';
 import { makeCourse, makePublishedLesson, makeUser, NUMERIC_LESSON } from '../helpers/factories';
@@ -79,18 +80,64 @@ describe('the answer forgery boundary', () => {
     expect(mastery!.score).toBe(0);
   });
 
-  it('never persists the raw submitted answer into quizHistory', async () => {
+});
+
+describe('answers kept for going Back', () => {
+  it('stores the answer and variant, so a reload can show them again', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 2,
+      isCompleted: false,
+      quizHistory: [
+        attempt({ answer: '12', variant: 'v.token' }),
+        attempt({ slideId: 'pick', kind: 'quiz', answer: 1 }),
+      ],
+    });
+
+    const { quizHistory } = await getLessonProgress(user.id, lesson.lessonKey);
+    const [power, pick] = quizHistory as { answer?: unknown; variant?: string }[];
+    expect(power.answer).toBe('12');
+    expect(power.variant).toBe('v.token');
+    expect(pick.answer).toBe(1);
+    expect(pick.variant).toBeUndefined();
+  });
+
+  it('drops an answer too big to keep but still records the attempt', async () => {
     const user = await makeUser();
     const lesson = await makePublishedLesson(NUMERIC_LESSON);
 
     await upsertLessonProgress(user.id, lesson.lessonKey, {
       currentStep: 1,
       isCompleted: false,
-      quizHistory: [attempt({ answer: '12' })],
+      quizHistory: [attempt({ answer: '1'.repeat(MAX_ANSWER_CHARS + 1) })],
     });
 
-    const row = await prisma.userLessonProgress.findFirst({ where: { userId: user.id } });
-    expect(JSON.stringify(row!.quizHistory)).not.toContain('answer');
+    const { quizHistory } = await getLessonProgress(user.id, lesson.lessonKey);
+    const [entry] = quizHistory as { answer?: unknown; slideId: string }[];
+    expect(entry.slideId).toBe('power');
+    expect(entry).not.toHaveProperty('answer');
+    expect(await prisma.lessonAttempt.count({ where: { userId: user.id } })).toBe(1);
+  });
+
+  it('keeps one answer per real exercise, however many entries arrive', async () => {
+    const user = await makeUser();
+    const lesson = await makePublishedLesson(NUMERIC_LESSON);
+
+    await upsertLessonProgress(user.id, lesson.lessonKey, {
+      currentStep: 1,
+      isCompleted: false,
+      quizHistory: [
+        attempt({ answer: '12' }),
+        attempt({ answer: '13' }),
+        attempt({ slideId: 'made-up', answer: '14' }),
+      ],
+    });
+
+    const { quizHistory } = await getLessonProgress(user.id, lesson.lessonKey);
+    const answers = (quizHistory as { answer?: unknown }[]).map((e) => e.answer);
+    expect(answers).toEqual(['12', undefined, undefined]);
   });
 });
 

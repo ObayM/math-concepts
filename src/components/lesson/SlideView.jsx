@@ -61,7 +61,7 @@ export default function SlideView({
     setStep({ slideId: slide.id, idx });
     onStepChange(idx);
   };
-  const shown = exerciseVisible(slide, goalsMet, stepIdx);
+  const shown = checked || exerciseVisible(slide, goalsMet, stepIdx);
   const showMe = (i) => {
     const goal = slide.goals?.[i];
     if (!goal?.showme) return;

@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { compileLesson } from '@/engine/lang';
-import { buildSlideMap, verifyAttempts } from '@/lib/db/progressService';
+import {
+  buildSlideMap,
+  verifyAttempts,
+  storableAnswer,
+  MAX_SKETCH_POINTS,
+  MAX_ANSWER_CHARS,
+} from '@/lib/db/progressService';
 
 // this is the mastery/attempts trust boundary: a client can send whatever
 // `correct` flag it wants, but only the server-recomputed value should ever
@@ -79,6 +85,21 @@ describe('verifyAttempts', () => {
     expect(wrong.correct).toBe(false);
   });
 
+  it('passes the answer and variant through for the history entry', () => {
+    const [result] = verifyAttempts(slideMap, [
+      {
+        slideId: numericSlide.id,
+        kind: 'numeric',
+        question: '2+2',
+        correct: true,
+        answer: '4',
+        variant: 'v.token',
+      },
+    ]);
+    expect(result.answer).toBe('4');
+    expect(result.variant).toBe('v.token');
+  });
+
   it('defaults to incorrect when the slideId is unknown or missing', () => {
     const [unknown, missing] = verifyAttempts(slideMap, [
       { slideId: 'not-a-real-slide', kind: 'quiz', question: '?', correct: true, answer: 1 },
@@ -86,5 +107,26 @@ describe('verifyAttempts', () => {
     ]);
     expect(unknown.correct).toBe(false);
     expect(missing.correct).toBe(false);
+  });
+});
+
+describe('storableAnswer', () => {
+  it('keeps small answers as they are', () => {
+    expect(storableAnswer('numeric', '4')).toBe('4');
+    expect(storableAnswer('quiz', 0)).toBe(0);
+    expect(storableAnswer('match', ['a', null])).toEqual(['a', null]);
+  });
+
+  it('thins a long sketch down, keeping both ends', () => {
+    const drawn = Array.from({ length: 1000 }, (_, i) => [i / 10, Math.sin(i / 100)]);
+    const kept = storableAnswer('sketch', drawn) as number[][];
+    expect(kept).toHaveLength(MAX_SKETCH_POINTS);
+    expect(kept[0]).toEqual(drawn[0]);
+    expect(kept.at(-1)).toEqual(drawn.at(-1));
+  });
+
+  it('drops anything still too big, and anything that is not json', () => {
+    expect(storableAnswer('numeric', '1'.repeat(MAX_ANSWER_CHARS))).toBeUndefined();
+    expect(storableAnswer('numeric', undefined)).toBeUndefined();
   });
 });

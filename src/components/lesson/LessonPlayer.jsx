@@ -35,6 +35,18 @@ const PAD_KEY = 'mathly-scratchpad-open';
 
 const getChecker = (s) => (s?.exercise ? (exercises[s.exercise.kind] ?? null) : null);
 
+const restorable = (slides, flow, slide, past) => {
+  if (past?.answer === undefined || past.kind !== slide.exercise.kind) return null;
+  if (varies(slide) && !past.variant) return null;
+  const shown = past.variant ? instantiate(slide, seedOf(past.variant)) : slide;
+  const correct = getChecker(slide).check(shown, past.answer);
+  // a wrong answer whose detour never ran stays open, so Back can't skip the detour
+  if (stageBranch(slides, { ...flow, pending: null }, correct, past.answer, shown).pending) {
+    return null;
+  }
+  return past;
+};
+
 export default function LessonPlayer({
   slides = [],
   lessonId,
@@ -54,6 +66,7 @@ export default function LessonPlayer({
   const [goalsState, setGoalsState] = useState({ slideId: null, met: [] });
   const [stepState, setStepState] = useState({ key: null, idx: 0 });
   const [quizHistory, setQuizHistory] = useState([]);
+  const [lastTry, setLastTry] = useState({});
   const [memory, setMemory] = useState(emptyMemory);
   const [variant, setVariant] = useState({ key: null, token: null });
   const [isComplete, setIsComplete] = useState(false);
@@ -97,7 +110,7 @@ export default function LessonPlayer({
   }, [slide, needsVariant, variantToken]);
 
   useEffect(() => {
-    if (!needsVariant) return;
+    if (!needsVariant || variantToken) return;
     let live = true;
     const land = (token) => live && setVariant({ key: currentKey, token });
     fetch('/api/variant', {
@@ -111,7 +124,7 @@ export default function LessonPlayer({
     return () => {
       live = false;
     };
-  }, [currentKey, needsVariant, lessonId, slide?.id]);
+  }, [currentKey, needsVariant, variantToken, lessonId, slide?.id]);
 
   useEffect(() => {
     if (shownKeyRef.current !== null && shownKeyRef.current !== currentKey) {
@@ -160,12 +173,13 @@ export default function LessonPlayer({
         if (Array.isArray(d.quizHistory)) {
           setMemory(memoryFromHistory(slides, d.quizHistory));
           setQuizHistory(d.quizHistory);
+          if (d.quizHistory.some((e) => e.slideId === path[0]?.id)) setResetForKey(null);
         }
         if (d.completed) setIsComplete(true);
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
-  }, [lessonId, path.length, slides, skipTo]);
+  }, [lessonId, path, slides, skipTo]);
 
   const skipNextSaveRef = useRef(true);
   useEffect(() => {
@@ -203,10 +217,27 @@ export default function LessonPlayer({
   }, [topic]);
 
   const [resetForKey, setResetForKey] = useState(null);
+  const [retryKey, setRetryKey] = useState(null);
   if (resetForKey !== currentKey) {
     setResetForKey(currentKey);
-    setAnswer(checker ? checker.initial(slide) : null);
-    setChecked(false);
+    const retrying = retryKey === currentKey;
+    if (retryKey !== null) setRetryKey(null);
+    const past =
+      checker && !inDetour && !retrying
+        ? restorable(
+            slides,
+            flow,
+            slide,
+            lastTry[slide.id] ?? quizHistory.find((e) => e.slideId === slide.id)
+          )
+        : null;
+    setAnswer(past ? past.answer : checker ? checker.initial(slide) : null);
+    setChecked(Boolean(past));
+    if (past?.variant) setVariant({ key: currentKey, token: past.variant });
+    else if (retrying) setVariant({ key: null, token: null });
+    if (past && slide.goals?.length) {
+      setGoalsState({ slideId: slide.id, met: slide.goals.map(() => true) });
+    }
     setTutorOpen(false);
     setTutorTurns([]);
     setTutorError(null);
@@ -287,17 +318,23 @@ export default function LessonPlayer({
 
   const handleNext = () => {
     const { state, complete } = nextFlow(slides, flow);
+    const retrying = Boolean(flow.detour?.retry) && !state.detour;
     tracker.track(complete ? 'complete' : 'next', slideId);
-    runTransition(flow.detour?.retry && !slide?.then ? 'left' : 'right', () => {
+    runTransition(retrying ? 'left' : 'right', () => {
       setFlow(state);
+      if (retrying) setRetryKey(slideKey(state));
       if (complete) setIsComplete(true);
     });
     if (complete) markComplete();
   };
 
   const handleBack = () => {
+    const state = backFlow(slides, flow);
     tracker.track('back', slideId);
-    runTransition('left', () => setFlow(backFlow(slides, flow)));
+    runTransition('left', () => {
+      setFlow(state);
+      if (flow.detour?.retry) setRetryKey(slideKey(state));
+    });
   };
 
   const handleCheck = () => {
@@ -308,6 +345,10 @@ export default function LessonPlayer({
     setFlow((f) => stageBranch(slides, f, correct, answer, played));
     setMemory((m) => remember(m, played, answer));
     const question = played.exercise?.prompt ?? slide.title ?? '';
+    setLastTry((m) => ({
+      ...m,
+      [slide.id]: { kind: slide.exercise?.kind, answer, ...(variantToken && { variant: variantToken }) },
+    }));
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;
       return [
@@ -404,6 +445,8 @@ export default function LessonPlayer({
     setSkippedTo(0);
     setResetForKey(null);
     setQuizHistory([]);
+    setLastTry({});
+    setVariant({ key: null, token: null });
     setMemory(emptyMemory());
     setIsComplete(false);
     setChecked(false);

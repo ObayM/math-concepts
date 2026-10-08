@@ -40,6 +40,23 @@ export function gradeAnswer(slide, answer, variant, { userId, lessonKey } = {}) 
   return Boolean(checker.check(instantiate(slide, seed), answer));
 }
 
+export const MAX_SKETCH_POINTS = 200;
+export const MAX_ANSWER_CHARS = 8000;
+
+const thin = (points, max) => {
+  const step = (points.length - 1) / (max - 1);
+  return Array.from({ length: max }, (_, i) => points[Math.round(i * step)]);
+};
+
+export function storableAnswer(kind, answer) {
+  const kept =
+    kind === 'sketch' && Array.isArray(answer) && answer.length > MAX_SKETCH_POINTS
+      ? thin(answer, MAX_SKETCH_POINTS)
+      : answer;
+  const json = JSON.stringify(kept);
+  return json !== undefined && json.length <= MAX_ANSWER_CHARS ? kept : undefined;
+}
+
 export function verifyAttempts(slideMap, attempts, who = {}) {
   return attempts.map((a) => {
     const slide = a.slideId ? slideMap.get(a.slideId) : null;
@@ -50,6 +67,8 @@ export function verifyAttempts(slideMap, attempts, who = {}) {
       kind: a.kind ?? null,
       skill: slide?.exercise?.skill ?? slide?.skill ?? null,
       correct: gradeAnswer(slide, a.answer, a.variant, who),
+      answer: slide?.exercise ? storableAnswer(slide.exercise.kind, a.answer) : undefined,
+      variant: typeof a.variant === 'string' ? a.variant : undefined,
     };
   });
 }
@@ -255,15 +274,22 @@ export async function upsertLessonProgress(
         }
         earnedXp += xpForAttempts(verified);
 
+        const seen = new Set(prior.map((e) => e.slideId));
         verifiedQuizHistory = [
           ...prior,
-          ...verified.map(({ title, question, slideId, kind, correct }) => ({
-            title,
-            question,
-            slideId,
-            kind,
-            correct,
-          })),
+          ...verified.map(({ title, question, slideId, kind, correct, answer, variant }) => {
+            const first = !seen.has(slideId);
+            seen.add(slideId);
+            return {
+              title,
+              question,
+              slideId,
+              kind,
+              correct,
+              ...(first && answer !== undefined && { answer }),
+              ...(first && variant && { variant }),
+            };
+          }),
         ];
       }
     }
