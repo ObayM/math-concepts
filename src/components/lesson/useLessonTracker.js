@@ -180,5 +180,10 @@ export default function useLessonTracker(lessonKey) {
     };
   }, [lessonKey, push, flush, drain, leaveSlide]);
 
-  return useMemo(() => ({ track, enterSlide, control }), [track, enterSlide, control]);
+  const leave = useCallback(() => leaveSlide(Date.now()), [leaveSlide]);
+
+  return useMemo(
+    () => ({ track, enterSlide, leave, control }),
+    [track, enterSlide, leave, control]
+  );
 }

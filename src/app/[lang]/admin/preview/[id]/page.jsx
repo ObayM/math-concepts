@@ -40,6 +40,7 @@ export default async function LessonPreviewPage({ params, searchParams }) {
           coursePath={`admin/content`}
           nextLessonId={null}
           skipTo={skipTo}
+          kind={parsed.data.kind}
         />
       </MathNotationProvider>
     </div>

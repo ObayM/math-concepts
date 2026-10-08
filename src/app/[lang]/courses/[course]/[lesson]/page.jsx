@@ -81,6 +81,7 @@ export default async function LessonPage({ params, searchParams }) {
       coursePath={course}
       nextLessonId={nextLessonId}
       skipTo={skipTo}
+      kind={parsed.data.kind}
     />
   );
 }

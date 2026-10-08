@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { Sparkles, RotateCcw, Send, PencilLine } from 'lucide-react';
+import { Sparkles, RotateCcw, Send, PencilLine, LayoutGrid } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -19,6 +19,9 @@ import {
   canGoBack,
   stageBranch,
   exerciseVisible,
+  rounds as roundsOf,
+  roundAt,
+  jumpTo,
   next as nextFlow,
   back as backFlow,
 } from '@/engine/runtime/flow';
@@ -26,6 +29,8 @@ import {
 import RichText from './RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
 import SlideView from './SlideView';
+import QuestionGrid from './QuestionGrid';
+import RoundBreak from './RoundBreak';
 import Scratchpad from './scratchpad/Scratchpad';
 import useScratchpad from './scratchpad/useScratchpad';
 import useLessonTracker from './useLessonTracker';
@@ -54,6 +59,7 @@ export default function LessonPlayer({
   topic = false,
   nextLessonId,
   skipTo = 0,
+  kind = null,
 }) {
   const router = useRouter();
   const t = useT();
@@ -75,6 +81,7 @@ export default function LessonPlayer({
   const [saveError, setSaveError] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const [skippedTo, setSkippedTo] = useState(0);
+  const [roundBreak, setRoundBreak] = useState(null);
 
   const [padOpen, setPadOpen] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -94,10 +101,18 @@ export default function LessonPlayer({
   const headingRef = useRef(null);
   const shownKeyRef = useRef(null);
   const transcriptRef = useRef(null);
+  const frontierRef = useRef(0);
 
   const path = useMemo(() => visiblePath(slides), [slides]);
+  const bank = kind === 'bank';
+  const rounds = useMemo(() => (bank ? roundsOf(slides) : []), [bank, slides]);
+  const results = useMemo(
+    () => new Map(quizHistory.map((e) => [e.slideId, e.correct])),
+    [quizHistory]
+  );
   const slide = useMemo(() => activeSlide(slides, flow), [slides, flow]);
   const pathIndex = flow.pathIndex;
+  const roundIdx = bank ? roundAt(rounds, pathIndex) : -1;
   const inDetour = Boolean(flow.detour);
   const currentKey = slideKey(flow);
   const isLast = !inDetour && pathIndex === path.length - 1;
@@ -127,16 +142,21 @@ export default function LessonPlayer({
   }, [currentKey, needsVariant, variantToken, lessonId, slide?.id]);
 
   useEffect(() => {
+    if (roundBreak) {
+      shownKeyRef.current = '';
+      return;
+    }
     if (shownKeyRef.current !== null && shownKeyRef.current !== currentKey) {
       headingRef.current?.focus({ preventScroll: true });
     }
     shownKeyRef.current = currentKey;
-  }, [currentKey]);
+  }, [currentKey, roundBreak]);
 
   const slideId = slide?.id;
   useEffect(() => {
-    if (slideId) tracker.enterSlide(slideId, inDetour ? { detour: true } : undefined);
-  }, [currentKey, slideId, inDetour, tracker]);
+    if (roundBreak) tracker.leave();
+    else if (slideId) tracker.enterSlide(slideId, inDetour ? { detour: true } : undefined);
+  }, [currentKey, slideId, inDetour, roundBreak, tracker]);
 
   const pad = useScratchpad(lessonId, slide?.id, () => setSaveError(true));
 
@@ -165,6 +185,7 @@ export default function LessonPlayer({
     fetch(`/api/progress?lessonKey=${lessonId}`)
       .then((r) => r.json())
       .then((d) => {
+        frontierRef.current = d.currentStep ?? 0;
         if (d.currentStep > 0 && d.currentStep < path.length) setFlow(initialFlow(d.currentStep));
         else if (!d.completed && skipTo > 0 && skipTo < path.length) {
           setFlow(initialFlow(skipTo));
@@ -175,11 +196,11 @@ export default function LessonPlayer({
           setQuizHistory(d.quizHistory);
           if (d.quizHistory.some((e) => e.slideId === path[0]?.id)) setResetForKey(null);
         }
-        if (d.completed) setIsComplete(true);
+        if (d.completed && !bank) setIsComplete(true);
         setProgressLoaded(true);
       })
       .catch(() => setProgressLoaded(true));
-  }, [lessonId, path, slides, skipTo]);
+  }, [lessonId, path, slides, skipTo, bank]);
 
   const skipNextSaveRef = useRef(true);
   useEffect(() => {
@@ -188,12 +209,14 @@ export default function LessonPlayer({
       skipNextSaveRef.current = false;
       return;
     }
+    // a bank resumes at the furthest question reached, so going back to review doesn't move it
+    if (bank) frontierRef.current = Math.max(frontierRef.current, pathIndex);
     fetch('/api/progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lessonKey: lessonId,
-        currentStep: pathIndex,
+        currentStep: bank ? frontierRef.current : pathIndex,
         isCompleted: false,
         quizHistory,
       }),
@@ -204,7 +227,7 @@ export default function LessonPlayer({
         if (d?.xp) setXpEarned((x) => x + d.xp);
       })
       .catch(() => setSaveError(true));
-  }, [pathIndex, quizHistory, lessonId, progressLoaded]);
+  }, [pathIndex, quizHistory, lessonId, progressLoaded, bank]);
 
   useEffect(() => {
     if (topic) return;
@@ -319,13 +342,30 @@ export default function LessonPlayer({
   const handleNext = () => {
     const { state, complete } = nextFlow(slides, flow);
     const retrying = Boolean(flow.detour?.retry) && !state.detour;
-    tracker.track(complete ? 'complete' : 'next', slideId);
+    const skipping = bank && checker && !checked;
+    if (bank && complete) {
+      tracker.track(skipping ? 'skip' : 'next', slideId);
+      setRoundBreak({ finished: roundIdx });
+      return;
+    }
+    tracker.track(complete ? 'complete' : skipping ? 'skip' : 'next', slideId);
     runTransition(retrying ? 'left' : 'right', () => {
       setFlow(state);
       if (retrying) setRetryKey(slideKey(state));
       if (complete) setIsComplete(true);
+      else if (bank && roundAt(rounds, state.pathIndex) !== roundIdx) {
+        setRoundBreak({ finished: roundIdx });
+      }
     });
     if (complete) markComplete();
+  };
+
+  const handleJump = (index) => {
+    if (index !== pathIndex) tracker.track('jump', slideId, { to: path[index]?.id.slice(0, 64) });
+    runTransition(index < pathIndex ? 'left' : 'right', () => {
+      setRoundBreak(null);
+      setFlow(jumpTo(slides, flow, index));
+    });
   };
 
   const handleBack = () => {
@@ -347,7 +387,11 @@ export default function LessonPlayer({
     const question = played.exercise?.prompt ?? slide.title ?? '';
     setLastTry((m) => ({
       ...m,
-      [slide.id]: { kind: slide.exercise?.kind, answer, ...(variantToken && { variant: variantToken }) },
+      [slide.id]: {
+        kind: slide.exercise?.kind,
+        answer,
+        ...(variantToken && { variant: variantToken }),
+      },
     }));
     setQuizHistory((h) => {
       if (h.some((e) => e.slideId === slide.id)) return h;
@@ -443,6 +487,8 @@ export default function LessonPlayer({
     fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
     setFlow(initialFlow(0));
     setSkippedTo(0);
+    setRoundBreak(null);
+    frontierRef.current = 0;
     setResetForKey(null);
     setQuizHistory([]);
     setLastTry({});
@@ -489,10 +535,29 @@ export default function LessonPlayer({
     );
   }
 
+  if (roundBreak) {
+    return (
+      <div className="-mt-[var(--nav-h)] min-h-dvh pt-[var(--nav-h)] flex items-center justify-center">
+        <Card className="card-hero animate-fade-in-up w-full max-w-5xl min-h-[500px] max-md:min-h-0 rounded-3xl md:max-h-[calc(100dvh-var(--nav-h)-1.5rem)] overflow-y-auto">
+          <RoundBreak
+            rounds={rounds}
+            finished={roundBreak.finished}
+            path={path}
+            results={results}
+            current={pathIndex}
+            onJump={handleJump}
+            onResume={() => setRoundBreak(null)}
+            onStop={handleBackToCourse}
+          />
+        </Card>
+      </div>
+    );
+  }
+
   const goalsMet =
     goalsState.slideId === slide?.id ? goalsState.met : (slide?.goals ?? []).map(() => false);
   const goalsSatisfied = !slide?.goals?.length || goalsMet.every(Boolean);
-  const canAdvance = (!checker || checked) && goalsSatisfied;
+  const canAdvance = (!checker || checked || bank) && goalsSatisfied;
   const questionShown = exerciseVisible(
     slide,
     goalsMet,
@@ -507,7 +572,7 @@ export default function LessonPlayer({
         : flow.detour.retry
           ? t('lesson.tryAgain')
           : t('lesson.gotIt')
-      : isLast
+      : isLast && !bank
         ? t('lesson.complete')
         : t('lesson.continue');
 
@@ -580,31 +645,53 @@ export default function LessonPlayer({
       >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="pt-8 px-10 pb-2 flex items-center justify-between max-md:pt-4 max-md:px-4 max-md:gap-3">
-            <div
-              className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
-              role="progressbar"
-              aria-label={t('lesson.progressAria')}
-              aria-valuemin={1}
-              aria-valuemax={path.length}
-              aria-valuenow={pathIndex + 1}
-              aria-valuetext={t(inDetour ? 'lesson.detourOf' : 'lesson.slideOf', {
-                n: pathIndex + 1,
-                total: path.length,
-              })}
-            >
-              {path.map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`flex-1 rounded-full transition-all duration-500 ${
-                    inDetour && idx === pathIndex
-                      ? 'bg-primary-200'
-                      : idx <= pathIndex
-                        ? 'bg-primary-500'
-                        : 'bg-neutral-200'
-                  }`}
+            {bank ? (
+              <div className="flex-1 mx-8 max-md:mx-0">
+                <button
+                  type="button"
+                  onClick={() => setRoundBreak({ finished: null })}
+                  title={t('bank.overview')}
+                  className="tap-target-h flex items-center gap-1.5 text-xs font-bold text-neutral-400 transition-colors hover:text-primary-600"
+                >
+                  {t('bank.roundOf', { n: roundIdx + 1, total: rounds.length })}
+                  {rounds[roundIdx]?.label ? ` · ${rounds[roundIdx].label}` : ''}
+                  <LayoutGrid className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                </button>
+                <QuestionGrid
+                  path={path}
+                  round={rounds[roundIdx]}
+                  current={pathIndex}
+                  results={results}
+                  onJump={handleJump}
                 />
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div
+                className="flex-1 mx-8 flex space-x-1 h-2 max-md:mx-0"
+                role="progressbar"
+                aria-label={t('lesson.progressAria')}
+                aria-valuemin={1}
+                aria-valuemax={path.length}
+                aria-valuenow={pathIndex + 1}
+                aria-valuetext={t(inDetour ? 'lesson.detourOf' : 'lesson.slideOf', {
+                  n: pathIndex + 1,
+                  total: path.length,
+                })}
+              >
+                {path.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex-1 rounded-full transition-all duration-500 ${
+                      inDetour && idx === pathIndex
+                        ? 'bg-primary-200'
+                        : idx <= pathIndex
+                          ? 'bg-primary-500'
+                          : 'bg-neutral-200'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
             <div className="flex shrink-0 items-center gap-2">
               {padButton}
               {mobileChrome}
@@ -680,13 +767,20 @@ export default function LessonPlayer({
               </button>
 
               {checker && !checked && questionShown ? (
-                <Button
-                  onClick={handleCheck}
-                  variant="primary"
-                  disabled={!checker.isComplete(slide, answer)}
-                >
-                  {t('lesson.check')}
-                </Button>
+                <>
+                  {bank && (
+                    <Button onClick={handleNext} variant="ghost">
+                      {t('bank.skip')}
+                    </Button>
+                  )}
+                  <Button
+                    onClick={handleCheck}
+                    variant="primary"
+                    disabled={!checker.isComplete(slide, answer)}
+                  >
+                    {t('lesson.check')}
+                  </Button>
+                </>
               ) : (
                 <Button onClick={handleNext} variant="primary" disabled={!canAdvance}>
                   {nextLabel}

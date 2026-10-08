@@ -77,6 +77,7 @@ export default async function TopicPage({ params, searchParams }) {
       topic
       nextLessonId={null}
       skipTo={skipTo}
+      kind={parsed.data.kind}
     />
   );
 }
