@@ -31,11 +31,10 @@ export default function NumericExercise({
       </RichText>
 
       <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative flex-1 max-w-xs" dir="ltr">
           <input
             type="text"
             inputMode="decimal"
-            dir="ltr"
             value={text}
             disabled={checked}
             onChange={(e) => onChange(e.target.value)}
