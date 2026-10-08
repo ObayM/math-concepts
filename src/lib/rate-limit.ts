@@ -21,6 +21,7 @@ export const TIERS = {
   progress: { max: 60, perMin: 60 },
   notes: { max: 60, perMin: 60 },
   activity: { max: 60, perMin: 60 },
+  events: { max: 60, perMin: 60 },
   profile: { max: 10, perMin: 10 },
   settings: { max: 10, perMin: 10 },
   username: { max: 5, perMin: 5 },

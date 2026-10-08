@@ -4,7 +4,7 @@ import { Lightbulb } from 'lucide-react';
 import RichText from './RichText';
 import { useT } from '@/components/i18n/LocaleProvider';
 
-export default function HintLadder({ hints, disabled = false }) {
+export default function HintLadder({ hints, disabled = false, onReveal = () => {} }) {
   const t = useT();
   const [shown, setShown] = useState(0);
   if (!hints?.length) return null;
@@ -22,7 +22,10 @@ export default function HintLadder({ hints, disabled = false }) {
       ))}
       {shown < hints.length && !disabled && (
         <button
-          onClick={() => setShown((n) => n + 1)}
+          onClick={() => {
+            setShown(shown + 1);
+            onReveal(shown + 1);
+          }}
           className="tap-target-h flex items-center gap-2 text-sm font-bold text-neutral-500 transition-colors hover:text-primary-600"
         >
           <Lightbulb className="h-4 w-4" />

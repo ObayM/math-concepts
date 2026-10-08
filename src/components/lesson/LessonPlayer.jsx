@@ -28,6 +28,7 @@ import { useT } from '@/components/i18n/LocaleProvider';
 import SlideView from './SlideView';
 import Scratchpad from './scratchpad/Scratchpad';
 import useScratchpad from './scratchpad/useScratchpad';
+import useLessonTracker from './useLessonTracker';
 import { exercises } from './exercises';
 
 const PAD_KEY = 'mathly-scratchpad-open';
@@ -44,6 +45,7 @@ export default function LessonPlayer({
 }) {
   const router = useRouter();
   const t = useT();
+  const tracker = useLessonTracker(lessonId);
 
   const [flow, setFlow] = useState(() => initialFlow(0));
   const [slideDir, setSlideDir] = useState('right');
@@ -117,6 +119,11 @@ export default function LessonPlayer({
     }
     shownKeyRef.current = currentKey;
   }, [currentKey]);
+
+  const slideId = slide?.id;
+  useEffect(() => {
+    if (slideId) tracker.enterSlide(slideId, inDetour ? { detour: true } : undefined);
+  }, [currentKey, slideId, inDetour, tracker]);
 
   const pad = useScratchpad(lessonId, slide?.id, () => setSaveError(true));
 
@@ -280,6 +287,7 @@ export default function LessonPlayer({
 
   const handleNext = () => {
     const { state, complete } = nextFlow(slides, flow);
+    tracker.track(complete ? 'complete' : 'next', slideId);
     runTransition(flow.detour?.retry && !slide?.then ? 'left' : 'right', () => {
       setFlow(state);
       if (complete) setIsComplete(true);
@@ -288,6 +296,7 @@ export default function LessonPlayer({
   };
 
   const handleBack = () => {
+    tracker.track('back', slideId);
     runTransition('left', () => setFlow(backFlow(slides, flow)));
   };
 
@@ -295,6 +304,7 @@ export default function LessonPlayer({
     if (!checker || !played) return;
     setChecked(true);
     const correct = checker.check(played, answer);
+    tracker.track('check', slide.id, { correct, kind: slide.exercise?.kind });
     setFlow((f) => stageBranch(slides, f, correct, answer, played));
     setMemory((m) => remember(m, played, answer));
     const question = played.exercise?.prompt ?? slide.title ?? '';
@@ -321,6 +331,7 @@ export default function LessonPlayer({
   };
 
   const handleScopeChange = (scope) => {
+    tracker.control();
     scopeRef.current = scope;
     setMemory((m) => keepFromScope(m, slide, scope));
     const goals = slide?.goals;
@@ -340,6 +351,7 @@ export default function LessonPlayer({
     const question = tutorQuery.trim();
     if (!question || tutorStreaming || !slide) return;
 
+    tracker.track('tutor_ask', slide.id);
     const history = tutorTurns;
     setTutorQuery('');
     setTutorError(null);
@@ -386,6 +398,7 @@ export default function LessonPlayer({
 
   const handleReset = () => {
     if (!confirm(t('lesson.restart'))) return;
+    tracker.track('reset', slideId);
     fetch(`/api/progress?lessonKey=${lessonId}`, { method: 'DELETE' }).catch(console.error);
     setFlow(initialFlow(0));
     setSkippedTo(0);
@@ -592,6 +605,8 @@ export default function LessonPlayer({
                   revealAnswer={!flow.pending?.retry}
                   onStepChange={(idx) => setStepState({ key: currentKey, idx })}
                   memory={memory}
+                  onHint={(level) => tracker.track('hint', slideId, { level })}
+                  onShowMe={(goal) => tracker.track('show_me', slideId, { goal })}
                 />
                 <div aria-live="polite" className="sr-only">
                   {checked &&
@@ -609,7 +624,10 @@ export default function LessonPlayer({
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setTutorOpen((o) => !o)}
+                onClick={() => {
+                  if (!tutorOpen) tracker.track('tutor_open', slideId);
+                  setTutorOpen((o) => !o);
+                }}
                 className="tap-target text-neutral-400 hover:text-primary-600 transition-colors p-2 rounded-xl hover:bg-primary-50 flex items-center justify-center"
                 title={t('lesson.askTutor')}
                 aria-label={t('lesson.askTutor')}

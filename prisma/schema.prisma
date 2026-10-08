@@ -39,6 +39,7 @@ model User {
   warmupAnswers   WarmupAnswer[]
   slideNotes      UserSlideNote[]
   aiUsage         AiUsage[]
+  lessonEvents    LessonEvent[]
 
   @@map("user")
 }
@@ -138,6 +139,7 @@ model Lesson {
   progress   UserLessonProgress[]
   attempts   LessonAttempt[]
   slideNotes UserSlideNote[]
+  events     LessonEvent[]
 
   @@index([courseId])
   @@index([status])
@@ -212,6 +214,27 @@ model LessonAttempt {
   @@index([userId, skill, createdAt])
   @@index([userId, createdAt])
   @@map("lesson_attempts")
+}
+
+model LessonEvent {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  lessonId  String   @map("lesson_id")
+  sessionId String   @map("session_id")
+  slideId   String?  @map("slide_id")
+  type      String
+  clientAt  DateTime @map("client_at")
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([lessonId, createdAt])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("lesson_events")
 }
 
 // an audit row must outlive the thing it describes, so nothing here is a

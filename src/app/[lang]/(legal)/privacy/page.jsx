@@ -9,7 +9,7 @@ export default function PrivacyPage() {
   return (
     <>
       <h1 className="font-display text-4xl font-bold tracking-tight text-neutral-900">Privacy</h1>
-      <p className="mt-2 text-sm text-neutral-400">Last updated 27 July 2026</p>
+      <p className="mt-2 text-sm text-neutral-400">Last updated 8 October 2026</p>
 
       <Section title="What we store">
         Your email and password (hashed, never in plain text), the username you pick, and an
@@ -17,6 +17,13 @@ export default function PrivacyPage() {
         have played, the answers you submitted, how confident we are in each skill, and a per-day
         count of the XP you earned. We record your browser&apos;s timezone so streaks roll over at
         your midnight rather than ours.
+      </Section>
+
+      <Section title="How you move through a lesson">
+        While you play a lesson we log what you do in it: which slide you are on and for how long,
+        when you check an answer, open a hint, go back, or leave the tab. We never log what you type
+        or where your mouse goes. We keep this for 90 days and use it only to make lessons shorter
+        and clearer.
       </Section>
 
       <Section title="What we do with it">

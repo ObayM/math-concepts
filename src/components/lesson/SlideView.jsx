@@ -49,6 +49,8 @@ export default function SlideView({
   revealAnswer = true,
   onStepChange = () => {},
   memory = NO_MEMORY,
+  onHint = () => {},
+  onShowMe = () => {},
 }) {
   const t = useT();
   const slide = withMemory(source, memory);
@@ -62,7 +64,9 @@ export default function SlideView({
   const shown = exerciseVisible(slide, goalsMet, stepIdx);
   const showMe = (i) => {
     const goal = slide.goals?.[i];
-    if (goal?.showme) setCommand({ id: Date.now(), slideId: slide.id, ...goal.showme });
+    if (!goal?.showme) return;
+    setCommand({ id: Date.now(), slideId: slide.id, ...goal.showme });
+    onShowMe(i);
   };
   const Exercise = slide.exercise && shown ? exerciseRegistry[slide.exercise.kind] : null;
 
@@ -127,7 +131,12 @@ export default function SlideView({
             revealAnswer={revealAnswer}
           />
           <div className="mt-4">
-            <HintLadder key={slide.id} hints={slide.exercise.hints} disabled={checked} />
+            <HintLadder
+              key={slide.id}
+              hints={slide.exercise.hints}
+              disabled={checked}
+              onReveal={onHint}
+            />
           </div>
         </div>
       )}

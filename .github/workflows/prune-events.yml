@@ -1,0 +1,19 @@
+name: Prune lesson events
+
+on:
+  schedule:
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Drop interaction events past the retention window
+        run: |
+          code=$(curl -sS -o /tmp/out.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://en.${{ secrets.APP_DOMAIN }}/api/cron/prune-events")
+          echo "status: $code"
+          cat /tmp/out.json
+          test "$code" = "200"
