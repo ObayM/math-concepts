@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
+    'videos/**',
   ]),
   {
     // typescript catches undefined identifiers in .ts/.tsx, and nothing catches
