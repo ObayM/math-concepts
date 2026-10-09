@@ -140,6 +140,7 @@ const COURSES = [
       'ar-calc-8',
       'ar-calc-6',
       'ar-calc-10',
+      'ar-calc-bank-5',
     ],
   },
 ];
